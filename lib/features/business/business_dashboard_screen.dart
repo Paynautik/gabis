@@ -13,6 +13,15 @@ class BusinessDashboardScreen extends ConsumerStatefulWidget {
 class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  // Tax Calculator state
+  final _taxAmountController = TextEditingController(text: '500000');
+  String _selectedServiceType = 'Consulting / Professional Services (5% WHT)';
+  double _calculatedVat = 37500.0;
+  double _calculatedWht = 25000.0;
+  double _calculatedNet = 475000.0;
+  bool _isRemittingTax = false;
+  String _selectedTaxCountry = 'Nigeria 🇳🇬';
+
   // Invoice creator state
   final _invoicePromptController = TextEditingController(text: 'Create an invoice for ABC Technologies for ₦450,000 for cloud consulting.');
   Map<String, String>? _draftedInvoice;
@@ -78,7 +87,7 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -279,7 +288,8 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
           tabs: const [
             Tab(text: 'Overview & Forecast'),
             Tab(text: 'AI Reconciliation'),
-            Tab(text: 'Invoicing & Payroll'),
+            Tab(text: 'Invoices & Installments'),
+            Tab(text: 'Tax & Compliance'),
             Tab(text: 'Developer & Search'),
           ],
         ),
@@ -290,6 +300,7 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
           _buildOverviewTab(isDesktop),
           _buildReconciliationTab(),
           _buildInvoicingPayrollTab(isDesktop),
+          _buildTaxComplianceTab(isDesktop),
           _buildDeveloperTab(isDesktop),
         ],
       ),
@@ -677,6 +688,10 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
   // ============================================================
   // TAB 3: INVOICING & PAYROLL
   // ============================================================
+
+  // ============================================================
+  // TAB 3: INVOICES & INSTALLMENTS lifecycle operations
+  // ============================================================
   Widget _buildInvoicingPayrollTab(bool isDesktop) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
@@ -688,13 +703,21 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
               children: [
                 Expanded(flex: 5, child: _buildInvoiceAssistantCard()),
                 const SizedBox(width: 24),
-                Expanded(flex: 5, child: _buildPayrollRunnerCard()),
+                Expanded(flex: 5, child: Column(
+                  children: [
+                    _buildInstallmentLedgerCard(),
+                    const SizedBox(height: 24),
+                    _buildRefundManagerCard(),
+                  ],
+                )),
               ],
             )
           else ...[
             _buildInvoiceAssistantCard(),
             const SizedBox(height: 24),
-            _buildPayrollRunnerCard(),
+            _buildInstallmentLedgerCard(),
+            const SizedBox(height: 24),
+            _buildRefundManagerCard(),
           ],
         ],
       ),
@@ -721,7 +744,7 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
           ),
           const SizedBox(height: 12),
           const Text(
-            'Type a sentence to automatically draft a completed invoice using Elumo\'s semantic parser.',
+            "Type a sentence to automatically draft a completed invoice using Elumo's semantic parser.",
             style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, height: 1.35),
           ),
           const SizedBox(height: 20),
@@ -818,7 +841,470 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
     );
   }
 
-  Widget _buildPayrollRunnerCard() {
+  Widget _buildInstallmentLedgerCard() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.payment_rounded, color: Color(0xFF22D3EE), size: 20),
+              SizedBox(width: 8),
+              Text('Installment & Receivables Ledger', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Track customer installment milestones, outstanding balances, payment deadlines, and service cut-offs.',
+            style: TextStyle(color: Color(0xFF64748B), fontSize: 11.5, height: 1.35),
+          ),
+          const SizedBox(height: 20),
+          
+          _installmentRow(
+            name: 'Mwangi Kamau',
+            service: 'Photography Consulting',
+            amountPaid: 'KES 100,000',
+            amountRemaining: 'KES 50,000',
+            deadline: '3 days remaining',
+            color: const Color(0xFF22D3EE),
+            actionText: 'Send Reminder',
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Payment reminder dispatched to Mwangi Kamau: "Sarah\'s KES 50,000 installment is due in 3 days."')),
+              );
+            },
+          ),
+          const Divider(color: Colors.white10, height: 24),
+          _installmentRow(
+            name: 'Sarah Okafor',
+            service: 'E-commerce Audit',
+            amountPaid: '₦50,000',
+            amountRemaining: '₦50,000',
+            deadline: 'OVERDUE (1d)',
+            color: Colors.redAccent,
+            actionText: 'Review Service Status',
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: const Color(0xFF0F172A),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                  title: const Text('Review Service Status', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  content: const Text(
+                    'Sarah Okafor\'s installment deadline has passed. Review the customer\'s service status.',
+                    style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13.5, height: 1.4),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Restrict Client Access', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Extend Deadline', style: TextStyle(color: Color(0xFF2563EB), fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _installmentRow({
+    required String name,
+    required String service,
+    required String amountPaid,
+    required String amountRemaining,
+    required String deadline,
+    required Color color,
+    required String actionText,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(name, style: const TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.bold)),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
+              child: Text(deadline, style: TextStyle(color: color, fontSize: 9.5, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 3),
+        Text(service, style: const TextStyle(color: Color(0xFF64748B), fontSize: 11)),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('PAID TO DATE', style: TextStyle(color: Color(0xFF475569), fontSize: 8.5, fontWeight: FontWeight.bold)),
+                Text(amountPaid, style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('REMAINING DUE', style: TextStyle(color: Color(0xFF475569), fontSize: 8.5, fontWeight: FontWeight.bold)),
+                Text(amountRemaining, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+              ],
+            ),
+            ElevatedButton(
+              onPressed: onTap,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: color.withValues(alpha: 0.15),
+                foregroundColor: color,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: Text(actionText, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRefundManagerCard() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.assignment_return_rounded, color: Color(0xFF10B981), size: 20),
+              SizedBox(width: 8),
+              Text('Refund Policy & Deadline Tracker', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          const Text(
+            'Monitor refund windows and return policies. Receive alerts before customer refund deadlines expire.',
+            style: TextStyle(color: Color(0xFF64748B), fontSize: 11.5, height: 1.35),
+          ),
+          const SizedBox(height: 20),
+          
+          _refundRow(
+            customer: 'Funke Adebayo',
+            policy: '14-day full return policy',
+            timeRemaining: '2 days remaining',
+            color: const Color(0xFF10B981),
+            amount: '₦150,000.00',
+            actionText: 'Send e-Receipt',
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('e-Receipt dispatch completed. Reference locked under transaction ledger.')),
+              );
+            },
+          ),
+          const Divider(color: Colors.white10, height: 24),
+          _refundRow(
+            customer: 'Amara Diallo',
+            policy: '7-day cancellation policy',
+            timeRemaining: '4 days remaining',
+            color: const Color(0xFF22D3EE),
+            amount: 'GHS 420.00',
+            actionText: 'Process Refund',
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Refund request initiated. Settlement scheduled instantly.')),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _refundRow({
+    required String customer,
+    required String policy,
+    required String timeRemaining,
+    required Color color,
+    required String amount,
+    required String actionText,
+    required VoidCallback onTap,
+  }) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(customer, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 2),
+            Text(policy, style: const TextStyle(color: Color(0xFF64748B), fontSize: 10.5)),
+            const SizedBox(height: 6),
+            Text(amount, style: const TextStyle(color: Colors.white70, fontSize: 12.5, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
+              child: Text(timeRemaining, style: TextStyle(color: color, fontSize: 9.5, fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: onTap,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: color.withValues(alpha: 0.15),
+                foregroundColor: color,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: Text(actionText, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+
+  // ============================================================
+  // TAB 4: TAX & PAN-AFRICAN COMPLIANCE HUB
+  // ============================================================
+  String _getTaxAuthority() {
+    if (_selectedTaxCountry.contains('Kenya')) return 'KRA';
+    if (_selectedTaxCountry.contains('Ghana')) return 'GRA';
+    if (_selectedTaxCountry.contains('South')) return 'SARS';
+    return 'FIRS';
+  }
+
+  String _getTaxCurrency() {
+    if (_selectedTaxCountry.contains('Kenya')) return 'KES ';
+    if (_selectedTaxCountry.contains('Ghana')) return 'GHS ';
+    if (_selectedTaxCountry.contains('South')) return 'ZAR ';
+    return '₦';
+  }
+
+  double _getVatRate() {
+    if (_selectedTaxCountry.contains('Kenya')) return 0.16; // 16% standard VAT
+    if (_selectedTaxCountry.contains('Ghana')) return 0.15; // 15% standard VAT
+    if (_selectedTaxCountry.contains('South')) return 0.15; // 15% standard VAT
+    return 0.075; // 7.5% standard VAT Nigeria
+  }
+
+  List<String> _getServiceOptions() {
+    if (_selectedTaxCountry.contains('Kenya')) {
+      return const [
+        'Professional / Management Services (5% WHT)',
+        'Contractual / Construction Services (3% WHT)',
+        'Consultancy & Agency Fees (10% WHT)',
+      ];
+    } else if (_selectedTaxCountry.contains('Ghana')) {
+      return const [
+        'Professional / Consulting Services (7.5% WHT)',
+        'Works & Construction Contracts (5% WHT)',
+        'Supply of Goods / Commodities (3% WHT)',
+      ];
+    } else if (_selectedTaxCountry.contains('South')) {
+      return const [
+        'Services by Non-Residents (15% WHT)',
+        'Royalties & Interest Payments (10% WHT)',
+        'Dividends & Corporate Payouts (5% WHT)',
+      ];
+    } else {
+      return const [
+        'Consulting / Professional Services (5% WHT)',
+        'Corporate Supplies / Goods (2.5% WHT)',
+        'Construction / Building Contracts (10% WHT)',
+      ];
+    }
+  }
+
+  void _recalculateTax(String val) {
+    final amt = double.tryParse(val.replaceAll(',', '').trim()) ?? 0.0;
+    double whtPercent = 0.05; // Default Consulting
+
+    if (_selectedServiceType.contains('15%')) {
+      whtPercent = 0.15;
+    } else if (_selectedServiceType.contains('10%')) {
+      whtPercent = 0.10;
+    } else if (_selectedServiceType.contains('7.5%')) {
+      whtPercent = 0.075;
+    } else if (_selectedServiceType.contains('5%')) {
+      whtPercent = 0.05;
+    } else if (_selectedServiceType.contains('3%')) {
+      whtPercent = 0.03;
+    } else if (_selectedServiceType.contains('2.5%')) {
+      whtPercent = 0.025;
+    }
+
+    setState(() {
+      _calculatedVat = amt * _getVatRate();
+      _calculatedWht = amt * whtPercent;
+      _calculatedNet = amt - _calculatedWht;
+    });
+  }
+
+  void _executeFirsRemittance() async {
+    setState(() => _isRemittingTax = true);
+    await Future.delayed(const Duration(seconds: 2));
+    if (!mounted) return;
+    setState(() => _isRemittingTax = false);
+
+    final auth = _getTaxAuthority();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF0F172A),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: const BoxDecoration(color: Color(0xFF10B981), shape: BoxShape.circle),
+              child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Text('$auth Remitted', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          'Tax remittance payment successfully processed. $auth e-receipt generated and logged under certificate clearance ledger. Ref: $auth-TX-9082A.',
+          style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13.5, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Download Receipt', style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK', style: TextStyle(color: Color(0xFF2563EB), fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaxComplianceTab(bool isDesktop) {
+    final auth = _getTaxAuthority();
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          // Pan-African Country Selector & Summary Card
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E293B),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Tax Jurisdiction:', style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.bold)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0F172A),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          dropdownColor: const Color(0xFF0F172A),
+                          value: _selectedTaxCountry,
+                          items: const [
+                            DropdownMenuItem(value: 'Nigeria 🇳🇬', child: Text('Nigeria 🇳🇬 (FIRS)', style: TextStyle(color: Colors.white, fontSize: 12))),
+                            DropdownMenuItem(value: 'Kenya 🇰🇪', child: Text('Kenya 🇰🇪 (KRA)', style: TextStyle(color: Colors.white, fontSize: 12))),
+                            DropdownMenuItem(value: 'Ghana 🇬🇭', child: Text('Ghana 🇬🇭 (GRA)', style: TextStyle(color: Colors.white, fontSize: 12))),
+                            DropdownMenuItem(value: 'South Africa 🇿🇦', child: Text('South Africa 🇿🇦 (SARS)', style: TextStyle(color: Colors.white, fontSize: 12))),
+                          ],
+                          onChanged: (val) {
+                            if (val != null) {
+                              setState(() {
+                                _selectedTaxCountry = val;
+                                _selectedServiceType = _getServiceOptions().first;
+                                _recalculateTax(_taxAmountController.text);
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(color: Colors.white10, height: 24),
+                Row(
+                  children: [
+                    CircularProgressIndicator(
+                      value: 0.98,
+                      strokeWidth: 6,
+                      color: const Color(0xFF10B981),
+                      backgroundColor: Colors.white.withValues(alpha: 0.05),
+                    ),
+                    const SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('$auth Tax Compliance Score: 98%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Your business is fully compliant with tax mandates. Next local $auth Tax Clearance Certificate (TCC) review scheduled.',
+                            style: TextStyle(color: Colors.white.withValues(alpha: 0.6), fontSize: 11.5, height: 1.35),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          
+          if (isDesktop)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 5, child: _buildTaxCalculatorCard()),
+                const SizedBox(width: 24),
+                Expanded(flex: 5, child: _buildTaxLedgerCard()),
+              ],
+            )
+          else ...[
+            _buildTaxCalculatorCard(),
+            const SizedBox(height: 24),
+            _buildTaxLedgerCard(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaxCalculatorCard() {
+    final auth = _getTaxAuthority();
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -830,111 +1316,193 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
-                children: [
-                  Icon(Icons.hub_rounded, color: Color(0xFF10B981), size: 20),
-                  SizedBox(width: 8),
-                  Text('Global Payroll Runner', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(12)),
-                child: const Text('150+ Countries supported', style: TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.bold)),
-              ),
+              const Icon(Icons.calculate_rounded, color: Color(0xFF22D3EE), size: 20),
+              const SizedBox(width: 8),
+              Text('$auth WHT & VAT Calculator', style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
             ],
           ),
-          const SizedBox(height: 16),
-          const Text(
-            'Disburse salaries, bonuses, and contractor payments globally inside a unified ledger instantly.',
-            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, height: 1.35),
+          const SizedBox(height: 12),
+          Text(
+            'Calculate mandatory Withholding Tax (WHT) and Value Added Tax (VAT) deductions under current local $auth regulations.',
+            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12, height: 1.35),
           ),
           const SizedBox(height: 20),
-          _buildDarkField(
-            label: 'Employee Full Name / ID',
-            hint: 'e.g. Sarah Jenkins',
-            controller: _employeeNameController,
+          
+          // Dropdown selector for service type
+          const Text('Transaction Service Type', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 6),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFF070F1E),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                dropdownColor: const Color(0xFF0F172A),
+                value: _selectedServiceType,
+                items: _getServiceOptions().map((String opt) {
+                  return DropdownMenuItem<String>(
+                    value: opt,
+                    child: Text(opt, style: const TextStyle(color: Colors.white, fontSize: 11.5), overflow: TextOverflow.ellipsis),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() {
+                      _selectedServiceType = val;
+                      _recalculateTax(_taxAmountController.text);
+                    });
+                  }
+                },
+              ),
+            ),
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Destination Country', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF070F1E),
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String>(
-                          dropdownColor: const Color(0xFF0F172A),
-                          value: _selectedCountry,
-                          items: const [
-                            DropdownMenuItem(value: 'Nigeria 🇳🇬', child: Text('Nigeria 🇳🇬', style: TextStyle(color: Colors.white, fontSize: 12))),
-                            DropdownMenuItem(value: 'Ghana 🇬🇭', child: Text('Ghana 🇬🇭', style: TextStyle(color: Colors.white, fontSize: 12))),
-                            DropdownMenuItem(value: 'Kenya 🇰🇪', child: Text('Kenya 🇰🇪', style: TextStyle(color: Colors.white, fontSize: 12))),
-                            DropdownMenuItem(value: 'United Kingdom 🇬🇧', child: Text('United Kingdom 🇬🇧', style: TextStyle(color: Colors.white, fontSize: 12))),
-                            DropdownMenuItem(value: 'United States 🇺🇸', child: Text('United States 🇺🇸', style: TextStyle(color: Colors.white, fontSize: 12))),
-                          ],
-                          onChanged: (val) {
-                            if (val != null) {
-                              setState(() {
-                                _selectedCountry = val;
-                                if (val.contains('Nigeria')) _selectedCurrency = 'NGN';
-                                else if (val.contains('Ghana')) _selectedCurrency = 'GHS';
-                                else if (val.contains('Kenya')) _selectedCurrency = 'KES';
-                                else if (val.contains('Kingdom')) _selectedCurrency = 'GBP';
-                                else if (val.contains('States')) _selectedCurrency = 'USD';
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 4,
-                child: _buildDarkField(
-                  label: 'Payout Amount ($_selectedCurrency)',
-                  hint: 'e.g. 2500',
-                  controller: _amountController,
-                  keyboardType: TextInputType.number,
-                ),
-              ),
-            ],
+          
+          _buildDarkField(
+            label: 'Invoice Gross Amount (${_getTaxCurrency().trim()})',
+            hint: 'e.g. 500000',
+            controller: _taxAmountController,
+            keyboardType: TextInputType.number,
           ),
           const SizedBox(height: 24),
+          
+          // Real-time calculation summary block
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.02),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+            ),
+            child: Column(
+              children: [
+                _taxRow('VAT Collected (' + (_getVatRate() * 100).toStringAsFixed(1) + '%)', _getTaxCurrency() + _calculatedVat.toStringAsFixed(2), const Color(0xFF10B981)),
+                const SizedBox(height: 8),
+                _taxRow('WHT Deducted', _getTaxCurrency() + _calculatedWht.toStringAsFixed(2), const Color(0xFFFBBF24)),
+                const Divider(color: Colors.white10, height: 24),
+                _taxRow('Net Invoice Payable', _getTaxCurrency() + _calculatedNet.toStringAsFixed(2), const Color(0xFF22D3EE), isBold: true),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          
           SizedBox(
             width: double.infinity,
-            height: 48,
+            height: 44,
             child: ElevatedButton(
-              onPressed: _isProcessingPayroll ? null : _executeDisbursement,
+              onPressed: () {
+                _recalculateTax(_taxAmountController.text);
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2563EB),
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: _isProcessingPayroll
-                  ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                  : const Text('Execute Payroll Payout', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              child: const Text('Calculate Taxes', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5)),
             ),
           ),
         ],
       ),
     );
   }
+
+  Widget _taxRow(String label, String value, Color color, {bool isBold = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontWeight: FontWeight.bold)),
+        Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontSize: isBold ? 15 : 13,
+            fontWeight: isBold ? FontWeight.w900 : FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTaxLedgerCard() {
+    final auth = _getTaxAuthority();
+    final cur = _getTaxCurrency().trim();
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Auto-Deducted $auth Ledger', style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          Text(
+            'Local $auth-compliant audit ledger showing VAT collections and WHT certificates associated with client transfers.',
+            style: const TextStyle(color: Color(0xFF64748B), fontSize: 11.5, height: 1.35),
+          ),
+          const SizedBox(height: 20),
+          
+          _taxLedgerRow('Acme Ltd (Server Migration)', '$cur 250,000 gross', 'WHT Deducted: $cur 12,500', 'VAT: $cur 18,750'),
+          const Divider(color: Colors.white10),
+          _taxLedgerRow('Funke Adebayo (Baking Flour Supply)', '$cur 150,000 gross', 'WHT Deducted: $cur 3,750', 'VAT: $cur 11,250'),
+          const Divider(color: Colors.white10),
+          _taxLedgerRow('Access Partner Payout (Suppliers)', '$cur 1,200,000 gross', 'WHT Withheld: $cur 60,000', 'VAT Exempted'),
+          
+          const SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton.icon(
+              onPressed: _isRemittingTax ? null : _executeFirsRemittance,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF10B981),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              icon: _isRemittingTax
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  : const Icon(Icons.account_balance_rounded, size: 16),
+              label: Text('Remit Pending Taxes to $auth', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5)),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _taxLedgerRow(String title, String gross, String wht, String vat) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(title, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+              Text(gross, style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 11.5, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(wht, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+              Text(vat, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
 
   // ============================================================
   // TAB 4: DEVELOPER & SEMANTIC SEARCH
