@@ -238,7 +238,7 @@ class HeroSection extends StatelessWidget {
         ),
         const SizedBox(height: 25),
         const Text(
-          'Get paid.\nStay organized.\nKnow your money.',
+          'Get paid.\nWithout\nthe chase.',
           style: TextStyle(
             fontSize: 54,
             height: 1.05,
@@ -1417,7 +1417,7 @@ class Footer extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           const Text(
-            'ElumoPay — From payment to proof, Elumo keeps your business on track.',
+            'ElumoPay — Get paid without the chase.',
             style: TextStyle(
               color: brandMuted,
               fontSize: 13,
@@ -1760,9 +1760,9 @@ class _BusinessCopilotTerminalState extends State<BusinessCopilotTerminal> {
                         child: Row(
                           children: [
                             _queryChip(
-                              label: "Who has overdue installments?",
-                              query: "Who has overdue installments?",
-                              response: "📅 **Overdue Installment Status:**\n- **Mwangi Kamau:** ₦50,000 due (3 days overdue) • *Service Cut-off Active*\n- **Amara Diallo:** ₦30,000 due (1 day overdue)\n\n[Send Reminders] [Review Service Status]",
+                              label: "Trigger robot calls for debt?",
+                              query: "Trigger robot calls for debt?",
+                              response: "🤖 **AI Voice Reminder Dispatch:**\n- **Sarah Okafor** (₦50,000 overdue) • *Robot Call scheduled: 10:15 PM*\n- **Mwangi Kamau** (KES 50,000 due) • *Safaricom SMS dispatched*\n\n[Trigger Voice Call Now]",
                             ),
                             const SizedBox(width: 6),
                             _queryChip(
