@@ -1,0 +1,2367 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/theme/app_theme.dart';
+import '../../shared/models/money.dart';
+import '../../shared/models/transaction.dart';
+import '../../shared/providers/app_providers.dart';
+import '../../shared/widgets/coming_soon.dart';
+import '../../shared/widgets/transaction_tile.dart';
+import '../../shared/widgets/glowing_background.dart';
+
+class HomeScreen extends ConsumerStatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  void _showAvatarUploadDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: context.colors.bgSoft,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, _) {
+            final hasPhoto = ref.watch(userAvatarProvider) != null;
+            return SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 12),
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: context.colors.border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Profile Photo',
+                    style: TextStyle(
+                      color: context.colors.ink,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ListTile(
+                    leading: Icon(Icons.photo_library_rounded, color: context.colors.bluePrimary),
+                    title: Text('Upload from Gallery', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w600)),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      try {
+                        final picker = ImagePicker();
+                        final XFile? image = await picker.pickImage(source: ImageSource.gallery, maxWidth: 300, maxHeight: 300);
+                        if (image != null) {
+                          final bytes = await image.readAsBytes();
+                          ref.read(userAvatarProvider.notifier).state = base64Encode(bytes);
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error picking image: $e')),
+                        );
+                      }
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.camera_alt_rounded, color: context.colors.bluePrimary),
+                    title: Text('Take a Photo', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w600)),
+                    onTap: () async {
+                      Navigator.pop(context);
+                      try {
+                        final picker = ImagePicker();
+                        final XFile? image = await picker.pickImage(source: ImageSource.camera, maxWidth: 300, maxHeight: 300);
+                        if (image != null) {
+                          final bytes = await image.readAsBytes();
+                          ref.read(userAvatarProvider.notifier).state = base64Encode(bytes);
+                        }
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error taking photo: $e')),
+                        );
+                      }
+                    },
+                  ),
+                  if (hasPhoto)
+                    ListTile(
+                      leading: const Icon(Icons.delete_rounded, color: Colors.redAccent),
+                      title: const Text('Remove Photo', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600)),
+                      onTap: () {
+                        Navigator.pop(context);
+                        ref.read(userAvatarProvider.notifier).state = null;
+                      },
+                    ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String _selectedPeriod = '7D';
+  bool _showPromoBanner = true;
+  bool _showAllTransactions = false;
+  bool _hideBalances = false;
+  bool _showSecurityBanner = true;
+  bool _isBalanceHidden = false;
+  
+  late PageController _pageController;
+  int _currentSlide = 0;
+  Timer? _carouselTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController();
+    _carouselTimer = Timer.periodic(const Duration(seconds: 6), (timer) {
+      if (_pageController.hasClients) {
+        final next = (_currentSlide + 1) % 2;
+        _pageController.animateToPage(
+          next,
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _carouselTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final userName = ref.watch(userNameProvider);
+    final balance = ref.watch(totalBalanceNgnProvider);
+    final accounts = ref.watch(accountsProvider);
+    final transactions = ref.watch(transactionsProvider);
+
+    final width = MediaQuery.of(context).size.width;
+    final isDesktop = width > 720;
+
+    return Scaffold(
+      body: GlowingBackground(
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Top Header Row (Search, Notifications, Profile)
+              _buildHeader(context),
+              
+              Expanded(
+                child: ListView(
+                  padding: const EdgeInsets.all(24),
+                  children: [
+                    // ================= NET WORTH SECTION =================
+                    _buildNetWorthCard(balance),
+                    const SizedBox(height: 24),
+                    
+                    // ================= ACCOUNTS SECTION =================
+                    _buildAccountsSection(context, accounts),
+                    const SizedBox(height: 24),
+                    
+                    // ================= PROMO BANNER =================
+                    if (_showPromoBanner) ...[
+                      _buildCarouselBanner(),
+                      const SizedBox(height: 24),
+                    ],
+                    
+                    // ================= QUICK ACTIONS =================
+                    _buildQuickActionsSection(context),
+                    const SizedBox(height: 24),
+                    
+                    // ================= STANDALONE SECURITY BANNER =================
+                    if (_showSecurityBanner) ...[
+                      _buildRealSecurityBanner(),
+                      const SizedBox(height: 24),
+                    ],
+                    
+                    // ================= BUSINESS INSIGHTS GATEWAY =================
+                    _buildBusinessInsightsCard(context),
+                    const SizedBox(height: 24),
+                    
+                    // ================= BOTTOM GRID =================
+                    if (isDesktop)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(flex: 6, child: _buildTransactionsCard(transactions)),
+                          const SizedBox(width: 24),
+                          Expanded(flex: 4, child: _buildSpendingInsightsCard()),
+                        ],
+                      )
+                    else ...[
+                      _buildTransactionsCard(transactions),
+                      const SizedBox(height: 24),
+                      _buildSpendingInsightsCard(),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // --- Header ---
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      height: 72,
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      decoration: BoxDecoration(
+        color: context.colors.scaffoldBg,
+        border: Border(bottom: BorderSide(color: context.colors.border, width: 1.0)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          // Left side: Avatar + Hi, Name
+          Row(
+            children: [
+              GestureDetector(
+                onTap: () => _showAvatarUploadDialog(context),
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: context.colors.bluePrimary.withValues(alpha: 0.3), width: 2),
+                  ),
+                  child: CircleAvatar(
+                    radius: 18,
+                    backgroundColor: context.colors.blueHighlight,
+                    backgroundImage: ref.watch(userAvatarProvider) != null
+                        ? MemoryImage(base64Decode(ref.watch(userAvatarProvider)!))
+                        : null,
+                    child: ref.watch(userAvatarProvider) == null
+                        ? const Text('RM', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12))
+                        : null,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text('Hi, RAPHAEL', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: context.colors.ink, letterSpacing: -0.3)),
+            ],
+          ),
+          
+          // Right side: Icons
+          Row(
+            children: [
+              IconButton(
+                onPressed: () => _showHelpSupportSheet(context),
+                icon: Icon(Icons.headset_mic_rounded, color: context.colors.ink, size: 24),
+              ),
+              IconButton(
+                onPressed: () => _showScannerDialog(context),
+                icon: Icon(Icons.qr_code_scanner_rounded, color: context.colors.ink, size: 22),
+              ),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconButton(
+                    onPressed: () => _showNotificationsSheet(context),
+                    icon: Icon(Icons.notifications_none_rounded, color: context.colors.ink, size: 26),
+                  ),
+                  Positioned(
+                    right: 6,
+                    top: 6,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFEF4444),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: context.colors.scaffoldBg, width: 1.5),
+                      ),
+                      child: const Text('99+', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Net Worth Card ---
+  Widget _buildNetWorthCard(Money balance) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8), Color(0xFF1E3A8A)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF1D4ED8).withValues(alpha: 0.4),
+            blurRadius: 24,
+            spreadRadius: -4,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Top Row: Shield + Available Balance + Eye + History
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () => setState(() => _isBalanceHidden = !_isBalanceHidden),
+                behavior: HitTestBehavior.opaque,
+                child: Row(
+                  children: [
+                    const Icon(Icons.verified_user_rounded, color: Colors.white, size: 16),
+                    const SizedBox(width: 6),
+                    const Text('Available Balance', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600)),
+                    const SizedBox(width: 8),
+                    Icon(_isBalanceHidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: Colors.white, size: 16),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: () => showComingSoon(context, 'Transaction History'),
+                child: Row(
+                  children: const [
+                    Text('Transaction History', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                    SizedBox(width: 2),
+                    Icon(Icons.chevron_right_rounded, color: Colors.white, size: 16),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Middle Row: Big Balance + Add Money Button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () => setState(() => _isBalanceHidden = !_isBalanceHidden),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      _isBalanceHidden ? '****' : balance.format(),
+                      style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: -1.0),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 24),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: () => _showReceiveSheet(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                  child: Text('+ Add Money', style: TextStyle(color: context.colors.bluePrimary, fontWeight: FontWeight.w900, fontSize: 13)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Bottom Strip (Business Service)
+          GestureDetector(
+            onTap: () => _showBusinessInsights(context),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.storefront_rounded, color: Colors.white, size: 16),
+                      const SizedBox(width: 8),
+                      const Text("Business Service - Today's Sales: ", style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+                      Text(_isBalanceHidden ? '****' : '₦0.00', style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
+                    ],
+                  ),
+                  const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 16),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Accounts Section ---
+  Widget _buildAccountsSection(BuildContext context, List<dynamic> accounts) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Accounts', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: context.colors.ink)),
+            TextButton(
+              onPressed: () => showComingSoon(context, 'Accounts View'),
+              child: Text(_showAllTransactions ? 'View less' : 'View all', style: TextStyle(color: context.colors.bluePrimary, fontWeight: FontWeight.w800, fontSize: 13)),
+            ),
+                      ],
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: accounts.map((a) {
+            final isNgn = a.currency == 'NGN';
+            final flag = isNgn ? '🇳🇬' : '🇺🇸';
+            final name = isNgn ? 'NGN Account' : 'USD Account';
+            final subtitle = isNgn ? 'Nigerian Naira' : 'US Dollar';
+            final icon = isNgn ? Icon(Icons.wallet_rounded, color: Color(0xFF16A34A), size: 20) : Text('\$', style: TextStyle(color: context.colors.bluePrimary, fontWeight: FontWeight.w900, fontSize: 18));
+            final iconBg = isNgn ? Color(0x1A16A34A) : context.colors.blueHighlight;
+
+            return Expanded(
+              child: Container(
+                margin: EdgeInsets.only(right: a == accounts.last ? 0 : 16),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: context.colors.bgSoft,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: context.colors.border),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Text(flag, style: const TextStyle(fontSize: 22)),
+                            const SizedBox(width: 8),
+                            Text(name, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5, color: context.colors.ink)),
+                          ],
+                        ),
+                        Theme(
+                          data: Theme.of(context).copyWith(
+                            splashColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                          ),
+                          child: PopupMenuButton<String>(
+                            padding: EdgeInsets.zero,
+                            icon: Icon(Icons.more_vert_rounded, color: context.colors.inkSoft, size: 18),
+                            color: context.colors.bgSoft,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            onSelected: (value) {
+                              if (value == 'View Statement') {
+                                _showStatementSheet(context);
+                              } else if (value == 'Hide Balance' || value == 'Show Balance') {
+                                setState(() => _hideBalances = !_hideBalances);
+                              } else if (value == 'Account Details') {
+                                _showReceiveSheet(context);
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              PopupMenuItem(value: 'View Statement', child: Row(children: [Icon(Icons.receipt_long_rounded, color: context.colors.inkSoft, size: 18), SizedBox(width: 8), Text('View Statement', style: TextStyle(color: context.colors.ink))])),
+                              PopupMenuItem(value: _hideBalances ? 'Show Balance' : 'Hide Balance', child: Row(children: [Icon(_hideBalances ? Icons.visibility_rounded : Icons.visibility_off_rounded, color: context.colors.inkSoft, size: 18), SizedBox(width: 8), Text(_hideBalances ? 'Show Balance' : 'Hide Balance', style: TextStyle(color: context.colors.ink))])),
+                              PopupMenuItem(value: 'Account Details', child: Row(children: [Icon(Icons.info_outline_rounded, color: context.colors.inkSoft, size: 18), SizedBox(width: 8), Text('Account Details', style: TextStyle(color: context.colors.ink))])),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(_hideBalances ? '****' : a.balance.format(), style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: context.colors.ink, letterSpacing: -0.5)),
+                            const SizedBox(height: 2),
+                            Text(subtitle, style: TextStyle(color: context.colors.inkSoft, fontSize: 11.5, fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(16)),
+                          alignment: Alignment.center,
+                          child: icon,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  // --- Consolidated Carousel Banner ---
+    // --- Standalone Real Virtual Card / Security Banner ---
+  // --- Business Insights Gateway Card ---
+  Widget _buildBusinessInsightsCard(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.colors.bgSoft,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: context.colors.border, width: 1.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: Icon + Title
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFE6F7F0), // Teal/green highlight
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.storefront_rounded,
+                  color: Color(0xFF00B97A), // Official Business Green
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Business Insights',
+                style: TextStyle(
+                  color: context.colors.ink,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.3,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Label: Today's Sales
+          Text(
+            "Today's Sales",
+            style: TextStyle(
+              color: context.colors.inkSoft,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          // Value: ₦0.00
+          Text(
+            "₦0.00",
+            style: TextStyle(
+              color: context.colors.ink,
+              fontSize: 30,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Grid: Transactions & Customers
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: context.colors.scaffoldBg,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: context.colors.border.withValues(alpha: 0.5)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Transactions',
+                        style: TextStyle(
+                          color: context.colors.inkSoft,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '0',
+                        style: TextStyle(
+                          color: context.colors.ink,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: context.colors.scaffoldBg,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: context.colors.border.withValues(alpha: 0.5)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Customers',
+                        style: TextStyle(
+                          color: context.colors.inkSoft,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '0',
+                        style: TextStyle(
+                          color: context.colors.ink,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Button: Manage Business
+          SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: ElevatedButton(
+              onPressed: () {
+                ref.read(isBusinessModeProvider.notifier).state = true;
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF00B97A), // Shop Green
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                elevation: 0,
+              ),
+              child: const Text(
+                'Manage Business',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRealSecurityBanner() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(22),
+      child: Stack(
+        children: [
+          Positioned(
+            right: 0,
+            top: 0,
+            child: GestureDetector(
+              onTap: () => setState(() => _showSecurityBanner = false),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close_rounded, color: Color(0xFF94A3B8), size: 16),
+              ),
+            ),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Left text info
+              Expanded(
+                flex: 5,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.shield_rounded, color: Colors.white, size: 12),
+                              SizedBox(width: 4),
+                              Text('Virtual Platinum', style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w900)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text('• Secure & Instant', style: TextStyle(color: context.colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w700)),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Global Virtual Debit Card',
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.white, letterSpacing: -0.3),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Spend internationally anywhere Visa is accepted with 0% FX fees and bank-grade 3D-Secure protection.',
+                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, height: 1.35, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 12),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pushNamed('/cards'),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Manage Cards', style: TextStyle(color: context.colors.bluePrimary, fontSize: 13, fontWeight: FontWeight.w900)),
+                          const SizedBox(width: 4),
+                          Icon(Icons.arrow_forward_rounded, color: context.colors.bluePrimary, size: 14),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Right: Embedded Real 3D Virtual Card
+              GestureDetector(
+                onTap: () => Navigator.of(context).pushNamed('/cards'),
+                child: Transform(
+                  transform: Matrix4.identity()
+                    ..setEntry(3, 2, 0.001)
+                    ..rotateY(-0.08)
+                    ..rotateZ(-0.02),
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: 175,
+                    height: 110,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF1E293B), Color(0xFF090D16)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF1D4ED8).withValues(alpha: 0.35),
+                          blurRadius: 16,
+                          offset: const Offset(0, 8),
+                        ),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.6),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Top row: EMV Chip + NFC + Logo
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                // Golden EMV Chip
+                                Container(
+                                  width: 22,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [Color(0xFFFFDF79), Color(0xFFC79224)],
+                                    ),
+                                    borderRadius: BorderRadius.circular(4),
+                                    border: Border.all(color: const Color(0xFFE5B53A), width: 0.5),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                const Icon(Icons.contactless_rounded, color: Colors.white70, size: 14),
+                              ],
+                            ),
+                            const Text(
+                              'ELUMO',
+                              style: TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.w900, letterSpacing: 1.2),
+                            ),
+                          ],
+                        ),
+                        // Middle Card Number
+                        const Text(
+                          '•••• •••• •••• 4821',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        // Bottom row: Holder + Visa
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('RAPHAEL MOMOH', style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w800)),
+                                SizedBox(height: 1),
+                                Text('08/29', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 6.5, fontWeight: FontWeight.w700)),
+                              ],
+                            ),
+                            // VISA Logo Mockup
+                            const Text(
+                              'VISA',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                fontStyle: FontStyle.italic,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  Widget _buildCarouselBanner() {
+    return Column(
+      children: [
+        SizedBox(
+          height: 180,
+          child: PageView(
+            controller: _pageController,
+            onPageChanged: (idx) => setState(() => _currentSlide = idx),
+            children: [
+              // Slide 1: PayNautik Global Payroll
+              _buildPayrollSlide(),
+              // Slide 2: Elumo Promo (Pay Smarter, Live Better)
+              _buildElumoPromoSlide(),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(2, (index) {
+            final isSel = _currentSlide == index;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              width: isSel ? 18 : 6,
+              height: 6,
+              decoration: BoxDecoration(
+                color: isSel ? context.colors.bluePrimary : context.colors.inkSoft.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+  }
+
+  // --- Slide 1: Payroll ---
+  Widget _buildPayrollSlide() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF10B981), Color(0xFF059669)],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.hub_rounded, color: Colors.white, size: 10),
+                          SizedBox(width: 4),
+                          Text('GLOBAL PAYROLL', style: TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.w900)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text('• paynautik.com', style: TextStyle(color: context.colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w700)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Frictionless Global Payroll',
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white, letterSpacing: -0.3),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Automate salary disbursements across 150+ countries via smart contracts instantly.',
+                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, height: 1.3, fontWeight: FontWeight.w500),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    final url = Uri.parse('https://paynautik.com');
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(url, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF10B981),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    minimumSize: Size.zero,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('Launch PayNautik', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+                      SizedBox(width: 4),
+                      Icon(Icons.launch_rounded, size: 12),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 3,
+            child: Center(
+              child: CustomPaint(
+                size: const Size(120, 90),
+                painter: _PayrollNodesPainter(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Slide 2: Elumo Promo ---
+  Widget _buildElumoPromoSlide() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF2856E8), Color(0xFF4949E8)],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Pay smarter. Live better.', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Colors.white)),
+                const SizedBox(height: 4),
+                const Text(
+                  'Make seamless payments, send money, and manage your finances effortlessly on Elumo.',
+                  style: TextStyle(color: Colors.white70, fontSize: 11, height: 1.3, fontWeight: FontWeight.w600),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: context.colors.bluePrimary,
+                    minimumSize: const Size(120, 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  icon: const Icon(Icons.arrow_outward_rounded, size: 12),
+                  label: const Text('Visit Elumo.com', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Overlapping card mockup
+          const SizedBox(
+            width: 80,
+            height: 50,
+            child: Stack(
+              children: [
+                Positioned(
+                  left: 0,
+                  top: 6,
+                  child: _MockCard(color: Color(0xFF1761E9)),
+                ),
+                Positioned(
+                  left: 15,
+                  top: 0,
+                  child: _MockCard(color: Colors.white10),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Slide 3: Virtual Platinum Debit Card ---
+  Widget _buildVirtualCardSlide() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.shield_rounded, color: Colors.white, size: 10),
+                          SizedBox(width: 4),
+                          Text('Virtual Platinum', style: TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.w900)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Global Virtual Visa Card',
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white, letterSpacing: -0.3),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Spend internationally anywhere Visa is accepted with 0% markup and 3D-Secure locks.',
+                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, height: 1.3, fontWeight: FontWeight.w500),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pushNamed('/cards'),
+                  child: Row(
+                    children: [
+                      Text('Manage Cards', style: TextStyle(color: context.colors.bluePrimary, fontSize: 12, fontWeight: FontWeight.w900)),
+                      const SizedBox(width: 4),
+                      Icon(Icons.arrow_forward_rounded, color: context.colors.bluePrimary, size: 12),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          // Embedded Visa Card graphic
+          Transform(
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, 0.001)
+              ..rotateY(-0.06)
+              ..rotateZ(-0.02),
+            alignment: Alignment.center,
+            child: Container(
+              width: 120,
+              height: 76,
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF1E293B), Color(0xFF090D16)],
+                ),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.4), blurRadius: 8, offset: const Offset(0, 4)),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: 14,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(colors: [Color(0xFFFFDF79), Color(0xFFC79224)]),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const Text('ELUMO', style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w900)),
+                    ],
+                  ),
+                  const Text('•••• 4821', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900)),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('RAPHAEL M.', style: TextStyle(color: Colors.white, fontSize: 5.5, fontWeight: FontWeight.w800)),
+                      Text('VISA', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900, fontStyle: FontStyle.italic)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  // --- Quick Actions Grid ---
+  Widget _buildQuickActionsSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Quick Actions', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: context.colors.ink)),
+        const SizedBox(height: 12),
+        GridView.count(
+          crossAxisCount: 5,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 16,
+          childAspectRatio: 0.8,
+          children: [
+            _buildActionCard(
+              icon: Icons.north_east_rounded,
+              title: 'Send Money',
+              subtitle: 'Transfer to anyone',
+              color: const Color(0xFF1858F2),
+              bg: context.colors.blueHighlight,
+              onTap: () => Navigator.of(context).pushNamed('/send'),
+            ),
+            _buildActionCard(
+              icon: Icons.download_rounded,
+              title: 'Receive Money',
+              subtitle: 'Get paid easily',
+              color: const Color(0xFF16A34A),
+              bg: const Color(0x1A16A34A),
+              onTap: () => _showReceiveSheet(context),
+            ),
+            _buildActionCard(
+              icon: Icons.credit_card_rounded,
+              title: 'Manage Cards',
+              subtitle: 'View and freeze',
+              color: const Color(0xFF7C3AED),
+              bg: const Color(0x1A7C3AED),
+              onTap: () => Navigator.of(context).pushNamed('/cards'),
+            ),
+            _buildActionCard(
+              icon: Icons.swap_horiz_rounded,
+              title: 'Exchange',
+              subtitle: 'Convert currency',
+              color: const Color(0xFFF79009),
+              bg: const Color(0x1AF79009),
+              onTap: () => Navigator.of(context).pushNamed('/fx'),
+            ),
+            _buildActionCard(
+              icon: Icons.receipt_long_rounded,
+              title: 'Bills',
+              subtitle: 'Pay utilities',
+              color: const Color(0xFFE11D48),
+              bg: const Color(0x1AE11D48),
+              onTap: () => Navigator.of(context).pushNamed('/bills'),
+            ),
+                      ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required Color bg,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              color: bg, 
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.2),
+                  blurRadius: 16,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: color, size: 26),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.visible,
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11.5, color: context.colors.ink, letterSpacing: -0.2),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- paynautik.com Payroll Banner ---
+  Widget _buildSecurityBanner() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(22),
+      child: Stack(
+        children: [
+          Positioned(
+            right: 0,
+            top: 0,
+            child: GestureDetector(
+              onTap: () => setState(() => _showSecurityBanner = false),
+              child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.close_rounded, color: Color(0xFF94A3B8), size: 16),
+              ),
+            ),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Left text info
+              Expanded(
+                flex: 5,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF10B981), Color(0xFF059669)],
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.hub_rounded, color: Colors.white, size: 12),
+                              SizedBox(width: 4),
+                              Text('GLOBAL PAYROLL', style: TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.w900)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text('• paynautik.com', style: TextStyle(color: context.colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w700)),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Frictionless Global Payroll',
+                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: Colors.white, letterSpacing: -0.3),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Automate salary disbursements across 150+ countries. Let our smart contracts handle the complexity of multi-currency payouts instantly with zero hidden fees.',
+                      style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, height: 1.35, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 14),
+                    ElevatedButton(
+                      onPressed: () async {
+                        final url = Uri.parse('https://paynautik.com');
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Could not launch paynautik.com')),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF10B981),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Launch PayNautik', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800)),
+                          SizedBox(width: 4),
+                          Icon(Icons.launch_rounded, size: 14),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Right: Embedded Global Payout / Smart Contract graphic
+              Transform(
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.001)
+                  ..rotateY(-0.06)
+                  ..rotateZ(-0.02),
+                alignment: Alignment.center,
+                child: Container(
+                  width: 160,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1E1E38), Color(0xFF0F0F1E)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.25),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      // Node connection lines
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: _PayrollNodesPainter(),
+                        ),
+                      ),
+                      // Overlay currency badges
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981).withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.sync_alt_rounded, color: Color(0xFF10B981), size: 24),
+                            ),
+                            const SizedBox(height: 8),
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _CurrencyBadge('USD', Colors.blue),
+                                SizedBox(width: 4),
+                                _CurrencyBadge('EUR', Colors.purple),
+                                SizedBox(width: 4),
+                                _CurrencyBadge('NGN', Colors.green),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Transactions feed ---
+  Widget _buildTransactionsCard(List<AppTransaction> transactions) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: context.colors.bgSoft,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: context.colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Recent Transactions', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: context.colors.ink)),
+              TextButton(
+                onPressed: () => setState(() => _showAllTransactions = !_showAllTransactions),
+                child: Text(_showAllTransactions ? 'View less' : 'View all', style: TextStyle(color: context.colors.bluePrimary, fontWeight: FontWeight.w800, fontSize: 12.5)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          ...transactions.take(_showAllTransactions ? transactions.length : 3).map((tx) => TransactionTile(transaction: tx)),
+        ],
+      ),
+    );
+  }
+
+  // --- Spending Insights Donut Chart ---
+  Widget _buildSpendingInsightsCard() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: context.colors.bgSoft,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: context.colors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Spending Insights', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: context.colors.ink)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(color: context.colors.scaffoldBg, borderRadius: BorderRadius.circular(10), border: Border.all(color: context.colors.border)),
+                child: Row(
+                  children: [
+                    Text('This Month', style: TextStyle(color: context.colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w800)),
+                    SizedBox(width: 4),
+                    Icon(Icons.keyboard_arrow_down_rounded, color: context.colors.inkSoft, size: 12),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              // Vector Painted Donut Chart
+              SizedBox(
+                width: 110,
+                height: 110,
+                child: CustomPaint(
+                  painter: _DonutChartPainter(context),
+                ),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  children: [
+                    _SpendItemRow('Shopping', '₦145,000', '45%', context.colors.bluePrimary),
+                    SizedBox(height: 8),
+                    _SpendItemRow('Bills', '₦86,400', '27%', Color(0xFF7C4DFF)),
+                    SizedBox(height: 8),
+                    _SpendItemRow('Food', '₦44,800', '14%', Color(0xFF12B76A)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Add Money sheet ---
+  void _showAddMoneySheet(BuildContext context, WidgetRef ref) {
+    final controller = TextEditingController(text: '10000');
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+            left: 24,
+            right: 24,
+            top: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Add Money',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.black),
+              ),
+              const SizedBox(height: 8),
+              const Text('Enter amount to fund your NGN account', style: TextStyle(color: Colors.grey, fontSize: 13)),
+              const SizedBox(height: 20),
+              TextField(
+                controller: controller,
+                keyboardType: TextInputType.number,
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.black),
+                decoration: const InputDecoration(
+                  prefixText: '₦ ',
+                  suffixText: 'NGN',
+                ),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(color: context.colors.blueHighlight, borderRadius: BorderRadius.circular(10)),
+                  child: Icon(Icons.credit_card_rounded, color: context.colors.bluePrimary),
+                ),
+                title: const Text('Visa Debit **** 4821', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, color: Colors.black)),
+                subtitle: const Text('Instant funding', style: TextStyle(fontSize: 12)),
+                trailing: Icon(Icons.check_circle_rounded, color: context.colors.bluePrimary),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  final text = controller.text;
+                  final amount = double.tryParse(text) ?? 0.0;
+                  if (amount > 0) {
+                    final minorUnits = (amount * 100).toInt();
+                    ref.read(accountsProvider.notifier).addBalance('NGN', minorUnits);
+                    ref.read(transactionsProvider.notifier).addTransaction(
+                          AppTransaction(
+                            id: 'dep_${DateTime.now().millisecondsSinceEpoch}',
+                            type: TransactionType.deposit,
+                            status: TransactionStatus.completed,
+                            amount: Money(minorUnits: minorUnits, currency: 'NGN'),
+                            description: 'Card deposit',
+                            counterparty: 'Visa **** 4821',
+                            createdAt: DateTime.now(),
+                            isCredit: true,
+                          ),
+                        );
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: context.colors.success,
+                        content: Row(
+                          children: [
+                            const Icon(Icons.check_circle_rounded, color: Colors.white),
+                            const SizedBox(width: 10),
+                            Text('Funded ₦${amount.toStringAsFixed(2)} successfully!'),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Confirm Deposit'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showBusinessInsights(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: const Color(0xFF00B876).withValues(alpha: 0.1), shape: BoxShape.circle),
+                    child: const Icon(Icons.storefront_rounded, color: Color(0xFF00B876)),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text('Business Insights', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF101828))),
+                ],
+              ),
+              const SizedBox(height: 24),
+              const Text("Today's Sales", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF667085))),
+              const SizedBox(height: 8),
+              const Text('₦0.00', style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Color(0xFF101828))),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(16)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text('Transactions', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF667085))),
+                          SizedBox(height: 4),
+                          Text('0', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF101828))),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(16)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text('Customers', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF667085))),
+                          SizedBox(height: 4),
+                          Text('0', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF101828))),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF00B876),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: const Text('Manage Business', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white)),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  // --- Receive Details sheet ---
+  void _showStatementSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Account Statements', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.black)),
+                    IconButton(icon: const Icon(Icons.close_rounded, color: Colors.grey), onPressed: () => Navigator.pop(context)),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                _buildStatementRow(context, 'August 2026', 'PDF • 124 KB'),
+                const Divider(height: 32),
+                _buildStatementRow(context, 'July 2026', 'PDF • 140 KB'),
+                const Divider(height: 32),
+                _buildStatementRow(context, 'June 2026', 'PDF • 118 KB'),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildStatementRow(BuildContext context, String month, String details) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: const Color(0x1A1858F2), borderRadius: BorderRadius.circular(12)),
+              child: const Icon(Icons.picture_as_pdf_rounded, color: Color(0xFF1858F2), size: 20),
+            ),
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(month, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w800, fontSize: 15)),
+                const SizedBox(height: 2),
+                Text(details, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+              ],
+            ),
+          ],
+        ),
+        IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Downloading statement for ' + month + '...')));
+          },
+          icon: const Icon(Icons.download_rounded, color: Color(0xFF1858F2)),
+        ),
+      ],
+    );
+  }
+
+void _showReceiveSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Receive Money',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Colors.black),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                width: 140,
+                height: 140,
+                decoration: BoxDecoration(
+                  color: context.colors.blueHighlight,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: context.colors.bluePrimary, width: 2.0),
+                ),
+                padding: const EdgeInsets.all(12),
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 6,
+                    crossAxisSpacing: 4,
+                    mainAxisSpacing: 4,
+                  ),
+                  itemCount: 36,
+                  itemBuilder: (context, index) {
+                    final isFilled = (index * 3 + 7) % 5 == 0 || index % 6 == 0 || index < 6 || index % 6 == 5;
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: isFilled ? context.colors.bluePrimary : Colors.transparent,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F3F7),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Column(
+                  children: [
+                    _DetailRow('Bank Name', 'Elumo Partner Bank'),
+                    SizedBox(height: 8),
+                    _DetailRow('Account Number', '9928371102'),
+                    SizedBox(height: 8),
+                    _DetailRow('Account Name', 'Raphael G. Momoh'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Clipboard.setData(const ClipboardData(
+                    text: 'Bank: Elumo Partner Bank\nAcct: 9928371102\nName: Raphael G. Momoh',
+                  ));
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Account details copied to clipboard!'),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.copy_rounded),
+                label: const Text('Copy Account Details'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+  const _DetailRow(this.label, this.value);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 13)),
+        Text(value, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w800, fontSize: 13.5)),
+      ],
+    );
+  }
+}
+
+class _MockCard extends StatelessWidget {
+  final Color color;
+  const _MockCard({required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 54,
+      height: 34,
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.white24),
+      ),
+    );
+  }
+}
+
+
+  // --- Header Modals ---
+  void _showHelpSupportSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('Help & Support', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF101828))),
+              const SizedBox(height: 24),
+              ListTile(
+                leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFF1858F2).withValues(alpha: 0.1), shape: BoxShape.circle), child: const Icon(Icons.chat_bubble_rounded, color: Color(0xFF1858F2))),
+                title: const Text('Live Chat', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                subtitle: const Text('Typically replies in 2 mins', style: TextStyle(fontSize: 11)),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => Navigator.pop(context),
+              ),
+              ListTile(
+                leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: const Color(0xFF16A34A).withValues(alpha: 0.1), shape: BoxShape.circle), child: const Icon(Icons.article_rounded, color: Color(0xFF16A34A))),
+                title: const Text('FAQs', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                subtitle: const Text('Read our help articles', style: TextStyle(fontSize: 11)),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => Navigator.pop(context),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showScannerDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          backgroundColor: Colors.black87,
+          child: Container(
+            height: 400,
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Scan QR Code', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 24),
+                Container(
+                  height: 200,
+                  width: 200,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0xFF00B876), width: 3),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: const Center(
+                    child: Icon(Icons.qr_code_scanner_rounded, color: Colors.white54, size: 64),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.white, fontSize: 14)),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showNotificationsSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (context) {
+        return Container(
+          height: MediaQuery.of(context).size.height * 0.7,
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Notifications', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF101828))),
+                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('Mark all as read')),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView(
+                  children: [
+                    ListTile(
+                      leading: Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: const Color(0xFF00B876).withValues(alpha: 0.1), shape: BoxShape.circle), child: const Icon(Icons.download_rounded, color: Color(0xFF00B876))),
+                      title: const Text('Money Received', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                      subtitle: const Text('You received ₦50,000 from John Doe.', style: TextStyle(fontSize: 12)),
+                      trailing: const Text('2m ago', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                    ),
+                    ListTile(
+                      leading: Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: const Color(0xFF1858F2).withValues(alpha: 0.1), shape: BoxShape.circle), child: const Icon(Icons.security_rounded, color: Color(0xFF1858F2))),
+                      title: const Text('New Login', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                      subtitle: const Text('New login from Mac OS on Chrome.', style: TextStyle(fontSize: 12)),
+                      trailing: const Text('1h ago', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+class _DayLabel extends StatelessWidget {
+  final String text;
+  const _DayLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: TextStyle(color: context.colors.inkSoft, fontSize: 9, fontWeight: FontWeight.w800),
+    );
+  }
+}
+
+class _SpendItemRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final String percentage;
+  final Color color;
+
+  const _SpendItemRow(this.label, this.value, this.percentage, this.color);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+            const SizedBox(width: 8),
+            Text(label, style: TextStyle(color: context.colors.inkSoft, fontSize: 12, fontWeight: FontWeight.w700)),
+                      ],
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(value, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800)),
+            Text(percentage, style: TextStyle(color: context.colors.inkSoft, fontSize: 10, fontWeight: FontWeight.w600)),
+                      ],
+        ),
+      ],
+    );
+  }
+}
+
+// --- Custom Painters for Charts ---
+
+class _SvgTrendLinePainter extends CustomPainter {
+  final Color lineColor;
+  _SvgTrendLinePainter({required this.lineColor});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path();
+    final fillPath = Path();
+
+    // Map the NextJS SVG coordinates dynamically to the size of the canvas
+    // Width map: 0 to 1100 -> size.width
+    // Height map: 12 to 130 -> size.height (reversing scale: 12 is top, 130 is bottom)
+    
+    double getX(double x) => (x / 1100.0) * size.width;
+    double getY(double y) => size.height - ((130.0 - y) / 130.0) * size.height * 0.9 - size.height * 0.05;
+
+    path.moveTo(getX(0), getY(95));
+    fillPath.moveTo(getX(0), size.height);
+    fillPath.lineTo(getX(0), getY(95));
+
+    // NextJS exact Cubic curves:
+    // C 70 96 85 96 130 90
+    path.cubicTo(getX(70), getY(96), getX(85), getY(96), getX(130), getY(90));
+    fillPath.cubicTo(getX(70), getY(96), getX(85), getY(96), getX(130), getY(90));
+
+    // S 230 80 280 84 (S is smooth cubic; implies control point is reflection of previous)
+    path.cubicTo(getX(175), getY(84), getX(230), getY(80), getX(280), getY(84));
+    fillPath.cubicTo(getX(175), getY(84), getX(230), getY(80), getX(280), getY(84));
+
+    // S 365 89 410 80
+    path.cubicTo(getX(330), getY(88), getX(365), getY(89), getX(410), getY(80));
+    fillPath.cubicTo(getX(330), getY(88), getX(365), getY(89), getX(410), getY(80));
+
+    // S 500 70 550 72
+    path.cubicTo(getX(455), getY(71), getX(500), getY(70), getX(550), getY(72));
+    fillPath.cubicTo(getX(455), getY(71), getX(500), getY(70), getX(550), getY(72));
+
+    // S 630 78 680 70
+    path.cubicTo(getX(600), getY(74), getX(630), getY(78), getX(680), getY(70));
+    fillPath.cubicTo(getX(600), getY(74), getX(630), getY(78), getX(680), getY(70));
+
+    // S 750 45 820 48
+    path.cubicTo(getX(730), getY(62), getX(750), getY(45), getX(820), getY(48));
+    fillPath.cubicTo(getX(730), getY(62), getX(750), getY(45), getX(820), getY(48));
+
+    // S 900 48 960 41
+    path.cubicTo(getX(890), getY(51), getX(900), getY(48), getX(960), getY(41));
+    fillPath.cubicTo(getX(890), getY(51), getX(900), getY(48), getX(960), getY(41));
+
+    // S 1030 22 1080 12
+    path.cubicTo(getX(1020), getY(34), getX(1030), getY(22), getX(1080), getY(12));
+    fillPath.cubicTo(getX(1020), getY(34), getX(1030), getY(22), getX(1080), getY(12));
+
+    fillPath.lineTo(getX(1080), size.height);
+    fillPath.close();
+
+    // Paint line
+    final linePaint = Paint()
+      ..color = lineColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.8
+      ..strokeCap = StrokeCap.round;
+    
+    // Paint gradient area
+    final fillGradient = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [lineColor.withValues(alpha: 0.16), lineColor.withValues(alpha: 0.0)],
+    );
+    final fillPaint = Paint()
+      ..shader = fillGradient.createShader(Rect.fromLTWH(0, 0, size.width, size.height))
+      ..style = PaintingStyle.fill;
+
+    canvas.drawPath(fillPath, fillPaint);
+    canvas.drawPath(path, linePaint);
+
+    // Draw end circle point
+    final pointPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    
+    final pointStrokePaint = Paint()
+      ..color = lineColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.0;
+
+    canvas.drawCircle(Offset(getX(1080), getY(12)), 5.0, pointPaint);
+    canvas.drawCircle(Offset(getX(1080), getY(12)), 5.0, pointStrokePaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _DonutChartPainter extends CustomPainter {
+  final BuildContext context;
+  _DonutChartPainter(this.context);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = min(size.width, size.height) / 2;
+    
+    // Thick stroke paint to make arcs look like a donut ring
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 14.0
+      ..strokeCap = StrokeCap.round;
+
+    final rect = Rect.fromCircle(center: center, radius: radius - 7);
+
+    // Dynamic arcs angles (Shopping: 45%, Bills: 27%, Food: 14%, Others: 14%)
+    double startAngle = -pi / 2; // Start from top 12 o'clock
+
+    // Shopping (45%, blue)
+    paint.color = context.colors.bluePrimary;
+    double sweepAngle = 2 * pi * 0.45;
+    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
+    startAngle += sweepAngle;
+
+    // Bills (27%, purple)
+    paint.color = const Color(0xFF7C4DFF);
+    sweepAngle = 2 * pi * 0.27;
+    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
+    startAngle += sweepAngle;
+
+    // Food (14%, green)
+    paint.color = const Color(0xFF12B76A);
+    sweepAngle = 2 * pi * 0.14;
+    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
+    startAngle += sweepAngle;
+
+    // Others (14%, orange)
+    paint.color = const Color(0xFFF79009);
+    sweepAngle = 2 * pi * 0.14;
+    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
+
+    // Draw inner text: "Total Spent \n ₦320,000"
+    final textPainterLabel = TextPainter(
+      text: TextSpan(
+        text: 'Total Spent',
+        style: TextStyle(color: context.colors.inkSoft, fontSize: 10, fontWeight: FontWeight.w600),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    
+    final textPainterValue = TextPainter(
+      text: TextSpan(
+        text: '₦320,000',
+        style: TextStyle(color: context.colors.ink, fontSize: 13, fontWeight: FontWeight.w900),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+
+    textPainterLabel.paint(
+      canvas,
+      center - Offset(textPainterLabel.width / 2, 12),
+    );
+    textPainterValue.paint(
+      canvas,
+      center - Offset(textPainterValue.width / 2, -4),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _CurrencyBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+  const _CurrencyBadge(this.label, this.color);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.5), width: 0.5),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(color: color, fontSize: 8, fontWeight: FontWeight.w900),
+      ),
+    );
+  }
+}
+
+class _PayrollNodesPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withValues(alpha: 0.08)
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    final dotPaint = Paint()
+      ..color = const Color(0xFF10B981).withValues(alpha: 0.3)
+      ..style = PaintingStyle.fill;
+
+    // Draw grid nodes
+    canvas.drawLine(Offset(0, size.height * 0.3), Offset(size.width, size.height * 0.3), paint);
+    canvas.drawLine(Offset(0, size.height * 0.7), Offset(size.width, size.height * 0.7), paint);
+    canvas.drawLine(Offset(size.width * 0.3, 0), Offset(size.width * 0.3, size.height), paint);
+    canvas.drawLine(Offset(size.width * 0.7, 0), Offset(size.width * 0.7, size.height), paint);
+
+    canvas.drawCircle(Offset(size.width * 0.3, size.height * 0.3), 3, dotPaint);
+    canvas.drawCircle(Offset(size.width * 0.7, size.height * 0.3), 3, dotPaint);
+    canvas.drawCircle(Offset(size.width * 0.3, size.height * 0.7), 3, dotPaint);
+    canvas.drawCircle(Offset(size.width * 0.7, size.height * 0.7), 3, dotPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}

@@ -1,0 +1,9 @@
+python3 recover_home.py
+python3 /Users/raphaelgab-momoh/.gemini/antigravity/brain/13b53fa4-ead6-421d-8831-33d876290ba1/scratch/replace_colors.py
+python3 fix_consts_regex.py
+python3 fix_white_colors.py
+python3 fix_donut_call.py
+python3 replace_promo.py
+python3 update_banner.py
+python3 fix_small.py
+python3 fix_maxWidth.py
