@@ -3305,26 +3305,359 @@ class _FooterSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final isDesktop = width >= 900;
+
     return Container(
-      color: const Color(0xFF09090B),
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 48),
+      width: double.infinity,
+      color: const Color(0xFF07090E),
       child: Column(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: const [
-                  GabismWordmark(height: 28, isWhite: true),
-                ],
+          // 1. "Stay ahead of the curve" Newsletter Section
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              horizontal: isDesktop ? 64 : 24,
+              vertical: isDesktop ? 90 : 60,
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFF07090E),
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.06),
+                ),
               ),
-              const Text(
-                '© 2024 gabism. A Paynautik Limited Product. All rights reserved.',
-                style: TextStyle(color: Color(0xFF71717A), fontSize: 12),
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 700),
+                child: Column(
+                  children: [
+                    Text(
+                      'Stay ahead of the curve',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: isDesktop ? 36 : 26,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.8,
+                        color: Colors.white,
+                        fontFamily: 'Arial',
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Subscribe to our newsletter for the latest updates on stablecoins, asset tokenization, and platform features.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14.5,
+                        height: 1.5,
+                        color: Color(0xFF94A3B8),
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Newsletter Input Field + Subscribe Button
+                    Container(
+                      width: double.infinity,
+                      constraints: const BoxConstraints(maxWidth: 520),
+                      padding: const EdgeInsets.only(left: 18, top: 4, bottom: 4, right: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF141923),
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(color: const Color(0xFF232A3B)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Expanded(
+                            child: TextField(
+                              style: TextStyle(color: Colors.white, fontSize: 13.5),
+                              decoration: InputDecoration(
+                                hintText: 'Enter your email address',
+                                hintStyle: TextStyle(color: Color(0xFF64748B), fontSize: 13.5),
+                                border: InputBorder.none,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                          ),
+                          MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Thank you for subscribing to gabis!'),
+                                    backgroundColor: Color(0xFF10B981),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF10B981),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Subscribe',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    SizedBox(width: 6),
+                                    Icon(
+                                      Icons.send_rounded,
+                                      size: 13,
+                                      color: Colors.white,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'By subscribing, you agree to our Terms of Service and Privacy Policy.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: Color(0xFF64748B),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ],
+            ),
+          ),
+
+          // 2. Links & Columns Section
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              horizontal: isDesktop ? 64 : 24,
+              vertical: isDesktop ? 80 : 50,
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: isDesktop
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Left Brand Column
+                          Expanded(
+                            flex: 4,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Container(
+                                      width: 22,
+                                      height: 22,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: LinearGradient(
+                                          colors: [Color(0xFF10B981), Color(0xFF06B6D4)],
+                                        ),
+                                      ),
+                                      child: const Center(
+                                        child: Icon(Icons.waves, size: 13, color: Colors.white),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    const Text(
+                                      'paynautik',
+                                      style: TextStyle(
+                                        fontSize: 21,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: -0.5,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const Text(
+                                      ' *',
+                                      style: TextStyle(
+                                        fontSize: 21,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF10B981),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 20),
+                                const Text(
+                                  'The future of finance, today.',
+                                  style: TextStyle(
+                                    color: Color(0xFF64748B),
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // 5 Nav Columns
+                          Expanded(flex: 2, child: _buildFooterCol('SOLUTIONS', ['Escrow', 'Group Savings', 'Paynautik Business', 'Asset Tokenization'])),
+                          Expanded(flex: 2, child: _buildFooterCol('COMPANY', ['About Us', 'Careers', 'Press', 'Blog'])),
+                          Expanded(flex: 2, child: _buildFooterCol('LEGAL', ['Terms of Service', 'Privacy Policy', 'Licenses'])),
+                          Expanded(flex: 2, child: _buildFooterCol('SUPPORT', ['Help Center', 'Contact Us', 'FAQ'])),
+                          Expanded(flex: 2, child: _buildFooterCol('DEVELOPERS', ['API Documentation', 'API Status', 'GitHub', 'Twitter'])),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                width: 22,
+                                height: 22,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: LinearGradient(
+                                    colors: [Color(0xFF10B981), Color(0xFF06B6D4)],
+                                  ),
+                                ),
+                                child: const Center(
+                                  child: Icon(Icons.waves, size: 13, color: Colors.white),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Text(
+                                'paynautik',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: -0.5,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const Text(
+                                ' *',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF10B981),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
+                          const Text(
+                            'The future of finance, today.',
+                            style: TextStyle(color: Color(0xFF64748B), fontSize: 13.5),
+                          ),
+                          const SizedBox(height: 36),
+                          Wrap(
+                            spacing: 36,
+                            runSpacing: 28,
+                            children: [
+                              _buildFooterCol('SOLUTIONS', ['Escrow', 'Group Savings', 'Paynautik Business', 'Asset Tokenization']),
+                              _buildFooterCol('COMPANY', ['About Us', 'Careers', 'Press', 'Blog']),
+                              _buildFooterCol('LEGAL', ['Terms of Service', 'Privacy Policy', 'Licenses']),
+                              _buildFooterCol('SUPPORT', ['Help Center', 'Contact Us', 'FAQ']),
+                              _buildFooterCol('DEVELOPERS', ['API Documentation', 'API Status', 'GitHub', 'Twitter']),
+                            ],
+                          ),
+                        ],
+                      ),
+              ),
+            ),
+          ),
+
+          // 3. Bottom Copyright & Socials Bar
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(
+              horizontal: isDesktop ? 64 : 24,
+              vertical: 24,
+            ),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.05),
+                ),
+              ),
+            ),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1200),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '© 2026 Paynautik Limited. All rights reserved.',
+                      style: TextStyle(
+                        color: Color(0xFF64748B),
+                        fontSize: 12.5,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        _socialIcon(Icons.share_outlined),
+                        const SizedBox(width: 14),
+                        _socialIcon(Icons.business_center_outlined),
+                        const SizedBox(width: 14),
+                        _socialIcon(Icons.smart_display_outlined),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFooterCol(String title, List<String> links) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.2,
+            color: Color(0xFF94A3B8),
+          ),
+        ),
+        const SizedBox(height: 18),
+        ...links.map((link) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Text(
+                  link,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF64748B),
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+              ),
+            )),
+      ],
+    );
+  }
+
+  Widget _socialIcon(IconData icon) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: Icon(
+        icon,
+        size: 17,
+        color: const Color(0xFF64748B),
       ),
     );
   }
