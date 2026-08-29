@@ -282,14 +282,35 @@ class _HeroText extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        Text(
-          'Send, Receive & Grow — Your Money, Your Way.',
-          style: TextStyle(
-            fontSize: mobile ? 36 : 52,
-            fontWeight: FontWeight.w900,
-            color: kOnBackground,
-            letterSpacing: mobile ? -1.2 : -2.0,
-            height: 1.1,
+        // ── Headline: two tight single lines ──
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Send. Get Paid. Grow.',
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: mobile ? 40 : 56,
+              fontWeight: FontWeight.w900,
+              color: kOnBackground,
+              letterSpacing: mobile ? -1.4 : -2.5,
+              height: 1.05,
+            ),
+          ),
+        ),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            'Your Money, Your Way.',
+            maxLines: 1,
+            style: TextStyle(
+              fontSize: mobile ? 40 : 56,
+              fontWeight: FontWeight.w900,
+              color: kPrimary,
+              letterSpacing: mobile ? -1.4 : -2.5,
+              height: 1.1,
+            ),
           ),
         ),
         const SizedBox(height: 20),
