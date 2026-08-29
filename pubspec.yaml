@@ -73,6 +73,8 @@ flutter:
   assets:
     - assets/logo_mark.png
     - assets/logo_mark_white.png
+    - assets/gabis_logo.png
+    - assets/gabis_logo_white.png
     - assets/gabism_logo.png
     - assets/gabism_logo_white.png
     - assets/gabis_pay_logo.png

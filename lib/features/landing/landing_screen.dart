@@ -103,7 +103,7 @@ class _LandingScreenState extends State<LandingScreen> {
 }
 
 // ============================================================
-// MAIN HERO
+// MAIN HERO (BENCHMARKED FROM BITSO)
 // ============================================================
 
 class GabisPayHero extends StatefulWidget {
@@ -129,29 +129,39 @@ class GabisPayHero extends StatefulWidget {
 }
 
 class _GabisPayHeroState extends State<GabisPayHero> {
-  bool showingPay = true;
+  int currentSlide = 0;
+  Timer? slideTimer;
 
-  Timer? logoTimer;
+  final List<Map<String, String>> slides = [
+    {
+      'headline': 'Discover what your\nmoney\nis capable of',
+      'body':
+          'One app, every opportunity to build your future. Send, receive, earn, and spend globally in just a few taps.',
+      'cta': 'Open your account',
+    },
+    {
+      'headline': 'New gabis app:\npowerfully simple',
+      'body':
+          'The gabis app has a new look. It\'s been redesigned to simplify and enhance your global multi-currency payments, evolving with you and the future of your finances.',
+      'cta': 'Download the new app',
+    },
+  ];
 
   @override
   void initState() {
     super.initState();
-
-    logoTimer = Timer.periodic(
-      const Duration(seconds: 3),
-      (_) {
-        if (mounted) {
-          setState(() {
-            showingPay = !showingPay;
-          });
-        }
-      },
-    );
+    slideTimer = Timer.periodic(const Duration(seconds: 6), (_) {
+      if (mounted) {
+        setState(() {
+          currentSlide = (currentSlide + 1) % slides.length;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
-    logoTimer?.cancel();
+    slideTimer?.cancel();
     super.dispose();
   }
 
@@ -159,24 +169,26 @@ class _GabisPayHeroState extends State<GabisPayHero> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 850;
+        final isMobile = constraints.maxWidth < 950;
+        final slide = slides[currentSlide];
 
         return Container(
           width: double.infinity,
           decoration: const BoxDecoration(
-            gradient: RadialGradient(
-              center: Alignment(0.7, -0.1),
-              radius: 1.1,
+            color: Color(0xFFFAF9F6),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
               colors: [
-                Color(0xFFF3F1FF),
-                Colors.white,
+                Color(0xFFFFFFFF),
+                Color(0xFFF7F5F0),
               ],
             ),
           ),
           child: Column(
             children: [
-              _Navigation(
-                showingPay: showingPay,
+              // Top Navigation Bar
+              _BitsoNavigation(
                 onScrollTo: widget.onScrollTo,
                 showcaseKey: widget.showcaseKey,
                 useCasesKey: widget.useCasesKey,
@@ -185,46 +197,74 @@ class _GabisPayHeroState extends State<GabisPayHero> {
                 faqKey: widget.faqKey,
               ),
 
+              const SizedBox(height: 20),
+
+              // Hero Body
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: isMobile ? 20 : 55,
+                  horizontal: isMobile ? 24 : 64,
                 ),
                 child: isMobile
                     ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _HeroCopy(
-                            showingPay: showingPay,
-                            centered: true,
+                          _HeroSlideCopy(
+                            slide: slide,
+                            isMobile: true,
                           ),
                           const SizedBox(height: 40),
-                          _HeroVisual(
-                            showingPay: showingPay,
-                            mobile: true,
+                          _HeroLifestyleVisual(
+                            isMobile: true,
                           ),
                         ],
                       )
                     : SizedBox(
-                        height: 690,
+                        height: 560,
                         child: Row(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Expanded(
-                              flex: 45,
-                              child: _HeroCopy(
-                                showingPay: showingPay,
+                              flex: 50,
+                              child: _HeroSlideCopy(
+                                slide: slide,
+                                isMobile: false,
                               ),
                             ),
+                            const SizedBox(width: 32),
                             Expanded(
-                              flex: 55,
-                              child: _HeroVisual(
-                                showingPay: showingPay,
+                              flex: 50,
+                              child: _HeroLifestyleVisual(
+                                isMobile: false,
                               ),
                             ),
                           ],
                         ),
                       ),
               ),
+
+              const SizedBox(height: 30),
+
+              // Bottom Carousel Navigation Controls (< [—— —— ——] >)
+              _CarouselControls(
+                currentIndex: currentSlide,
+                totalCount: slides.length,
+                onSelect: (index) {
+                  setState(() {
+                    currentSlide = index;
+                  });
+                },
+                onPrev: () {
+                  setState(() {
+                    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                  });
+                },
+                onNext: () {
+                  setState(() {
+                    currentSlide = (currentSlide + 1) % slides.length;
+                  });
+                },
+              ),
+
               const SizedBox(height: 40),
             ],
           ),
@@ -235,11 +275,10 @@ class _GabisPayHeroState extends State<GabisPayHero> {
 }
 
 // ============================================================
-// NAVIGATION
+// BITSO-STYLE NAVIGATION
 // ============================================================
 
-class _Navigation extends StatelessWidget {
-  final bool showingPay;
+class _BitsoNavigation extends StatelessWidget {
   final void Function(GlobalKey)? onScrollTo;
   final GlobalKey? showcaseKey;
   final GlobalKey? useCasesKey;
@@ -247,8 +286,7 @@ class _Navigation extends StatelessWidget {
   final GlobalKey? comparisonKey;
   final GlobalKey? faqKey;
 
-  const _Navigation({
-    required this.showingPay,
+  const _BitsoNavigation({
     this.onScrollTo,
     this.showcaseKey,
     this.useCasesKey,
@@ -260,737 +298,235 @@ class _Navigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return Padding(
+    final isMobile = width < 950;
+
+    return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: width < 850 ? 20 : 55,
-        vertical: 25,
+        horizontal: isMobile ? 20 : 55,
+        vertical: 18,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          GabisLogo(
-            showingPay: showingPay,
-            size: 43,
+          // Left: Official gabis Logo
+          Row(
+            children: [
+              const GabisLogo(size: 34),
+              if (!isMobile) ...[
+                const SizedBox(width: 42),
+                _NavDropdownItem('About gabis', onTap: () {
+                  if (comparisonKey != null) onScrollTo?.call(comparisonKey!);
+                }),
+                _NavDropdownItem('Products', onTap: () {
+                  if (showcaseKey != null) onScrollTo?.call(showcaseKey!);
+                }),
+                _NavDropdownItem('Cards', onTap: () {
+                  if (cardsKey != null) onScrollTo?.call(cardsKey!);
+                }),
+                _NavDropdownItem('Business', onTap: () {
+                  if (useCasesKey != null) onScrollTo?.call(useCasesKey!);
+                }),
+                _NavDropdownItem('Support', onTap: () {
+                  if (faqKey != null) onScrollTo?.call(faqKey!);
+                }),
+              ],
+            ],
           ),
 
-          if (width > 850)
-            Row(
-              children: [
-                _NavLink(
-                  'Features',
-                  onTap: () {
-                    if (showcaseKey != null) onScrollTo?.call(showcaseKey!);
-                  },
+          // Right: Action Buttons
+          Row(
+            children: [
+              if (!isMobile) ...[
+                _NavDropdownItem('Download app', showArrow: true),
+                const SizedBox(width: 14),
+                const Row(
+                  children: [
+                    Icon(Icons.language, size: 16, color: Color(0xFF22263C)),
+                    SizedBox(width: 4),
+                    Text(
+                      'US',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF22263C),
+                      ),
+                    ),
+                    Icon(Icons.keyboard_arrow_down, size: 14, color: Color(0xFF22263C)),
+                  ],
                 ),
-                _NavLink(
-                  'For Business',
-                  onTap: () {
-                    if (useCasesKey != null) onScrollTo?.call(useCasesKey!);
-                  },
-                ),
-                _NavLink(
-                  'Cards',
-                  onTap: () {
-                    if (cardsKey != null) onScrollTo?.call(cardsKey!);
-                  },
-                ),
-                _NavLink(
-                  'Why gabism',
-                  onTap: () {
-                    if (comparisonKey != null) onScrollTo?.call(comparisonKey!);
-                  },
-                ),
-                _NavLink(
-                  'FAQ',
-                  onTap: () {
-                    if (faqKey != null) onScrollTo?.call(faqKey!);
-                  },
-                ),
-                const SizedBox(width: 25),
-                _NavButton(),
+                const SizedBox(width: 20),
               ],
-            ),
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(context, '/login'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEBE9FE),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text(
+                    'Log in',
+                    style: TextStyle(
+                      color: Color(0xFF4F46E5),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(context, '/login'),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4F46E5),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                        blurRadius: 15,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Text(
+                    'Sign up',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 }
 
-class _NavLink extends StatelessWidget {
-  final String text;
+class _NavDropdownItem extends StatelessWidget {
+  final String title;
+  final bool showArrow;
   final VoidCallback? onTap;
 
-  const _NavLink(this.text, {this.onTap});
+  const _NavDropdownItem(this.title, {this.showArrow = true, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 17),
-        child: Text(
-          text,
-          style: const TextStyle(
-            color: Color(0xFF343B5C),
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-          ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        child: Row(
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1E2442),
+              ),
+            ),
+            if (showArrow) ...[
+              const SizedBox(width: 4),
+              const Icon(
+                Icons.keyboard_arrow_down,
+                size: 14,
+                color: Color(0xFF555B77),
+              ),
+            ],
+          ],
         ),
       ),
     );
   }
 }
 
-class _NavButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/login'),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 13,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.indigo,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: const Text(
-          'Get Started',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: 14,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-
-
 // ============================================================
-// HERO COPY
+// HERO SLIDE COPY
 // ============================================================
 
-class _HeroCopy extends StatelessWidget {
-  final bool showingPay;
-  final bool centered;
+class _HeroSlideCopy extends StatelessWidget {
+  final Map<String, String> slide;
+  final bool isMobile;
 
-  const _HeroCopy({
-    required this.showingPay,
-    this.centered = false,
+  const _HeroSlideCopy({
+    required this.slide,
+    required this.isMobile,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: centered
-          ? CrossAxisAlignment.center
-          : CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // ----------------------------------------------------
-        // EYEBROW
-        // ----------------------------------------------------
-
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 15,
-            vertical: 9,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.softPurple,
-            borderRadius: BorderRadius.circular(50),
-            border: Border.all(
-              color: AppColors.purple.withOpacity(.12),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 21,
-                height: 21,
-                decoration: const BoxDecoration(
-                  color: AppColors.purple,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check,
-                  color: Colors.white,
-                  size: 13,
-                ),
-              ),
-              const SizedBox(width: 9),
-              const Text(
-                'Smart Payments. Real People.',
-                style: TextStyle(
-                  color: AppColors.indigo,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 28),
-
-        // ----------------------------------------------------
-        // HEADLINE
-        // ----------------------------------------------------
-
-        RichText(
-          textAlign: centered
-              ? TextAlign.center
-              : TextAlign.left,
-          text: const TextSpan(
-            style: TextStyle(
-              fontFamily: 'Arial',
-              fontSize: 70,
-              height: .98,
-              letterSpacing: -4,
-              fontWeight: FontWeight.w800,
-              color: AppColors.navy,
-            ),
-            children: [
-              TextSpan(
-                text: 'Business payments\n',
-              ),
-              TextSpan(
-                text: 'that ',
-              ),
-              TextSpan(
-                text: 'just work',
-                style: TextStyle(
-                  color: AppColors.purple,
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 30),
-
-        // ----------------------------------------------------
-        // DESCRIPTION
-        // ----------------------------------------------------
-
-        SizedBox(
-          width: 510,
+        // Large Bold Headline
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 350),
           child: Text(
-            'Send, receive and manage payments seamlessly. '
-            'Built for modern businesses and the people behind them.',
-            textAlign:
-                centered ? TextAlign.center : TextAlign.left,
+            slide['headline'] ?? '',
+            key: ValueKey(slide['headline']),
+            style: TextStyle(
+              fontSize: isMobile ? 40 : 58,
+              height: 1.08,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -2.0,
+              color: const Color(0xFF0F172A),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 24),
+
+        // Subtitle Description
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 350),
+          child: Text(
+            slide['body'] ?? '',
+            key: ValueKey(slide['body']),
             style: const TextStyle(
-              color: AppColors.muted,
-              fontSize: 18,
-              height: 1.6,
+              fontSize: 17,
+              height: 1.55,
               fontWeight: FontWeight.w400,
+              color: Color(0xFF475569),
             ),
           ),
         ),
 
-        const SizedBox(height: 32),
+        const SizedBox(height: 34),
 
-        // ----------------------------------------------------
-        // BUTTONS
-        // ----------------------------------------------------
-
-        Wrap(
-          alignment: centered
-              ? WrapAlignment.center
-              : WrapAlignment.start,
-          spacing: 14,
-          runSpacing: 12,
-          children: [
-            _PrimaryButton(),
-            _SecondaryButton(),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-// ============================================================
-// BUTTONS
-// ============================================================
-
-class _PrimaryButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/login'),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 25,
-          vertical: 17,
-        ),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              AppColors.purple,
-              AppColors.violet,
-            ],
-          ),
-          borderRadius: BorderRadius.circular(13),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.purple.withOpacity(.25),
-              blurRadius: 25,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
-        child: const Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Get Started',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 15,
-              ),
-            ),
-            SizedBox(width: 18),
-            Icon(
-              Icons.arrow_forward,
-              color: Colors.white,
-              size: 19,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SecondaryButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/login'),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 25,
-          vertical: 17,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(13),
-          border: Border.all(
-            color: AppColors.border,
-          ),
-        ),
-        child: const Text(
-          'Learn More',
-          style: TextStyle(
-            color: AppColors.navy,
-            fontWeight: FontWeight.w700,
-            fontSize: 15,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================
-// HERO VISUAL
-// ============================================================
-
-class _HeroVisual extends StatelessWidget {
-  final bool showingPay;
-  final bool mobile;
-
-  const _HeroVisual({
-    required this.showingPay,
-    this.mobile = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: mobile ? 610 : 680,
-      child: Stack(
-        alignment: Alignment.center,
-        clipBehavior: Clip.none,
-        children: [
-          // --------------------------------------------------
-          // BACK PHONE
-          // --------------------------------------------------
-
-          Positioned(
-            right: mobile ? 10 : 0,
-            top: 70,
-            child: Transform.rotate(
-              angle: 5 * math.pi / 180,
-              child: _Phone(
-                showingPay: showingPay,
-                invoiceMode: true,
-                scale: mobile ? .78 : .9,
-              ),
-            ),
-          ),
-
-          // --------------------------------------------------
-          // FRONT PHONE
-          // --------------------------------------------------
-
-          Positioned(
-            left: mobile ? 0 : 45,
-            top: 35,
-            child: Transform.rotate(
-              angle: -5 * math.pi / 180,
-              child: _Phone(
-                showingPay: showingPay,
-                invoiceMode: false,
-                scale: mobile ? .78 : .9,
-              ),
-            ),
-          ),
-
-          // --------------------------------------------------
-          // TOP TRANSACTION CARD
-          // --------------------------------------------------
-
-          Positioned(
-            right: mobile ? -10 : -25,
-            top: 15,
-            child: const _PaymentCard(),
-          ),
-
-          // --------------------------------------------------
-          // BOTTOM TRANSACTION CARD
-          // --------------------------------------------------
-
-          Positioned(
-            left: mobile ? -10 : -35,
-            bottom: 30,
-            child: const _TransactionCard(),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ============================================================
-// PHONE
-// ============================================================
-
-class _Phone extends StatelessWidget {
-  final bool showingPay;
-  final bool invoiceMode;
-  final double scale;
-
-  const _Phone({
-    required this.showingPay,
-    required this.invoiceMode,
-    this.scale = 1,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Transform.scale(
-      scale: scale,
-      child: Container(
-        width: 310,
-        height: 620,
-        padding: const EdgeInsets.all(9),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(45),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF111329),
-              Color(0xFF45465B),
-            ],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.indigo.withOpacity(.20),
-              blurRadius: 60,
-              offset: const Offset(0, 30),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(37),
+        // Pill CTA Button
+        GestureDetector(
+          onTap: () => Navigator.pushNamed(context, '/login'),
           child: Container(
-            color: const Color(0xFFFCFCFF),
-            child: Stack(
-              children: [
-                Column(
-                  children: [
-                    const SizedBox(height: 16),
-
-                    // Top bar
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 21,
-                      ),
-                      child: Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            '9:41',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                          Container(
-                            padding:
-                                const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 7,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.softPurple,
-                              borderRadius:
-                                  BorderRadius.circular(50),
-                            ),
-                            child: const Text(
-                              'Live',
-                              style: TextStyle(
-                                color: AppColors.purple,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // App logo
-                    Padding(
-                      padding:
-                          const EdgeInsets.symmetric(
-                        horizontal: 21,
-                      ),
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: GabisLogo(
-                          showingPay: showingPay,
-                          size: 25,
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 18),
-
-                    if (!invoiceMode)
-                      const _WalletContent()
-                    else
-                      const _InvoiceContent(),
-                  ],
-                ),
-
-                // Dynamic island
-                Positioned(
-                  top: 16,
-                  left: 105,
-                  child: Container(
-                    width: 85,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-
-                // Bottom navigation
-                const Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: _PhoneBottomNav(),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 30,
+              vertical: 16,
+            ),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4F46E5),
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4F46E5).withValues(alpha: 0.30),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================
-// WALLET CONTENT
-// ============================================================
-
-class _WalletContent extends StatelessWidget {
-  const _WalletContent();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 21),
             child: Text(
-              'Total Net Balance',
-              style: TextStyle(
-                color: Color(0xFF78809A),
-                fontSize: 13,
+              slide['cta'] ?? 'Open your account',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
               ),
             ),
-          ),
-        ),
-
-        const SizedBox(height: 7),
-
-        const Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 21),
-            child: Text(
-              '₦14,820,000.00',
-              style: TextStyle(
-                color: AppColors.navy,
-                fontSize: 30,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -1.5,
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 18),
-
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 21),
-          child: Row(
-            children: [
-              Expanded(
-                child: _PhoneAction(
-                  text: 'Send',
-                  primary: true,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: _PhoneAction(
-                  text: 'Receive',
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 18),
-
-        const _AccountCard(
-          name: 'NGN Wallet',
-          amount: '₦10,400,000.00',
-          color: AppColors.purple,
-        ),
-
-        const _AccountCard(
-          name: 'USD Account',
-          amount: '\$5,420.00',
-          color: AppColors.blue,
-        ),
-
-        const _AccountCard(
-          name: 'GBP Account',
-          amount: '£1,850.00',
-          color: Color(0xFFE58B1B),
-        ),
-      ],
-    );
-  }
-}
-
-// ============================================================
-// INVOICE CONTENT
-// ============================================================
-
-class _InvoiceContent extends StatelessWidget {
-  const _InvoiceContent();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 21),
-            child: Text(
-              'Smart Invoices & Ledgers',
-              style: TextStyle(
-                color: Color(0xFF69718D),
-                fontSize: 13,
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 13),
-
-        const _InvoiceCard(
-          name: 'Skill School',
-          amount: '₦100,000',
-          meta: 'Amara J. · Inst 2/4',
-          status: 'PAID',
-        ),
-
-        const _InvoiceCard(
-          name: 'SolarGrid Energy',
-          amount: '₦200,000',
-          meta: 'Emmanuel A. · Inst 4/6',
-          status: 'DUE',
-          due: true,
-        ),
-
-        const _InvoiceCard(
-          name: 'Acme Corp Software',
-          amount: '\$1,200',
-          meta: 'Q3 Retainer',
-          status: 'PAID',
-        ),
-
-        Container(
-          margin: const EdgeInsets.symmetric(
-            horizontal: 21,
-            vertical: 13,
-          ),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.softPurple,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Row(
-            children: [
-              Icon(
-                Icons.bolt,
-                color: AppColors.purple,
-                size: 17,
-              ),
-              SizedBox(width: 6),
-              Text(
-                '10-Day Automated SMS Reminders Active',
-                style: TextStyle(
-                  color: AppColors.purple,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
           ),
         ),
       ],
@@ -999,458 +535,102 @@ class _InvoiceContent extends StatelessWidget {
 }
 
 // ============================================================
-// PHONE ACTION
+// HERO LIFESTYLE VISUAL
 // ============================================================
 
-class _PhoneAction extends StatelessWidget {
-  final String text;
-  final bool primary;
+class _HeroLifestyleVisual extends StatelessWidget {
+  final bool isMobile;
 
-  const _PhoneAction({
-    required this.text,
-    this.primary = false,
+  const _HeroLifestyleVisual({
+    required this.isMobile,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        vertical: 13,
-      ),
+      height: isMobile ? 360 : 520,
+      width: double.infinity,
       decoration: BoxDecoration(
-        color: primary
-            ? AppColors.purple
-            : Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: primary
-              ? AppColors.purple
-              : const Color(0xFFE0E2EC),
-        ),
-      ),
-      child: Center(
-        child: Text(
-          text,
-          style: TextStyle(
-            color: primary
-                ? Colors.white
-                : AppColors.navy,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================
-// ACCOUNT CARD
-// ============================================================
-
-class _AccountCard extends StatelessWidget {
-  final String name;
-  final String amount;
-  final Color color;
-
-  const _AccountCard({
-    required this.name,
-    required this.amount,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(
-        left: 21,
-        right: 21,
-        bottom: 9,
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 13,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0x19282B48),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            name,
-            style: const TextStyle(
-              color: Color(0xFF303650),
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          Text(
-            amount,
-            style: TextStyle(
-              color: color,
-              fontSize: 12,
-              fontWeight: FontWeight.w800,
-            ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 40,
+            offset: const Offset(0, 16),
           ),
         ],
       ),
-    );
-  }
-}
-
-// ============================================================
-// INVOICE CARD
-// ============================================================
-
-class _InvoiceCard extends StatelessWidget {
-  final String name;
-  final String amount;
-  final String meta;
-  final String status;
-  final bool due;
-
-  const _InvoiceCard({
-    required this.name,
-    required this.amount,
-    required this.meta,
-    required this.status,
-    this.due = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final statusColor =
-        due ? const Color(0xFFE58B1B) : AppColors.purple;
-
-    return Container(
-      margin: const EdgeInsets.only(
-        left: 21,
-        right: 21,
-        bottom: 9,
-      ),
-      padding: const EdgeInsets.all(13),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0x19282B48),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                name,
-                style: const TextStyle(
-                  color: Color(0xFF20263E),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              Text(
-                amount,
-                style: TextStyle(
-                  color: statusColor,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 5),
-
-          Text(
-            meta,
-            style: const TextStyle(
-              color: Color(0xFF8790A9),
-              fontSize: 10,
-            ),
-          ),
-
-          const SizedBox(height: 7),
-
-          Text(
-            status,
-            style: TextStyle(
-              color: statusColor,
-              fontSize: 9,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ============================================================
-// PHONE BOTTOM NAVIGATION
-// ============================================================
-
-class _PhoneBottomNav extends StatelessWidget {
-  const _PhoneBottomNav();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 68,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 9,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.97),
-        border: const Border(
-          top: BorderSide(
-            color: Color(0x14202540),
-          ),
-        ),
-      ),
-      child: const Row(
-        mainAxisAlignment:
-            MainAxisAlignment.spaceAround,
-        children: [
-          _BottomItem(
-            icon: Icons.home_rounded,
-            label: 'Home',
-            active: true,
-          ),
-          _BottomItem(
-            icon: Icons.receipt_long_outlined,
-            label: 'Invoices',
-          ),
-          _BottomItem(
-            icon: Icons.bolt_outlined,
-            label: 'Payments',
-          ),
-          _BottomItem(
-            icon: Icons.settings_outlined,
-            label: 'Settings',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BottomItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool active;
-
-  const _BottomItem({
-    required this.icon,
-    required this.label,
-    this.active = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment:
-          MainAxisAlignment.center,
-      children: [
-        Icon(
-          icon,
-          size: 16,
-          color: active
-              ? AppColors.purple
-              : const Color(0xFF7B8299),
-        ),
-        const SizedBox(height: 3),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 8,
-            fontWeight: FontWeight.w700,
-            color: active
-                ? AppColors.purple
-                : const Color(0xFF7B8299),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-// ============================================================
-// PAYMENT CONFIRMATION CARD
-// ============================================================
-
-class _PaymentCard extends StatelessWidget {
-  const _PaymentCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return const _FloatingCard(
-      width: 305,
-      icon: Icons.check,
-      title: 'Payment Successful!',
-      amount: '+₦1,200 Upwork Direct ACH',
-      subtitle: 'NGN Bank Transfer',
-    );
-  }
-}
-
-// ============================================================
-// TRANSACTION CONFIRMATION CARD
-// ============================================================
-
-class _TransactionCard extends StatelessWidget {
-  const _TransactionCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return const _FloatingCard(
-      width: 300,
-      icon: Icons.check,
-      title: 'Transaction Confirmed!',
-      amount: '₦120,000',
-      subtitle: 'Tuition Settled · skill-sch.com',
-    );
-  }
-}
-
-// ============================================================
-// FLOATING CARD
-// ============================================================
-
-class _FloatingCard extends StatefulWidget {
-  final double width;
-  final IconData icon;
-  final String title;
-  final String amount;
-  final String subtitle;
-
-  const _FloatingCard({
-    required this.width,
-    required this.icon,
-    required this.title,
-    required this.amount,
-    required this.subtitle,
-  });
-
-  @override
-  State<_FloatingCard> createState() =>
-      _FloatingCardState();
-}
-
-class _FloatingCardState
-    extends State<_FloatingCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (_, child) {
-        final y =
-            math.sin(controller.value * math.pi) * 10;
-
-        return Transform.translate(
-          offset: Offset(0, -y),
-          child: child,
-        );
-      },
-      child: Container(
-        width: widget.width,
-        padding: const EdgeInsets.all(17),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(.97),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: const Color(0x19282B48),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.indigo.withOpacity(.14),
-              blurRadius: 45,
-              offset: const Offset(0, 20),
-            ),
-          ],
-        ),
-        child: Row(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: const BoxDecoration(
-                color: AppColors.softPurple,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                widget.icon,
-                color: AppColors.purple,
-                size: 20,
-              ),
+            // Lifestyle Photography Image
+            Image.asset(
+              'assets/images/hero_bitso_holding_phone.jpg',
+              fit: BoxFit.cover,
             ),
 
-            const SizedBox(width: 13),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.title,
-                    style: const TextStyle(
-                      color: AppColors.navy,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                    ),
+            // Subtle Glassmorphism Live Notification Badge
+            Positioned(
+              bottom: 24,
+              left: 24,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.94),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
-
-                  const SizedBox(height: 4),
-
-                  Text(
-                    widget.amount,
-                    style: const TextStyle(
-                      color: AppColors.navy,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 25,
+                      offset: const Offset(0, 10),
                     ),
-                  ),
-
-                  const SizedBox(height: 3),
-
-                  Text(
-                    widget.subtitle,
-                    style: const TextStyle(
-                      color: Color(0xFF77809B),
-                      fontSize: 9,
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF4F46E5),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.trending_up,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Total Balance',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xFF64748B),
+                          ),
+                        ),
+                        Text(
+                          '₦14,850,500.00',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ],
@@ -1459,6 +639,87 @@ class _FloatingCardState
     );
   }
 }
+
+// ============================================================
+// CAROUSEL CONTROLS
+// ============================================================
+
+class _CarouselControls extends StatelessWidget {
+  final int currentIndex;
+  final int totalCount;
+  final ValueChanged<int> onSelect;
+  final VoidCallback onPrev;
+  final VoidCallback onNext;
+
+  const _CarouselControls({
+    required this.currentIndex,
+    required this.totalCount,
+    required this.onSelect,
+    required this.onPrev,
+    required this.onNext,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Prev Arrow
+        InkWell(
+          onTap: onPrev,
+          borderRadius: BorderRadius.circular(20),
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(
+              Icons.arrow_back_ios_new,
+              size: 13,
+              color: Color(0xFF64748B),
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 8),
+
+        // Indicator Bars
+        Row(
+          children: List.generate(totalCount, (index) {
+            final isActive = index == currentIndex;
+            return GestureDetector(
+              onTap: () => onSelect(index),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: isActive ? 38 : 22,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: isActive ? const Color(0xFF4F46E5) : const Color(0xFFCBD5E1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            );
+          }),
+        ),
+
+        const SizedBox(width: 8),
+
+        // Next Arrow
+        InkWell(
+          onTap: onNext,
+          borderRadius: BorderRadius.circular(20),
+          child: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Icon(
+              Icons.arrow_forward_ios,
+              size: 13,
+              color: Color(0xFF64748B),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 
 // ============================================================================
 // 3. INTERACTIVE FEATURE SLIDE SECTION (All Mockups in an Interactive Switcher)
