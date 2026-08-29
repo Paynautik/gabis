@@ -361,7 +361,8 @@ class _PremiumHeroImage extends StatelessWidget {
 // PHONE MOCKUP
 // ─────────────────────────────────────────────────────────────
 class _PhoneMockup extends StatelessWidget {
-  const _PhoneMockup();
+  final Widget? screenContent;
+  const _PhoneMockup({this.screenContent});
 
   @override
   Widget build(BuildContext context) {
@@ -418,7 +419,7 @@ class _PhoneMockup extends StatelessWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: Stack(children: [
-              const _AppScreen(),
+              screenContent ?? const _AppScreen(),
               // Glass sheen
               Positioned(
                 top: 0, left: 0, right: 0,
@@ -833,9 +834,19 @@ class _AICard extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Container(
-          height: 180,
+          height: 340,
           color: const Color(0xFF080D18),
-          child: mockupView,
+          alignment: Alignment.center,
+          child: SizedBox(
+            height: 340,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 40),
+                child: mockupView,
+              ),
+            ),
+          ),
         ),
         const Divider(color: Color(0xFF1E2A3A), height: 1),
         Padding(
@@ -851,99 +862,46 @@ class _AICard extends StatelessWidget {
   }
 }
 
-class _MiniPhoneScreen extends StatelessWidget {
-  final Widget child;
-  const _MiniPhoneScreen({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 220,
-      margin: const EdgeInsets.only(top: 20),
-      decoration: const BoxDecoration(
-        color: Color(0xFF060A14),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(32),
-          topRight: Radius.circular(32),
-        ),
-        boxShadow: [
-          BoxShadow(color: Colors.black45, blurRadius: 20, offset: Offset(0, 10)),
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        alignment: Alignment.topCenter,
-        children: [
-          // Chassis bezel
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(32),
-                topRight: Radius.circular(32),
-              ),
-              border: Border.all(color: const Color(0xFF2C3240), width: 4),
-            ),
-          ),
-          // Content
-          Positioned.fill(
-            top: 24,
-            child: child,
-          ),
-          // Dynamic Island
-          Container(
-            margin: const EdgeInsets.only(top: 10),
-            width: 70, height: 20,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // ─── AI Mockup Visuals ───
 
 class _ReconMockup extends StatelessWidget {
   const _ReconMockup();
   @override
   Widget build(BuildContext context) {
-    return _MiniPhoneScreen(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
+    return _PhoneMockup(
+      screenContent: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 60),
         child: Column(children: [
           // Bank Transfer
           Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: const Color(0xFF131F33), borderRadius: BorderRadius.circular(12)),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: const Color(0xFF131F33), borderRadius: BorderRadius.circular(16)),
             child: Row(children: [
-              Container(width: 28, height: 28, decoration: BoxDecoration(color: kGreen.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.account_balance_rounded, color: kGreen, size: 14)),
-              const SizedBox(width: 10),
+              Container(width: 32, height: 32, decoration: BoxDecoration(color: kGreen.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.account_balance_rounded, color: kGreen, size: 16)),
+              const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
-                Text('GTBank Transfer', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
-                Text('Sarah Okafor', style: TextStyle(color: Colors.white54, fontSize: 9)),
+                Text('GTBank Transfer', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+                Text('Sarah Okafor', style: TextStyle(color: Colors.white54, fontSize: 11)),
               ])),
-              const Text('₦85,000', style: TextStyle(color: kGreen, fontSize: 11, fontWeight: FontWeight.w800)),
+              const Text('₦85,000', style: TextStyle(color: kGreen, fontSize: 14, fontWeight: FontWeight.w800)),
             ]),
           ),
           // Link animation
           Container(
-            height: 20,
+            height: 30,
             width: 2,
             color: kGreen.withValues(alpha: 0.5),
           ),
           // Invoice Matched
           Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: kGreen.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12), border: Border.all(color: kGreen.withValues(alpha: 0.3))),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: kGreen.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(16), border: Border.all(color: kGreen.withValues(alpha: 0.3))),
             child: Row(children: [
-              const Icon(Icons.check_circle_rounded, color: kGreen, size: 18),
-              const SizedBox(width: 10),
+              const Icon(Icons.check_circle_rounded, color: kGreen, size: 22),
+              const SizedBox(width: 12),
               Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
-                Text('Matched to INV-0042', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
-                Text('Branding Project', style: TextStyle(color: kGreen, fontSize: 9)),
+                Text('Matched to INV-0042', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
+                Text('Branding Project', style: TextStyle(color: kGreen, fontSize: 11)),
               ])),
             ]),
           ),
@@ -957,24 +915,24 @@ class _VoiceMockup extends StatelessWidget {
   const _VoiceMockup();
   @override
   Widget build(BuildContext context) {
-    return _MiniPhoneScreen(
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        const SizedBox(height: 10),
+    return _PhoneMockup(
+      screenContent: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         Container(
-          width: 50, height: 50,
+          width: 80, height: 80,
           decoration: BoxDecoration(color: kGreen.withValues(alpha: 0.15), shape: BoxShape.circle),
-          child: const Icon(Icons.person_rounded, color: kGreen, size: 24),
+          child: const Icon(Icons.person_rounded, color: kGreen, size: 40),
         ),
-        const SizedBox(height: 12),
-        const Text('Chukwuemeka Ltd', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
-        const Text('AI Voice Assistant calling...', style: TextStyle(color: Colors.white54, fontSize: 9)),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
+        const Text('Chukwuemeka Ltd', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 8),
+        const Text('AI Voice Assistant calling...', style: TextStyle(color: Colors.white54, fontSize: 13)),
+        const SizedBox(height: 40),
         // Fake equalizer
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(9, (i) => Container(
-            margin: const EdgeInsets.symmetric(horizontal: 2),
-            width: 3, height: [8.0, 16.0, 24.0, 14.0, 28.0, 18.0, 22.0, 12.0, 6.0][i],
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            width: 4, height: [12.0, 24.0, 36.0, 20.0, 48.0, 28.0, 34.0, 18.0, 10.0][i],
             decoration: BoxDecoration(color: kGreen, borderRadius: BorderRadius.circular(2)),
           )),
         ),
@@ -987,37 +945,36 @@ class _ChatMockup extends StatelessWidget {
   const _ChatMockup();
   @override
   Widget build(BuildContext context) {
-    return _MiniPhoneScreen(
-      child: Padding(
-        padding: const EdgeInsets.all(14),
+    return _PhoneMockup(
+      screenContent: Padding(
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // User bubble
             Align(
               alignment: Alignment.centerRight,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: const BoxDecoration(color: kBlue, borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12), bottomLeft: Radius.circular(12), bottomRight: Radius.circular(4))),
-                child: const Text('Bill Amaka ₦150k\nfor branding', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w500)),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: const BoxDecoration(color: kBlue, borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16), bottomLeft: Radius.circular(16), bottomRight: Radius.circular(4))),
+                child: const Text('Bill Amaka ₦150k\nfor branding', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w500)),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             // AI response bubble
             Align(
               alignment: Alignment.centerLeft,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: const BoxDecoration(color: Color(0xFF131F33), borderRadius: BorderRadius.only(topLeft: Radius.circular(12), topRight: Radius.circular(12), bottomRight: Radius.circular(12), bottomLeft: Radius.circular(4))),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: const BoxDecoration(color: Color(0xFF131F33), borderRadius: BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16), bottomRight: Radius.circular(16), bottomLeft: Radius.circular(4))),
                 child: Row(mainAxisSize: MainAxisSize.min, children: const [
-                  Icon(Icons.auto_awesome_rounded, color: kGreen, size: 12),
-                  SizedBox(width: 6),
-                  Text('Invoice created!', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w600)),
+                  Icon(Icons.auto_awesome_rounded, color: kGreen, size: 16),
+                  SizedBox(width: 8),
+                  Text('Invoice created!', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
                 ]),
               ),
             ),
-            const SizedBox(height: 10),
           ],
         ),
       ),
