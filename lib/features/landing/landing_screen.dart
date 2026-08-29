@@ -126,7 +126,7 @@ class _NavHeader extends StatelessWidget {
           _PrimaryPillButton(
             'Get Started',
             onTap: () => Navigator.pushNamed(context, '/login'),
-            backgroundColor: kElumoGreen,
+            backgroundColor: const Color(0xFF292083),
           ),
         ],
       ),
@@ -237,493 +237,943 @@ class _PrimaryPillButtonState extends State<_PrimaryPillButton> {
 }
 
 // ============================================================================
-// 2. HERO SECTION (Clean, Multi-Color Headline + Download Buttons + Centered Mockup)
 // ============================================================================
-class _HeroSection extends StatelessWidget {
+// 2. HERO SECTION (gabisPay ↔ gabism Animation + Dual Phone Showcase)
+// ============================================================================
+
+class _HeroSection extends StatefulWidget {
   const _HeroSection();
+
+  @override
+  State<_HeroSection> createState() => _HeroSectionState();
+}
+
+class _HeroSectionState extends State<_HeroSection> {
+  bool _showingPay = true;
+  Timer? _logoTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _logoTimer = Timer.periodic(
+      const Duration(seconds: 3),
+      (_) {
+        if (mounted) {
+          setState(() {
+            _showingPay = !_showingPay;
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _logoTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final isDesktop = width >= 900;
+    final isMobile = width < 950;
 
     return Container(
       width: double.infinity,
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+        gradient: RadialGradient(
+          center: Alignment(0.7, -0.1),
+          radius: 1.1,
           colors: [
+            Color(0xFFF3F1FF),
             Colors.white,
-            Color(0xFFF0FDF4),
-            Color(0xFFF8FAFC),
           ],
         ),
       ),
-      padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 48 : 20,
-        vertical: isDesktop ? 50 : 36,
-      ),
-      child: Column(
-        children: [
-          const SizedBox(height: 10),
-
-          // Main Multi-Color Headline
-          Text.rich(
-            TextSpan(
-              children: [
-                const TextSpan(
-                  text: 'Borderless ',
-                  style: TextStyle(
-                    color: kElumoGreen,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -1.5,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 20 : 55,
+          vertical: isMobile ? 30 : 20,
+        ),
+        child: isMobile
+            ? Column(
+                children: [
+                  _HeroCopy(
+                    showingPay: _showingPay,
+                    centered: true,
                   ),
-                ),
-                const TextSpan(
-                  text: 'Payments,\n',
-                  style: TextStyle(
-                    color: kElumoDark,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -1.5,
+                  const SizedBox(height: 40),
+                  _HeroVisual(
+                    showingPay: _showingPay,
+                    mobile: true,
                   ),
+                ],
+              )
+            : SizedBox(
+                height: 720,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 45,
+                      child: _HeroCopy(
+                        showingPay: _showingPay,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 55,
+                      child: _HeroVisual(
+                        showingPay: _showingPay,
+                      ),
+                    ),
+                  ],
                 ),
-                const TextSpan(
-                  text: 'Smart Installments & ',
-                  style: TextStyle(
-                    color: kElumoDark,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -1.5,
-                  ),
-                ),
-                const TextSpan(
-                  text: 'Global Banking',
-                  style: TextStyle(
-                    color: kElumoBlue,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -1.5,
-                  ),
-                ),
-              ],
-            ),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: isDesktop ? 56 : 34,
-              height: 1.15,
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Subtitle
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 680),
-            child: const Text(
-              'From multi-currency accounts and virtual cards to smart installment tracking, robot debt collection calls, and pan-African tax compliance.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Color(0xFF4B5563),
-                height: 1.6,
-                fontWeight: FontWeight.w400,
               ),
-            ),
-          ),
-          const SizedBox(height: 32),
-
-          // Store CTAs
-          Wrap(
-            spacing: 16,
-            runSpacing: 12,
-            alignment: WrapAlignment.center,
-            children: [
-              _StoreButton(
-                iconWidget: const _GooglePlayLogoWidget(size: 20),
-                label: 'Get on Android',
-                onTap: () => Navigator.pushNamed(context, '/login'),
-                backgroundColor: kElumoDark,
-              ),
-              _StoreButton(
-                iconWidget: const _AppleLogoWidget(size: 20),
-                label: 'Get on iPhone',
-                onTap: () => Navigator.pushNamed(context, '/login'),
-                backgroundColor: kElumoDark,
-              ),
-            ],
-          ),
-          const SizedBox(height: 48),
-
-          // Dual Angled Phone Mockups Centered
-          _DualAngledHeroMockups(isDesktop: isDesktop),
-        ],
       ),
     );
   }
 }
 
-class _StoreButton extends StatefulWidget {
-  final Widget iconWidget;
-  final String label;
-  final VoidCallback onTap;
-  final Color backgroundColor;
-  const _StoreButton({
-    required this.iconWidget,
-    required this.label,
-    required this.onTap,
-    this.backgroundColor = kElumoDark,
+// ─── Hero Copy ────────────────────────────────────────────────────────────────
+class _HeroCopy extends StatelessWidget {
+  final bool showingPay;
+  final bool centered;
+
+  const _HeroCopy({
+    required this.showingPay,
+    this.centered = false,
   });
 
   @override
-  State<_StoreButton> createState() => _StoreButtonState();
-}
-
-class _StoreButtonState extends State<_StoreButton> {
-  bool _hovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+    final width = MediaQuery.of(context).size.width;
+    final isDesktop = width >= 1150;
+
+    return Column(
+      crossAxisAlignment: centered
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Eyebrow Pill
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 15,
+            vertical: 9,
+          ),
           decoration: BoxDecoration(
-            color: _hovered ? widget.backgroundColor.withOpacity(0.9) : widget.backgroundColor,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black.withOpacity(0.15), width: 1.5),
+            color: const Color(0xFFF1EFFF),
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(
+              color: const Color(0xFF5535E8).withOpacity(0.15),
+            ),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              widget.iconWidget,
-              const SizedBox(width: 10),
-              Text(
-                widget.label,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 14.5,
+              Container(
+                width: 21,
+                height: 21,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF5535E8),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check,
                   color: Colors.white,
+                  size: 13,
+                ),
+              ),
+              const SizedBox(width: 9),
+              const Text(
+                'Smart Payments. Real People.',
+                style: TextStyle(
+                  color: Color(0xFF292083),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
           ),
         ),
+
+        const SizedBox(height: 24),
+
+        // Headline
+        RichText(
+          textAlign: centered ? TextAlign.center : TextAlign.left,
+          text: TextSpan(
+            style: TextStyle(
+              fontSize: isDesktop ? 64 : (centered ? 38 : 50),
+              height: 1.02,
+              letterSpacing: -2.8,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF11163F),
+            ),
+            children: const [
+              TextSpan(
+                text: 'Business payments\n',
+              ),
+              TextSpan(
+                text: 'that ',
+              ),
+              TextSpan(
+                text: 'just work',
+                style: TextStyle(
+                  color: Color(0xFF5535E8),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 22),
+
+        // Description
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 510),
+          child: Text(
+            'Send, receive and manage payments seamlessly. '
+            'Built for modern businesses and the people behind them.',
+            textAlign: centered ? TextAlign.center : TextAlign.left,
+            style: const TextStyle(
+              color: Color(0xFF65708F),
+              fontSize: 17,
+              height: 1.6,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 32),
+
+        // Buttons
+        Wrap(
+          alignment: centered ? WrapAlignment.center : WrapAlignment.start,
+          spacing: 14,
+          runSpacing: 12,
+          children: [
+            GestureDetector(
+              onTap: () => Navigator.pushNamed(context, '/login'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 26,
+                  vertical: 16,
+                ),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFF5535E8),
+                      Color(0xFF6B3DF5),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(13),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF5535E8).withOpacity(0.30),
+                      blurRadius: 25,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Get Started',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                    SizedBox(width: 14),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () => Navigator.pushNamed(context, '/login'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 26,
+                  vertical: 16,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(13),
+                  border: Border.all(
+                    color: const Color(0x1F1F244B),
+                  ),
+                ),
+                child: const Text(
+                  'Learn More',
+                  style: TextStyle(
+                    color: Color(0xFF11163F),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Hero Visual (Dual Floating Phones + Animated Cards) ──────────────────────
+class _HeroVisual extends StatelessWidget {
+  final bool showingPay;
+  final bool mobile;
+
+  const _HeroVisual({
+    required this.showingPay,
+    this.mobile = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: mobile ? 610 : 680,
+      child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          // Back Phone (Invoice Mode)
+          Positioned(
+            right: mobile ? 10 : 15,
+            top: 60,
+            child: Transform.rotate(
+              angle: 5 * math.pi / 180,
+              child: _HeroVisualPhone(
+                showingPay: showingPay,
+                invoiceMode: true,
+                scale: mobile ? 0.78 : 0.88,
+              ),
+            ),
+          ),
+
+          // Front Phone (Wallet Mode)
+          Positioned(
+            left: mobile ? 0 : 35,
+            top: 25,
+            child: Transform.rotate(
+              angle: -5 * math.pi / 180,
+              child: _HeroVisualPhone(
+                showingPay: showingPay,
+                invoiceMode: false,
+                scale: mobile ? 0.78 : 0.88,
+              ),
+            ),
+          ),
+
+          // Top Floating Transaction Card
+          Positioned(
+            right: mobile ? -10 : -20,
+            top: 15,
+            child: const _FloatingTransactionBadge(
+              width: 305,
+              icon: Icons.check,
+              title: 'Payment Successful!',
+              amount: '+₦1,200 Upwork Direct ACH',
+              subtitle: 'NGN Bank Transfer',
+            ),
+          ),
+
+          // Bottom Floating Transaction Card
+          Positioned(
+            left: mobile ? -10 : -30,
+            bottom: 30,
+            child: const _FloatingTransactionBadge(
+              width: 300,
+              icon: Icons.check,
+              title: 'Transaction Confirmed!',
+              amount: '₦120,000',
+              subtitle: 'Tuition Settled · skill-sch.com',
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-// ─── Custom Pixel-Perfect Vector Icons ────────────────────────────────────────
-class _GooglePlayLogoWidget extends StatelessWidget {
-  final double size;
-  const _GooglePlayLogoWidget({this.size = 22});
+// ─── Hero Visual Phone ────────────────────────────────────────────────────────
+class _HeroVisualPhone extends StatelessWidget {
+  final bool showingPay;
+  final bool invoiceMode;
+  final double scale;
+
+  const _HeroVisualPhone({
+    required this.showingPay,
+    required this.invoiceMode,
+    this.scale = 1,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(painter: _GooglePlayPainter()),
-    );
-  }
-}
-
-class _GooglePlayPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final w = size.width;
-    final h = size.height;
-
-    final bluePath = Path()
-      ..moveTo(w * 0.08, h * 0.04)
-      ..lineTo(w * 0.62, h * 0.50)
-      ..lineTo(w * 0.08, h * 0.96)
-      ..close();
-    canvas.drawPath(bluePath, Paint()..color = const Color(0xFF00D2FF)..style = PaintingStyle.fill);
-
-    final greenPath = Path()
-      ..moveTo(w * 0.08, h * 0.04)
-      ..lineTo(w * 0.78, h * 0.36)
-      ..lineTo(w * 0.62, h * 0.50)
-      ..close();
-    canvas.drawPath(greenPath, Paint()..color = const Color(0xFF00E676)..style = PaintingStyle.fill);
-
-    final redPath = Path()
-      ..moveTo(w * 0.08, h * 0.96)
-      ..lineTo(w * 0.62, h * 0.50)
-      ..lineTo(w * 0.78, h * 0.64)
-      ..close();
-    canvas.drawPath(redPath, Paint()..color = const Color(0xFFFF334B)..style = PaintingStyle.fill);
-
-    final yellowPath = Path()
-      ..moveTo(w * 0.62, h * 0.50)
-      ..lineTo(w * 0.78, h * 0.36)
-      ..lineTo(w * 0.96, h * 0.50)
-      ..lineTo(w * 0.78, h * 0.64)
-      ..close();
-    canvas.drawPath(yellowPath, Paint()..color = const Color(0xFFFFD400)..style = PaintingStyle.fill);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _AppleLogoWidget extends StatelessWidget {
-  final double size;
-  final Color color;
-  const _AppleLogoWidget({this.size = 22, this.color = Colors.white});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(painter: _AppleLogoPainter(color: color)),
-    );
-  }
-}
-
-class _AppleLogoPainter extends CustomPainter {
-  final Color color;
-  const _AppleLogoPainter({this.color = Colors.white});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = color..style = PaintingStyle.fill;
-    final w = size.width;
-    final h = size.height;
-
-    final leafPath = Path();
-    leafPath.moveTo(w * 0.53, h * 0.20);
-    leafPath.cubicTo(w * 0.54, h * 0.10, w * 0.64, h * 0.02, w * 0.73, h * 0.02);
-    leafPath.cubicTo(w * 0.74, h * 0.13, w * 0.65, h * 0.22, w * 0.53, h * 0.20);
-    leafPath.close();
-    canvas.drawPath(leafPath, paint);
-
-    final bodyPath = Path();
-    bodyPath.moveTo(w * 0.53, h * 0.24);
-    bodyPath.cubicTo(w * 0.42, h * 0.24, w * 0.33, h * 0.30, w * 0.27, h * 0.30);
-    bodyPath.cubicTo(w * 0.16, h * 0.30, w * 0.06, h * 0.42, w * 0.06, h * 0.62);
-    bodyPath.cubicTo(w * 0.06, h * 0.79, w * 0.17, h * 0.98, w * 0.28, h * 0.98);
-    bodyPath.cubicTo(w * 0.35, h * 0.98, w * 0.39, h * 0.92, w * 0.49, h * 0.92);
-    bodyPath.cubicTo(w * 0.59, h * 0.92, w * 0.63, h * 0.98, w * 0.71, h * 0.98);
-    bodyPath.cubicTo(w * 0.81, h * 0.98, w * 0.92, h * 0.81, w * 0.95, h * 0.71);
-    bodyPath.cubicTo(w * 0.82, h * 0.67, w * 0.80, h * 0.47, w * 0.94, h * 0.42);
-    bodyPath.cubicTo(w * 0.85, h * 0.27, w * 0.70, h * 0.24, w * 0.63, h * 0.24);
-    bodyPath.cubicTo(w * 0.58, h * 0.24, w * 0.56, h * 0.26, w * 0.53, h * 0.24);
-    bodyPath.close();
-    canvas.drawPath(bodyPath, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// ─── Dual Angled Hero Phone Mockups (Full-Space Visual Showcase) ─────────────
-class _DualAngledHeroMockups extends StatelessWidget {
-  final bool isDesktop;
-  const _DualAngledHeroMockups({required this.isDesktop});
-
-  @override
-  Widget build(BuildContext context) {
-    if (!isDesktop) {
-      return Center(
-        child: Container(
-          width: double.infinity,
-          height: 520,
-          margin: const EdgeInsets.symmetric(horizontal: 8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.08),
-                blurRadius: 24,
-                offset: const Offset(0, 10),
-              ),
+    return Transform.scale(
+      scale: scale,
+      child: Container(
+        width: 310,
+        height: 620,
+        padding: const EdgeInsets.all(9),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(45),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF111329),
+              Color(0xFF45465B),
             ],
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF292083).withOpacity(0.20),
+              blurRadius: 60,
+              offset: const Offset(0, 30),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(37),
+          child: Container(
+            color: const Color(0xFFFCFCFF),
             child: Stack(
-              alignment: Alignment.center,
-              fit: StackFit.expand,
               children: [
-                Image.asset(
-                  'assets/images/african_person_mockup.jpg',
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const SizedBox(),
+                Column(
+                  children: [
+                    const SizedBox(height: 16),
+
+                    // Top Bar
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 21),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            '9:41',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF11163F),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1EFFF),
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                            child: const Text(
+                              'Live',
+                              style: TextStyle(
+                                color: Color(0xFF5535E8),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    // App Logo in Phone Header
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 21),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: GabisLogo(
+                          showingPay: showingPay,
+                          size: 22,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    if (!invoiceMode)
+                      const _HeroWalletContent()
+                    else
+                      const _HeroInvoiceContent(),
+                  ],
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.black.withOpacity(0.15),
-                        Colors.black.withOpacity(0.40),
-                        Colors.black.withOpacity(0.75),
-                      ],
+
+                // Dynamic Island
+                Positioned(
+                  top: 14,
+                  left: 105,
+                  child: Container(
+                    width: 85,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(20),
                     ),
                   ),
                 ),
-                Center(
-                  child: Transform.scale(
-                    scale: 0.85,
-                    child: const _SingleHeroPhone(type: _MockupType.walletBalances),
-                  ),
+
+                // Bottom Navigation
+                const Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: _HeroPhoneBottomNav(),
                 ),
               ],
             ),
           ),
         ),
-      );
-    }
-
-    return Center(
-      child: Container(
-        width: 1120,
-        height: 630,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(36),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.09),
-              blurRadius: 36,
-              offset: const Offset(0, 16),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(36),
-          child: Stack(
-            alignment: Alignment.center,
-            fit: StackFit.expand,
-            children: [
-              // Real African lifestyle photography occupying entire space
-              Image.asset(
-                'assets/images/african_person_mockup.jpg',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(color: const Color(0xFFF1F5F9)),
-              ),
-              // Multi-stop gradient overlay
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      Colors.black.withOpacity(0.55),
-                      Colors.black.withOpacity(0.20),
-                      Colors.black.withOpacity(0.60),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Dual Angled White iPhone Mockups Centered
-              Center(
-                child: SizedBox(
-                  width: 560,
-                  height: 580,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    clipBehavior: Clip.none,
-                    children: [
-                      Positioned(
-                        left: 0,
-                        top: 20,
-                        child: Transform.rotate(
-                          angle: -0.08,
-                          child: const _SingleHeroPhone(type: _MockupType.walletBalances),
-                        ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        top: 35,
-                        child: Transform.rotate(
-                          angle: 0.08,
-                          child: const _SingleHeroPhone(type: _MockupType.smartInvoices),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Floating Live Transaction Badges
-              Positioned(
-                left: 40,
-                bottom: 40,
-                child: _heroFloatingBadge(
-                  icon: Icons.check_circle_rounded,
-                  iconColor: kElumoGreen,
-                  title: '₦120,000 Tuition Settled',
-                  subtitle: 'skill-sch.com · Installment 2/4',
-                ),
-              ),
-              Positioned(
-                right: 40,
-                top: 40,
-                child: _heroFloatingBadge(
-                  icon: Icons.arrow_downward_rounded,
-                  iconColor: kElumoBlue,
-                  title: '+\$1,200 Upwork Direct ACH',
-                  subtitle: 'Instant NGN Bank Transfer',
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
+}
 
-  Widget _heroFloatingBadge({
-    required IconData icon,
-    required Color iconColor,
-    required String title,
-    required String subtitle,
-  }) {
+// ─── Hero Wallet Content ──────────────────────────────────────────────────────
+class _HeroWalletContent extends StatelessWidget {
+  const _HeroWalletContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 21),
+            child: Text(
+              'Total Net Balance',
+              style: TextStyle(
+                color: Color(0xFF78809A),
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 4),
+
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 21),
+            child: Text(
+              '₦14,820,000.00',
+              style: TextStyle(
+                color: Color(0xFF11163F),
+                fontSize: 26,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -1.2,
+              ),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 21),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 11),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF5535E8),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Send',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 11),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE0E2EC)),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Receive',
+                      style: TextStyle(
+                        color: Color(0xFF11163F),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 14),
+
+        _heroAccountCard('NGN Wallet', '₦10,400,000.00', const Color(0xFF5535E8)),
+        _heroAccountCard('USD Account', '\$5,420.00', const Color(0xFF3155D9)),
+        _heroAccountCard('GBP Account', '£1,850.00', const Color(0xFFE58B1B)),
+      ],
+    );
+  }
+
+  static Widget _heroAccountCard(String name, String amount, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.only(left: 21, right: 21, bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.92),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.18),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0x19282B48)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            name,
+            style: const TextStyle(
+              color: Color(0xFF303650),
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Text(
+            amount,
+            style: TextStyle(
+              color: color,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ],
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
-              shape: BoxShape.circle,
+    );
+  }
+}
+
+// ─── Hero Invoice Content ─────────────────────────────────────────────────────
+class _HeroInvoiceContent extends StatelessWidget {
+  const _HeroInvoiceContent();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 21),
+            child: Text(
+              'Smart Invoices & Ledgers',
+              style: TextStyle(
+                color: Color(0xFF69718D),
+                fontSize: 12,
+              ),
             ),
-            child: Icon(icon, color: iconColor, size: 18),
           ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+        ),
+
+        const SizedBox(height: 10),
+
+        _heroInvoiceCard('Skill School', '₦100,000', 'Amara J. · Inst 2/4', 'PAID', false),
+        _heroInvoiceCard('SolarGrid Energy', '₦200,000', 'Emmanuel A. · Inst 4/6', 'DUE', true),
+        _heroInvoiceCard('Acme Corp Software', '\$1,200', 'Q3 Retainer', 'PAID', false),
+
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 21, vertical: 10),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF1EFFF),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Row(
             children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: kElumoDark)),
-              const SizedBox(height: 2),
-              Text(subtitle, style: const TextStyle(color: Color(0xFF64748B), fontSize: 11)),
+              Icon(
+                Icons.bolt,
+                color: Color(0xFF5535E8),
+                size: 16,
+              ),
+              SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  '10-Day Automated SMS Reminders Active',
+                  style: TextStyle(
+                    color: Color(0xFF5535E8),
+                    fontSize: 8.5,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
             ],
           ),
+        ),
+      ],
+    );
+  }
+
+  static Widget _heroInvoiceCard(String name, String amount, String meta, String status, bool due) {
+    final statusColor = due ? const Color(0xFFE58B1B) : const Color(0xFF5535E8);
+
+    return Container(
+      margin: const EdgeInsets.only(left: 21, right: 21, bottom: 8),
+      padding: const EdgeInsets.all(11),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0x19282B48)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                name,
+                style: const TextStyle(
+                  color: Color(0xFF20263E),
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              Text(
+                amount,
+                style: TextStyle(
+                  color: statusColor,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 3),
+          Text(
+            meta,
+            style: const TextStyle(
+              color: Color(0xFF8790A9),
+              fontSize: 9.5,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            status,
+            style: TextStyle(
+              color: statusColor,
+              fontSize: 8.5,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
         ],
+      ),
+    );
+  }
+}
+
+// ─── Hero Phone Bottom Navigation ─────────────────────────────────────────────
+class _HeroPhoneBottomNav extends StatelessWidget {
+  const _HeroPhoneBottomNav();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.97),
+        border: const Border(
+          top: BorderSide(color: Color(0x14202540)),
+        ),
+      ),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _HeroBottomNavItem(icon: Icons.home_rounded, label: 'Home', active: true),
+          _HeroBottomNavItem(icon: Icons.receipt_long_outlined, label: 'Invoices'),
+          _HeroBottomNavItem(icon: Icons.bolt_outlined, label: 'Payments'),
+          _HeroBottomNavItem(icon: Icons.settings_outlined, label: 'Settings'),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroBottomNavItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool active;
+
+  const _HeroBottomNavItem({
+    required this.icon,
+    required this.label,
+    this.active = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          icon,
+          size: 15,
+          color: active ? const Color(0xFF5535E8) : const Color(0xFF7B8299),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 7.5,
+            fontWeight: FontWeight.w700,
+            color: active ? const Color(0xFF5535E8) : const Color(0xFF7B8299),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Floating Animated Transaction Badge ─────────────────────────────────────
+class _FloatingTransactionBadge extends StatefulWidget {
+  final double width;
+  final IconData icon;
+  final String title;
+  final String amount;
+  final String subtitle;
+
+  const _FloatingTransactionBadge({
+    required this.width,
+    required this.icon,
+    required this.title,
+    required this.amount,
+    required this.subtitle,
+  });
+
+  @override
+  State<_FloatingTransactionBadge> createState() => _FloatingTransactionBadgeState();
+}
+
+class _FloatingTransactionBadgeState extends State<_FloatingTransactionBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (_, child) {
+        final y = math.sin(_controller.value * math.pi) * 8;
+        return Transform.translate(
+          offset: Offset(0, -y),
+          child: child,
+        );
+      },
+      child: Container(
+        width: widget.width,
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.97),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: const Color(0x19282B48),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF292083).withOpacity(0.14),
+              blurRadius: 40,
+              offset: const Offset(0, 18),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: const BoxDecoration(
+                color: Color(0xFFF1EFFF),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                widget.icon,
+                color: const Color(0xFF5535E8),
+                size: 18,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      color: Color(0xFF11163F),
+                      fontSize: 11.5,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    widget.amount,
+                    style: const TextStyle(
+                      color: Color(0xFF11163F),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    widget.subtitle,
+                    style: const TextStyle(
+                      color: Color(0xFF77809B),
+                      fontSize: 9,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2280,6 +2730,167 @@ class _DownloadCtaSection extends StatelessWidget {
       ),
     );
   }
+}
+
+class _StoreButton extends StatefulWidget {
+  final Widget iconWidget;
+  final String label;
+  final VoidCallback onTap;
+  final Color backgroundColor;
+  const _StoreButton({
+    required this.iconWidget,
+    required this.label,
+    required this.onTap,
+    this.backgroundColor = const Color(0xFF1E1B4B),
+  });
+
+  @override
+  State<_StoreButton> createState() => _StoreButtonState();
+}
+
+class _StoreButtonState extends State<_StoreButton> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+          decoration: BoxDecoration(
+            color: _hovered ? widget.backgroundColor.withOpacity(0.85) : widget.backgroundColor,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withOpacity(0.12), width: 1.5),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              widget.iconWidget,
+              const SizedBox(width: 10),
+              Text(
+                widget.label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14.5,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GooglePlayLogoWidget extends StatelessWidget {
+  final double size;
+  const _GooglePlayLogoWidget({this.size = 22});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(painter: _GooglePlayPainter()),
+    );
+  }
+}
+
+class _GooglePlayPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    final bluePath = Path()
+      ..moveTo(w * 0.08, h * 0.04)
+      ..lineTo(w * 0.62, h * 0.50)
+      ..lineTo(w * 0.08, h * 0.96)
+      ..close();
+    canvas.drawPath(bluePath, Paint()..color = const Color(0xFF00D2FF)..style = PaintingStyle.fill);
+
+    final greenPath = Path()
+      ..moveTo(w * 0.08, h * 0.04)
+      ..lineTo(w * 0.78, h * 0.36)
+      ..lineTo(w * 0.62, h * 0.50)
+      ..close();
+    canvas.drawPath(greenPath, Paint()..color = const Color(0xFF00E676)..style = PaintingStyle.fill);
+
+    final redPath = Path()
+      ..moveTo(w * 0.08, h * 0.96)
+      ..lineTo(w * 0.62, h * 0.50)
+      ..lineTo(w * 0.78, h * 0.64)
+      ..close();
+    canvas.drawPath(redPath, Paint()..color = const Color(0xFFFF334B)..style = PaintingStyle.fill);
+
+    final yellowPath = Path()
+      ..moveTo(w * 0.62, h * 0.50)
+      ..lineTo(w * 0.78, h * 0.36)
+      ..lineTo(w * 0.96, h * 0.50)
+      ..lineTo(w * 0.78, h * 0.64)
+      ..close();
+    canvas.drawPath(yellowPath, Paint()..color = const Color(0xFFFFD400)..style = PaintingStyle.fill);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _AppleLogoWidget extends StatelessWidget {
+  final double size;
+  final Color color;
+  const _AppleLogoWidget({this.size = 22, this.color = Colors.white});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(painter: _AppleLogoPainter(color: color)),
+    );
+  }
+}
+
+class _AppleLogoPainter extends CustomPainter {
+  final Color color;
+  const _AppleLogoPainter({this.color = Colors.white});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color..style = PaintingStyle.fill;
+    final w = size.width;
+    final h = size.height;
+
+    final leafPath = Path();
+    leafPath.moveTo(w * 0.53, h * 0.20);
+    leafPath.cubicTo(w * 0.54, h * 0.10, w * 0.64, h * 0.02, w * 0.73, h * 0.02);
+    leafPath.cubicTo(w * 0.74, h * 0.13, w * 0.65, h * 0.22, w * 0.53, h * 0.20);
+    leafPath.close();
+    canvas.drawPath(leafPath, paint);
+
+    final bodyPath = Path();
+    bodyPath.moveTo(w * 0.53, h * 0.24);
+    bodyPath.cubicTo(w * 0.42, h * 0.24, w * 0.33, h * 0.30, w * 0.27, h * 0.30);
+    bodyPath.cubicTo(w * 0.16, h * 0.30, w * 0.06, h * 0.42, w * 0.06, h * 0.62);
+    bodyPath.cubicTo(w * 0.06, h * 0.79, w * 0.17, h * 0.98, w * 0.28, h * 0.98);
+    bodyPath.cubicTo(w * 0.35, h * 0.98, w * 0.39, h * 0.92, w * 0.49, h * 0.92);
+    bodyPath.cubicTo(w * 0.59, h * 0.92, w * 0.63, h * 0.98, w * 0.71, h * 0.98);
+    bodyPath.cubicTo(w * 0.81, h * 0.98, w * 0.92, h * 0.81, w * 0.95, h * 0.71);
+    bodyPath.cubicTo(w * 0.82, h * 0.67, w * 0.80, h * 0.47, w * 0.94, h * 0.42);
+    bodyPath.cubicTo(w * 0.85, h * 0.27, w * 0.70, h * 0.24, w * 0.63, h * 0.24);
+    bodyPath.cubicTo(w * 0.58, h * 0.24, w * 0.56, h * 0.26, w * 0.53, h * 0.24);
+    bodyPath.close();
+    canvas.drawPath(bodyPath, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _FooterSection extends StatelessWidget {

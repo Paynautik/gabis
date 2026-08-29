@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,109 @@ class NautikLogoMark extends StatelessWidget {
   }
 }
 
+class GabisLogo extends StatefulWidget {
+  final bool? showingPay;
+  final double size;
+  final bool isWhite;
+
+  const GabisLogo({
+    super.key,
+    this.showingPay,
+    this.size = 32,
+    this.isWhite = false,
+  });
+
+  @override
+  State<GabisLogo> createState() => _GabisLogoState();
+}
+
+class _GabisLogoState extends State<GabisLogo> {
+  late bool _showingPay;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _showingPay = widget.showingPay ?? true;
+    if (widget.showingPay == null) {
+      _timer = Timer.periodic(const Duration(seconds: 3), (_) {
+        if (mounted) {
+          setState(() {
+            _showingPay = !_showingPay;
+          });
+        }
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant GabisLogo oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.showingPay != null) {
+      _showingPay = widget.showingPay!;
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final effectivePay = widget.showingPay ?? _showingPay;
+    final primaryColor = widget.isWhite ? Colors.white : const Color(0xFF11163F);
+    final accentColor = widget.isWhite ? const Color(0xFF93C5FD) : (effectivePay ? const Color(0xFF5535E8) : const Color(0xFF292083));
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Text(
+          'gabis',
+          style: TextStyle(
+            fontSize: widget.size,
+            height: 0.95,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -widget.size * 0.05,
+            color: primaryColor,
+          ),
+        ),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 500),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 0.15),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            );
+          },
+          child: Text(
+            effectivePay ? 'Pay' : 'm',
+            key: ValueKey<bool>(effectivePay),
+            style: TextStyle(
+              fontSize: widget.size,
+              height: 0.95,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -widget.size * 0.05,
+              color: accentColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class GabismWordmark extends StatelessWidget {
   final double height;
   final bool isWhite;
@@ -18,22 +122,7 @@ class GabismWordmark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      isWhite ? 'assets/gabism_logo_white.png' : 'assets/gabism_logo.png',
-      height: height,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) {
-        return Text(
-          'gabism',
-          style: TextStyle(
-            color: isWhite ? Colors.white : const Color(0xFF1E0E62),
-            fontSize: height * 0.75,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.5,
-          ),
-        );
-      },
-    );
+    return GabisLogo(size: height, isWhite: isWhite);
   }
 }
 
