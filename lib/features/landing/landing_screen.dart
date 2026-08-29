@@ -375,26 +375,31 @@ class _HeroImage extends StatelessWidget {
     final w = MediaQuery.of(context).size.width;
     final mobile = w < 900;
 
+    // Fixed dimensions matching the reference composition
+    const double compositionH = 640.0;
+    const double photoW       = 340.0;   // person card width
+    const double phoneScale   = 1.0;     // full size phone
+
     return SizedBox(
-      height: mobile ? 480 : 660,
+      width: double.infinity,
+      height: mobile ? 520 : compositionH,
       child: Stack(
         clipBehavior: Clip.none,
-        alignment: Alignment.center,
         children: [
-          // ── Person photo (left / behind) ──
+          // ── Person photo card (left, behind) ──
           Positioned(
             left: 0,
-            top: 0,
+            top: mobile ? 20 : 0,
             bottom: 0,
             child: Container(
-              width: mobile ? 220 : 320,
+              width: mobile ? 200 : photoW,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.18),
-                    blurRadius: 40,
-                    offset: const Offset(0, 16),
+                    color: Colors.black.withValues(alpha: 0.22),
+                    blurRadius: 48,
+                    offset: const Offset(0, 20),
                   ),
                 ],
               ),
@@ -402,18 +407,20 @@ class _HeroImage extends StatelessWidget {
               child: Image.network(
                 'hero_person.jpg',
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(color: const Color(0xFF1E293B)),
+                errorBuilder: (_, __, ___) => Container(
+                  decoration: const BoxDecoration(color: Color(0xFF1E293B)),
+                ),
               ),
             ),
           ),
 
-          // ── Phone mockup (right / in front, overlapping person) ──
+          // ── Phone mockup (right, in front) — same height as photo ──
           Positioned(
-            right: 0,
-            top: mobile ? 40 : 20,
-            bottom: mobile ? 0 : 20,
+            right: mobile ? -10 : 0,
+            top: mobile ? 0 : 20,
+            bottom: mobile ? 20 : 0,
             child: Transform.scale(
-              scale: mobile ? 0.78 : 0.92,
+              scale: mobile ? 0.72 : phoneScale,
               alignment: Alignment.centerRight,
               child: const _PhoneMockup(),
             ),
@@ -491,9 +498,9 @@ class _PhoneMockup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double phoneW = 300;
-    const double phoneH = 620;
-    const double cornerRadius = 50.0;
+    const double phoneW = 310;
+    const double phoneH = 600;
+    const double cornerRadius = 48.0;
 
     return SizedBox(
       width: phoneW + 16,
