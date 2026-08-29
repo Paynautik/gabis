@@ -367,6 +367,44 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
         ),
       ],
     ),
+    ConnectedCompany(
+      name: 'SolarGrid Energy',
+      domain: 'solargrid.ng',
+      paymentType: 'Solar Inverter Installments',
+      payers: [
+        Payer(
+          name: 'Emmanuel Adeyemi',
+          email: 'emmanuel@adeyemi.ng',
+          phone: '+2348045678901',
+          totalAmount: 1200000,
+          amountPaid: 800000,
+          installments: 6,
+          currentInstallment: 4,
+          nextDueDate: DateTime.now().add(const Duration(days: 6)),
+          status: 'reminder_sent',
+          payments: [
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 90)), amount: 200000, note: 'Installment 1 of 6'),
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 60)), amount: 200000, note: 'Installment 2 of 6'),
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 30)), amount: 200000, note: 'Installment 3 of 6'),
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 1)), amount: 200000, note: 'Installment 4 of 6'),
+          ],
+        ),
+        Payer(
+          name: 'Ngozi Okonkwo',
+          email: 'ngozi.o@gmail.com',
+          phone: '+2348056789012',
+          totalAmount: 850000,
+          amountPaid: 283333,
+          installments: 3,
+          currentInstallment: 1,
+          nextDueDate: DateTime.now().subtract(const Duration(days: 7)),
+          status: 'defaulted',
+          payments: [
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 37)), amount: 283333, note: 'Installment 1 of 3'),
+          ],
+        ),
+      ],
+    ),
   ];
 
   void _addCompany() {
@@ -375,11 +413,11 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: const Text('Connect a Company', style: TextStyle(color: Colors.white)),
       content: Column(mainAxisSize: MainAxisSize.min, children: [
-        _buildField('Company Name', 'e.g. Skill School', _nameCtrl),
+        _buildField('Company Name', 'e.g. Skill School, SolarGrid, Acme Corp', _nameCtrl),
         const SizedBox(height: 12),
-        _buildField('Domain', 'e.g. skill-sch.com', _domainCtrl),
+        _buildField('Domain', 'e.g. skill-sch.com, company.com', _domainCtrl),
         const SizedBox(height: 12),
-        _buildField('Payment Type', 'e.g. Tuition Fees', _typeCtrl),
+        _buildField('Payment Type', 'e.g. Tuition Fees, Device Installments, Retainer', _typeCtrl),
       ]),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel', style: TextStyle(color: Color(0xFFA1A1AA)))),
@@ -387,7 +425,7 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
           style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black),
           onPressed: () {
             if (_nameCtrl.text.isEmpty || _domainCtrl.text.isEmpty) return;
-            setState(() => _companies.add(ConnectedCompany(name: _nameCtrl.text.trim(), domain: _domainCtrl.text.trim(), paymentType: _typeCtrl.text.trim().isEmpty ? 'General' : _typeCtrl.text.trim())));
+            setState(() => _companies.add(ConnectedCompany(name: _nameCtrl.text.trim(), domain: _domainCtrl.text.trim(), paymentType: _typeCtrl.text.trim().isEmpty ? 'Installments' : _typeCtrl.text.trim())));
             _nameCtrl.clear(); _domainCtrl.clear(); _typeCtrl.clear();
             Navigator.pop(ctx);
           },
@@ -401,18 +439,18 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
     showDialog(context: context, builder: (ctx) => AlertDialog(
       backgroundColor: const Color(0xFF18181B),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Text('Add Student / Customer to ${_companies[companyIndex].name}', style: const TextStyle(color: Colors.white, fontSize: 16)),
+      title: Text('Add Customer / Payer to ${_companies[companyIndex].name}', style: const TextStyle(color: Colors.white, fontSize: 16)),
       content: SingleChildScrollView(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
-          _buildField('Full Name', 'e.g. Amara Johnson', _payerNameCtrl),
+          _buildField('Customer / Student Name', 'e.g. Amara Johnson', _payerNameCtrl),
           const SizedBox(height: 12),
-          _buildField('Email', 'e.g. amara@gmail.com', _payerEmailCtrl),
+          _buildField('Email', 'e.g. customer@gmail.com', _payerEmailCtrl),
           const SizedBox(height: 12),
           _buildField('Phone Number', 'e.g. +2348012345678', _payerPhoneCtrl),
           const SizedBox(height: 12),
-          _buildField('Total Fee', 'e.g. 500000', _payerAmountCtrl, isNumber: true),
+          _buildField('Total Amount (NGN)', 'e.g. 500000', _payerAmountCtrl, isNumber: true),
           const SizedBox(height: 12),
-          _buildField('Installments', 'e.g. 4', _payerInstCtrl, isNumber: true),
+          _buildField('Number of Installments', 'e.g. 4', _payerInstCtrl, isNumber: true),
         ]),
       ),
       actions: [
@@ -439,7 +477,7 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
             _payerNameCtrl.clear(); _payerEmailCtrl.clear(); _payerPhoneCtrl.clear(); _payerAmountCtrl.clear(); _payerInstCtrl.clear();
             Navigator.pop(ctx);
           },
-          child: const Text('Add'),
+          child: const Text('Add Customer'),
         ),
       ],
     ));
@@ -551,7 +589,7 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
           const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('Connected Payments', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600)),
             SizedBox(height: 8),
-            Text('Connect companies and track every student/customer installment payment. Automatic reminders 10 days before due, robot callers for defaulters.', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 13, height: 1.5)),
+            Text('Connect any company (schools, retailers, solar providers, agencies) and track every customer installment plan. Automatic SMS reminders 10 days before due, robot voice calls for defaulters.', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 13, height: 1.5)),
           ])),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.black, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
@@ -594,7 +632,7 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
                     ]),
                     const SizedBox(height: 20),
                     Row(children: [
-                      _compactStat('Students', '${c.payers.length}'),
+                      _compactStat('Customers', '${c.payers.length}'),
                       const SizedBox(width: 24),
                       _compactStat('Collected', _formatCurrency(c.totalCollected)),
                       const SizedBox(width: 24),
@@ -608,19 +646,19 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
                 ),
               ),
 
-              // Expanded: student list
+              // Expanded: customer list
               if (isExpanded) ...[
                 const Divider(color: Color(0xFF27272A), height: 1),
                 Container(
                   padding: const EdgeInsets.all(24),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
-                      const Text('Students / Customers', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                      Text('${c.name} Customers & Payers', style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
                       const Spacer(),
                       TextButton.icon(
                         onPressed: () => _addPayer(ci),
                         icon: const Icon(Icons.person_add, size: 14, color: Color(0xFF3B82F6)),
-                        label: const Text('Add Student', style: TextStyle(color: Color(0xFF3B82F6), fontSize: 12, fontWeight: FontWeight.w600)),
+                        label: const Text('Add Customer', style: TextStyle(color: Color(0xFF3B82F6), fontSize: 12, fontWeight: FontWeight.w600)),
                       ),
                     ]),
                     const SizedBox(height: 16),
