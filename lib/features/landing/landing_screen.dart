@@ -315,34 +315,7 @@ class _HeroSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Badge Header
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            decoration: BoxDecoration(
-              color: kElumoGreen.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: kElumoGreen.withOpacity(0.3)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CustomPaint(
-                  size: const Size(12, 14),
-                  painter: _VectorBoltPainter(color: kElumoGreen),
-                ),
-                const SizedBox(width: 8),
-                const Text(
-                  "Africa's All-in-One Borderless Money Platform",
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w700,
-                    color: kElumoGreen,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 10),
 
           // Main Multi-Color Headline (ElumoPay's Value Proposition)
           Text.rich(
@@ -684,7 +657,7 @@ class _DualAngledHeroMockups extends StatelessWidget {
 
           // Left Tilted Phone (-6 degrees)
           Positioned(
-            left: MediaQuery.of(context).size.width * 0.15,
+            left: (MediaQuery.of(context).size.width - 560) / 2 - 120,
             top: 20,
             child: Transform.rotate(
               angle: -0.08,
@@ -694,94 +667,11 @@ class _DualAngledHeroMockups extends StatelessWidget {
 
           // Right Tilted Phone (+6 degrees)
           Positioned(
-            right: MediaQuery.of(context).size.width * 0.15,
+            left: (MediaQuery.of(context).size.width - 560) / 2 + 120,
             top: 40,
             child: Transform.rotate(
               angle: 0.08,
               child: const _SingleHeroPhone(type: _MockupType.smartInvoices),
-            ),
-          ),
-
-          // Floating Payment Inflow Badge (+₦120,000)
-          Positioned(
-            top: 150,
-            right: MediaQuery.of(context).size.width * 0.22,
-            child: _FloatingInflowBadge(
-              amount: '+₦120,000.00',
-              title: 'Tuition Installment Inflow',
-              subtitle: 'skill-sch.com · Amara J.',
-              color: kElumoGreen,
-            ),
-          ),
-
-          // Floating Payment Success Badge (Left)
-          Positioned(
-            bottom: 110,
-            left: MediaQuery.of(context).size.width * 0.18,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: kElumoGreen.withOpacity(0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    alignment: Alignment.center,
-                    child: CustomPaint(
-                      size: const Size(14, 14),
-                      painter: _VectorCheckPainter(color: kElumoGreen),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Payment Successful', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: kElumoDark)),
-                      Text('USD Debit Card · \$45.00', style: TextStyle(fontSize: 10, color: kElumoMuted)),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // Floating Gold Coin Badge
-          Positioned(
-            top: 40,
-            left: MediaQuery.of(context).size.width * 0.12,
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFFFD54F), Color(0xFFF59E0B)],
-                ),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: kElumoAmber.withOpacity(0.4),
-                    blurRadius: 15,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: const Center(
-                child: Text('₦', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900)),
-              ),
             ),
           ),
         ],
