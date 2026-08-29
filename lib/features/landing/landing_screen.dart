@@ -21,28 +21,7 @@ const Color kPastelBlue       = Color(0xFFDBEAFE);
 const Color kPastelAmber      = Color(0xFFFEF3C7);
 const Color kPastelIndigo     = Color(0xFFEDE9FE);
 
-// ─── Navigation Global Keys ───────────────────────────────────────────────────
-final _showcaseKey    = GlobalKey();
-final _useCasesKey    = GlobalKey();
-final _comparisonKey  = GlobalKey();
-final _cardsKey       = GlobalKey();
-final _securityKey    = GlobalKey();
-final _faqKey         = GlobalKey();
-
-void _scrollTo(GlobalKey key) {
-  if (key.currentContext != null) {
-    Scrollable.ensureVisible(
-      key.currentContext!,
-      duration: const Duration(milliseconds: 600),
-      curve: Curves.easeOutCubic,
-    );
-  }
-}
-
-// ============================================================
-// COLORS
-// ============================================================
-
+// ─── Constants ─────────────────────────────────────────────────────────────
 class AppColors {
   static const navy = Color(0xFF11163F);
   static const indigo = Color(0xFF292083);
@@ -60,17 +39,54 @@ class AppColors {
 // ============================================================================
 // MAIN LANDING SCREEN
 // ============================================================================
-class LandingScreen extends StatelessWidget {
+class LandingScreen extends StatefulWidget {
   const LandingScreen({super.key});
+
+  @override
+  State<LandingScreen> createState() => _LandingScreenState();
+}
+
+class _LandingScreenState extends State<LandingScreen> {
+  final _scrollController = ScrollController();
+  final _showcaseKey = GlobalKey();
+  final _useCasesKey = GlobalKey();
+  final _comparisonKey = GlobalKey();
+  final _cardsKey = GlobalKey();
+  final _securityKey = GlobalKey();
+  final _faqKey = GlobalKey();
+
+  void _scrollTo(GlobalKey key) {
+    if (key.currentContext != null) {
+      Scrollable.ensureVisible(
+        key.currentContext!,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeOutCubic,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Column(
           children: [
-            const GabisPayHero(),
+            GabisPayHero(
+              onScrollTo: _scrollTo,
+              showcaseKey: _showcaseKey,
+              useCasesKey: _useCasesKey,
+              cardsKey: _cardsKey,
+              comparisonKey: _comparisonKey,
+              faqKey: _faqKey,
+            ),
             _InteractiveFeatureSlideSection(key: _showcaseKey),
             _UseCasesSection(key: _useCasesKey),
             _ValueComparisonSection(key: _comparisonKey),
@@ -91,7 +107,22 @@ class LandingScreen extends StatelessWidget {
 // ============================================================
 
 class GabisPayHero extends StatefulWidget {
-  const GabisPayHero({super.key});
+  final void Function(GlobalKey)? onScrollTo;
+  final GlobalKey? showcaseKey;
+  final GlobalKey? useCasesKey;
+  final GlobalKey? cardsKey;
+  final GlobalKey? comparisonKey;
+  final GlobalKey? faqKey;
+
+  const GabisPayHero({
+    super.key,
+    this.onScrollTo,
+    this.showcaseKey,
+    this.useCasesKey,
+    this.cardsKey,
+    this.comparisonKey,
+    this.faqKey,
+  });
 
   @override
   State<GabisPayHero> createState() => _GabisPayHeroState();
@@ -146,6 +177,12 @@ class _GabisPayHeroState extends State<GabisPayHero> {
             children: [
               _Navigation(
                 showingPay: showingPay,
+                onScrollTo: widget.onScrollTo,
+                showcaseKey: widget.showcaseKey,
+                useCasesKey: widget.useCasesKey,
+                cardsKey: widget.cardsKey,
+                comparisonKey: widget.comparisonKey,
+                faqKey: widget.faqKey,
               ),
 
               Padding(
@@ -203,9 +240,21 @@ class _GabisPayHeroState extends State<GabisPayHero> {
 
 class _Navigation extends StatelessWidget {
   final bool showingPay;
+  final void Function(GlobalKey)? onScrollTo;
+  final GlobalKey? showcaseKey;
+  final GlobalKey? useCasesKey;
+  final GlobalKey? cardsKey;
+  final GlobalKey? comparisonKey;
+  final GlobalKey? faqKey;
 
   const _Navigation({
     required this.showingPay,
+    this.onScrollTo,
+    this.showcaseKey,
+    this.useCasesKey,
+    this.cardsKey,
+    this.comparisonKey,
+    this.faqKey,
   });
 
   @override
@@ -227,11 +276,36 @@ class _Navigation extends StatelessWidget {
           if (width > 850)
             Row(
               children: [
-                _NavLink('Features', onTap: () => _scrollTo(_showcaseKey)),
-                _NavLink('For Business', onTap: () => _scrollTo(_useCasesKey)),
-                _NavLink('Cards', onTap: () => _scrollTo(_cardsKey)),
-                _NavLink('Why gabism', onTap: () => _scrollTo(_comparisonKey)),
-                _NavLink('FAQ', onTap: () => _scrollTo(_faqKey)),
+                _NavLink(
+                  'Features',
+                  onTap: () {
+                    if (showcaseKey != null) onScrollTo?.call(showcaseKey!);
+                  },
+                ),
+                _NavLink(
+                  'For Business',
+                  onTap: () {
+                    if (useCasesKey != null) onScrollTo?.call(useCasesKey!);
+                  },
+                ),
+                _NavLink(
+                  'Cards',
+                  onTap: () {
+                    if (cardsKey != null) onScrollTo?.call(cardsKey!);
+                  },
+                ),
+                _NavLink(
+                  'Why gabism',
+                  onTap: () {
+                    if (comparisonKey != null) onScrollTo?.call(comparisonKey!);
+                  },
+                ),
+                _NavLink(
+                  'FAQ',
+                  onTap: () {
+                    if (faqKey != null) onScrollTo?.call(faqKey!);
+                  },
+                ),
                 const SizedBox(width: 25),
                 _NavButton(),
               ],

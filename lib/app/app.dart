@@ -25,8 +25,9 @@ class ElumoApp extends ConsumerWidget {
       themeMode: themeMode,
       theme: AppTheme.getTheme(Brightness.light),
       darkTheme: AppTheme.getTheme(Brightness.dark),
-      initialRoute: '/splash',
+      initialRoute: '/',
       routes: {
+        '/': (_) => const LandingScreen(),
         '/splash': (_) => const SplashScreen(),
         '/landing': (_) => const LandingScreen(),
         '/login': (_) => const LoginScreen(),
