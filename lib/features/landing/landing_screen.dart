@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../shared/widgets/nautik_logo.dart';
@@ -14,19 +15,20 @@ const Color kElumoCanvas      = Color(0xFFF8FAFC); // Main page background
 const Color kElumoMuted       = Color(0xFF64748B); // Slate 500
 const Color kElumoBorder      = Color(0xFFE2E8F0); // Slate 200
 
-// Pastel Card Backgrounds (ElumoPay brand tints)
-const Color kPastelMint       = Color(0xFFDCFCE7); // Elumo Green Pastel
-const Color kPastelBlue       = Color(0xFFDBEAFE); // Elumo Blue Pastel
-const Color kPastelAmber      = Color(0xFFFEF3C7); // Elumo Amber Pastel
-const Color kPastelIndigo     = Color(0xFFEDE9FE); // Elumo Indigo Pastel
+// Pastel Card Backgrounds
+const Color kPastelMint       = Color(0xFFDCFCE7);
+const Color kPastelBlue       = Color(0xFFDBEAFE);
+const Color kPastelAmber      = Color(0xFFFEF3C7);
+const Color kPastelIndigo     = Color(0xFFEDE9FE);
 
 // ─── Navigation Global Keys ───────────────────────────────────────────────────
-final _walletsKey     = GlobalKey();
-final _usdAccountKey  = GlobalKey();
-final _transfersKey   = GlobalKey();
+final _showcaseKey    = GlobalKey();
+final _useCasesKey    = GlobalKey();
+final _comparisonKey  = GlobalKey();
 final _cardsKey       = GlobalKey();
 final _billsKey       = GlobalKey();
-final _complianceKey  = GlobalKey();
+final _securityKey    = GlobalKey();
+final _faqKey         = GlobalKey();
 
 // ============================================================================
 // MAIN LANDING SCREEN
@@ -43,52 +45,13 @@ class LandingScreen extends StatelessWidget {
           children: [
             const _NavHeader(),
             const _HeroSection(),
-            _PastelFeatureSection(
-              key: _walletsKey,
-              backgroundColor: kPastelMint,
-              titlePrefix: 'One Account,\n',
-              titleHighlight: 'Multiple Currencies.',
-              titleSuffix: '\nNo borders.',
-              description: 'Manage NGN, USD, GBP, and EUR seamlessly. Track customer installment plans, send automated reminders, and collect payments effortlessly.',
-              linkText: 'Open a Multi-Currency Account →',
-              isImageRight: true,
-              screenType: _MockupType.walletBalances,
-            ),
-            _PastelFeatureSection(
-              key: _usdAccountKey,
-              backgroundColor: kPastelBlue,
-              titlePrefix: 'Open a USD bank\n',
-              titleHighlight: 'account in minutes',
-              titleSuffix: '',
-              description: 'Get dedicated US routing and account numbers. Receive payments from global clients, platforms, and employers with zero friction.',
-              linkText: 'Get a USD Account →',
-              isImageRight: false,
-              screenType: _MockupType.usdAccount,
-            ),
-            _PastelFeatureSection(
-              key: _transfersKey,
-              backgroundColor: kPastelAmber,
-              titlePrefix: 'Smart Invoicing &\n',
-              titleHighlight: 'Global Transfers',
-              titleSuffix: '',
-              description: 'Generate professional invoices, track installments for schools and businesses, and move funds across Africa and beyond at real-time rates.',
-              linkText: 'Explore Invoicing & Transfers →',
-              isImageRight: true,
-              screenType: _MockupType.smartInvoices,
-            ),
-            _PastelFeatureSection(
-              backgroundColor: kPastelIndigo,
-              titlePrefix: 'Instant Currency\n',
-              titleHighlight: 'conversion at best value',
-              titleSuffix: '',
-              description: 'Swap between African and global currencies instantly with transparent, bank-beating FX rates and zero hidden charges.',
-              linkText: 'View Live Exchange Rates →',
-              isImageRight: false,
-              screenType: _MockupType.currencySwap,
-            ),
-            _DarkShowcaseSection(key: _cardsKey),
+            _InteractiveFeatureSlideSection(key: _showcaseKey),
+            _UseCasesSection(key: _useCasesKey),
+            _ValueComparisonSection(key: _comparisonKey),
+            _DarkCardsShowcaseSection(key: _cardsKey),
             _BillsPaymentSection(key: _billsKey),
-            _SecurityComplianceSection(key: _complianceKey),
+            _SecurityComplianceSection(key: _securityKey),
+            _FaqSection(key: _faqKey),
             const _DownloadCtaSection(),
             const _FooterSection(),
           ],
@@ -147,24 +110,26 @@ class _NavHeader extends StatelessWidget {
           ),
           const Spacer(),
           if (isDesktopFull) ...[
-            _NavLink('Accounts & FX', onTap: () => _scrollTo(_walletsKey)),
+            _NavLink('Features', onTap: () => _scrollTo(_showcaseKey)),
             const SizedBox(width: 20),
-            _NavLink('USD Banking', onTap: () => _scrollTo(_usdAccountKey)),
+            _NavLink('Use Cases', onTap: () => _scrollTo(_useCasesKey)),
             const SizedBox(width: 20),
-            _NavLink('Smart Invoices', onTap: () => _scrollTo(_transfersKey)),
+            _NavLink('Why Elumo', onTap: () => _scrollTo(_comparisonKey)),
             const SizedBox(width: 20),
             _NavLink('Virtual Cards', onTap: () => _scrollTo(_cardsKey)),
             const SizedBox(width: 20),
             _NavLink('Bill Payments', onTap: () => _scrollTo(_billsKey)),
             const SizedBox(width: 20),
-            _NavLink('Security & Tax', onTap: () => _scrollTo(_complianceKey)),
+            _NavLink('Security & Tax', onTap: () => _scrollTo(_securityKey)),
+            const SizedBox(width: 20),
+            _NavLink('FAQ', onTap: () => _scrollTo(_faqKey)),
             const SizedBox(width: 24),
           ] else if (isTablet) ...[
-            _NavLink('Accounts', onTap: () => _scrollTo(_walletsKey)),
+            _NavLink('Features', onTap: () => _scrollTo(_showcaseKey)),
             const SizedBox(width: 16),
-            _NavLink('USD Banking', onTap: () => _scrollTo(_usdAccountKey)),
+            _NavLink('Use Cases', onTap: () => _scrollTo(_useCasesKey)),
             const SizedBox(width: 16),
-            _NavLink('Invoices', onTap: () => _scrollTo(_transfersKey)),
+            _NavLink('Cards', onTap: () => _scrollTo(_cardsKey)),
             const SizedBox(width: 16),
           ],
           _TextButton(
@@ -286,7 +251,7 @@ class _PrimaryPillButtonState extends State<_PrimaryPillButton> {
 }
 
 // ============================================================================
-// 2. HERO SECTION (ElumoPay Value Proposition + Dual iPhone Mockups)
+// 2. HERO SECTION (Clean, Multi-Color Headline + Download Buttons + Centered Mockup)
 // ============================================================================
 class _HeroSection extends StatelessWidget {
   const _HeroSection();
@@ -317,7 +282,7 @@ class _HeroSection extends StatelessWidget {
         children: [
           const SizedBox(height: 10),
 
-          // Main Multi-Color Headline (ElumoPay's Value Proposition)
+          // Main Multi-Color Headline
           Text.rich(
             TextSpan(
               children: [
@@ -379,7 +344,7 @@ class _HeroSection extends StatelessWidget {
           ),
           const SizedBox(height: 32),
 
-          // Store CTAs (Vector Play Store & Apple Logos)
+          // Store CTAs
           Wrap(
             spacing: 16,
             runSpacing: 12,
@@ -401,7 +366,7 @@ class _HeroSection extends StatelessWidget {
           ),
           const SizedBox(height: 48),
 
-          // Dual Angled Phone Mockups with floating badges
+          // Dual Angled Phone Mockups Centered
           _DualAngledHeroMockups(isDesktop: isDesktop),
         ],
       ),
@@ -466,35 +431,6 @@ class _StoreButtonState extends State<_StoreButton> {
 }
 
 // ─── Custom Pixel-Perfect Vector Icons ────────────────────────────────────────
-class _VectorBoltPainter extends CustomPainter {
-  final Color color;
-  const _VectorBoltPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
-    final w = size.width;
-    final h = size.height;
-
-    final path = Path()
-      ..moveTo(w * 0.60, 0)
-      ..lineTo(w * 0.15, h * 0.55)
-      ..lineTo(w * 0.52, h * 0.55)
-      ..lineTo(w * 0.40, h)
-      ..lineTo(w * 0.85, h * 0.45)
-      ..lineTo(w * 0.48, h * 0.45)
-      ..close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
 class _GooglePlayLogoWidget extends StatelessWidget {
   final double size;
   const _GooglePlayLogoWidget({this.size = 22});
@@ -504,9 +440,7 @@ class _GooglePlayLogoWidget extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(
-        painter: _GooglePlayPainter(),
-      ),
+      child: CustomPaint(painter: _GooglePlayPainter()),
     );
   }
 }
@@ -517,7 +451,6 @@ class _GooglePlayPainter extends CustomPainter {
     final w = size.width;
     final h = size.height;
 
-    // Blue Left Triangle
     final bluePath = Path()
       ..moveTo(w * 0.08, h * 0.04)
       ..lineTo(w * 0.62, h * 0.50)
@@ -525,7 +458,6 @@ class _GooglePlayPainter extends CustomPainter {
       ..close();
     canvas.drawPath(bluePath, Paint()..color = const Color(0xFF00D2FF)..style = PaintingStyle.fill);
 
-    // Green Top Triangle
     final greenPath = Path()
       ..moveTo(w * 0.08, h * 0.04)
       ..lineTo(w * 0.78, h * 0.36)
@@ -533,7 +465,6 @@ class _GooglePlayPainter extends CustomPainter {
       ..close();
     canvas.drawPath(greenPath, Paint()..color = const Color(0xFF00E676)..style = PaintingStyle.fill);
 
-    // Red Bottom Triangle
     final redPath = Path()
       ..moveTo(w * 0.08, h * 0.96)
       ..lineTo(w * 0.62, h * 0.50)
@@ -541,7 +472,6 @@ class _GooglePlayPainter extends CustomPainter {
       ..close();
     canvas.drawPath(redPath, Paint()..color = const Color(0xFFFF334B)..style = PaintingStyle.fill);
 
-    // Yellow Right Arrow
     final yellowPath = Path()
       ..moveTo(w * 0.62, h * 0.50)
       ..lineTo(w * 0.78, h * 0.36)
@@ -565,9 +495,7 @@ class _AppleLogoWidget extends StatelessWidget {
     return SizedBox(
       width: size,
       height: size,
-      child: CustomPaint(
-        painter: _AppleLogoPainter(color: color),
-      ),
+      child: CustomPaint(painter: _AppleLogoPainter(color: color)),
     );
   }
 }
@@ -578,14 +506,10 @@ class _AppleLogoPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.fill;
-
+    final paint = Paint()..color = color..style = PaintingStyle.fill;
     final w = size.width;
     final h = size.height;
 
-    // Leaf
     final leafPath = Path();
     leafPath.moveTo(w * 0.53, h * 0.20);
     leafPath.cubicTo(w * 0.54, h * 0.10, w * 0.64, h * 0.02, w * 0.73, h * 0.02);
@@ -593,7 +517,6 @@ class _AppleLogoPainter extends CustomPainter {
     leafPath.close();
     canvas.drawPath(leafPath, paint);
 
-    // Apple Body
     final bodyPath = Path();
     bodyPath.moveTo(w * 0.53, h * 0.24);
     bodyPath.cubicTo(w * 0.42, h * 0.24, w * 0.33, h * 0.30, w * 0.27, h * 0.30);
@@ -602,7 +525,6 @@ class _AppleLogoPainter extends CustomPainter {
     bodyPath.cubicTo(w * 0.35, h * 0.98, w * 0.39, h * 0.92, w * 0.49, h * 0.92);
     bodyPath.cubicTo(w * 0.59, h * 0.92, w * 0.63, h * 0.98, w * 0.71, h * 0.98);
     bodyPath.cubicTo(w * 0.81, h * 0.98, w * 0.92, h * 0.81, w * 0.95, h * 0.71);
-    // Bite cutout
     bodyPath.cubicTo(w * 0.82, h * 0.67, w * 0.80, h * 0.47, w * 0.94, h * 0.42);
     bodyPath.cubicTo(w * 0.85, h * 0.27, w * 0.70, h * 0.24, w * 0.63, h * 0.24);
     bodyPath.cubicTo(w * 0.58, h * 0.24, w * 0.56, h * 0.26, w * 0.53, h * 0.24);
@@ -614,9 +536,7 @@ class _AppleLogoPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-// ============================================================================
-// DUAL ANGLED HERO PHONE MOCKUPS (Clean Tilted iPhone 15 Pro Display)
-// ============================================================================
+// ─── Dual Angled Hero Phone Mockups (Centered) ────────────────────────────────
 class _DualAngledHeroMockups extends StatelessWidget {
   final bool isDesktop;
   const _DualAngledHeroMockups({required this.isDesktop});
@@ -640,7 +560,6 @@ class _DualAngledHeroMockups extends StatelessWidget {
           alignment: Alignment.center,
           clipBehavior: Clip.none,
           children: [
-            // Background ambient glow
             Positioned(
               bottom: 20,
               child: Container(
@@ -657,8 +576,6 @@ class _DualAngledHeroMockups extends StatelessWidget {
                 ),
               ),
             ),
-
-            // Left Tilted Phone (-6 degrees)
             Positioned(
               left: 0,
               top: 20,
@@ -667,8 +584,6 @@ class _DualAngledHeroMockups extends StatelessWidget {
                 child: const _SingleHeroPhone(type: _MockupType.walletBalances),
               ),
             ),
-
-            // Right Tilted Phone (+6 degrees, overlapping left phone)
             Positioned(
               right: 0,
               top: 40,
@@ -684,179 +599,405 @@ class _DualAngledHeroMockups extends StatelessWidget {
   }
 }
 
-class _FloatingInflowBadge extends StatelessWidget {
-  final String amount;
+// ============================================================================
+// 3. INTERACTIVE FEATURE SLIDE SECTION (All Mockups in an Interactive Switcher)
+// ============================================================================
+class _FeatureSlideItem {
+  final String tag;
   final String title;
   final String subtitle;
-  final Color color;
-  const _FloatingInflowBadge({
-    required this.amount,
+  final String description;
+  final List<String> bulletPoints;
+  final String ctaText;
+  final Color accentColor;
+  final Color bgGradientStart;
+  final _MockupType mockupType;
+
+  const _FeatureSlideItem({
+    required this.tag,
     required this.title,
     required this.subtitle,
-    required this.color,
+    required this.description,
+    required this.bulletPoints,
+    required this.ctaText,
+    required this.accentColor,
+    required this.bgGradientStart,
+    required this.mockupType,
   });
+}
+
+class _InteractiveFeatureSlideSection extends StatefulWidget {
+  const _InteractiveFeatureSlideSection({super.key});
+
+  @override
+  State<_InteractiveFeatureSlideSection> createState() => _InteractiveFeatureSlideSectionState();
+}
+
+class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlideSection> {
+  int _selectedIndex = 0;
+  Timer? _autoSlideTimer;
+
+  static const List<_FeatureSlideItem> _slides = [
+    _FeatureSlideItem(
+      tag: 'Multi-Currency Accounts',
+      title: 'One Global Account,',
+      subtitle: 'Infinite Currencies.',
+      description: 'Hold, convert, and manage NGN, USD, GBP, and EUR balances in real time with bank-beating institutional rates.',
+      bulletPoints: [
+        'Instant multi-currency wallet creation with zero opening fees',
+        'Direct local bank account transfers across African banks',
+        'Real-time automated conversion ledgers',
+      ],
+      ctaText: 'Open a Multi-Currency Account →',
+      accentColor: kElumoGreen,
+      bgGradientStart: Color(0xFFDCFCE7),
+      mockupType: _MockupType.walletBalances,
+    ),
+    _FeatureSlideItem(
+      tag: 'US Checking & Banking',
+      title: 'Open a US Bank Account',
+      subtitle: 'in Under 2 Minutes.',
+      description: 'Get verified US routing numbers and checking account details to receive ACH and Wire payments from employers and global platforms.',
+      bulletPoints: [
+        'Dedicated US Account & ACH Routing number via US partner banks',
+        'Zero receiving fees from Upwork, Stripe, Deel, and Amazon',
+        'Instant withdrawal directly to local African currency accounts',
+      ],
+      ctaText: 'Get Your US Account →',
+      accentColor: kElumoBlue,
+      bgGradientStart: Color(0xFFDBEAFE),
+      mockupType: _MockupType.usdAccount,
+    ),
+    _FeatureSlideItem(
+      tag: 'Smart Invoicing & Installments',
+      title: 'Tuition Installment Tracking',
+      subtitle: '& Automated Ledgers.',
+      description: 'Built for schools (like skill-sch.com) and businesses to issue installment plans with automatic 10-day SMS reminders.',
+      bulletPoints: [
+        'Flexible 2, 4, or 6-part installment payment schedules',
+        'Automated SMS & email reminders before each payment due date',
+        'Instant automated receipts and real-time reconciliation',
+      ],
+      ctaText: 'Explore Smart Invoicing →',
+      accentColor: kElumoAmber,
+      bgGradientStart: Color(0xFFFEF3C7),
+      mockupType: _MockupType.smartInvoices,
+    ),
+    _FeatureSlideItem(
+      tag: 'Instant Currency Swap',
+      title: 'Instant FX Swaps',
+      subtitle: 'at Bank-Beating Rates.',
+      description: 'Convert between Naira, US Dollars, British Pounds, and Euros at true mid-market rates with transparent, zero hidden spread fees.',
+      bulletPoints: [
+        'Live streaming exchange rate calculations',
+        'Instant balance settlement with zero delays',
+        'Transparent 0.3% low FX margin vs traditional 5% bank spread',
+      ],
+      ctaText: 'Check Live Exchange Rates →',
+      accentColor: Color(0xFF00D2B4),
+      bgGradientStart: Color(0xFFE0F2FE),
+      mockupType: _MockupType.currencySwap,
+    ),
+    _FeatureSlideItem(
+      tag: 'AI Voice Robot Debt Calls',
+      title: 'Automated AI Phone Callers',
+      subtitle: 'for Overdue Invoices.',
+      description: 'Dispatch automated conversational AI voice phone calls to follow up with overdue customers and send instant 1-tap WhatsApp payment links.',
+      bulletPoints: [
+        'Automated Africa\'s Talking telecom audio caller dispatch',
+        'Conversational voice assistant handles polite invoice reminders',
+        'One-click instant payment link sent directly to customer WhatsApp',
+      ],
+      ctaText: 'Learn About AI Debt Recovery →',
+      accentColor: kElumoDeepGreen,
+      bgGradientStart: Color(0xFFD1FAE5),
+      mockupType: _MockupType.aiVoiceCall,
+    ),
+    _FeatureSlideItem(
+      tag: 'Pan-African Settlements',
+      title: 'Real-Time Cross-Border',
+      subtitle: 'Settlements & Payouts.',
+      description: 'Unify and track merchant and freelancer transactions across Nigeria, Kenya, Ghana, and global international accounts.',
+      bulletPoints: [
+        'Instant multi-country settlement stream (NGN, KSh, GH₵, USD)',
+        'Webhook automation for developers and enterprise ledgers',
+        'Zero paperwork for cross-border African commerce',
+      ],
+      ctaText: 'View Settlement Infrastructure →',
+      accentColor: kElumoBlue,
+      bgGradientStart: Color(0xFFEDE9FE),
+      mockupType: _MockupType.crossBorderFeed,
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoSlide();
+  }
+
+  void _startAutoSlide() {
+    _autoSlideTimer?.cancel();
+    _autoSlideTimer = Timer.periodic(const Duration(seconds: 7), (_) {
+      if (mounted) {
+        setState(() {
+          _selectedIndex = (_selectedIndex + 1) % _slides.length;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _autoSlideTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final isDesktop = width >= 900;
+    final currentSlide = _slides[_selectedIndex];
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 24,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            currentSlide.bgGradientStart.withOpacity(0.45),
+            currentSlide.bgGradientStart.withOpacity(0.12),
+            Colors.white,
+          ],
+          stops: const [0.0, 0.45, 1.0],
+        ),
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: CustomPaint(
-              size: const Size(14, 14),
-              painter: _VectorArrowDownPainter(color: color),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      padding: EdgeInsets.symmetric(
+        horizontal: isDesktop ? 80 : 24,
+        vertical: isDesktop ? 80 : 40,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: Column(
             children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kElumoDark)),
-              Text(subtitle, style: const TextStyle(fontSize: 11, color: kElumoMuted)),
+              // Section Header
+              const Text(
+                'Explore the Platform',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.5,
+                  color: kElumoGreen,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Everything You Need to Move Money Globally',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: isDesktop ? 36 : 26,
+                  fontWeight: FontWeight.w800,
+                  color: kElumoDark,
+                  letterSpacing: -1.0,
+                ),
+              ),
+              const SizedBox(height: 28),
+
+              // Interactive Slide Selector Tabs
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(_slides.length, (index) {
+                    final item = _slides[index];
+                    final isSelected = index == _selectedIndex;
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() => _selectedIndex = index);
+                            _startAutoSlide(); // Reset timer on user click
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: isSelected ? kElumoDark : Colors.white.withOpacity(0.8),
+                              borderRadius: BorderRadius.circular(24),
+                              border: Border.all(
+                                color: isSelected ? kElumoDark : const Color(0xFFE2E8F0),
+                                width: 1.5,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.12),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 4),
+                                      ),
+                                    ]
+                                  : [],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: isSelected ? item.accentColor : const Color(0xFF94A3B8),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  item.tag,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                    color: isSelected ? Colors.white : const Color(0xFF475569),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              const SizedBox(height: 48),
+
+              // Slide Body (Left Copy + Right Phone Mockup)
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 400),
+                transitionBuilder: (child, animation) {
+                  return FadeTransition(opacity: animation, child: child);
+                },
+                child: isDesktop
+                    ? Row(
+                        key: ValueKey<int>(_selectedIndex),
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: 6,
+                            child: _buildSlideCopy(currentSlide),
+                          ),
+                          const SizedBox(width: 60),
+                          Expanded(
+                            flex: 5,
+                            child: Center(
+                              child: _SingleHeroPhone(type: currentSlide.mockupType),
+                            ),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        key: ValueKey<int>(_selectedIndex),
+                        children: [
+                          _buildSlideCopy(currentSlide),
+                          const SizedBox(height: 36),
+                          Center(
+                            child: _SingleHeroPhone(type: currentSlide.mockupType),
+                          ),
+                        ],
+                      ),
+              ),
             ],
           ),
-          const SizedBox(width: 20),
-          Text(
-            amount,
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: color),
-          ),
-        ],
+        ),
       ),
     );
   }
-}
 
-class _VectorCheckPainter extends CustomPainter {
-  final Color color;
-  const _VectorCheckPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final path = Path()
-      ..moveTo(size.width * 0.15, size.height * 0.50)
-      ..lineTo(size.width * 0.42, size.height * 0.80)
-      ..lineTo(size.width * 0.88, size.height * 0.20);
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-class _VectorArrowDownPainter extends CustomPainter {
-  final Color color;
-  const _VectorArrowDownPainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final path = Path()
-      ..moveTo(size.width * 0.50, size.height * 0.15)
-      ..lineTo(size.width * 0.50, size.height * 0.85)
-      ..moveTo(size.width * 0.20, size.height * 0.55)
-      ..lineTo(size.width * 0.50, size.height * 0.85)
-      ..lineTo(size.width * 0.80, size.height * 0.55);
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// ============================================================================
-// 3. ALTERNATING PASTEL FEATURE SECTIONS (ElumoPay Colors)
-// ============================================================================
-class _PastelFeatureSection extends StatelessWidget {
-  final Color backgroundColor;
-  final String titlePrefix;
-  final String titleHighlight;
-  final String titleSuffix;
-  final String description;
-  final String linkText;
-  final bool isImageRight;
-  final _MockupType screenType;
-
-  const _PastelFeatureSection({
-    super.key,
-    required this.backgroundColor,
-    required this.titlePrefix,
-    required this.titleHighlight,
-    required this.titleSuffix,
-    required this.description,
-    required this.linkText,
-    required this.isImageRight,
-    required this.screenType,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width >= 900;
-
-    final copyContent = Column(
+  Widget _buildSlideCopy(_FeatureSlideItem slide) {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+          decoration: BoxDecoration(
+            color: slide.accentColor.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: slide.accentColor.withOpacity(0.3)),
+          ),
+          child: Text(
+            slide.tag,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: slide.accentColor,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
         Text.rich(
           TextSpan(
             children: [
-              TextSpan(text: titlePrefix),
+              TextSpan(text: '${slide.title}\n'),
               TextSpan(
-                text: titleHighlight,
-                style: const TextStyle(color: kElumoGreen),
+                text: slide.subtitle,
+                style: TextStyle(color: slide.accentColor),
               ),
-              TextSpan(text: titleSuffix),
             ],
           ),
-          style: TextStyle(
-            fontSize: isDesktop ? 44 : 30,
+          style: const TextStyle(
+            fontSize: 40,
             fontWeight: FontWeight.w800,
             color: kElumoDark,
             letterSpacing: -1.2,
             height: 1.15,
           ),
         ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
         Text(
-          description,
+          slide.description,
           style: const TextStyle(
             fontSize: 16,
             color: Color(0xFF4B5563),
             height: 1.6,
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 24),
+        ...slide.bulletPoints.map((point) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(top: 3),
+                    width: 18,
+                    height: 18,
+                    decoration: BoxDecoration(
+                      color: slide.accentColor.withOpacity(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(Icons.check_rounded, size: 12, color: slide.accentColor),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      point,
+                      style: const TextStyle(
+                        fontSize: 14.5,
+                        color: Color(0xFF334155),
+                        fontWeight: FontWeight.w500,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )),
+        const SizedBox(height: 24),
         MouseRegion(
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
@@ -865,9 +1006,9 @@ class _PastelFeatureSection extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  linkText,
-                  style: const TextStyle(
-                    color: kElumoGreen,
+                  slide.ctaText,
+                  style: TextStyle(
+                    color: slide.accentColor,
                     fontWeight: FontWeight.w800,
                     fontSize: 16,
                   ),
@@ -878,65 +1019,331 @@ class _PastelFeatureSection extends StatelessWidget {
         ),
       ],
     );
+  }
+}
 
-    final mockupContainer = Center(
-      child: _SingleHeroPhone(type: screenType),
-    );
+// ============================================================================
+// 4. USE CASES SECTION ("Built For Every Ambition")
+// ============================================================================
+class _UseCasesSection extends StatelessWidget {
+  const _UseCasesSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
 
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [
-            backgroundColor.withOpacity(0.40),
-            backgroundColor.withOpacity(0.12),
-            Colors.white,
-          ],
-          stops: const [0.0, 0.45, 1.0],
-        ),
-      ),
+      color: const Color(0xFFF8FAFC),
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 80 : 24,
-        vertical: isDesktop ? 100 : 50,
+        vertical: isDesktop ? 80 : 50,
       ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1200),
-          child: isDesktop
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: isImageRight
-                      ? [
-                          Expanded(flex: 6, child: copyContent),
-                          const SizedBox(width: 60),
-                          Expanded(flex: 5, child: mockupContainer),
-                        ]
-                      : [
-                          Expanded(flex: 5, child: mockupContainer),
-                          const SizedBox(width: 60),
-                          Expanded(flex: 6, child: copyContent),
-                        ],
-                )
-              : Column(
-                  children: [
-                    copyContent,
-                    const SizedBox(height: 48),
-                    mockupContainer,
-                  ],
-                ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1200),
+        child: Column(
+          children: [
+            const Text(
+              'Tailored For Your Needs',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.5,
+                color: kElumoGreen,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Built For Africa\'s Builders & Global Citizens',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 34,
+                fontWeight: FontWeight.w800,
+                color: kElumoDark,
+                letterSpacing: -1.0,
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'From individual freelancers to scaling schools and cross-border enterprises.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Color(0xFF64748B), fontSize: 15),
+            ),
+            const SizedBox(height: 48),
+
+            // 3 Use Case Cards
+            isDesktop
+                ? Row(
+                    children: const [
+                      Expanded(
+                        child: _UseCaseCard(
+                          icon: Icons.school_rounded,
+                          title: 'Schools & Education',
+                          subtitle: 'Tuition Installment Management',
+                          description: 'Track multi-installment student tuition plans (like skill-sch.com), send automated SMS reminders, and trigger AI follow-up calls.',
+                          color: kElumoGreen,
+                          highlight: 'Zero Late Payment Defaults',
+                        ),
+                      ),
+                      SizedBox(width: 24),
+                      Expanded(
+                        child: _UseCaseCard(
+                          icon: Icons.laptop_mac_rounded,
+                          title: 'Freelancers & Tech',
+                          subtitle: 'Direct Global Payments',
+                          description: 'Receive USD, GBP, and EUR from international clients on Upwork, Deel, and Stripe with dedicated US routing details.',
+                          color: kElumoBlue,
+                          highlight: 'Bank-Beating FX Rates',
+                        ),
+                      ),
+                      SizedBox(width: 24),
+                      Expanded(
+                        child: _UseCaseCard(
+                          icon: Icons.storefront_rounded,
+                          title: 'Cross-Border Traders',
+                          subtitle: 'Pan-African Commerce',
+                          description: 'Instant settlement across Nigeria, Ghana, and Kenya with multi-currency virtual cards and automated tax filing.',
+                          color: kElumoAmber,
+                          highlight: 'Zero Decline Virtual Cards',
+                        ),
+                      ),
+                    ],
+                  )
+                : Column(
+                    children: const [
+                      _UseCaseCard(
+                        icon: Icons.school_rounded,
+                        title: 'Schools & Education',
+                        subtitle: 'Tuition Installment Management',
+                        description: 'Track multi-installment student tuition plans, send automated SMS reminders, and trigger AI follow-up calls.',
+                        color: kElumoGreen,
+                        highlight: 'Zero Late Payment Defaults',
+                      ),
+                      SizedBox(height: 20),
+                      _UseCaseCard(
+                        icon: Icons.laptop_mac_rounded,
+                        title: 'Freelancers & Tech',
+                        subtitle: 'Direct Global Payments',
+                        description: 'Receive USD, GBP, and EUR from international clients on Upwork, Deel, and Stripe with dedicated US routing details.',
+                        color: kElumoBlue,
+                        highlight: 'Bank-Beating FX Rates',
+                      ),
+                      SizedBox(height: 20),
+                      _UseCaseCard(
+                        icon: Icons.storefront_rounded,
+                        title: 'Cross-Border Traders',
+                        subtitle: 'Pan-African Commerce',
+                        description: 'Instant settlement across Nigeria, Ghana, and Kenya with multi-currency virtual cards and automated tax filing.',
+                        color: kElumoAmber,
+                        highlight: 'Zero Decline Virtual Cards',
+                      ),
+                    ],
+                  ),
+          ],
         ),
       ),
     );
   }
 }
 
+class _UseCaseCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final String description;
+  final Color color;
+  final String highlight;
+
+  const _UseCaseCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.description,
+    required this.color,
+    required this.highlight,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: color, size: 24),
+          ),
+          const SizedBox(height: 18),
+          Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 19, color: kElumoDark)),
+          const SizedBox(height: 4),
+          Text(subtitle, style: TextStyle(color: color, fontSize: 12.5, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 12),
+          Text(description, style: const TextStyle(color: Color(0xFF64748B), fontSize: 14, height: 1.5)),
+          const SizedBox(height: 20),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.08),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(highlight, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ============================================================================
-// 4. DARK SHOWCASE SECTION ("And that is not all" + Virtual Cards Fan + Bento)
+// 5. VALUE COMPARISON SECTION ("Why Choose ElumoPay")
 // ============================================================================
-class _DarkShowcaseSection extends StatelessWidget {
-  const _DarkShowcaseSection({super.key});
+class _ValueComparisonSection extends StatelessWidget {
+  const _ValueComparisonSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
+
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(
+        horizontal: isDesktop ? 80 : 24,
+        vertical: isDesktop ? 80 : 50,
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 1100),
+        child: Column(
+          children: [
+            const Text(
+              'The Clear Advantage',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.5,
+                color: kElumoGreen,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Why Thousands Switch to ElumoPay',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 34,
+                fontWeight: FontWeight.w800,
+                color: kElumoDark,
+                letterSpacing: -1.0,
+              ),
+            ),
+            const SizedBox(height: 40),
+
+            // Comparison Table Container
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Column(
+                  children: [
+                    // Table Header
+                    Container(
+                      color: kElumoDark,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      child: Row(
+                        children: const [
+                          Expanded(flex: 4, child: Text('Features & Capabilities', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))),
+                          Expanded(flex: 3, child: Text('ElumoPay', style: TextStyle(color: kElumoGreen, fontWeight: FontWeight.w800, fontSize: 14))),
+                          Expanded(flex: 3, child: Text('Traditional Banks', style: TextStyle(color: Color(0xFFA1A1AA), fontWeight: FontWeight.w600, fontSize: 13))),
+                        ],
+                      ),
+                    ),
+                    _comparisonRow('US Bank Account Setup', '< 2 Minutes (Instant)', '2 – 4 Weeks (Paperwork)', true),
+                    _comparisonRow('FX Conversion Spread', '0.3% (Mid-Market)', '3.5% – 7.0% Hidden Markup', false),
+                    _comparisonRow('Tuition & Debt Recovery', 'AI Voice Calls + WhatsApp', 'Manual In-Branch Visits', true),
+                    _comparisonRow('Virtual Card Decline Rate', '< 0.1% (99.9% Success)', '18% – 35% Decline Rates', false),
+                    _comparisonRow('Pan-African Tax Automation', 'Automated FIRS/KRA/GRA', 'Manual Paperwork', true),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _comparisonRow(String feature, String elumoVal, String traditionalVal, bool isEven) {
+    return Container(
+      color: isEven ? const Color(0xFFF8FAFC) : Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 4,
+            child: Text(feature, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5, color: kElumoDark)),
+          ),
+          Expanded(
+            flex: 3,
+            child: Row(
+              children: [
+                const Icon(Icons.check_circle_rounded, color: kElumoGreen, size: 16),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(elumoVal, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kElumoGreen)),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Row(
+              children: [
+                const Icon(Icons.close_rounded, color: Color(0xFF94A3B8), size: 16),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(traditionalVal, style: const TextStyle(color: Color(0xFF64748B), fontSize: 12.5)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// 6. DARK SHOWCASE SECTION (Virtual Cards Fan Showcase)
+// ============================================================================
+class _DarkCardsShowcaseSection extends StatelessWidget {
+  const _DarkCardsShowcaseSection({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -953,12 +1360,11 @@ class _DarkShowcaseSection extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 1200),
         child: Column(
           children: [
-            // Section Header
             const Text(
-              'And that is not all.',
+              'Virtual Cards for Global Ambition',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 44,
+                fontSize: 40,
                 fontWeight: FontWeight.w800,
                 letterSpacing: -1.0,
               ),
@@ -966,16 +1372,12 @@ class _DarkShowcaseSection extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             const Text(
-              'Packed with intelligent features for everyday spending, debt collection, and cross-border operations.',
-              style: TextStyle(
-                color: Color(0xFFA1A1AA),
-                fontSize: 16,
-              ),
+              'Create instant multi-currency cards for Netflix, AWS, Apple, and international vendor spending with zero decline rates.',
+              style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 16),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 60),
+            const SizedBox(height: 48),
 
-            // Virtual Card Fan Showcase Card
             Container(
               width: double.infinity,
               padding: EdgeInsets.all(isDesktop ? 48 : 24),
@@ -998,24 +1400,20 @@ class _DarkShowcaseSection extends StatelessWidget {
                                     TextSpan(text: 'A '),
                                     TextSpan(text: 'Better ', style: TextStyle(color: kElumoAmber)),
                                     TextSpan(text: 'Way\n', style: TextStyle(color: kElumoGreen)),
-                                    TextSpan(text: 'to Spend'),
+                                    TextSpan(text: 'to Spend Globally'),
                                   ],
                                 ),
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 42,
+                                  fontSize: 38,
                                   fontWeight: FontWeight.w800,
                                   height: 1.1,
                                 ),
                               ),
                               const SizedBox(height: 16),
                               const Text(
-                                'Create instant multi-currency virtual cards for global subscriptions (Netflix, AWS, Apple) with zero decline rates and automated spending limits.',
-                                style: TextStyle(
-                                  color: Color(0xFFA1A1AA),
-                                  fontSize: 15,
-                                  height: 1.6,
-                                ),
+                                'Instant 3D-secure virtual debit cards in USD, GBP, EUR, and NGN. Set custom transaction limits, freeze cards in 1-tap, and eliminate payment rejections.',
+                                style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 15, height: 1.6),
                               ),
                               const SizedBox(height: 32),
                               _PrimaryPillButton(
@@ -1027,10 +1425,7 @@ class _DarkShowcaseSection extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 40),
-                        const Expanded(
-                          flex: 6,
-                          child: _VirtualCardsFan(),
-                        ),
+                        const Expanded(flex: 6, child: _VirtualCardsFan()),
                       ],
                     )
                   : Column(
@@ -1044,7 +1439,7 @@ class _DarkShowcaseSection extends StatelessWidget {
                               TextSpan(text: 'to Spend'),
                             ],
                           ),
-                          style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w800),
+                          style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: 14),
                         const Text(
@@ -1057,93 +1452,13 @@ class _DarkShowcaseSection extends StatelessWidget {
                       ],
                     ),
             ),
-            const SizedBox(height: 32),
-
-            // 2-Column Bento Grid: AI Debt Collection + Cross Border Stacks
-            Row(
-              children: [
-                Expanded(
-                  child: _BentoFeatureCard(
-                    title: 'AI Debt Collection &\nRobot Phone Callers',
-                    description: 'Dispatch automated AI phone calls via Africa\'s Talking to follow up on overdue student or customer invoices.',
-                    badgeText: 'Live Audio AI',
-                    badgeColor: kElumoAmber,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _callDialogRow('AI Agent', 'Calling David O. (INV-492) · ₦150,000 overdue', kElumoBlue),
-                        const SizedBox(height: 8),
-                        _callDialogRow('Status', 'Call Connected — Payment link sent to WhatsApp', kElumoGreen),
-                      ],
-                    ),
-                  ),
-                ),
-                if (isDesktop) const SizedBox(width: 24),
-                if (isDesktop)
-                  Expanded(
-                    child: _BentoFeatureCard(
-                      title: 'Cross-Border Payments\nMade Simple',
-                      description: 'Real-time transaction tracking across Nigeria, Kenya, Ghana, and international banks.',
-                      badgeText: 'Instant Settlements',
-                      badgeColor: kElumoGreen,
-                      child: Column(
-                        children: [
-                          _transactionPill('Received money', '+₦120,000.00', 'Inflow Received · School Fee', kElumoGreen),
-                          const SizedBox(height: 10),
-                          _transactionPill('USD Converted', '+\$500.00', 'Exchange Swap Settled', kElumoAmber),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
           ],
         ),
       ),
     );
   }
-
-  Widget _callDialogRow(String label, String text, Color dotColor) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF09090B),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFF27272A)),
-      ),
-      child: Row(
-        children: [
-          Container(width: 8, height: 8, decoration: BoxDecoration(shape: BoxShape.circle, color: dotColor)),
-          const SizedBox(width: 10),
-          Expanded(child: Text(text, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500))),
-        ],
-      ),
-    );
-  }
-
-  Widget _transactionPill(String title, String amount, String subtitle, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF09090B),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF27272A)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-            Text(subtitle, style: const TextStyle(color: Color(0xFF71717A), fontSize: 11)),
-          ]),
-          Text(amount, style: TextStyle(color: color, fontWeight: FontWeight.w800, fontSize: 14)),
-        ],
-      ),
-    );
-  }
 }
 
-// 4-Card Virtual Cards Fan (Black, Green, Blue, Amber)
 class _VirtualCardsFan extends StatelessWidget {
   const _VirtualCardsFan();
 
@@ -1154,56 +1469,36 @@ class _VirtualCardsFan extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // 1. Black Card (Bottom)
           Positioned(
             bottom: 0,
             left: 20,
             child: Transform.rotate(
               angle: -0.12,
-              child: const _SingleVirtualCard(
-                color: Color(0xFF1E1E1E),
-                title: 'Elumo Black',
-                currency: 'USD CARD',
-              ),
+              child: const _SingleVirtualCard(color: Color(0xFF1E1E1E), title: 'Elumo Black', currency: 'USD CARD'),
             ),
           ),
-          // 2. Green Card
           Positioned(
             bottom: 20,
             left: 60,
             child: Transform.rotate(
               angle: -0.04,
-              child: const _SingleVirtualCard(
-                color: kElumoDeepGreen,
-                title: 'Elumo Business',
-                currency: 'EUR CARD',
-              ),
+              child: const _SingleVirtualCard(color: kElumoDeepGreen, title: 'Elumo Business', currency: 'EUR CARD'),
             ),
           ),
-          // 3. Amber Gold Card
           Positioned(
             bottom: 40,
             left: 100,
             child: Transform.rotate(
               angle: 0.04,
-              child: const _SingleVirtualCard(
-                color: kElumoAmber,
-                title: 'Elumo Premier',
-                currency: 'GBP CARD',
-              ),
+              child: const _SingleVirtualCard(color: kElumoAmber, title: 'Elumo Premier', currency: 'GBP CARD'),
             ),
           ),
-          // 4. Vibrant Elumo Green Card (Top)
           Positioned(
             bottom: 60,
             left: 140,
             child: Transform.rotate(
               angle: 0.12,
-              child: const _SingleVirtualCard(
-                color: kElumoGreen,
-                title: 'Elumo Global',
-                currency: 'NGN CARD',
-              ),
+              child: const _SingleVirtualCard(color: kElumoGreen, title: 'Elumo Global', currency: 'NGN CARD'),
             ),
           ),
         ],
@@ -1216,11 +1511,7 @@ class _SingleVirtualCard extends StatelessWidget {
   final Color color;
   final String title;
   final String currency;
-  const _SingleVirtualCard({
-    required this.color,
-    required this.title,
-    required this.currency,
-  });
+  const _SingleVirtualCard({required this.color, required this.title, required this.currency});
 
   @override
   Widget build(BuildContext context) {
@@ -1233,11 +1524,7 @@ class _SingleVirtualCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.15), width: 1.5),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 16, offset: const Offset(0, 8)),
         ],
       ),
       child: Column(
@@ -1259,55 +1546,8 @@ class _SingleVirtualCard extends StatelessWidget {
   }
 }
 
-class _BentoFeatureCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final String badgeText;
-  final Color badgeColor;
-  final Widget child;
-
-  const _BentoFeatureCard({
-    required this.title,
-    required this.description,
-    required this.badgeText,
-    required this.badgeColor,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: const Color(0xFF18181B),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF27272A)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: badgeColor.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Text(badgeText, style: TextStyle(color: badgeColor, fontSize: 11, fontWeight: FontWeight.bold)),
-          ),
-          const SizedBox(height: 16),
-          Text(title, style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold, height: 1.2)),
-          const SizedBox(height: 10),
-          Text(description, style: const TextStyle(color: Color(0xFFA1A1AA), fontSize: 14, height: 1.5)),
-          const SizedBox(height: 24),
-          child,
-        ],
-      ),
-    );
-  }
-}
-
 // ============================================================================
-// 5. BILL PAYMENTS SECTION (Airtime, Data, Electricity, Cable)
+// 7. BILL PAYMENTS SECTION (Airtime, Data, Electricity, Cable)
 // ============================================================================
 class _BillsPaymentSection extends StatelessWidget {
   const _BillsPaymentSection({super.key});
@@ -1358,10 +1598,7 @@ class _BillsPaymentSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 60),
-                  Expanded(
-                    flex: 5,
-                    child: _BillsGridPreview(),
-                  ),
+                  Expanded(flex: 5, child: _BillsGridPreview()),
                 ],
               )
             : Column(
@@ -1443,7 +1680,7 @@ class _BillsGridPreview extends StatelessWidget {
 }
 
 // ============================================================================
-// 6. SECURITY & REGULATORY COMPLIANCE SECTION
+// 8. SECURITY & PAN-AFRICAN TAX COMPLIANCE SECTION
 // ============================================================================
 class _SecurityComplianceSection extends StatelessWidget {
   const _SecurityComplianceSection({super.key});
@@ -1567,7 +1804,149 @@ class _SecurityCard extends StatelessWidget {
 }
 
 // ============================================================================
-// 7. DOWNLOAD CTA & FOOTER
+// 9. FAQ ACCORDION SECTION
+// ============================================================================
+class _FaqSection extends StatefulWidget {
+  const _FaqSection({super.key});
+
+  @override
+  State<_FaqSection> createState() => _FaqSectionState();
+}
+
+class _FaqSectionState extends State<_FaqSection> {
+  int? _expandedIndex = 0;
+
+  static const List<Map<String, String>> _faqs = [
+    {
+      'q': 'How quickly can I open a US Bank Account on ElumoPay?',
+      'a': 'Your USD checking account and dedicated ACH routing details are generated in under 2 minutes upon completing instant biometric KYC verification.',
+    },
+    {
+      'q': 'How does the Smart Invoice & Tuition Installment tracking work?',
+      'a': 'Schools (such as skill-sch.com) and businesses can create structured 2, 4, or 6-installment payment plans. Elumo automatically schedules automated SMS reminders and reconciles inflows in real-time.',
+    },
+    {
+      'q': 'How do the automated AI Debt Collection phone calls work?',
+      'a': 'When an invoice exceeds its due date, Elumo can automatically dispatch an AI conversational phone caller powered by Africa\'s Talking telecom infrastructure to follow up politely with the student/customer and dispatch a direct 1-tap WhatsApp payment settlement link.',
+    },
+    {
+      'q': 'Which currencies can I hold, convert, and swap?',
+      'a': 'You can instantly hold and convert Nigerian Naira (NGN), US Dollars (USD), British Pounds (GBP), and Euros (EUR), with real-time settlement across Kenyan Shillings (KSh) and Ghanaian Cedis (GH₵).',
+    },
+    {
+      'q': 'Are ElumoPay virtual cards accepted globally?',
+      'a': 'Yes! Our USD and EUR virtual cards are 3D-secure enabled and work seamlessly for Apple, Netflix, AWS, Google Cloud, Facebook Ads, Shopify, and millions of global merchants with near-zero decline rates.',
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width >= 900;
+
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(
+        horizontal: isDesktop ? 80 : 24,
+        vertical: isDesktop ? 80 : 50,
+      ),
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 900),
+        child: Column(
+          children: [
+            const Text(
+              'Frequently Asked Questions',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.5,
+                color: kElumoGreen,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Got Questions? We\'ve Got Answers.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 34,
+                fontWeight: FontWeight.w800,
+                color: kElumoDark,
+                letterSpacing: -1.0,
+              ),
+            ),
+            const SizedBox(height: 40),
+
+            ...List.generate(_faqs.length, (i) {
+              final isExpanded = _expandedIndex == i;
+              final item = _faqs[i];
+
+              return Container(
+                margin: const EdgeInsets.only(bottom: 14),
+                decoration: BoxDecoration(
+                  color: isExpanded ? const Color(0xFFF0FDF4) : const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: isExpanded ? kElumoGreen.withOpacity(0.4) : const Color(0xFFE2E8F0),
+                  ),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () {
+                    setState(() {
+                      _expandedIndex = isExpanded ? null : i;
+                    });
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item['q']!,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 15,
+                                  color: isExpanded ? kElumoDeepGreen : kElumoDark,
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              isExpanded ? Icons.remove_circle_outline_rounded : Icons.add_circle_outline_rounded,
+                              color: isExpanded ? kElumoGreen : const Color(0xFF64748B),
+                              size: 20,
+                            ),
+                          ],
+                        ),
+                        if (isExpanded) ...[
+                          const SizedBox(height: 12),
+                          Text(
+                            item['a']!,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF475569),
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// 10. DOWNLOAD CTA & FOOTER
 // ============================================================================
 class _DownloadCtaSection extends StatelessWidget {
   const _DownloadCtaSection();
@@ -1657,7 +2036,7 @@ class _FooterSection extends StatelessWidget {
 // ============================================================================
 // REALISTIC PHONE MOCKUP RENDERER (Titanium iPhone 15 Pro + Official ElumoPay Logo)
 // ============================================================================
-enum _MockupType { walletBalances, usdAccount, smartInvoices, currencySwap }
+enum _MockupType { walletBalances, usdAccount, smartInvoices, currencySwap, aiVoiceCall, crossBorderFeed }
 
 class _SingleHeroPhone extends StatelessWidget {
   final _MockupType type;
@@ -1857,7 +2236,6 @@ class _SingleHeroPhone extends StatelessWidget {
               const SizedBox(height: 2),
               const Text('₦14,820,000.00', style: TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.w800)),
               const SizedBox(height: 10),
-              // Action Buttons
               Row(
                 children: [
                   Expanded(
@@ -1989,7 +2367,125 @@ class _SingleHeroPhone extends StatelessWidget {
             ],
           ),
         );
+      case _MockupType.aiVoiceCall:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: kElumoAmber.withOpacity(0.18),
+                  border: Border.all(color: kElumoAmber, width: 2),
+                ),
+                child: const Icon(Icons.record_voice_over_rounded, color: kElumoAmber, size: 24),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'AI Collections Caller',
+                style: TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w800),
+              ),
+              const SizedBox(height: 2),
+              const Text(
+                'Calling David O. · ₦150,000 Overdue',
+                style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 10),
+              ),
+              const SizedBox(height: 4),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: kElumoGreen.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Text('Live Call · 00:42', style: TextStyle(color: kElumoGreen, fontSize: 9, fontWeight: FontWeight.bold)),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(9),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF18181B),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFF27272A)),
+                ),
+                child: const Text(
+                  '"Hello David, this is Elumo AI following up on your Skill School invoice. I have dispatched a secure WhatsApp payment link to your phone."',
+                  style: TextStyle(color: Color(0xFFE4E4E7), fontSize: 9.5, height: 1.35, fontStyle: FontStyle.italic),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: kElumoGreen,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text('WhatsApp Link Sent', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10)),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEF4444),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.call_end_rounded, color: Colors.white, size: 14),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      case _MockupType.crossBorderFeed:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Cross-Border Settlements', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 10.5)),
+              const SizedBox(height: 2),
+              const Text('Live Inflow Stream', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 8),
+              _settlementItem('Nigeria (NGN)', 'Tuition · skill-sch.com', '+₦120,000.00', kElumoGreen),
+              const SizedBox(height: 6),
+              _settlementItem('United States (USD)', 'Stripe US Settlement', '+\$850.00', kElumoBlue),
+              const SizedBox(height: 6),
+              _settlementItem('Kenya (KES)', 'Supplier Payout', '+KSh 45,000.00', kElumoAmber),
+              const SizedBox(height: 6),
+              _settlementItem('Ghana (GHS)', 'Freelance Merchant', '+GH₵ 3,200.00', const Color(0xFF00D2B4)),
+            ],
+          ),
+        );
     }
+  }
+
+  Widget _settlementItem(String country, String desc, String amount, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(color: const Color(0xFF18181B), borderRadius: BorderRadius.circular(8), border: Border.all(color: const Color(0xFF27272A))),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(country, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
+              Text(desc, style: const TextStyle(color: Color(0xFF71717A), fontSize: 8.5)),
+            ]),
+          ),
+          Text(amount, style: TextStyle(color: color, fontSize: 10.5, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
   }
 
   Widget _balancePill(String name, String amount, Color color) {
