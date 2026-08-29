@@ -26,7 +26,6 @@ final _showcaseKey    = GlobalKey();
 final _useCasesKey    = GlobalKey();
 final _comparisonKey  = GlobalKey();
 final _cardsKey       = GlobalKey();
-final _billsKey       = GlobalKey();
 final _securityKey    = GlobalKey();
 final _faqKey         = GlobalKey();
 
@@ -49,7 +48,6 @@ class LandingScreen extends StatelessWidget {
             _UseCasesSection(key: _useCasesKey),
             _ValueComparisonSection(key: _comparisonKey),
             _DarkCardsShowcaseSection(key: _cardsKey),
-            _BillsPaymentSection(key: _billsKey),
             _SecurityComplianceSection(key: _securityKey),
             _FaqSection(key: _faqKey),
             const _DownloadCtaSection(),
@@ -117,8 +115,6 @@ class _NavHeader extends StatelessWidget {
             _NavLink('Why Elumo', onTap: () => _scrollTo(_comparisonKey)),
             const SizedBox(width: 20),
             _NavLink('Virtual Cards', onTap: () => _scrollTo(_cardsKey)),
-            const SizedBox(width: 20),
-            _NavLink('Bill Payments', onTap: () => _scrollTo(_billsKey)),
             const SizedBox(width: 20),
             _NavLink('Security & Tax', onTap: () => _scrollTo(_securityKey)),
             const SizedBox(width: 20),
@@ -727,6 +723,21 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
       accentColor: kElumoBlue,
       bgGradientStart: Color(0xFFEDE9FE),
       mockupType: _MockupType.crossBorderFeed,
+    ),
+    _FeatureSlideItem(
+      tag: 'Utility & Bill Payments',
+      title: 'Pay Everyday Bills,',
+      subtitle: 'Instant & Stress-Free.',
+      description: 'Recharge airtime & data, purchase electricity tokens, and renew cable TV subscriptions with instant automated tokens and receipts.',
+      bulletPoints: [
+        'Instant Airtime & Data top-ups for MTN, Airtel, Glo, 9mobile',
+        'Prepaid & Postpaid Electricity tokens (IKEDC, EKEDC, AEDC, IBEDC)',
+        'Instant cable TV renewals (DStv, GOtv, StarTimes) & fiber internet',
+      ],
+      ctaText: 'Explore Bill Payments →',
+      accentColor: kElumoAmber,
+      bgGradientStart: Color(0xFFFEF3C7),
+      mockupType: _MockupType.billPayments,
     ),
   ];
 
@@ -1547,140 +1558,7 @@ class _SingleVirtualCard extends StatelessWidget {
 }
 
 // ============================================================================
-// 7. BILL PAYMENTS SECTION (Airtime, Data, Electricity, Cable)
-// ============================================================================
-class _BillsPaymentSection extends StatelessWidget {
-  const _BillsPaymentSection({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width >= 900;
-
-    return Container(
-      width: double.infinity,
-      color: const Color(0xFFF8FAFC),
-      padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 64 : 24,
-        vertical: isDesktop ? 80 : 50,
-      ),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1200),
-        child: isDesktop
-            ? Row(
-                children: [
-                  Expanded(
-                    flex: 5,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Pay Your Bills\nWithout Stress',
-                          style: TextStyle(
-                            fontSize: 44,
-                            fontWeight: FontWeight.w800,
-                            color: kElumoDark,
-                            height: 1.1,
-                            letterSpacing: -1.0,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'From airtime and data purchases to electricity tokens and cable TV subscriptions — manage all utility bills with instant automated receipts.',
-                          style: TextStyle(fontSize: 16, color: Color(0xFF4B5563), height: 1.6),
-                        ),
-                        const SizedBox(height: 28),
-                        _PrimaryPillButton(
-                          'Pay a Bill Now →',
-                          onTap: () => Navigator.pushNamed(context, '/login'),
-                          backgroundColor: kElumoGreen,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 60),
-                  Expanded(flex: 5, child: _BillsGridPreview()),
-                ],
-              )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Pay Your Bills Without Stress', style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800, color: kElumoDark)),
-                  const SizedBox(height: 12),
-                  const Text('From airtime and data to electricity tokens — manage all bills in one place.', style: TextStyle(color: Color(0xFF4B5563))),
-                  const SizedBox(height: 24),
-                  _BillsGridPreview(),
-                ],
-              ),
-      ),
-    );
-  }
-}
-
-class _BillsGridPreview extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.black.withOpacity(0.08)),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10)),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              _billItem(Icons.phone_android_rounded, 'Airtime & Data', 'MTN, Airtel, Glo', kElumoGreen),
-              const SizedBox(width: 16),
-              _billItem(Icons.electric_bolt_rounded, 'Electricity', 'IKEDC, EKEDC, AEDC', kElumoAmber),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              _billItem(Icons.tv_rounded, 'Cable TV', 'DStv, GOtv, StarTimes', kElumoBlue),
-              const SizedBox(width: 16),
-              _billItem(Icons.wifi_rounded, 'Internet Fiber', 'Spectranet, Smile, Fibre', const Color(0xFF00D2B4)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _billItem(IconData icon, String title, String sub, Color color) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFAFAFA),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE4E4E7)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(color: color.withOpacity(0.12), shape: BoxShape.circle),
-              child: Icon(icon, color: color, size: 20),
-            ),
-            const SizedBox(height: 12),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kElumoDark)),
-            const SizedBox(height: 4),
-            Text(sub, style: const TextStyle(color: kElumoMuted, fontSize: 10)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// 8. SECURITY & PAN-AFRICAN TAX COMPLIANCE SECTION
+// 7. SECURITY & PAN-AFRICAN TAX COMPLIANCE SECTION
 // ============================================================================
 class _SecurityComplianceSection extends StatelessWidget {
   const _SecurityComplianceSection({super.key});
@@ -2036,7 +1914,7 @@ class _FooterSection extends StatelessWidget {
 // ============================================================================
 // REALISTIC PHONE MOCKUP RENDERER (Titanium iPhone 15 Pro + Official ElumoPay Logo)
 // ============================================================================
-enum _MockupType { walletBalances, usdAccount, smartInvoices, currencySwap, aiVoiceCall, crossBorderFeed }
+enum _MockupType { walletBalances, usdAccount, smartInvoices, currencySwap, aiVoiceCall, crossBorderFeed, billPayments }
 
 class _SingleHeroPhone extends StatelessWidget {
   final _MockupType type;
@@ -2466,7 +2344,61 @@ class _SingleHeroPhone extends StatelessWidget {
             ],
           ),
         );
+      case _MockupType.billPayments:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Utility Bills & Services', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 10.5)),
+              const SizedBox(height: 2),
+              const Text('Quick Recharge Hub', style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 10),
+              // 4 Quick Service Badges
+              Row(
+                children: [
+                  _quickBillChip(Icons.phone_android_rounded, 'Airtime', kElumoGreen),
+                  const SizedBox(width: 6),
+                  _quickBillChip(Icons.electric_bolt_rounded, 'Power', kElumoAmber),
+                  const SizedBox(width: 6),
+                  _quickBillChip(Icons.tv_rounded, 'Cable TV', kElumoBlue),
+                  const SizedBox(width: 6),
+                  _quickBillChip(Icons.wifi_rounded, 'Internet', const Color(0xFF00D2B4)),
+                ],
+              ),
+              const SizedBox(height: 10),
+              const Text('Recent Token Receipts', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 10, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
+              _invoiceItem('IKEDC Prepaid Token', 'Token: 4920-1182-9930', '₦15,000', kElumoGreen, isPaid: true),
+              const SizedBox(height: 6),
+              _invoiceItem('MTN 20GB Data Bundle', '0803••••821', '₦5,000', kElumoBlue, isPaid: true),
+              const SizedBox(height: 6),
+              _invoiceItem('DStv Premium Renewal', 'Smartcard: 2018••••49', '₦29,000', kElumoAmber, isPaid: true),
+            ],
+          ),
+        );
     }
+  }
+
+  Widget _quickBillChip(IconData icon, String label, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF18181B),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFF27272A)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 16),
+            const SizedBox(height: 4),
+            Text(label, style: const TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _settlementItem(String country, String desc, String amount, Color color) {
