@@ -799,21 +799,45 @@ class _AISection extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 15, color: Color(0xFF6B7280), height: 1.6)),
           const SizedBox(height: 56),
-          mobile
-              ? Column(children: [
-                  _AICard(Icons.auto_awesome_rounded, 'Gemini Reconciliation', 'Automatically matches bank transfers to invoices — even with fuzzy names or wrong amounts.'),
-                  const SizedBox(height: 16),
-                  _AICard(Icons.record_voice_over_rounded, 'AI Voice Reminders', 'Sends automated voice calls in local accents to gently remind debtors of outstanding payments.'),
-                  const SizedBox(height: 16),
-                  _AICard(Icons.chat_bubble_outline_rounded, 'Natural Language Invoicing', '"Bill Amaka ₦150k for branding" — ElumoPay creates and sends the invoice instantly.'),
-                ])
-              : Row(children: [
-                  Expanded(child: _AICard(Icons.auto_awesome_rounded, 'Gemini Reconciliation', 'Automatically matches bank transfers to invoices — even with fuzzy names or wrong amounts.')),
-                  const SizedBox(width: 20),
-                  Expanded(child: _AICard(Icons.record_voice_over_rounded, 'AI Voice Reminders', 'Sends automated voice calls in local accents to gently remind debtors of outstanding payments.')),
-                  const SizedBox(width: 20),
-                  Expanded(child: _AICard(Icons.chat_bubble_outline_rounded, 'Natural Language Invoicing', '"Bill Amaka ₦150k for branding" — ElumoPay creates and sends the invoice instantly.')),
-                ]),
+        mobile
+            ? Column(children: const [
+                _AICard(
+                  _ReconMockup(),
+                  'Gemini Reconciliation',
+                  'Automatically matches bank transfers to invoices — even with fuzzy names or wrong amounts.',
+                ),
+                SizedBox(height: 24),
+                _AICard(
+                  _VoiceMockup(),
+                  'AI Voice Reminders',
+                  'Sends automated voice calls in local accents to gently remind debtors of outstanding payments.',
+                ),
+                SizedBox(height: 24),
+                _AICard(
+                  _ChatMockup(),
+                  'Natural Language Invoicing',
+                  '"Bill Amaka ₦150k for branding" — ElumoPay creates and sends the invoice instantly.',
+                ),
+              ])
+            : Row(crossAxisAlignment: CrossAxisAlignment.start, children: const [
+                Expanded(child: _AICard(
+                  _ReconMockup(),
+                  'Gemini Reconciliation',
+                  'Automatically matches bank transfers to invoices — even with fuzzy names or wrong amounts.',
+                )),
+                SizedBox(width: 24),
+                Expanded(child: _AICard(
+                  _VoiceMockup(),
+                  'AI Voice Reminders',
+                  'Sends automated voice calls in local accents to gently remind debtors of outstanding payments.',
+                )),
+                SizedBox(width: 24),
+                Expanded(child: _AICard(
+                  _ChatMockup(),
+                  'Natural Language Invoicing',
+                  '"Bill Amaka ₦150k for branding" — ElumoPay creates and sends the invoice instantly.',
+                )),
+              ]),
         ]),
       ),
     );
@@ -821,29 +845,152 @@ class _AISection extends StatelessWidget {
 }
 
 class _AICard extends StatelessWidget {
-  final IconData icon;
+  final Widget mockupView;
   final String title, body;
-  const _AICard(this.icon, this.title, this.body);
+  const _AICard(this.mockupView, this.title, this.body);
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: const Color(0xFF0F1929),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFF1E2A3A)),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      clipBehavior: Clip.antiAlias,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Container(
-          width: 44, height: 44,
-          decoration: BoxDecoration(color: kGreen.withValues(alpha: 0.12), shape: BoxShape.circle),
-          child: Icon(icon, color: kGreen, size: 22),
+          height: 180,
+          color: const Color(0xFF080D18),
+          child: mockupView,
         ),
-        const SizedBox(height: 18),
-        Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.3)),
-        const SizedBox(height: 10),
-        Text(body, style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280), height: 1.65)),
+        const Divider(color: Color(0xFF1E2A3A), height: 1),
+        Padding(
+          padding: const EdgeInsets.all(28),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.3)),
+            const SizedBox(height: 10),
+            Text(body, style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280), height: 1.65)),
+          ]),
+        ),
       ]),
+    );
+  }
+}
+
+// ─── AI Mockup Visuals ───
+
+class _ReconMockup extends StatelessWidget {
+  const _ReconMockup();
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Left side: Bank deposit
+        Positioned(
+          left: 20, top: 40,
+          child: Container(
+            width: 140, padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: const Color(0xFF131F33), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF1E2A3A))),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
+              Text('Deposit (GTB)', style: TextStyle(color: Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w600)),
+              SizedBox(height: 4),
+              Text('₦85,000', style: TextStyle(color: kGreen, fontSize: 14, fontWeight: FontWeight.w800)),
+              Text('from "S. OKAFOR"', style: TextStyle(color: Colors.white54, fontSize: 9)),
+            ]),
+          ),
+        ),
+        // Right side: Invoice
+        Positioned(
+          right: 20, bottom: 40,
+          child: Container(
+            width: 140, padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: const Color(0xFF131F33), borderRadius: BorderRadius.circular(12), border: Border.all(color: const Color(0xFF1E2A3A))),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: const [
+              Text('INV-0042', style: TextStyle(color: Color(0xFF6B7280), fontSize: 10, fontWeight: FontWeight.w600)),
+              SizedBox(height: 4),
+              Text('₦85,000', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800)),
+              Text('Sarah Okafor', style: TextStyle(color: Colors.white54, fontSize: 9)),
+            ]),
+          ),
+        ),
+        // Center match icon
+        Container(
+          width: 36, height: 36,
+          decoration: BoxDecoration(color: kGreen, shape: BoxShape.circle, boxShadow: [BoxShadow(color: kGreen.withValues(alpha: 0.3), blurRadius: 12)]),
+          child: const Icon(Icons.check_rounded, color: Colors.white, size: 20),
+        ),
+      ],
+    );
+  }
+}
+
+class _VoiceMockup extends StatelessWidget {
+  const _VoiceMockup();
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 180, height: 110,
+        decoration: BoxDecoration(color: const Color(0xFF131F33), borderRadius: BorderRadius.circular(16), border: Border.all(color: const Color(0xFF1E2A3A))),
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Container(
+            width: 40, height: 40,
+            decoration: BoxDecoration(color: kGreen.withValues(alpha: 0.15), shape: BoxShape.circle),
+            child: const Icon(Icons.record_voice_over_rounded, color: kGreen, size: 18),
+          ),
+          const SizedBox(height: 12),
+          const Text('Calling Chuka...', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(7, (i) => Container(
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              width: 3, height: [6.0, 12.0, 18.0, 10.0, 14.0, 8.0, 4.0][i],
+              decoration: BoxDecoration(color: kGreen, borderRadius: BorderRadius.circular(2)),
+            )),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+class _ChatMockup extends StatelessWidget {
+  const _ChatMockup();
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // User bubble
+          Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: const BoxDecoration(color: kBlue, borderRadius: BorderRadius.only(topLeft: Radius.circular(14), topRight: Radius.circular(14), bottomLeft: Radius.circular(14), bottomRight: Radius.circular(4))),
+              child: const Text('Bill Amaka ₦150k for branding', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // AI response bubble
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: const BoxDecoration(color: Color(0xFF131F33), borderRadius: BorderRadius.only(topLeft: Radius.circular(14), topRight: Radius.circular(14), bottomRight: Radius.circular(14), bottomLeft: Radius.circular(4))),
+              child: Row(mainAxisSize: MainAxisSize.min, children: const [
+                Icon(Icons.auto_awesome_rounded, color: kGreen, size: 14),
+                SizedBox(width: 8),
+                Text('Invoice sent to Amaka.', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w500)),
+              ]),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
