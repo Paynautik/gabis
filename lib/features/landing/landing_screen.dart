@@ -3098,33 +3098,23 @@ class _DownloadCtaSection extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        GestureDetector(
-                          onTap: () => Navigator.pushNamed(context, '/login'),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 28,
-                              vertical: 14,
+                        Wrap(
+                          spacing: 14,
+                          runSpacing: 10,
+                          children: [
+                            _CtaStoreBadge(
+                              icon: const _GooglePlayLogoWidget(size: 22),
+                              subtitle: 'GET IT ON',
+                              title: 'Google Play',
+                              onTap: () => Navigator.pushNamed(context, '/login'),
                             ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF4F46E5),
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0xFF4F46E5).withValues(alpha: 0.35),
-                                  blurRadius: 16,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ],
+                            _CtaStoreBadge(
+                              icon: const _AppleLogoWidget(size: 22, color: Colors.white),
+                              subtitle: 'DOWNLOAD ON THE',
+                              title: 'App Store',
+                              onTap: () => Navigator.pushNamed(context, '/login'),
                             ),
-                            child: const Text(
-                              'Start now',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w700,
-                                fontSize: 14.5,
-                              ),
-                            ),
-                          ),
+                          ],
                         ),
                       ],
                     ),
@@ -3132,6 +3122,92 @@ class _DownloadCtaSection extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CtaStoreBadge extends StatefulWidget {
+  final Widget icon;
+  final String subtitle;
+  final String title;
+  final VoidCallback onTap;
+  const _CtaStoreBadge({
+    required this.icon,
+    required this.subtitle,
+    required this.title,
+    required this.onTap,
+  });
+
+  @override
+  State<_CtaStoreBadge> createState() => _CtaStoreBadgeState();
+}
+
+class _CtaStoreBadgeState extends State<_CtaStoreBadge> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          decoration: BoxDecoration(
+            color: _isHovered
+                ? Colors.black.withValues(alpha: 0.85)
+                : Colors.black.withValues(alpha: 0.65),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: _isHovered
+                  ? const Color(0xFF10B981)
+                  : Colors.white.withValues(alpha: 0.25),
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              widget.icon,
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    widget.subtitle,
+                    style: const TextStyle(
+                      fontSize: 8.5,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.8,
+                      color: Color(0xFFCBD5E1),
+                    ),
+                  ),
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
