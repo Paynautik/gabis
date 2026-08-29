@@ -260,9 +260,9 @@ class _HeroCopy extends StatelessWidget {
         const SizedBox(height: 36),
 
         // CTAs
-        Wrap(spacing: 12, runSpacing: 12, children: const [
-          _Btn('Get Started for Free', kBlue, Colors.white),
-          _GhostBtn('Watch Demo'),
+        Wrap(spacing: 12, runSpacing: 12, children: [
+          _Btn('Get Started for Free', kBlue, Colors.white, onTap: () => Navigator.pushNamed(context, '/login')),
+          const _GhostBtn('Watch Demo'),
         ]),
         const SizedBox(height: 40),
 
@@ -655,7 +655,7 @@ class _Txn extends StatelessWidget {
 // FOR EVERYONE SECTION
 // ─────────────────────────────────────────────────────────────
 class _ForEveryoneSection extends StatelessWidget {
-  const _ForEveryoneSection();
+  const _ForEveryoneSection({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -778,7 +778,7 @@ class _AudienceCard extends StatelessWidget {
 // AI SECTION
 // ─────────────────────────────────────────────────────────────
 class _AISection extends StatelessWidget {
-  const _AISection();
+  const _AISection({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1014,7 +1014,7 @@ class _ChatMockup extends StatelessWidget {
 // COMPLIANCE SECTION
 // ─────────────────────────────────────────────────────────────
 class _ComplianceSection extends StatelessWidget {
-  const _ComplianceSection();
+  const _ComplianceSection({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1097,81 +1097,86 @@ class _CheckItem extends StatelessWidget {
 }
 
 class _ComplianceCard extends StatelessWidget {
-  const _ComplianceCard();
+  const _ComplianceCard({super.key});
   @override
   Widget build(BuildContext context) {
     return _PhoneMockup(
-      screenContent: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 60),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text('Tax Remittances', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 24),
-            // Q3 Card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF131F33),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFF1E2A3A)),
-                boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 20, offset: Offset(0, 10))],
-              ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                  const Text('Q3 2024', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800)),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: kGreen.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(9999)),
-                    child: Row(children: const [
-                      Icon(Icons.check_circle_rounded, color: kGreen, size: 12),
-                      SizedBox(width: 4),
-                      Text('Filed', style: TextStyle(color: kGreen, fontSize: 11, fontWeight: FontWeight.w700)),
-                    ]),
-                  ),
-                ]),
-                const Divider(color: Color(0xFF1E2A3A), height: 32),
-                _TaxRow('VAT (7.5%)', '₦318,750'),
-                const SizedBox(height: 12),
-                _TaxRow('WHT (2.5%)', '₦71,188'),
-                const SizedBox(height: 24),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(9999),
-                  child: const LinearProgressIndicator(value: 1, minHeight: 6, backgroundColor: Color(0xFF1E2A3A), valueColor: AlwaysStoppedAnimation<Color>(kGreen)),
+      screenContent: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 60),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text('Tax Remittances', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 24),
+              // Q3 Card
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF131F33),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFF1E2A3A)),
+                  boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 20, offset: Offset(0, 10))],
                 ),
-                const SizedBox(height: 16),
-                const Text('Auto-calculated & filed · Oct 15, 2024', style: TextStyle(color: Color(0xFF6B7280), fontSize: 10)),
-              ]),
-            ),
-            const SizedBox(height: 16),
-            // Q2 Card (past)
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0C1322),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF1E2A3A)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    const Text('Q3 2024', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(color: kGreen.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(9999)),
+                      child: Row(children: const [
+                        Icon(Icons.check_circle_rounded, color: kGreen, size: 12),
+                        SizedBox(width: 4),
+                        Text('Filed', style: TextStyle(color: kGreen, fontSize: 11, fontWeight: FontWeight.w700)),
+                      ]),
+                    ),
+                  ]),
+                  const Divider(color: Color(0xFF1E2A3A), height: 32),
+                  const _TaxRow('VAT (7.5%)', '₦318,750'),
+                  const SizedBox(height: 12),
+                  const _TaxRow('WHT (2.5%)', '₦71,188'),
+                  const SizedBox(height: 24),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(9999),
+                    child: const LinearProgressIndicator(value: 1, minHeight: 6, backgroundColor: Color(0xFF1E2A3A), valueColor: AlwaysStoppedAnimation<Color>(kGreen)),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Auto-calculated & filed · Oct 15, 2024', style: TextStyle(color: Color(0xFF6B7280), fontSize: 10)),
+                ]),
               ),
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
-                Text('Q2 2024', style: TextStyle(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w600)),
-                Text('Filed · ₦240,500', style: TextStyle(color: Colors.white54, fontSize: 13)),
-              ]),
-            ),
-            const SizedBox(height: 12),
-            // Q1 Card (past)
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0C1322),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: const Color(0xFF1E2A3A)),
+              const SizedBox(height: 16),
+              // Q2 Card (past)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0C1322),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFF1E2A3A)),
+                ),
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
+                  Flexible(child: Text('Q2 2024', style: TextStyle(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w600))),
+                  SizedBox(width: 8),
+                  Text('Filed · ₦240,500', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                ]),
               ),
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
-                Text('Q1 2024', style: TextStyle(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w600)),
-                Text('Filed · ₦195,200', style: TextStyle(color: Colors.white54, fontSize: 13)),
-              ]),
-            ),
-          ],
+              const SizedBox(height: 12),
+              // Q1 Card (past)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0C1322),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFF1E2A3A)),
+                ),
+                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
+                  Flexible(child: Text('Q1 2024', style: TextStyle(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w600))),
+                  SizedBox(width: 8),
+                  Text('Filed · ₦195,200', style: TextStyle(color: Colors.white54, fontSize: 13)),
+                ]),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -1185,7 +1190,8 @@ class _TaxRow extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      Text(label, style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13)),
+      Flexible(child: Text(label, style: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 13), overflow: TextOverflow.ellipsis)),
+      const SizedBox(width: 8),
       Text(amount, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700)),
     ],
   );
