@@ -999,7 +999,7 @@ class _ComplianceSection extends StatelessWidget {
             ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 _ComplianceText(),
                 const SizedBox(height: 48),
-                _ComplianceCard(),
+                Center(child: _ComplianceCard()),
               ])
             : Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                 Expanded(child: _ComplianceText()),
@@ -1053,40 +1053,80 @@ class _ComplianceCard extends StatelessWidget {
   const _ComplianceCard();
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: kInk,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: kBorderDark),
-        boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 32, offset: Offset(0, 12))],
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          const Text('Q3 Tax Remittance', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-            decoration: BoxDecoration(color: kGreen.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(9999)),
-            child: Row(children: const [
-              Icon(Icons.check_circle_rounded, color: kGreen, size: 12),
-              SizedBox(width: 4),
-              Text('Filed', style: TextStyle(color: kGreen, fontSize: 11, fontWeight: FontWeight.w700)),
-            ]),
-          ),
-        ]),
-        const Divider(color: Color(0xFF1F2937), height: 32),
-        _TaxRow('Value Added Tax (VAT) 7.5%', '₦318,750'),
-        const SizedBox(height: 14),
-        _TaxRow('Withholding Tax (WHT) 2.5%', '₦71,188'),
-        const SizedBox(height: 20),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(9999),
-          child: const LinearProgressIndicator(value: 1, minHeight: 8, backgroundColor: Color(0xFF1F2937), valueColor: AlwaysStoppedAnimation<Color>(kGreen)),
+    return _PhoneMockup(
+      screenContent: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 60),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Tax Remittances', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 24),
+            // Q3 Card
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF131F33),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: const Color(0xFF1E2A3A)),
+                boxShadow: const [BoxShadow(color: Color(0x22000000), blurRadius: 20, offset: Offset(0, 10))],
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                  const Text('Q3 2024', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w800)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(color: kGreen.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(9999)),
+                    child: Row(children: const [
+                      Icon(Icons.check_circle_rounded, color: kGreen, size: 12),
+                      SizedBox(width: 4),
+                      Text('Filed', style: TextStyle(color: kGreen, fontSize: 11, fontWeight: FontWeight.w700)),
+                    ]),
+                  ),
+                ]),
+                const Divider(color: Color(0xFF1E2A3A), height: 32),
+                _TaxRow('VAT (7.5%)', '₦318,750'),
+                const SizedBox(height: 12),
+                _TaxRow('WHT (2.5%)', '₦71,188'),
+                const SizedBox(height: 24),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(9999),
+                  child: const LinearProgressIndicator(value: 1, minHeight: 6, backgroundColor: Color(0xFF1E2A3A), valueColor: AlwaysStoppedAnimation<Color>(kGreen)),
+                ),
+                const SizedBox(height: 16),
+                const Text('Auto-calculated & filed · Oct 15, 2024', style: TextStyle(color: Color(0xFF6B7280), fontSize: 10)),
+              ]),
+            ),
+            const SizedBox(height: 16),
+            // Q2 Card (past)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0C1322),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF1E2A3A)),
+              ),
+              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
+                Text('Q2 2024', style: TextStyle(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w600)),
+                Text('Filed · ₦240,500', style: TextStyle(color: Colors.white54, fontSize: 13)),
+              ]),
+            ),
+            const SizedBox(height: 12),
+            // Q1 Card (past)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0C1322),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF1E2A3A)),
+              ),
+              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [
+                Text('Q1 2024', style: TextStyle(color: Colors.white54, fontSize: 13, fontWeight: FontWeight.w600)),
+                Text('Filed · ₦195,200', style: TextStyle(color: Colors.white54, fontSize: 13)),
+              ]),
+            ),
+          ],
         ),
-        const SizedBox(height: 14),
-        const Text('Auto-calculated & filed · Oct 15, 2024',
-            style: TextStyle(color: Color(0xFF4B5563), fontSize: 12)),
-      ]),
+      ),
     );
   }
 }
