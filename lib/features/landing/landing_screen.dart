@@ -1032,47 +1032,44 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
                             child: Center(
                               child: Container(
                                 width: double.infinity,
-                                height: 590,
+                                height: 600,
                                 decoration: BoxDecoration(
+                                  color: Colors.white,
                                   borderRadius: BorderRadius.circular(32),
-                                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                                  border: Border.all(color: const Color(0xFFF1F5F9)),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withOpacity(0.08),
-                                      blurRadius: 28,
-                                      offset: const Offset(0, 12),
+                                      color: Colors.black.withValues(alpha: 0.04),
+                                      blurRadius: 32,
+                                      offset: const Offset(0, 16),
+                                    ),
+                                    BoxShadow(
+                                      color: currentSlide.accentColor.withValues(alpha: 0.06),
+                                      blurRadius: 40,
+                                      offset: const Offset(0, 20),
                                     ),
                                   ],
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(32),
-                                  child: Stack(
-                                    fit: StackFit.expand,
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Image.asset(
-                                        'assets/images/african_person_mockup.jpg',
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) => Container(color: const Color(0xFFF1F5F9)),
-                                      ),
-                                      Container(
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    // Soft ambient studio glow in background
+                                    Positioned(
+                                      top: 40,
+                                      child: Container(
+                                        width: 280,
+                                        height: 280,
                                         decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topCenter,
-                                            end: Alignment.bottomCenter,
-                                            colors: [
-                                              Colors.black.withOpacity(0.35),
-                                              Colors.black.withOpacity(0.15),
-                                              Colors.black.withOpacity(0.65),
-                                            ],
-                                          ),
+                                          shape: BoxShape.circle,
+                                          color: currentSlide.accentColor.withValues(alpha: 0.10),
                                         ),
                                       ),
-                                      Center(
-                                        child: _SingleHeroPhone(type: currentSlide.mockupType),
-                                      ),
-                                    ],
-                                  ),
+                                    ),
+                                    // High-Definition Standing Phone Mockup
+                                    Center(
+                                      child: _SingleHeroPhone(type: currentSlide.mockupType),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -1087,50 +1084,40 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
                           Center(
                             child: Container(
                               width: double.infinity,
-                              height: 520,
+                              height: 540,
                               decoration: BoxDecoration(
+                                color: Colors.white,
                                 borderRadius: BorderRadius.circular(28),
-                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                                border: Border.all(color: const Color(0xFFF1F5F9)),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.08),
+                                    color: Colors.black.withValues(alpha: 0.04),
                                     blurRadius: 24,
                                     offset: const Offset(0, 10),
                                   ),
                                 ],
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(28),
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/african_person_mockup.jpg',
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Container(color: const Color(0xFFF1F5F9)),
-                                    ),
-                                    Container(
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Positioned(
+                                    top: 30,
+                                    child: Container(
+                                      width: 220,
+                                      height: 220,
                                       decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Colors.black.withOpacity(0.30),
-                                            Colors.black.withOpacity(0.15),
-                                            Colors.black.withOpacity(0.70),
-                                          ],
-                                        ),
+                                        shape: BoxShape.circle,
+                                        color: currentSlide.accentColor.withValues(alpha: 0.08),
                                       ),
                                     ),
-                                    Center(
-                                      child: Transform.scale(
-                                        scale: 0.85,
-                                        child: _SingleHeroPhone(type: currentSlide.mockupType),
-                                      ),
+                                  ),
+                                  Center(
+                                    child: Transform.scale(
+                                      scale: 0.88,
+                                      child: _SingleHeroPhone(type: currentSlide.mockupType),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
