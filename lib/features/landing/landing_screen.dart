@@ -2285,19 +2285,19 @@ class _SecurityComplianceSection extends StatelessWidget {
       width: double.infinity,
       color: const Color(0xFF05070A),
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 64 : 24,
-        vertical: isDesktop ? 128 : 80,
+        horizontal: isDesktop ? 48 : 20,
+        vertical: isDesktop ? 68 : 44,
       ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           // Background Emerald Glow
           Positioned(
-            right: -200,
-            top: -150,
+            right: -120,
+            top: -100,
             child: Container(
-              width: 650,
-              height: 650,
+              width: 450,
+              height: 450,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: const Color(0xFF10B981).withValues(alpha: 0.08),
@@ -2307,13 +2307,13 @@ class _SecurityComplianceSection extends StatelessWidget {
 
           Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1280),
+              constraints: const BoxConstraints(maxWidth: 1100),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Badge
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.03),
                       borderRadius: BorderRadius.circular(50),
@@ -2326,16 +2326,16 @@ class _SecurityComplianceSection extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.shield_outlined,
-                          size: 16,
+                          size: 14,
                           color: Color(0xFF34D399),
                         ),
-                        SizedBox(width: 8),
+                        SizedBox(width: 6),
                         Text(
                           'TRUSTED ACROSS AFRICA',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 10.5,
                             fontWeight: FontWeight.w600,
-                            letterSpacing: 3.0,
+                            letterSpacing: 2.0,
                             color: Color(0xFFA1A1AA),
                           ),
                         ),
@@ -2343,18 +2343,18 @@ class _SecurityComplianceSection extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 18),
 
                   // Heading
                   ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 760),
+                    constraints: const BoxConstraints(maxWidth: 680),
                     child: RichText(
                       text: TextSpan(
                         style: TextStyle(
-                          fontSize: isDesktop ? 64 : 40,
-                          fontWeight: FontWeight.w600,
-                          height: 0.98,
-                          letterSpacing: -2.5,
+                          fontSize: isDesktop ? 42 : 28,
+                          fontWeight: FontWeight.w700,
+                          height: 1.05,
+                          letterSpacing: -1.5,
                           color: Colors.white,
                           fontFamily: 'Arial',
                         ),
@@ -2372,23 +2372,23 @@ class _SecurityComplianceSection extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 14),
 
                   // Subtitle
                   ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 680),
+                    constraints: const BoxConstraints(maxWidth: 580),
                     child: const Text(
                       'Trust is our currency. We are committed to institutional security, pan-African compliance, and always-on support for businesses across Africa.',
                       style: TextStyle(
-                        fontSize: 18,
-                        height: 1.6,
+                        fontSize: 15,
+                        height: 1.5,
                         fontWeight: FontWeight.w400,
                         color: Color(0xFFA1A1AA),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 80),
+                  const SizedBox(height: 38),
 
                   // Cards Grid
                   isDesktop
@@ -2397,7 +2397,7 @@ class _SecurityComplianceSection extends StatelessWidget {
                           children: _securityFeatures.map((f) {
                             return Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
                                 child: _InteractiveSecurityCard(feature: f),
                               ),
                             );
@@ -2406,18 +2406,18 @@ class _SecurityComplianceSection extends StatelessWidget {
                       : Column(
                           children: _securityFeatures.map((f) {
                             return Padding(
-                              padding: const EdgeInsets.only(bottom: 24),
+                              padding: const EdgeInsets.only(bottom: 16),
                               child: _InteractiveSecurityCard(feature: f),
                             );
                           }).toList(),
                         ),
 
-                  const SizedBox(height: 70),
+                  const SizedBox(height: 36),
 
                   // Bottom Trust Bar
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.only(top: 32),
+                    padding: const EdgeInsets.only(top: 20),
                     decoration: BoxDecoration(
                       border: Border(
                         top: BorderSide(
@@ -2426,8 +2426,8 @@ class _SecurityComplianceSection extends StatelessWidget {
                       ),
                     ),
                     child: Wrap(
-                      spacing: 32,
-                      runSpacing: 16,
+                      spacing: 24,
+                      runSpacing: 12,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: const [
                         Row(
@@ -2435,14 +2435,14 @@ class _SecurityComplianceSection extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.shield_outlined,
-                              size: 16,
+                              size: 14,
                               color: Color(0xFF34D399),
                             ),
-                            SizedBox(width: 8),
+                            SizedBox(width: 6),
                             Text(
                               'Bank-grade Security',
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 12.5,
                                 color: Color(0xFF71717A),
                               ),
                             ),
@@ -2451,14 +2451,14 @@ class _SecurityComplianceSection extends StatelessWidget {
                         Text(
                           'ISO 27001 Aligned',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 12.5,
                             color: Color(0xFF71717A),
                           ),
                         ),
                         Text(
                           'Built for Africa',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 12.5,
                             color: Color(0xFF71717A),
                           ),
                         ),
@@ -2495,12 +2495,12 @@ class _InteractiveSecurityCardState extends State<_InteractiveSecurityCard> {
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(22),
         decoration: BoxDecoration(
           color: _isHovered
               ? Colors.white.withValues(alpha: 0.04)
               : Colors.white.withValues(alpha: 0.02),
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: _isHovered
                 ? const Color(0xFF34D399).withValues(alpha: 0.20)
@@ -2512,51 +2512,51 @@ class _InteractiveSecurityCardState extends State<_InteractiveSecurityCard> {
           children: [
             // Icon
             Container(
-              width: 56,
-              height: 56,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
                 color: const Color(0xFF10B981).withValues(alpha: 0.10),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 f['icon'] as IconData,
                 color: const Color(0xFF34D399),
-                size: 28,
+                size: 22,
               ),
             ),
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 20),
 
             // Title
             Text(
               f['title'] as String,
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
-                letterSpacing: -0.5,
+                letterSpacing: -0.3,
                 color: Colors.white,
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
 
             // Description
             Text(
               f['description'] as String,
               style: const TextStyle(
-                fontSize: 16,
-                height: 1.65,
+                fontSize: 13.5,
+                height: 1.5,
                 color: Color(0xFFA1A1AA),
               ),
             ),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 22),
 
             // Arrow Button
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
-              width: 44,
-              height: 44,
+              width: 34,
+              height: 34,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
@@ -2567,7 +2567,7 @@ class _InteractiveSecurityCardState extends State<_InteractiveSecurityCard> {
               ),
               child: Icon(
                 Icons.arrow_outward_rounded,
-                size: 20,
+                size: 16,
                 color: _isHovered
                     ? const Color(0xFF34D399)
                     : const Color(0xFF71717A),
