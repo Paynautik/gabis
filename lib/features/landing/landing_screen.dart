@@ -835,7 +835,6 @@ class _AICard extends StatelessWidget {
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Container(
           height: 340,
-          color: const Color(0xFF080D18),
           alignment: Alignment.center,
           child: SizedBox(
             height: 340,
@@ -848,9 +847,8 @@ class _AICard extends StatelessWidget {
             ),
           ),
         ),
-        const Divider(color: Color(0xFF1E2A3A), height: 1),
         Padding(
-          padding: const EdgeInsets.all(28),
+          padding: const EdgeInsets.only(left: 28, right: 28, bottom: 28),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.3)),
             const SizedBox(height: 10),
