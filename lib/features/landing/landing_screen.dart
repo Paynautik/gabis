@@ -4,7 +4,8 @@ import '../../shared/widgets/nautik_logo.dart';
 // ============================================================
 // BRAND COLOR PALETTE (from design spec)
 // ============================================================
-const Color kPrimary         = Color(0xFF006D44);
+const Color kPrimary         = Color(0xFF006D44); // brand green (kept for accents)
+const Color kButtonBlue      = Color(0xFF2563EB); // CTA button deep blue
 const Color kOnPrimary       = Color(0xFFFFFFFF);
 const Color kPrimaryContainer = Color(0xFF00B876);
 const Color kSurface         = Color(0xFFF9F9FF);
@@ -167,7 +168,7 @@ class _PillButtonState extends State<_PillButton> {
 
   @override
   Widget build(BuildContext context) {
-    final bg = widget.filled ? (widget.fillColor ?? kPrimary) : Colors.transparent;
+    final bg = widget.filled ? (widget.fillColor ?? kButtonBlue) : Colors.transparent;
     final fg = widget.textColor ?? (widget.filled ? kOnPrimary : kOnBackground);
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
@@ -352,7 +353,113 @@ class _HeroImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: _PhoneMockup());
+    final w = MediaQuery.of(context).size.width;
+    final mobile = w < 900;
+
+    return SizedBox(
+      height: mobile ? 480 : 660,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          // ── Person photo (left / behind) ──
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: mobile ? 220 : 320,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.18),
+                    blurRadius: 40,
+                    offset: const Offset(0, 16),
+                  ),
+                ],
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Image.asset(
+                'assets/images/hero_person.jpg',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+
+          // ── Phone mockup (right / in front, overlapping person) ──
+          Positioned(
+            right: 0,
+            top: mobile ? 40 : 20,
+            bottom: mobile ? 0 : 20,
+            child: Transform.scale(
+              scale: mobile ? 0.78 : 0.92,
+              alignment: Alignment.centerRight,
+              child: const _PhoneMockup(),
+            ),
+          ),
+
+          // ── "Used by 12,000+ sellers" social proof badge ──
+          Positioned(
+            bottom: 28,
+            left: 12,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Stacked avatar dots
+                  SizedBox(
+                    width: 52,
+                    height: 24,
+                    child: Stack(
+                      children: List.generate(3, (i) => Positioned(
+                        left: i * 16.0,
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: [kButtonBlue, kPrimary, kWarningAmber][i],
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: Center(
+                            child: Text(
+                              ['A', 'K', 'O'][i],
+                              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900),
+                            ),
+                          ),
+                        ),
+                      )),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text('12,000+ sellers', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: kOnBackground)),
+                      Text('across Africa', style: TextStyle(fontSize: 10, color: kOnSurfaceVariant)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

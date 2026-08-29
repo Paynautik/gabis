@@ -72,6 +72,7 @@ flutter:
   assets:
     - assets/logo_mark.png
     - assets/logo_mark_white.png
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
