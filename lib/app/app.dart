@@ -20,7 +20,7 @@ class ElumoApp extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
-      title: 'Elumo',
+      title: 'gabism',
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
       theme: AppTheme.getTheme(Brightness.light),

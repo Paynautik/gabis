@@ -7,22 +7,31 @@ class NautikLogoMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: Image.asset(
-        'assets/logo_mark.png',
-        width: size,
-        height: size,
-        fit: BoxFit.contain,
-        errorBuilder: (context, error, stackTrace) {
-          // Fallback vector painter if AssetManifest is loading
-          return CustomPaint(
-            size: Size(size, size),
-            painter: _ElumoOfficialLogoPainter(),
-          );
-        },
-      ),
+    return GabismWordmark(height: size);
+  }
+}
+
+class GabismWordmark extends StatelessWidget {
+  final double height;
+  const GabismWordmark({super.key, this.height = 32});
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      'assets/gabism_logo.png',
+      height: height,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) {
+        return Text(
+          'gabism',
+          style: TextStyle(
+            color: const Color(0xFF1E0E62),
+            fontSize: height * 0.75,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+          ),
+        );
+      },
     );
   }
 }
