@@ -29,7 +29,6 @@ class LandingScreen extends StatelessWidget {
         child: Column(children: const [
           _Nav(),
           _Hero(),
-          _StatsBar(),
           _ForEveryoneSection(),
           _AISection(),
           _ComplianceSection(),
@@ -646,47 +645,6 @@ class _Txn extends StatelessWidget {
       Text(amt, style: TextStyle(color: pos ? kGreen : const Color(0xFFF87171), fontSize: 10, fontWeight: FontWeight.w800)),
     ]);
   }
-}
-
-// ─────────────────────────────────────────────────────────────
-// STATS BAR
-// ─────────────────────────────────────────────────────────────
-class _StatsBar extends StatelessWidget {
-  const _StatsBar();
-
-  @override
-  Widget build(BuildContext context) {
-    final mobile = MediaQuery.of(context).size.width < 700;
-    return Container(
-      color: kInkSoft,
-      padding: EdgeInsets.symmetric(horizontal: mobile ? 24 : 64, vertical: 28),
-      child: Wrap(
-        alignment: WrapAlignment.spaceAround,
-        runSpacing: 20,
-        spacing: 40,
-        children: const [
-          _Stat('₦2.8B+', 'Processed monthly'),
-          _Stat('12,000+', 'Active users'),
-          _Stat('4', 'African markets'),
-          _Stat('97%', 'Reconciliation accuracy'),
-        ],
-      ),
-    );
-  }
-}
-
-class _Stat extends StatelessWidget {
-  final String value, label;
-  const _Stat(this.value, this.label);
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(value, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: kGreen, letterSpacing: -0.8)),
-      const SizedBox(height: 2),
-      Text(label, style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280), fontWeight: FontWeight.w500)),
-    ],
-  );
 }
 
 // ─────────────────────────────────────────────────────────────
