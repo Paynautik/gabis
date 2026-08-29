@@ -637,8 +637,8 @@ class _ComplianceSection extends StatelessWidget {
     final w = MediaQuery.of(context).size.width;
     final mobile = w < 900;
     return Container(
-      color: kSurfaceContainerLow,
       decoration: const BoxDecoration(
+        color: kSurfaceContainerLow,
         border: Border.symmetric(horizontal: BorderSide(color: kBorderLight)),
       ),
       padding: EdgeInsets.symmetric(horizontal: mobile ? 20 : 70, vertical: 80),
@@ -1035,9 +1035,9 @@ class _FooterSection extends StatelessWidget {
     final w = MediaQuery.of(context).size.width;
     final mobile = w < 700;
     return Container(
-      color: kCanvasLight,
       padding: EdgeInsets.symmetric(horizontal: mobile ? 20 : 70, vertical: 80),
       decoration: const BoxDecoration(
+        color: kCanvasLight,
         border: Border(top: BorderSide(color: kBorderLight)),
       ),
       child: ConstrainedBox(
