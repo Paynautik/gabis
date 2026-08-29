@@ -332,10 +332,6 @@ class _PremiumHeroImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double compositionH = 640.0;
-    const double photoW       = 320.0;
-    const double phoneScale   = 0.95;
-
     if (mobile) {
       return SizedBox(
         height: 520,
@@ -350,46 +346,12 @@ class _PremiumHeroImage extends StatelessWidget {
 
     return SizedBox(
       width: double.infinity,
-      height: compositionH,
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.center,
-        children: [
-          // ── Person photo card (left, behind) ──
-          Positioned(
-            left: -20,
-            top: 20,
-            bottom: 40,
-            child: Container(
-              width: photoW,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(color: kGreen.withValues(alpha: 0.1), blurRadius: 60, spreadRadius: 10),
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 40, offset: const Offset(0, 16)),
-                ],
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Image.network(
-                'hero_person.jpg',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(color: kBorder),
-              ),
-            ),
-          ),
-
-          // ── Phone mockup (right, in front) ──
-          Positioned(
-            right: 0,
-            top: 40,
-            bottom: 0,
-            child: Transform.scale(
-              scale: phoneScale,
-              alignment: Alignment.centerRight,
-              child: const _PhoneMockup(),
-            ),
-          ),
-        ],
+      height: 640.0,
+      child: Center(
+        child: Transform.scale(
+          scale: 0.95,
+          child: const _PhoneMockup(),
+        ),
       ),
     );
   }
