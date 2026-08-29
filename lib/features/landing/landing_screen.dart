@@ -1082,21 +1082,25 @@ class _UseCasesSection extends StatelessWidget {
             ),
             const SizedBox(height: 48),
 
-            // 3 Use Case Cards
+            // 3 Enhanced Use Case Cards with Mini UI Previews
             isDesktop
                 ? Row(
-                    children: const [
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Expanded(
                         child: _UseCaseCard(
                           icon: Icons.school_rounded,
                           title: 'Schools & Education',
                           subtitle: 'Tuition Installment Management',
-                          description: 'Track multi-installment student tuition plans (like skill-sch.com), send automated SMS reminders, and trigger AI follow-up calls.',
+                          description: 'Track structured student tuition plans, send automated SMS reminders, and trigger conversational AI phone calls.',
                           color: kElumoGreen,
                           highlight: 'Zero Late Payment Defaults',
+                          statBadge: '99.4% Collection',
+                          previewWidget: _schoolPreviewWidget(),
+                          actionText: 'Explore Invoicing',
                         ),
                       ),
-                      SizedBox(width: 24),
+                      const SizedBox(width: 24),
                       Expanded(
                         child: _UseCaseCard(
                           icon: Icons.laptop_mac_rounded,
@@ -1105,32 +1109,41 @@ class _UseCasesSection extends StatelessWidget {
                           description: 'Receive USD, GBP, and EUR from international clients on Upwork, Deel, and Stripe with dedicated US routing details.',
                           color: kElumoBlue,
                           highlight: 'Bank-Beating FX Rates',
+                          statBadge: '0.3% Mid-Market',
+                          previewWidget: _freelancerPreviewWidget(),
+                          actionText: 'Get US Account',
                         ),
                       ),
-                      SizedBox(width: 24),
+                      const SizedBox(width: 24),
                       Expanded(
                         child: _UseCaseCard(
                           icon: Icons.storefront_rounded,
                           title: 'Cross-Border Traders',
                           subtitle: 'Pan-African Commerce',
-                          description: 'Instant settlement across Nigeria, Ghana, and Kenya with multi-currency virtual cards and automated tax filing.',
+                          description: 'Instant multi-currency settlement across Nigeria, Ghana, and Kenya with virtual cards and automated tax filing.',
                           color: kElumoAmber,
                           highlight: 'Zero Decline Virtual Cards',
+                          statBadge: '< 0.1% Declines',
+                          previewWidget: _traderPreviewWidget(),
+                          actionText: 'Start Trading',
                         ),
                       ),
                     ],
                   )
                 : Column(
-                    children: const [
+                    children: [
                       _UseCaseCard(
                         icon: Icons.school_rounded,
                         title: 'Schools & Education',
                         subtitle: 'Tuition Installment Management',
-                        description: 'Track multi-installment student tuition plans, send automated SMS reminders, and trigger AI follow-up calls.',
+                        description: 'Track structured student tuition plans, send automated SMS reminders, and trigger conversational AI phone calls.',
                         color: kElumoGreen,
                         highlight: 'Zero Late Payment Defaults',
+                        statBadge: '99.4% Collection',
+                        previewWidget: _schoolPreviewWidget(),
+                        actionText: 'Explore Invoicing',
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       _UseCaseCard(
                         icon: Icons.laptop_mac_rounded,
                         title: 'Freelancers & Tech',
@@ -1138,15 +1151,21 @@ class _UseCasesSection extends StatelessWidget {
                         description: 'Receive USD, GBP, and EUR from international clients on Upwork, Deel, and Stripe with dedicated US routing details.',
                         color: kElumoBlue,
                         highlight: 'Bank-Beating FX Rates',
+                        statBadge: '0.3% Mid-Market',
+                        previewWidget: _freelancerPreviewWidget(),
+                        actionText: 'Get US Account',
                       ),
-                      SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       _UseCaseCard(
                         icon: Icons.storefront_rounded,
                         title: 'Cross-Border Traders',
                         subtitle: 'Pan-African Commerce',
-                        description: 'Instant settlement across Nigeria, Ghana, and Kenya with multi-currency virtual cards and automated tax filing.',
+                        description: 'Instant multi-currency settlement across Nigeria, Ghana, and Kenya with virtual cards and automated tax filing.',
                         color: kElumoAmber,
                         highlight: 'Zero Decline Virtual Cards',
+                        statBadge: '< 0.1% Declines',
+                        previewWidget: _traderPreviewWidget(),
+                        actionText: 'Start Trading',
                       ),
                     ],
                   ),
@@ -1155,15 +1174,149 @@ class _UseCasesSection extends StatelessWidget {
       ),
     );
   }
+
+  Widget _schoolPreviewWidget() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text('skill-sch.com', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: kElumoDark)),
+              Text('Inst. 2/4 · 50%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: kElumoGreen)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: const LinearProgressIndicator(
+              value: 0.50,
+              backgroundColor: Color(0xFFE2E8F0),
+              valueColor: AlwaysStoppedAnimation(kElumoGreen),
+              minHeight: 5,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text('Amara J. (Grade 11)', style: TextStyle(fontSize: 10.5, color: Color(0xFF64748B))),
+              Text('₦100,000 PAID', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: kElumoGreen)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _freelancerPreviewWidget() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Row(
+                children: [
+                  Icon(Icons.account_balance_rounded, size: 13, color: kElumoBlue),
+                  SizedBox(width: 4),
+                  Text('Lead Bank US Checking', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10.5, color: kElumoDark)),
+                ],
+              ),
+              Text('ACH Verified', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 9.5, color: kElumoBlue)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                Text('Upwork Global Escrow', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
+                Text('+\$1,200.00', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: kElumoGreen)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _traderPreviewWidget() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Text('Cross-Border Settlement Route', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10.5, color: kElumoDark)),
+              Text('Instant Swap', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 9.5, color: kElumoAmber)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _countryChip('🇳🇬 NGN', kElumoGreen),
+              const Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF94A3B8)),
+              _countryChip('🇰🇪 KES', kElumoAmber),
+              const Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF94A3B8)),
+              _countryChip('🇬🇭 GHS', kElumoBlue),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _countryChip(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(label, style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: color)),
+    );
+  }
 }
 
-class _UseCaseCard extends StatelessWidget {
+class _UseCaseCard extends StatefulWidget {
   final IconData icon;
   final String title;
   final String subtitle;
   final String description;
   final Color color;
   final String highlight;
+  final String statBadge;
+  final Widget previewWidget;
+  final String actionText;
 
   const _UseCaseCard({
     required this.icon,
@@ -1172,51 +1325,153 @@ class _UseCaseCard extends StatelessWidget {
     required this.description,
     required this.color,
     required this.highlight,
+    required this.statBadge,
+    required this.previewWidget,
+    required this.actionText,
   });
 
   @override
+  State<_UseCaseCard> createState() => _UseCaseCardState();
+}
+
+class _UseCaseCardState extends State<_UseCaseCard> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(12),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => Navigator.pushNamed(context, '/login'),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 220),
+          transform: Matrix4.translationValues(0, _hovered ? -6 : 0, 0),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: _hovered ? widget.color.withOpacity(0.5) : const Color(0xFFE2E8F0),
+              width: _hovered ? 2 : 1.2,
             ),
-            child: Icon(icon, color: color, size: 24),
+            boxShadow: [
+              BoxShadow(
+                color: _hovered ? widget.color.withOpacity(0.12) : Colors.black.withOpacity(0.04),
+                blurRadius: _hovered ? 24 : 12,
+                offset: Offset(0, _hovered ? 12 : 6),
+              ),
+            ],
           ),
-          const SizedBox(height: 18),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 19, color: kElumoDark)),
-          const SizedBox(height: 4),
-          Text(subtitle, style: TextStyle(color: color, fontSize: 12.5, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 12),
-          Text(description, style: const TextStyle(color: Color(0xFF64748B), fontSize: 14, height: 1.5)),
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.08),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(highlight, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Row: Icon + Stat Pill
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: widget.color.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: widget.color.withOpacity(0.2)),
+                    ),
+                    child: Icon(widget.icon, color: widget.color, size: 22),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: widget.color.withOpacity(0.09),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: widget.color.withOpacity(0.25)),
+                    ),
+                    child: Text(
+                      widget.statBadge,
+                      style: TextStyle(
+                        color: widget.color,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+
+              // Title & Subtitle
+              Text(
+                widget.title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 19,
+                  color: kElumoDark,
+                  letterSpacing: -0.4,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                widget.subtitle,
+                style: TextStyle(
+                  color: widget.color,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                widget.description,
+                style: const TextStyle(
+                  color: Color(0xFF64748B),
+                  fontSize: 13,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 18),
+
+              // Mini UI Preview Component
+              widget.previewWidget,
+              const SizedBox(height: 18),
+
+              // Bottom Highlight & Action Arrow
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      widget.highlight,
+                      style: const TextStyle(
+                        color: Color(0xFF334155),
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        widget.actionText,
+                        style: TextStyle(
+                          color: widget.color,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12.5,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(Icons.arrow_forward_rounded, color: widget.color, size: 14),
+                    ],
+                  ),
+                ],
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
