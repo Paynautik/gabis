@@ -352,23 +352,231 @@ class _HeroImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 4 / 5,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: kBorderLight),
-          boxShadow: [
-            BoxShadow(
-              color: kPrimary.withOpacity(0.06),
-              blurRadius: 40,
-              spreadRadius: 4,
-              offset: const Offset(0, 16),
+    return Center(child: _PhoneMockup());
+  }
+}
+
+// ============================================================
+// REALISTIC 2026 PHONE MOCKUP
+// ============================================================
+class _PhoneMockup extends StatelessWidget {
+  const _PhoneMockup();
+
+  @override
+  Widget build(BuildContext context) {
+    const double phoneW = 300;
+    const double phoneH = 620;
+    const double cornerRadius = 50.0;
+
+    return SizedBox(
+      width: phoneW + 16,
+      height: phoneH + 16,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // ── Drop shadow beneath phone ──
+          Container(
+            width: phoneW,
+            height: phoneH,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(cornerRadius),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  blurRadius: 80,
+                  spreadRadius: 10,
+                  offset: const Offset(0, 30),
+                ),
+                BoxShadow(
+                  color: kPrimary.withValues(alpha: 0.12),
+                  blurRadius: 60,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 20),
+                ),
+              ],
             ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: _MockAppScreen(),
+          ),
+
+          // ── Left hardware buttons (volume + silent) ──
+          Positioned(
+            left: 0,
+            top: 130,
+            child: Column(
+              children: [
+                // Silent toggle
+                Container(
+                  width: 4,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4A4A52),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                // Volume up
+                Container(
+                  width: 4,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4A4A52),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Volume down
+                Container(
+                  width: 4,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4A4A52),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Right power/lock button ──
+          Positioned(
+            right: 0,
+            top: 160,
+            child: Container(
+              width: 4,
+              height: 72,
+              decoration: BoxDecoration(
+                color: const Color(0xFF4A4A52),
+                borderRadius: BorderRadius.circular(3),
+              ),
+            ),
+          ),
+
+          // ── Titanium chassis (outer ring) ──
+          Container(
+            width: phoneW,
+            height: phoneH,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(cornerRadius),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF6E6E73),
+                  Color(0xFF3A3A3C),
+                  Color(0xFF5A5A60),
+                  Color(0xFF2C2C2E),
+                ],
+                stops: [0.0, 0.35, 0.65, 1.0],
+              ),
+            ),
+          ),
+
+          // ── Glass screen inset (inner bezel) ──
+          Positioned(
+            top: 6,
+            left: 6,
+            right: 6,
+            bottom: 6,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(cornerRadius - 6),
+                color: const Color(0xFF050508),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Stack(
+                children: [
+                  // App screen content
+                  const _MockAppScreen(),
+
+                  // ── Glossy glass sheen overlay ──
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      height: 180,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.white.withValues(alpha: 0.07),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // ── Dynamic Island (pill notch) ──
+                  Positioned(
+                    top: 14,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Container(
+                        width: 108,
+                        height: 33,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF050508),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: const Color(0xFF2A2A2E),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            // Front camera dot
+                            Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1C1C1E),
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: const Color(0xFF3A3A3C),
+                                  width: 1,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            // Infrared/Face ID sensor
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: const BoxDecoration(
+                                color: Color(0xFF2C2C2E),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // ── Home indicator bar ──
+                  Positioned(
+                    bottom: 8,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Container(
+                        width: 120,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -380,74 +588,114 @@ class _MockAppScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: kCanvasDark,
-      padding: const EdgeInsets.all(24),
+      color: const Color(0xFF0A0F1E),
+      padding: const EdgeInsets.fromLTRB(20, 60, 20, 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Status bar mock
+          // ── Greeting row ──
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text('9:41', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13)),
-              Row(children: [
-                Icon(Icons.signal_cellular_alt, color: Colors.white, size: 14),
-                SizedBox(width: 4),
-                Icon(Icons.wifi, color: Colors.white, size: 14),
-                SizedBox(width: 4),
-                Icon(Icons.battery_full, color: Colors.white, size: 14),
-              ]),
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text('Good morning', style: TextStyle(color: Color(0xFF64748B), fontSize: 11, fontWeight: FontWeight.w500)),
+                  SizedBox(height: 2),
+                  Text('Adebayo', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: -0.3)),
+                ],
+              ),
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [kPrimary, Color(0xFF00A86B)]),
+                  shape: BoxShape.circle,
+                ),
+                child: const Center(
+                  child: Text('A', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 14)),
+                ),
+              ),
             ],
           ),
-          const SizedBox(height: 24),
-          // Greeting
-          const Text('Good morning, Adebayo', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13)),
-          const SizedBox(height: 6),
-          const Text('Business Dashboard', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5)),
-          const SizedBox(height: 24),
-          // Balance Card
+          const SizedBox(height: 18),
+
+          // ── Main balance card ──
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(colors: [kPrimary, Color(0xFF00A86B)]),
-              borderRadius: BorderRadius.circular(16),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF006D44), Color(0xFF00A86B), Color(0xFF004D32)],
+                stops: [0, 0.55, 1],
+              ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: kPrimary.withValues(alpha: 0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Total Revenue', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600)),
-                SizedBox(height: 8),
-                Text('₦2,847,500', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: -1)),
-                SizedBox(height: 8),
-                Text('+18.4% vs last month', style: TextStyle(color: Color(0xFF6DFCB3), fontSize: 12, fontWeight: FontWeight.w700)),
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Text('Total Revenue', style: TextStyle(color: Colors.white60, fontSize: 10, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+                    Text('EP', style: TextStyle(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 1)),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text('₦2,847,500', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: -0.8)),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text('+18.4%', style: TextStyle(color: Color(0xFF6DFCB3), fontSize: 10, fontWeight: FontWeight.w800)),
+                    ),
+                    const SizedBox(width: 6),
+                    const Text('vs last month', style: TextStyle(color: Colors.white38, fontSize: 10)),
+                  ],
+                ),
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          // Quick stat row
+          const SizedBox(height: 14),
+
+          // ── Stat chips ──
           Row(
             children: [
               Expanded(child: _StatChip('Outstanding', '₦340K', kWarningAmber)),
-              const SizedBox(width: 12),
+              const SizedBox(width: 10),
               Expanded(child: _StatChip('Reconciled', '97%', kSuccessGreen)),
             ],
           ),
-          const SizedBox(height: 20),
-          // Recent transactions header
+          const SizedBox(height: 18),
+
+          // ── Transactions header ──
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
-              Text('Recent Transactions', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
-              Text('See all', style: TextStyle(color: kPrimaryContainer, fontSize: 12, fontWeight: FontWeight.w600)),
+              Text('Transactions', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: -0.2)),
+              Text('See all', style: TextStyle(color: Color(0xFF00B876), fontSize: 11, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 12),
           _TxnRow('Sarah Okafor', 'Payment received', '+₦85,000', true),
           const SizedBox(height: 10),
-          _TxnRow('Chukwuemeka Ltd', 'Installment #2/4', '+₦45,000', true),
+          _TxnRow('Chukwuemeka Ltd', 'Instalment #2/4', '+₦45,000', true),
           const SizedBox(height: 10),
-          _TxnRow('Tax Remittance', 'FIRS - Q3 VAT', '-₦12,500', false),
+          _TxnRow('FIRS - VAT Q3', 'Tax remittance', '-₦12,500', false),
         ],
       ),
     );
@@ -463,17 +711,18 @@ class _StatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFF111827),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFF1F2937), width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(color: Color(0xFF64748B), fontSize: 11, fontWeight: FontWeight.w600)),
+          Text(label, style: const TextStyle(color: Color(0xFF6B7280), fontSize: 9, fontWeight: FontWeight.w600, letterSpacing: 0.3)),
           const SizedBox(height: 4),
-          Text(value, style: TextStyle(color: valueColor, fontSize: 18, fontWeight: FontWeight.w900)),
+          Text(value, style: TextStyle(color: valueColor, fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: -0.3)),
         ],
       ),
     );
@@ -492,16 +741,18 @@ class _TxnRow extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 36,
-          height: 36,
+          width: 32,
+          height: 32,
           decoration: BoxDecoration(
-            color: const Color(0xFF1E293B),
+            color: positive
+                ? kSuccessGreen.withValues(alpha: 0.12)
+                : kWarningAmber.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
-            positive ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
+            positive ? Icons.south_west_rounded : Icons.north_east_rounded,
             color: positive ? kSuccessGreen : kWarningAmber,
-            size: 16,
+            size: 15,
           ),
         ),
         const SizedBox(width: 10),
@@ -509,8 +760,8 @@ class _TxnRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
-              Text(desc, style: const TextStyle(color: Color(0xFF64748B), fontSize: 11)),
+              Text(name, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
+              Text(desc, style: const TextStyle(color: Color(0xFF4B5563), fontSize: 10)),
             ],
           ),
         ),
@@ -518,7 +769,7 @@ class _TxnRow extends StatelessWidget {
           amount,
           style: TextStyle(
             color: positive ? kSuccessGreen : const Color(0xFFF87171),
-            fontSize: 13,
+            fontSize: 11,
             fontWeight: FontWeight.w800,
           ),
         ),
