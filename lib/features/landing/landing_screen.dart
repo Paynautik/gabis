@@ -29,6 +29,34 @@ final _cardsKey       = GlobalKey();
 final _securityKey    = GlobalKey();
 final _faqKey         = GlobalKey();
 
+void _scrollTo(GlobalKey key) {
+  if (key.currentContext != null) {
+    Scrollable.ensureVisible(
+      key.currentContext!,
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeOutCubic,
+    );
+  }
+}
+
+// ============================================================
+// COLORS
+// ============================================================
+
+class AppColors {
+  static const navy = Color(0xFF11163F);
+  static const indigo = Color(0xFF292083);
+  static const purple = Color(0xFF5535E8);
+  static const violet = Color(0xFF6B3DF5);
+  static const blue = Color(0xFF3155D9);
+
+  static const softPurple = Color(0xFFF1EFFF);
+  static const softBlue = Color(0xFFEEF2FF);
+
+  static const muted = Color(0xFF65708F);
+  static const border = Color(0x1F1F244B);
+}
+
 // ============================================================================
 // MAIN LANDING SCREEN
 // ============================================================================
@@ -42,8 +70,7 @@ class LandingScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const _NavHeader(),
-            const _HeroSection(),
+            const GabisPayHero(),
             _InteractiveFeatureSlideSection(key: _showcaseKey),
             _UseCasesSection(key: _useCasesKey),
             _ValueComparisonSection(key: _comparisonKey),
@@ -59,208 +86,32 @@ class LandingScreen extends StatelessWidget {
   }
 }
 
-// ============================================================================
-// 1. NAVIGATION HEADER (Fully Responsive, Zero Overflows)
-// ============================================================================
-class _NavHeader extends StatelessWidget {
-  const _NavHeader();
+// ============================================================
+// MAIN HERO
+// ============================================================
 
-  void _scrollTo(GlobalKey key) {
-    if (key.currentContext != null) {
-      Scrollable.ensureVisible(
-        key.currentContext!,
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeOutCubic,
-      );
-    }
-  }
+class GabisPayHero extends StatefulWidget {
+  const GabisPayHero({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final isDesktopFull = width >= 1150;
-    final isTablet = width >= 720 && width < 1150;
-
-    return Container(
-      height: 76,
-      padding: EdgeInsets.symmetric(horizontal: width >= 1150 ? 48 : 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.black.withOpacity(0.06))),
-      ),
-      child: Row(
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: const [
-              GabismWordmark(height: 32),
-            ],
-          ),
-          const Spacer(),
-          if (isDesktopFull) ...[
-            _NavLink('Features', onTap: () => _scrollTo(_showcaseKey)),
-            const SizedBox(width: 20),
-            _NavLink('Use Cases', onTap: () => _scrollTo(_useCasesKey)),
-            const SizedBox(width: 20),
-            _NavLink('Why gabism', onTap: () => _scrollTo(_comparisonKey)),
-            const SizedBox(width: 20),
-            _NavLink('Virtual Cards', onTap: () => _scrollTo(_cardsKey)),
-            const SizedBox(width: 20),
-            _NavLink('Security & Tax', onTap: () => _scrollTo(_securityKey)),
-            const SizedBox(width: 20),
-            _NavLink('FAQ', onTap: () => _scrollTo(_faqKey)),
-            const SizedBox(width: 24),
-          ] else if (isTablet) ...[
-            _NavLink('Features', onTap: () => _scrollTo(_showcaseKey)),
-            const SizedBox(width: 16),
-            _NavLink('Use Cases', onTap: () => _scrollTo(_useCasesKey)),
-            const SizedBox(width: 16),
-            _NavLink('Cards', onTap: () => _scrollTo(_cardsKey)),
-            const SizedBox(width: 16),
-          ],
-          _TextButton(
-            'Log In',
-            onTap: () => Navigator.pushNamed(context, '/login'),
-          ),
-          const SizedBox(width: 10),
-          _PrimaryPillButton(
-            'Get Started',
-            onTap: () => Navigator.pushNamed(context, '/login'),
-            backgroundColor: const Color(0xFF292083),
-          ),
-        ],
-      ),
-    );
-  }
+  State<GabisPayHero> createState() => _GabisPayHeroState();
 }
 
-class _NavLink extends StatefulWidget {
-  final String title;
-  final VoidCallback onTap;
-  const _NavLink(this.title, {required this.onTap});
+class _GabisPayHeroState extends State<GabisPayHero> {
+  bool showingPay = true;
 
-  @override
-  State<_NavLink> createState() => _NavLinkState();
-}
-
-class _NavLinkState extends State<_NavLink> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: Text(
-          widget.title,
-          style: TextStyle(
-            fontSize: 13.5,
-            fontWeight: FontWeight.w600,
-            color: _hovered ? kElumoGreen : const Color(0xFF4B5563),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _TextButton extends StatelessWidget {
-  final String text;
-  final VoidCallback onTap;
-  const _TextButton(this.text, {required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onTap,
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: kElumoDark,
-          fontWeight: FontWeight.w700,
-          fontSize: 14,
-        ),
-      ),
-    );
-  }
-}
-
-class _PrimaryPillButton extends StatefulWidget {
-  final String text;
-  final VoidCallback onTap;
-  final Color backgroundColor;
-  final Color textColor;
-  const _PrimaryPillButton(
-    this.text, {
-    required this.onTap,
-    this.backgroundColor = kElumoGreen,
-    this.textColor = Colors.white,
-  });
-
-  @override
-  State<_PrimaryPillButton> createState() => _PrimaryPillButtonState();
-}
-
-class _PrimaryPillButtonState extends State<_PrimaryPillButton> {
-  bool _hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        onTap: widget.onTap,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          decoration: BoxDecoration(
-            color: _hovered ? widget.backgroundColor.withOpacity(0.9) : widget.backgroundColor,
-            borderRadius: BorderRadius.circular(30),
-          ),
-          child: Text(
-            widget.text,
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 13.5,
-              color: widget.textColor,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================================
-// ============================================================================
-// 2. HERO SECTION (gabisPay ↔ gabism Animation + Dual Phone Showcase)
-// ============================================================================
-
-class _HeroSection extends StatefulWidget {
-  const _HeroSection();
-
-  @override
-  State<_HeroSection> createState() => _HeroSectionState();
-}
-
-class _HeroSectionState extends State<_HeroSection> {
-  bool _showingPay = true;
-  Timer? _logoTimer;
+  Timer? logoTimer;
 
   @override
   void initState() {
     super.initState();
-    _logoTimer = Timer.periodic(
+
+    logoTimer = Timer.periodic(
       const Duration(seconds: 3),
       (_) {
         if (mounted) {
           setState(() {
-            _showingPay = !_showingPay;
+            showingPay = !showingPay;
           });
         }
       },
@@ -269,72 +120,257 @@ class _HeroSectionState extends State<_HeroSection> {
 
   @override
   void dispose() {
-    _logoTimer?.cancel();
+    logoTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final isMobile = width < 950;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 850;
 
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: RadialGradient(
-          center: Alignment(0.7, -0.1),
-          radius: 1.1,
-          colors: [
-            Color(0xFFF3F1FF),
-            Colors.white,
-          ],
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 20 : 55,
-          vertical: isMobile ? 30 : 20,
-        ),
-        child: isMobile
-            ? Column(
-                children: [
-                  _HeroCopy(
-                    showingPay: _showingPay,
-                    centered: true,
-                  ),
-                  const SizedBox(height: 40),
-                  _HeroVisual(
-                    showingPay: _showingPay,
-                    mobile: true,
-                  ),
-                ],
-              )
-            : SizedBox(
-                height: 720,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 45,
-                      child: _HeroCopy(
-                        showingPay: _showingPay,
-                      ),
-                    ),
-                    Expanded(
-                      flex: 55,
-                      child: _HeroVisual(
-                        showingPay: _showingPay,
-                      ),
-                    ),
-                  ],
-                ),
+        return Container(
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            gradient: RadialGradient(
+              center: Alignment(0.7, -0.1),
+              radius: 1.1,
+              colors: [
+                Color(0xFFF3F1FF),
+                Colors.white,
+              ],
+            ),
+          ),
+          child: Column(
+            children: [
+              _Navigation(
+                showingPay: showingPay,
               ),
+
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isMobile ? 20 : 55,
+                ),
+                child: isMobile
+                    ? Column(
+                        children: [
+                          _HeroCopy(
+                            showingPay: showingPay,
+                            centered: true,
+                          ),
+                          const SizedBox(height: 40),
+                          _HeroVisual(
+                            showingPay: showingPay,
+                            mobile: true,
+                          ),
+                        ],
+                      )
+                    : SizedBox(
+                        height: 690,
+                        child: Row(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 45,
+                              child: _HeroCopy(
+                                showingPay: showingPay,
+                              ),
+                            ),
+                            Expanded(
+                              flex: 55,
+                              child: _HeroVisual(
+                                showingPay: showingPay,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+              const SizedBox(height: 40),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+
+class _Navigation extends StatelessWidget {
+  final bool showingPay;
+
+  const _Navigation({
+    required this.showingPay,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: width < 850 ? 20 : 55,
+        vertical: 25,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GabisLogo(
+            showingPay: showingPay,
+            size: 43,
+          ),
+
+          if (width > 850)
+            Row(
+              children: [
+                _NavLink('Features', onTap: () => _scrollTo(_showcaseKey)),
+                _NavLink('For Business', onTap: () => _scrollTo(_useCasesKey)),
+                _NavLink('Cards', onTap: () => _scrollTo(_cardsKey)),
+                _NavLink('Why gabism', onTap: () => _scrollTo(_comparisonKey)),
+                _NavLink('FAQ', onTap: () => _scrollTo(_faqKey)),
+                const SizedBox(width: 25),
+                _NavButton(),
+              ],
+            ),
+        ],
       ),
     );
   }
 }
 
-// ─── Hero Copy ────────────────────────────────────────────────────────────────
+class _NavLink extends StatelessWidget {
+  final String text;
+  final VoidCallback? onTap;
+
+  const _NavLink(this.text, {this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 17),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Color(0xFF343B5C),
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, '/login'),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 13,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.indigo,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Text(
+          'Get Started',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: 14,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// GABISPAY / GABISM LOGO
+// ============================================================
+
+class GabisLogo extends StatelessWidget {
+  final bool showingPay;
+  final double size;
+
+  const GabisLogo({
+    super.key,
+    required this.showingPay,
+    this.size = 60,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.baseline,
+      textBaseline: TextBaseline.alphabetic,
+      children: [
+        Text(
+          'gabis',
+          style: TextStyle(
+            fontSize: size,
+            height: 0.9,
+            fontWeight: FontWeight.w500,
+            letterSpacing: -size * .075,
+            color: AppColors.indigo,
+          ),
+        ),
+
+        // ----------------------------------------------------
+        // ONLY THIS SECTION ANIMATES
+        // ----------------------------------------------------
+
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 500),
+          switchInCurve: Curves.easeOutCubic,
+          switchOutCurve: Curves.easeInCubic,
+
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, .12),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              ),
+            );
+          },
+
+          child: Text(
+            showingPay ? 'Pay' : 'm',
+            key: ValueKey(showingPay),
+            style: TextStyle(
+              fontSize: size,
+              height: 0.9,
+              fontWeight: FontWeight.w500,
+              letterSpacing: -size * .075,
+              color: showingPay
+                  ? AppColors.purple
+                  : AppColors.indigo,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ============================================================
+// HERO COPY
+// ============================================================
+
 class _HeroCopy extends StatelessWidget {
   final bool showingPay;
   final bool centered;
@@ -346,26 +382,25 @@ class _HeroCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final isDesktop = width >= 1150;
-
     return Column(
       crossAxisAlignment: centered
           ? CrossAxisAlignment.center
           : CrossAxisAlignment.start,
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Eyebrow Pill
+        // ----------------------------------------------------
+        // EYEBROW
+        // ----------------------------------------------------
+
         Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 15,
             vertical: 9,
           ),
           decoration: BoxDecoration(
-            color: const Color(0xFFF1EFFF),
+            color: AppColors.softPurple,
             borderRadius: BorderRadius.circular(50),
             border: Border.all(
-              color: const Color(0xFF5535E8).withOpacity(0.15),
+              color: AppColors.purple.withOpacity(.12),
             ),
           ),
           child: Row(
@@ -375,7 +410,7 @@ class _HeroCopy extends StatelessWidget {
                 width: 21,
                 height: 21,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF5535E8),
+                  color: AppColors.purple,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -388,7 +423,7 @@ class _HeroCopy extends StatelessWidget {
               const Text(
                 'Smart Payments. Real People.',
                 style: TextStyle(
-                  color: Color(0xFF292083),
+                  color: AppColors.indigo,
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                 ),
@@ -397,20 +432,26 @@ class _HeroCopy extends StatelessWidget {
           ),
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
 
-        // Headline
+        // ----------------------------------------------------
+        // HEADLINE
+        // ----------------------------------------------------
+
         RichText(
-          textAlign: centered ? TextAlign.center : TextAlign.left,
-          text: TextSpan(
+          textAlign: centered
+              ? TextAlign.center
+              : TextAlign.left,
+          text: const TextSpan(
             style: TextStyle(
-              fontSize: isDesktop ? 64 : (centered ? 38 : 50),
-              height: 1.02,
-              letterSpacing: -2.8,
+              fontFamily: 'Arial',
+              fontSize: 70,
+              height: .98,
+              letterSpacing: -4,
               fontWeight: FontWeight.w800,
-              color: const Color(0xFF11163F),
+              color: AppColors.navy,
             ),
-            children: const [
+            children: [
               TextSpan(
                 text: 'Business payments\n',
               ),
@@ -420,25 +461,29 @@ class _HeroCopy extends StatelessWidget {
               TextSpan(
                 text: 'just work',
                 style: TextStyle(
-                  color: Color(0xFF5535E8),
+                  color: AppColors.purple,
                 ),
               ),
             ],
           ),
         ),
 
-        const SizedBox(height: 22),
+        const SizedBox(height: 30),
 
-        // Description
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 510),
+        // ----------------------------------------------------
+        // DESCRIPTION
+        // ----------------------------------------------------
+
+        SizedBox(
+          width: 510,
           child: Text(
             'Send, receive and manage payments seamlessly. '
             'Built for modern businesses and the people behind them.',
-            textAlign: centered ? TextAlign.center : TextAlign.left,
+            textAlign:
+                centered ? TextAlign.center : TextAlign.left,
             style: const TextStyle(
-              color: Color(0xFF65708F),
-              fontSize: 17,
+              color: AppColors.muted,
+              fontSize: 18,
               height: 1.6,
               fontWeight: FontWeight.w400,
             ),
@@ -447,80 +492,19 @@ class _HeroCopy extends StatelessWidget {
 
         const SizedBox(height: 32),
 
-        // Buttons
+        // ----------------------------------------------------
+        // BUTTONS
+        // ----------------------------------------------------
+
         Wrap(
-          alignment: centered ? WrapAlignment.center : WrapAlignment.start,
+          alignment: centered
+              ? WrapAlignment.center
+              : WrapAlignment.start,
           spacing: 14,
           runSpacing: 12,
           children: [
-            GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/login'),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 26,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF5535E8),
-                      Color(0xFF6B3DF5),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(13),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF5535E8).withOpacity(0.30),
-                      blurRadius: 25,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Get Started',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                      ),
-                    ),
-                    SizedBox(width: 14),
-                    Icon(
-                      Icons.arrow_forward_rounded,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/login'),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 26,
-                  vertical: 16,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(13),
-                  border: Border.all(
-                    color: const Color(0x1F1F244B),
-                  ),
-                ),
-                child: const Text(
-                  'Learn More',
-                  style: TextStyle(
-                    color: Color(0xFF11163F),
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                  ),
-                ),
-              ),
-            ),
+            _PrimaryButton(),
+            _SecondaryButton(),
           ],
         ),
       ],
@@ -528,7 +512,94 @@ class _HeroCopy extends StatelessWidget {
   }
 }
 
-// ─── Hero Visual (Dual Floating Phones + Animated Cards) ──────────────────────
+// ============================================================
+// BUTTONS
+// ============================================================
+
+class _PrimaryButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, '/login'),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 25,
+          vertical: 17,
+        ),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              AppColors.purple,
+              AppColors.violet,
+            ],
+          ),
+          borderRadius: BorderRadius.circular(13),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.purple.withOpacity(.25),
+              blurRadius: 25,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Get Started',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              ),
+            ),
+            SizedBox(width: 18),
+            Icon(
+              Icons.arrow_forward,
+              color: Colors.white,
+              size: 19,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SecondaryButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.pushNamed(context, '/login'),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 25,
+          vertical: 17,
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(13),
+          border: Border.all(
+            color: AppColors.border,
+          ),
+        ),
+        child: const Text(
+          'Learn More',
+          style: TextStyle(
+            color: AppColors.navy,
+            fontWeight: FontWeight.w700,
+            fontSize: 15,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// HERO VISUAL
+// ============================================================
+
 class _HeroVisual extends StatelessWidget {
   final bool showingPay;
   final bool mobile;
@@ -546,58 +617,58 @@ class _HeroVisual extends StatelessWidget {
         alignment: Alignment.center,
         clipBehavior: Clip.none,
         children: [
-          // Back Phone (Invoice Mode)
+          // --------------------------------------------------
+          // BACK PHONE
+          // --------------------------------------------------
+
           Positioned(
-            right: mobile ? 10 : 15,
-            top: 60,
+            right: mobile ? 10 : 0,
+            top: 70,
             child: Transform.rotate(
               angle: 5 * math.pi / 180,
-              child: _HeroVisualPhone(
+              child: _Phone(
                 showingPay: showingPay,
                 invoiceMode: true,
-                scale: mobile ? 0.78 : 0.88,
+                scale: mobile ? .78 : .9,
               ),
             ),
           ),
 
-          // Front Phone (Wallet Mode)
+          // --------------------------------------------------
+          // FRONT PHONE
+          // --------------------------------------------------
+
           Positioned(
-            left: mobile ? 0 : 35,
-            top: 25,
+            left: mobile ? 0 : 45,
+            top: 35,
             child: Transform.rotate(
               angle: -5 * math.pi / 180,
-              child: _HeroVisualPhone(
+              child: _Phone(
                 showingPay: showingPay,
                 invoiceMode: false,
-                scale: mobile ? 0.78 : 0.88,
+                scale: mobile ? .78 : .9,
               ),
             ),
           ),
 
-          // Top Floating Transaction Card
+          // --------------------------------------------------
+          // TOP TRANSACTION CARD
+          // --------------------------------------------------
+
           Positioned(
-            right: mobile ? -10 : -20,
+            right: mobile ? -10 : -25,
             top: 15,
-            child: const _FloatingTransactionBadge(
-              width: 305,
-              icon: Icons.check,
-              title: 'Payment Successful!',
-              amount: '+₦1,200 Upwork Direct ACH',
-              subtitle: 'NGN Bank Transfer',
-            ),
+            child: const _PaymentCard(),
           ),
 
-          // Bottom Floating Transaction Card
+          // --------------------------------------------------
+          // BOTTOM TRANSACTION CARD
+          // --------------------------------------------------
+
           Positioned(
-            left: mobile ? -10 : -30,
+            left: mobile ? -10 : -35,
             bottom: 30,
-            child: const _FloatingTransactionBadge(
-              width: 300,
-              icon: Icons.check,
-              title: 'Transaction Confirmed!',
-              amount: '₦120,000',
-              subtitle: 'Tuition Settled · skill-sch.com',
-            ),
+            child: const _TransactionCard(),
           ),
         ],
       ),
@@ -605,13 +676,16 @@ class _HeroVisual extends StatelessWidget {
   }
 }
 
-// ─── Hero Visual Phone ────────────────────────────────────────────────────────
-class _HeroVisualPhone extends StatelessWidget {
+// ============================================================
+// PHONE
+// ============================================================
+
+class _Phone extends StatelessWidget {
   final bool showingPay;
   final bool invoiceMode;
   final double scale;
 
-  const _HeroVisualPhone({
+  const _Phone({
     required this.showingPay,
     required this.invoiceMode,
     this.scale = 1,
@@ -637,7 +711,7 @@ class _HeroVisualPhone extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF292083).withOpacity(0.20),
+              color: AppColors.indigo.withOpacity(.20),
               blurRadius: 60,
               offset: const Offset(0, 30),
             ),
@@ -653,33 +727,37 @@ class _HeroVisualPhone extends StatelessWidget {
                   children: [
                     const SizedBox(height: 16),
 
-                    // Top Bar
+                    // Top bar
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 21),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 21,
+                      ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
                             '9:41',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
-                              color: Color(0xFF11163F),
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(
+                            padding:
+                                const EdgeInsets.symmetric(
                               horizontal: 10,
-                              vertical: 5,
+                              vertical: 7,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF1EFFF),
-                              borderRadius: BorderRadius.circular(50),
+                              color: AppColors.softPurple,
+                              borderRadius:
+                                  BorderRadius.circular(50),
                             ),
                             child: const Text(
                               'Live',
                               style: TextStyle(
-                                color: Color(0xFF5535E8),
+                                color: AppColors.purple,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w800,
                               ),
@@ -689,36 +767,39 @@ class _HeroVisualPhone extends StatelessWidget {
                       ),
                     ),
 
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 20),
 
-                    // App Logo in Phone Header
+                    // App logo
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 21),
+                      padding:
+                          const EdgeInsets.symmetric(
+                        horizontal: 21,
+                      ),
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: GabisLogo(
                           showingPay: showingPay,
-                          size: 22,
+                          size: 25,
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 18),
 
                     if (!invoiceMode)
-                      const _HeroWalletContent()
+                      const _WalletContent()
                     else
-                      const _HeroInvoiceContent(),
+                      const _InvoiceContent(),
                   ],
                 ),
 
-                // Dynamic Island
+                // Dynamic island
                 Positioned(
-                  top: 14,
+                  top: 16,
                   left: 105,
                   child: Container(
                     width: 85,
-                    height: 24,
+                    height: 25,
                     decoration: BoxDecoration(
                       color: Colors.black,
                       borderRadius: BorderRadius.circular(20),
@@ -726,12 +807,12 @@ class _HeroVisualPhone extends StatelessWidget {
                   ),
                 ),
 
-                // Bottom Navigation
+                // Bottom navigation
                 const Positioned(
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  child: _HeroPhoneBottomNav(),
+                  child: _PhoneBottomNav(),
                 ),
               ],
             ),
@@ -742,9 +823,12 @@ class _HeroVisualPhone extends StatelessWidget {
   }
 }
 
-// ─── Hero Wallet Content ──────────────────────────────────────────────────────
-class _HeroWalletContent extends StatelessWidget {
-  const _HeroWalletContent();
+// ============================================================
+// WALLET CONTENT
+// ============================================================
+
+class _WalletContent extends StatelessWidget {
+  const _WalletContent();
 
   @override
   Widget build(BuildContext context) {
@@ -758,13 +842,13 @@ class _HeroWalletContent extends StatelessWidget {
               'Total Net Balance',
               style: TextStyle(
                 color: Color(0xFF78809A),
-                fontSize: 12,
+                fontSize: 13,
               ),
             ),
           ),
         ),
 
-        const SizedBox(height: 4),
+        const SizedBox(height: 7),
 
         const Align(
           alignment: Alignment.centerLeft,
@@ -773,111 +857,67 @@ class _HeroWalletContent extends StatelessWidget {
             child: Text(
               '₦14,820,000.00',
               style: TextStyle(
-                color: Color(0xFF11163F),
-                fontSize: 26,
+                color: AppColors.navy,
+                fontSize: 30,
                 fontWeight: FontWeight.w800,
-                letterSpacing: -1.2,
+                letterSpacing: -1.5,
               ),
             ),
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 21),
           child: Row(
             children: [
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 11),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF5535E8),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Send',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
+                child: _PhoneAction(
+                  text: 'Send',
+                  primary: true,
                 ),
               ),
               const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 11),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFE0E2EC)),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Receive',
-                      style: TextStyle(
-                        color: Color(0xFF11163F),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
+              const Expanded(
+                child: _PhoneAction(
+                  text: 'Receive',
                 ),
               ),
             ],
           ),
         ),
 
-        const SizedBox(height: 14),
+        const SizedBox(height: 18),
 
-        _heroAccountCard('NGN Wallet', '₦10,400,000.00', const Color(0xFF5535E8)),
-        _heroAccountCard('USD Account', '\$5,420.00', const Color(0xFF3155D9)),
-        _heroAccountCard('GBP Account', '£1,850.00', const Color(0xFFE58B1B)),
+        const _AccountCard(
+          name: 'NGN Wallet',
+          amount: '₦10,400,000.00',
+          color: AppColors.purple,
+        ),
+
+        const _AccountCard(
+          name: 'USD Account',
+          amount: '\$5,420.00',
+          color: AppColors.blue,
+        ),
+
+        const _AccountCard(
+          name: 'GBP Account',
+          amount: '£1,850.00',
+          color: Color(0xFFE58B1B),
+        ),
       ],
-    );
-  }
-
-  static Widget _heroAccountCard(String name, String amount, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(left: 21, right: 21, bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0x19282B48)),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            name,
-            style: const TextStyle(
-              color: Color(0xFF303650),
-              fontSize: 11.5,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          Text(
-            amount,
-            style: TextStyle(
-              color: color,
-              fontSize: 11.5,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
 
-// ─── Hero Invoice Content ─────────────────────────────────────────────────────
-class _HeroInvoiceContent extends StatelessWidget {
-  const _HeroInvoiceContent();
+// ============================================================
+// INVOICE CONTENT
+// ============================================================
+
+class _InvoiceContent extends StatelessWidget {
+  const _InvoiceContent();
 
   @override
   Widget build(BuildContext context) {
@@ -891,41 +931,60 @@ class _HeroInvoiceContent extends StatelessWidget {
               'Smart Invoices & Ledgers',
               style: TextStyle(
                 color: Color(0xFF69718D),
-                fontSize: 12,
+                fontSize: 13,
               ),
             ),
           ),
         ),
 
-        const SizedBox(height: 10),
+        const SizedBox(height: 13),
 
-        _heroInvoiceCard('Skill School', '₦100,000', 'Amara J. · Inst 2/4', 'PAID', false),
-        _heroInvoiceCard('SolarGrid Energy', '₦200,000', 'Emmanuel A. · Inst 4/6', 'DUE', true),
-        _heroInvoiceCard('Acme Corp Software', '\$1,200', 'Q3 Retainer', 'PAID', false),
+        const _InvoiceCard(
+          name: 'Skill School',
+          amount: '₦100,000',
+          meta: 'Amara J. · Inst 2/4',
+          status: 'PAID',
+        ),
+
+        const _InvoiceCard(
+          name: 'SolarGrid Energy',
+          amount: '₦200,000',
+          meta: 'Emmanuel A. · Inst 4/6',
+          status: 'DUE',
+          due: true,
+        ),
+
+        const _InvoiceCard(
+          name: 'Acme Corp Software',
+          amount: '\$1,200',
+          meta: 'Q3 Retainer',
+          status: 'PAID',
+        ),
 
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 21, vertical: 10),
-          padding: const EdgeInsets.all(10),
+          margin: const EdgeInsets.symmetric(
+            horizontal: 21,
+            vertical: 13,
+          ),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFF1EFFF),
+            color: AppColors.softPurple,
             borderRadius: BorderRadius.circular(12),
           ),
           child: const Row(
             children: [
               Icon(
                 Icons.bolt,
-                color: Color(0xFF5535E8),
-                size: 16,
+                color: AppColors.purple,
+                size: 17,
               ),
               SizedBox(width: 6),
-              Expanded(
-                child: Text(
-                  '10-Day Automated SMS Reminders Active',
-                  style: TextStyle(
-                    color: Color(0xFF5535E8),
-                    fontSize: 8.5,
-                    fontWeight: FontWeight.w800,
-                  ),
+              Text(
+                '10-Day Automated SMS Reminders Active',
+                style: TextStyle(
+                  color: AppColors.purple,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
             ],
@@ -934,29 +993,165 @@ class _HeroInvoiceContent extends StatelessWidget {
       ],
     );
   }
+}
 
-  static Widget _heroInvoiceCard(String name, String amount, String meta, String status, bool due) {
-    final statusColor = due ? const Color(0xFFE58B1B) : const Color(0xFF5535E8);
+// ============================================================
+// PHONE ACTION
+// ============================================================
 
+class _PhoneAction extends StatelessWidget {
+  final String text;
+  final bool primary;
+
+  const _PhoneAction({
+    required this.text,
+    this.primary = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(left: 21, right: 21, bottom: 8),
-      padding: const EdgeInsets.all(11),
+      padding: const EdgeInsets.symmetric(
+        vertical: 13,
+      ),
+      decoration: BoxDecoration(
+        color: primary
+            ? AppColors.purple
+            : Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: primary
+              ? AppColors.purple
+              : const Color(0xFFE0E2EC),
+        ),
+      ),
+      child: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            color: primary
+                ? Colors.white
+                : AppColors.navy,
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ============================================================
+// ACCOUNT CARD
+// ============================================================
+
+class _AccountCard extends StatelessWidget {
+  final String name;
+  final String amount;
+  final Color color;
+
+  const _AccountCard({
+    required this.name,
+    required this.amount,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(
+        left: 21,
+        right: 21,
+        bottom: 9,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 13,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0x19282B48)),
+        border: Border.all(
+          color: const Color(0x19282B48),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment:
+            MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            name,
+            style: const TextStyle(
+              color: Color(0xFF303650),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Text(
+            amount,
+            style: TextStyle(
+              color: color,
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================
+// INVOICE CARD
+// ============================================================
+
+class _InvoiceCard extends StatelessWidget {
+  final String name;
+  final String amount;
+  final String meta;
+  final String status;
+  final bool due;
+
+  const _InvoiceCard({
+    required this.name,
+    required this.amount,
+    required this.meta,
+    required this.status,
+    this.due = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final statusColor =
+        due ? const Color(0xFFE58B1B) : AppColors.purple;
+
+    return Container(
+      margin: const EdgeInsets.only(
+        left: 21,
+        right: 21,
+        bottom: 9,
+      ),
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0x19282B48),
+        ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment:
+                MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 name,
                 style: const TextStyle(
                   color: Color(0xFF20263E),
-                  fontSize: 11.5,
+                  fontSize: 12,
                   fontWeight: FontWeight.w800,
                 ),
               ),
@@ -964,26 +1159,30 @@ class _HeroInvoiceContent extends StatelessWidget {
                 amount,
                 style: TextStyle(
                   color: statusColor,
-                  fontSize: 11.5,
+                  fontSize: 12,
                   fontWeight: FontWeight.w800,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 3),
+
+          const SizedBox(height: 5),
+
           Text(
             meta,
             style: const TextStyle(
               color: Color(0xFF8790A9),
-              fontSize: 9.5,
+              fontSize: 10,
             ),
           ),
-          const SizedBox(height: 4),
+
+          const SizedBox(height: 7),
+
           Text(
             status,
             style: TextStyle(
               color: statusColor,
-              fontSize: 8.5,
+              fontSize: 9,
               fontWeight: FontWeight.w900,
             ),
           ),
@@ -993,40 +1192,62 @@ class _HeroInvoiceContent extends StatelessWidget {
   }
 }
 
-// ─── Hero Phone Bottom Navigation ─────────────────────────────────────────────
-class _HeroPhoneBottomNav extends StatelessWidget {
-  const _HeroPhoneBottomNav();
+// ============================================================
+// PHONE BOTTOM NAVIGATION
+// ============================================================
+
+class _PhoneBottomNav extends StatelessWidget {
+  const _PhoneBottomNav();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      height: 68,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 9,
+      ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.97),
+        color: Colors.white.withOpacity(.97),
         border: const Border(
-          top: BorderSide(color: Color(0x14202540)),
+          top: BorderSide(
+            color: Color(0x14202540),
+          ),
         ),
       ),
       child: const Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment:
+            MainAxisAlignment.spaceAround,
         children: [
-          _HeroBottomNavItem(icon: Icons.home_rounded, label: 'Home', active: true),
-          _HeroBottomNavItem(icon: Icons.receipt_long_outlined, label: 'Invoices'),
-          _HeroBottomNavItem(icon: Icons.bolt_outlined, label: 'Payments'),
-          _HeroBottomNavItem(icon: Icons.settings_outlined, label: 'Settings'),
+          _BottomItem(
+            icon: Icons.home_rounded,
+            label: 'Home',
+            active: true,
+          ),
+          _BottomItem(
+            icon: Icons.receipt_long_outlined,
+            label: 'Invoices',
+          ),
+          _BottomItem(
+            icon: Icons.bolt_outlined,
+            label: 'Payments',
+          ),
+          _BottomItem(
+            icon: Icons.settings_outlined,
+            label: 'Settings',
+          ),
         ],
       ),
     );
   }
 }
 
-class _HeroBottomNavItem extends StatelessWidget {
+class _BottomItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool active;
 
-  const _HeroBottomNavItem({
+  const _BottomItem({
     required this.icon,
     required this.label,
     this.active = false,
@@ -1035,20 +1256,25 @@ class _HeroBottomNavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment:
+          MainAxisAlignment.center,
       children: [
         Icon(
           icon,
-          size: 15,
-          color: active ? const Color(0xFF5535E8) : const Color(0xFF7B8299),
+          size: 16,
+          color: active
+              ? AppColors.purple
+              : const Color(0xFF7B8299),
         ),
-        const SizedBox(height: 2),
+        const SizedBox(height: 3),
         Text(
           label,
           style: TextStyle(
-            fontSize: 7.5,
+            fontSize: 8,
             fontWeight: FontWeight.w700,
-            color: active ? const Color(0xFF5535E8) : const Color(0xFF7B8299),
+            color: active
+                ? AppColors.purple
+                : const Color(0xFF7B8299),
           ),
         ),
       ],
@@ -1056,15 +1282,56 @@ class _HeroBottomNavItem extends StatelessWidget {
   }
 }
 
-// ─── Floating Animated Transaction Badge ─────────────────────────────────────
-class _FloatingTransactionBadge extends StatefulWidget {
+// ============================================================
+// PAYMENT CONFIRMATION CARD
+// ============================================================
+
+class _PaymentCard extends StatelessWidget {
+  const _PaymentCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return const _FloatingCard(
+      width: 305,
+      icon: Icons.check,
+      title: 'Payment Successful!',
+      amount: '+₦1,200 Upwork Direct ACH',
+      subtitle: 'NGN Bank Transfer',
+    );
+  }
+}
+
+// ============================================================
+// TRANSACTION CONFIRMATION CARD
+// ============================================================
+
+class _TransactionCard extends StatelessWidget {
+  const _TransactionCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return const _FloatingCard(
+      width: 300,
+      icon: Icons.check,
+      title: 'Transaction Confirmed!',
+      amount: '₦120,000',
+      subtitle: 'Tuition Settled · skill-sch.com',
+    );
+  }
+}
+
+// ============================================================
+// FLOATING CARD
+// ============================================================
+
+class _FloatingCard extends StatefulWidget {
   final double width;
   final IconData icon;
   final String title;
   final String amount;
   final String subtitle;
 
-  const _FloatingTransactionBadge({
+  const _FloatingCard({
     required this.width,
     required this.icon,
     required this.title,
@@ -1073,17 +1340,20 @@ class _FloatingTransactionBadge extends StatefulWidget {
   });
 
   @override
-  State<_FloatingTransactionBadge> createState() => _FloatingTransactionBadgeState();
+  State<_FloatingCard> createState() =>
+      _FloatingCardState();
 }
 
-class _FloatingTransactionBadgeState extends State<_FloatingTransactionBadge>
+class _FloatingCardState
+    extends State<_FloatingCard>
     with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+  late AnimationController controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+
+    controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 4),
     )..repeat(reverse: true);
@@ -1091,16 +1361,18 @@ class _FloatingTransactionBadgeState extends State<_FloatingTransactionBadge>
 
   @override
   void dispose() {
-    _controller.dispose();
+    controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _controller,
+      animation: controller,
       builder: (_, child) {
-        final y = math.sin(_controller.value * math.pi) * 8;
+        final y =
+            math.sin(controller.value * math.pi) * 10;
+
         return Transform.translate(
           offset: Offset(0, -y),
           child: child,
@@ -1108,60 +1380,66 @@ class _FloatingTransactionBadgeState extends State<_FloatingTransactionBadge>
       },
       child: Container(
         width: widget.width,
-        padding: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(17),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.97),
+          color: Colors.white.withOpacity(.97),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: const Color(0x19282B48),
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF292083).withOpacity(0.14),
-              blurRadius: 40,
-              offset: const Offset(0, 18),
+              color: AppColors.indigo.withOpacity(.14),
+              blurRadius: 45,
+              offset: const Offset(0, 20),
             ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              width: 38,
-              height: 38,
+              width: 40,
+              height: 40,
               decoration: const BoxDecoration(
-                color: Color(0xFFF1EFFF),
+                color: AppColors.softPurple,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 widget.icon,
-                color: const Color(0xFF5535E8),
-                size: 18,
+                color: AppColors.purple,
+                size: 20,
               ),
             ),
-            const SizedBox(width: 12),
+
+            const SizedBox(width: 13),
+
             Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
                   Text(
                     widget.title,
                     style: const TextStyle(
-                      color: Color(0xFF11163F),
-                      fontSize: 11.5,
+                      color: AppColors.navy,
+                      fontSize: 12,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 3),
+
+                  const SizedBox(height: 4),
+
                   Text(
                     widget.amount,
                     style: const TextStyle(
-                      color: Color(0xFF11163F),
-                      fontSize: 15,
+                      color: AppColors.navy,
+                      fontSize: 16,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 2),
+
+                  const SizedBox(height: 3),
+
                   Text(
                     widget.subtitle,
                     style: const TextStyle(
@@ -2272,10 +2550,32 @@ class _DarkCardsShowcaseSection extends StatelessWidget {
                                 style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 15, height: 1.6),
                               ),
                               const SizedBox(height: 32),
-                              _PrimaryPillButton(
-                                'Get a Virtual Card',
+                              GestureDetector(
                                 onTap: () => Navigator.pushNamed(context, '/login'),
-                                backgroundColor: kElumoGreen,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [AppColors.purple, AppColors.violet],
+                                    ),
+                                    borderRadius: BorderRadius.circular(30),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.purple.withOpacity(0.35),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: const Text(
+                                    'Get a Virtual Card',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
