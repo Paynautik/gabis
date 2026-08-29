@@ -336,20 +336,32 @@ class _PremiumHeroImage extends StatelessWidget {
     const double photoW       = 320.0;
     const double phoneScale   = 0.95;
 
+    if (mobile) {
+      return SizedBox(
+        height: 520,
+        child: Center(
+          child: Transform.scale(
+            scale: 0.85,
+            child: const _PhoneMockup(),
+          ),
+        ),
+      );
+    }
+
     return SizedBox(
       width: double.infinity,
-      height: mobile ? 520 : compositionH,
+      height: compositionH,
       child: Stack(
         clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
           // ── Person photo card (left, behind) ──
           Positioned(
-            left: mobile ? 0 : -20,
-            top: mobile ? 20 : 20,
-            bottom: mobile ? 60 : 40,
+            left: -20,
+            top: 20,
+            bottom: 40,
             child: Container(
-              width: mobile ? 220 : photoW,
+              width: photoW,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
@@ -368,11 +380,11 @@ class _PremiumHeroImage extends StatelessWidget {
 
           // ── Phone mockup (right, in front) ──
           Positioned(
-            right: mobile ? -10 : 0,
-            top: mobile ? 0 : 40,
-            bottom: mobile ? 20 : 0,
+            right: 0,
+            top: 40,
+            bottom: 0,
             child: Transform.scale(
-              scale: mobile ? 0.75 : phoneScale,
+              scale: phoneScale,
               alignment: Alignment.centerRight,
               child: const _PhoneMockup(),
             ),
