@@ -2,22 +2,23 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../shared/widgets/nautik_logo.dart';
 
-// ─── Brand Colors (HitchPay + ElumoPay Fusion) ────────────────────────────────
-const Color kPurplePrimary   = Color(0xFF40196D); // HitchPay royal purple
-const Color kGoldAccent      = Color(0xFFFFA800); // Warm gold
-const Color kMintGreen       = Color(0xFF00BA88); // Fresh mint green
-const Color kInkDark         = Color(0xFF111111); // Near black
-const Color kInkSoft         = Color(0xFF1E1E1E); // Soft charcoal
-const Color kBackgroundLight = Color(0xFFFAF5FF); // Hero light purple tint
-const Color kSurfaceWhite    = Color(0xFFFFFFFF);
-const Color kMutedGray       = Color(0xFF71717A);
-const Color kBorderLight     = Color(0xFFE4E4E7);
+// ─── Brand Colors (ElumoPay Official Palette) ─────────────────────────────────
+const Color kElumoGreen       = Color(0xFF00C16A); // Vibrant ElumoPay Green
+const Color kElumoBlue        = Color(0xFF2563EB); // Signature Cobalt Blue
+const Color kElumoAmber       = Color(0xFFF59E0B); // Warm Gold / Amber Accent
+const Color kElumoDeepGreen   = Color(0xFF006D44); // Deep Forest Green
+const Color kElumoDark        = Color(0xFF0B0F1A); // Slate Black / Dark
+const Color kElumoNavy        = Color(0xFF141B2C); // Soft Dark Charcoal
+const Color kElumoSurface     = Color(0xFFFFFFFF);
+const Color kElumoCanvas      = Color(0xFFF8FAFC); // Main page background
+const Color kElumoMuted       = Color(0xFF64748B); // Slate 500
+const Color kElumoBorder      = Color(0xFFE2E8F0); // Slate 200
 
-// Pastel Card Backgrounds
-const Color kPastelLavender  = Color(0xFFC7B8F8);
-const Color kPastelGold      = Color(0xFFFFE8B2);
-const Color kPastelMint      = Color(0xFFD8FFEA);
-const Color kPastelRose      = Color(0xFFFFD6E5);
+// Pastel Card Backgrounds (ElumoPay brand tints)
+const Color kPastelMint       = Color(0xFFDCFCE7); // Elumo Green Pastel
+const Color kPastelBlue       = Color(0xFFDBEAFE); // Elumo Blue Pastel
+const Color kPastelAmber      = Color(0xFFFEF3C7); // Elumo Amber Pastel
+const Color kPastelIndigo     = Color(0xFFEDE9FE); // Elumo Indigo Pastel
 
 // ─── Navigation Global Keys ───────────────────────────────────────────────────
 final _walletsKey     = GlobalKey();
@@ -44,7 +45,7 @@ class LandingScreen extends StatelessWidget {
             const _HeroSection(),
             _PastelFeatureSection(
               key: _walletsKey,
-              backgroundColor: kPastelLavender,
+              backgroundColor: kPastelMint,
               titlePrefix: 'One Account,\n',
               titleHighlight: 'Multiple Currencies.',
               titleSuffix: '\nNo borders.',
@@ -55,7 +56,7 @@ class LandingScreen extends StatelessWidget {
             ),
             _PastelFeatureSection(
               key: _usdAccountKey,
-              backgroundColor: kPastelGold,
+              backgroundColor: kPastelBlue,
               titlePrefix: 'Open a USD bank\n',
               titleHighlight: 'account in minutes',
               titleSuffix: '',
@@ -66,7 +67,7 @@ class LandingScreen extends StatelessWidget {
             ),
             _PastelFeatureSection(
               key: _transfersKey,
-              backgroundColor: kPastelMint,
+              backgroundColor: kPastelAmber,
               titlePrefix: 'Smart Invoicing &\n',
               titleHighlight: 'Global Transfers',
               titleSuffix: '',
@@ -76,7 +77,7 @@ class LandingScreen extends StatelessWidget {
               screenType: _MockupType.smartInvoices,
             ),
             _PastelFeatureSection(
-              backgroundColor: kPastelRose,
+              backgroundColor: kPastelIndigo,
               titlePrefix: 'Instant Currency\n',
               titleHighlight: 'conversion at best value',
               titleSuffix: '',
@@ -128,23 +129,14 @@ class _NavHeader extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: kPurplePrimary,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                alignment: Alignment.center,
-                child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 20),
-              ),
+              const NautikLogoMark(size: 32),
               const SizedBox(width: 10),
               const Text(
                 'ElumoPay',
                 style: TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.w800,
-                  color: kInkDark,
+                  color: kElumoDark,
                   letterSpacing: -0.5,
                 ),
               ),
@@ -173,6 +165,7 @@ class _NavHeader extends StatelessWidget {
           _PrimaryPillButton(
             'Get Started',
             onTap: () => Navigator.pushNamed(context, '/login'),
+            backgroundColor: kElumoGreen,
           ),
         ],
       ),
@@ -205,7 +198,7 @@ class _NavLinkState extends State<_NavLink> {
           style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: _hovered ? kPurplePrimary : const Color(0xFF4B5563),
+            color: _hovered ? kElumoGreen : const Color(0xFF4B5563),
           ),
         ),
       ),
@@ -225,7 +218,7 @@ class _TextButton extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(
-          color: kInkDark,
+          color: kElumoDark,
           fontWeight: FontWeight.w700,
           fontSize: 14,
         ),
@@ -242,7 +235,7 @@ class _PrimaryPillButton extends StatefulWidget {
   const _PrimaryPillButton(
     this.text, {
     required this.onTap,
-    this.backgroundColor = kPurplePrimary,
+    this.backgroundColor = kElumoGreen,
     this.textColor = Colors.white,
   });
 
@@ -283,7 +276,7 @@ class _PrimaryPillButtonState extends State<_PrimaryPillButton> {
 }
 
 // ============================================================================
-// 2. HERO SECTION (HitchPay benchmarked multi-color + dual mockups)
+// 2. HERO SECTION (ElumoPay Vibrant Green & Cobalt Palette)
 // ============================================================================
 class _HeroSection extends StatelessWidget {
   const _HeroSection();
@@ -301,8 +294,8 @@ class _HeroSection extends StatelessWidget {
           end: Alignment.bottomCenter,
           colors: [
             Colors.white,
-            Color(0xFFFCFAFF),
-            Color(0xFFF7F0FF),
+            Color(0xFFF0FDF4), // Mint wash
+            Color(0xFFF8FAFC),
           ],
         ),
       ),
@@ -312,25 +305,25 @@ class _HeroSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Floating Paper Plane / Badge Header
+          // Badge Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFFF3E8FF),
+              color: kElumoGreen.withOpacity(0.12),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE9D5FF)),
+              border: Border.all(color: kElumoGreen.withOpacity(0.3)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.send_rounded, color: kPurplePrimary, size: 14),
+                Icon(Icons.bolt_rounded, color: kElumoGreen, size: 16),
                 const SizedBox(width: 6),
                 const Text(
-                  "Africa's Modern Borderless Payment Platform",
+                  "Africa's All-in-One Borderless Money Platform",
                   style: TextStyle(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w700,
-                    color: kPurplePrimary,
+                    color: kElumoGreen,
                   ),
                 ),
               ],
@@ -338,14 +331,14 @@ class _HeroSection extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Main Multi-Color Headline (HitchPay Style)
+          // Main Multi-Color Headline (ElumoPay Colors)
           Text.rich(
             TextSpan(
               children: [
                 const TextSpan(
                   text: 'Instant ',
                   style: TextStyle(
-                    color: kPurplePrimary,
+                    color: kElumoGreen,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -1.5,
                   ),
@@ -353,7 +346,7 @@ class _HeroSection extends StatelessWidget {
                 const TextSpan(
                   text: 'Payments\n',
                   style: TextStyle(
-                    color: kInkDark,
+                    color: kElumoDark,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -1.5,
                   ),
@@ -361,7 +354,7 @@ class _HeroSection extends StatelessWidget {
                 const TextSpan(
                   text: 'Anywhere',
                   style: TextStyle(
-                    color: kGoldAccent,
+                    color: kElumoBlue,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -1.5,
                   ),
@@ -369,14 +362,14 @@ class _HeroSection extends StatelessWidget {
                 const TextSpan(
                   text: ', ',
                   style: TextStyle(
-                    color: kMintGreen,
+                    color: kElumoAmber,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
                 const TextSpan(
                   text: 'Anytime',
                   style: TextStyle(
-                    color: kMintGreen,
+                    color: kElumoGreen,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -1.5,
                   ),
@@ -407,7 +400,7 @@ class _HeroSection extends StatelessWidget {
           ),
           const SizedBox(height: 32),
 
-          // Store CTAs (HitchPay Style Store Badges)
+          // Store CTAs (ElumoPay Styling)
           Wrap(
             spacing: 16,
             runSpacing: 12,
@@ -417,11 +410,13 @@ class _HeroSection extends StatelessWidget {
                 icon: Icons.android_rounded,
                 label: 'Get on Android',
                 onTap: () => Navigator.pushNamed(context, '/login'),
+                backgroundColor: kElumoDark,
               ),
               _StoreButton(
                 icon: Icons.apple_rounded,
                 label: 'Get on iPhone',
                 onTap: () => Navigator.pushNamed(context, '/login'),
+                backgroundColor: kElumoDark,
               ),
             ],
           ),
@@ -439,10 +434,12 @@ class _StoreButton extends StatefulWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+  final Color backgroundColor;
   const _StoreButton({
     required this.icon,
     required this.label,
     required this.onTap,
+    this.backgroundColor = kElumoDark,
   });
 
   @override
@@ -464,9 +461,9 @@ class _StoreButtonState extends State<_StoreButton> {
           duration: const Duration(milliseconds: 150),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           decoration: BoxDecoration(
-            color: _hovered ? kPurplePrimary.withOpacity(0.9) : kPurplePrimary,
+            color: _hovered ? widget.backgroundColor.withOpacity(0.9) : widget.backgroundColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.black, width: 1.5),
+            border: Border.all(color: Colors.black.withOpacity(0.15), width: 1.5),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -512,7 +509,7 @@ class _DualAngledHeroMockups extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Background decorative purple arc
+          // Background decorative green/blue glow
           Positioned(
             bottom: 0,
             child: Container(
@@ -522,7 +519,7 @@ class _DualAngledHeroMockups extends StatelessWidget {
                 borderRadius: BorderRadius.circular(400),
                 gradient: RadialGradient(
                   colors: [
-                    kPurplePrimary.withOpacity(0.12),
+                    kElumoGreen.withOpacity(0.12),
                     Colors.transparent,
                   ],
                 ),
@@ -558,7 +555,7 @@ class _DualAngledHeroMockups extends StatelessWidget {
               amount: '+₦120,000.00',
               title: 'Tuition Installment Inflow',
               subtitle: 'skill-sch.com · Amara J.',
-              color: kMintGreen,
+              color: kElumoGreen,
             ),
           ),
 
@@ -584,17 +581,17 @@ class _DualAngledHeroMockups extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: kMintGreen.withOpacity(0.15),
+                      color: kElumoGreen.withOpacity(0.15),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.check_rounded, color: kMintGreen, size: 16),
+                    child: const Icon(Icons.check_rounded, color: kElumoGreen, size: 16),
                   ),
                   const SizedBox(width: 10),
                   const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Payment Successful', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: kInkDark)),
-                      Text('USD Debit Card · \$45.00', style: TextStyle(fontSize: 10, color: kMutedGray)),
+                      Text('Payment Successful', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: kElumoDark)),
+                      Text('USD Debit Card · \$45.00', style: TextStyle(fontSize: 10, color: kElumoMuted)),
                     ],
                   ),
                 ],
@@ -602,7 +599,7 @@ class _DualAngledHeroMockups extends StatelessWidget {
             ),
           ),
 
-          // Floating 3D Gold Coin Badge
+          // Floating Gold Coin Badge
           Positioned(
             top: 50,
             left: MediaQuery.of(context).size.width * 0.12,
@@ -611,12 +608,12 @@ class _DualAngledHeroMockups extends StatelessWidget {
               height: 50,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFFFFD54F), Color(0xFFFFA000)],
+                  colors: [Color(0xFFFFD54F), Color(0xFFF59E0B)],
                 ),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: kGoldAccent.withOpacity(0.4),
+                    color: kElumoAmber.withOpacity(0.4),
                     blurRadius: 15,
                     offset: const Offset(0, 6),
                   ),
@@ -674,8 +671,8 @@ class _FloatingInflowBadge extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kInkDark)),
-              Text(subtitle, style: const TextStyle(fontSize: 11, color: kMutedGray)),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kElumoDark)),
+              Text(subtitle, style: const TextStyle(fontSize: 11, color: kElumoMuted)),
             ],
           ),
           const SizedBox(width: 20),
@@ -690,7 +687,7 @@ class _FloatingInflowBadge extends StatelessWidget {
 }
 
 // ============================================================================
-// 3. ALTERNATING PASTEL FEATURE SECTIONS (HitchPay Benchmark)
+// 3. ALTERNATING PASTEL FEATURE SECTIONS (ElumoPay Colors)
 // ============================================================================
 class _PastelFeatureSection extends StatelessWidget {
   final Color backgroundColor;
@@ -728,7 +725,7 @@ class _PastelFeatureSection extends StatelessWidget {
               TextSpan(text: titlePrefix),
               TextSpan(
                 text: titleHighlight,
-                style: const TextStyle(color: kPurplePrimary),
+                style: const TextStyle(color: kElumoGreen),
               ),
               TextSpan(text: titleSuffix),
             ],
@@ -736,7 +733,7 @@ class _PastelFeatureSection extends StatelessWidget {
           style: TextStyle(
             fontSize: isDesktop ? 44 : 32,
             fontWeight: FontWeight.w800,
-            color: kInkDark,
+            color: kElumoDark,
             letterSpacing: -1.2,
             height: 1.15,
           ),
@@ -761,7 +758,7 @@ class _PastelFeatureSection extends StatelessWidget {
                 Text(
                   linkText,
                   style: const TextStyle(
-                    color: kPurplePrimary,
+                    color: kElumoGreen,
                     fontWeight: FontWeight.w800,
                     fontSize: 16,
                   ),
@@ -834,7 +831,7 @@ class _DarkShowcaseSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      color: kInkDark,
+      color: kElumoDark,
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 64 : 24,
         vertical: isDesktop ? 100 : 60,
@@ -886,8 +883,8 @@ class _DarkShowcaseSection extends StatelessWidget {
                                 TextSpan(
                                   children: [
                                     TextSpan(text: 'A '),
-                                    TextSpan(text: 'Better ', style: TextStyle(color: kGoldAccent)),
-                                    TextSpan(text: 'Way\n', style: TextStyle(color: kMintGreen)),
+                                    TextSpan(text: 'Better ', style: TextStyle(color: kElumoAmber)),
+                                    TextSpan(text: 'Way\n', style: TextStyle(color: kElumoGreen)),
                                     TextSpan(text: 'to Spend'),
                                   ],
                                 ),
@@ -911,6 +908,7 @@ class _DarkShowcaseSection extends StatelessWidget {
                               _PrimaryPillButton(
                                 'Get a Virtual Card',
                                 onTap: () => Navigator.pushNamed(context, '/login'),
+                                backgroundColor: kElumoGreen,
                               ),
                             ],
                           ),
@@ -928,8 +926,8 @@ class _DarkShowcaseSection extends StatelessWidget {
                           TextSpan(
                             children: [
                               TextSpan(text: 'A '),
-                              TextSpan(text: 'Better ', style: TextStyle(color: kGoldAccent)),
-                              TextSpan(text: 'Way ', style: TextStyle(color: kMintGreen)),
+                              TextSpan(text: 'Better ', style: TextStyle(color: kElumoAmber)),
+                              TextSpan(text: 'Way ', style: TextStyle(color: kElumoGreen)),
                               TextSpan(text: 'to Spend'),
                             ],
                           ),
@@ -956,13 +954,13 @@ class _DarkShowcaseSection extends StatelessWidget {
                     title: 'AI Debt Collection &\nRobot Phone Callers',
                     description: 'Dispatch automated AI phone calls via Africa\'s Talking to follow up on overdue student or customer invoices.',
                     badgeText: 'Live Audio AI',
-                    badgeColor: kGoldAccent,
+                    badgeColor: kElumoAmber,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _callDialogRow('AI Agent', 'Calling David O. (INV-492) · ₦150,000 overdue', kPurplePrimary),
+                        _callDialogRow('AI Agent', 'Calling David O. (INV-492) · ₦150,000 overdue', kElumoBlue),
                         const SizedBox(height: 8),
-                        _callDialogRow('Status', 'Call Connected — Payment link sent to WhatsApp', kMintGreen),
+                        _callDialogRow('Status', 'Call Connected — Payment link sent to WhatsApp', kElumoGreen),
                       ],
                     ),
                   ),
@@ -974,12 +972,12 @@ class _DarkShowcaseSection extends StatelessWidget {
                       title: 'Cross-Border Payments\nMade Simple',
                       description: 'Real-time transaction tracking across Nigeria, Kenya, Ghana, and international banks.',
                       badgeText: 'Instant Settlements',
-                      badgeColor: kMintGreen,
+                      badgeColor: kElumoGreen,
                       child: Column(
                         children: [
-                          _transactionPill('Received money', '+₦120,000.00', 'Inflow Received · School Fee', kMintGreen),
+                          _transactionPill('Received money', '+₦120,000.00', 'Inflow Received · School Fee', kElumoGreen),
                           const SizedBox(height: 10),
-                          _transactionPill('USD Converted', '+\$500.00', 'Exchange Swap Settled', kGoldAccent),
+                          _transactionPill('USD Converted', '+\$500.00', 'Exchange Swap Settled', kElumoAmber),
                         ],
                       ),
                     ),
@@ -1032,7 +1030,7 @@ class _DarkShowcaseSection extends StatelessWidget {
   }
 }
 
-// 4-Card Virtual Cards Fan (Black, Green, Gold, Purple)
+// 4-Card Virtual Cards Fan (Black, Green, Blue, Amber)
 class _VirtualCardsFan extends StatelessWidget {
   const _VirtualCardsFan();
 
@@ -1063,33 +1061,33 @@ class _VirtualCardsFan extends StatelessWidget {
             child: Transform.rotate(
               angle: -0.04,
               child: _SingleVirtualCard(
-                color: const Color(0xFF006D44),
+                color: kElumoDeepGreen,
                 title: 'Elumo Business',
                 currency: 'EUR CARD',
               ),
             ),
           ),
-          // 3. Gold Card
+          // 3. Amber Gold Card
           Positioned(
             bottom: 40,
             left: 100,
             child: Transform.rotate(
               angle: 0.04,
               child: _SingleVirtualCard(
-                color: const Color(0xFFD97706),
+                color: kElumoAmber,
                 title: 'Elumo Premier',
                 currency: 'GBP CARD',
               ),
             ),
           ),
-          // 4. Purple Card (Top)
+          // 4. Vibrant Elumo Green Card (Top)
           Positioned(
             bottom: 60,
             left: 140,
             child: Transform.rotate(
               angle: 0.12,
               child: _SingleVirtualCard(
-                color: kPurplePrimary,
+                color: kElumoGreen,
                 title: 'Elumo Global',
                 currency: 'NGN CARD',
               ),
@@ -1207,7 +1205,7 @@ class _BillsPaymentSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      color: const Color(0xFFF5F3FF),
+      color: const Color(0xFFF8FAFC),
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 64 : 24,
         vertical: isDesktop ? 80 : 50,
@@ -1227,7 +1225,7 @@ class _BillsPaymentSection extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 44,
                             fontWeight: FontWeight.w800,
-                            color: kInkDark,
+                            color: kElumoDark,
                             height: 1.1,
                             letterSpacing: -1.0,
                           ),
@@ -1241,6 +1239,7 @@ class _BillsPaymentSection extends StatelessWidget {
                         _PrimaryPillButton(
                           'Pay a Bill Now →',
                           onTap: () => Navigator.pushNamed(context, '/login'),
+                          backgroundColor: kElumoGreen,
                         ),
                       ],
                     ),
@@ -1255,7 +1254,7 @@ class _BillsPaymentSection extends StatelessWidget {
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Pay Your Bills Without Stress', style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800, color: kInkDark)),
+                  const Text('Pay Your Bills Without Stress', style: TextStyle(fontSize: 32, fontWeight: FontWeight.w800, color: kElumoDark)),
                   const SizedBox(height: 12),
                   const Text('From airtime and data to electricity tokens — manage all bills in one place.', style: TextStyle(color: Color(0xFF4B5563))),
                   const SizedBox(height: 24),
@@ -1284,17 +1283,17 @@ class _BillsGridPreview extends StatelessWidget {
         children: [
           Row(
             children: [
-              _billItem(Icons.phone_android_rounded, 'Airtime & Data', 'MTN, Airtel, Glo', kPurplePrimary),
+              _billItem(Icons.phone_android_rounded, 'Airtime & Data', 'MTN, Airtel, Glo', kElumoGreen),
               const SizedBox(width: 16),
-              _billItem(Icons.electric_bolt_rounded, 'Electricity', 'IKEDC, EKEDC, AEDC', kGoldAccent),
+              _billItem(Icons.electric_bolt_rounded, 'Electricity', 'IKEDC, EKEDC, AEDC', kElumoAmber),
             ],
           ),
           const SizedBox(height: 16),
           Row(
             children: [
-              _billItem(Icons.tv_rounded, 'Cable TV', 'DStv, GOtv, StarTimes', kMintGreen),
+              _billItem(Icons.tv_rounded, 'Cable TV', 'DStv, GOtv, StarTimes', kElumoBlue),
               const SizedBox(width: 16),
-              _billItem(Icons.wifi_rounded, 'Internet Fiber', 'Spectranet, Smile, Fibre', const Color(0xFF3B82F6)),
+              _billItem(Icons.wifi_rounded, 'Internet Fiber', 'Spectranet, Smile, Fibre', const Color(0xFF00D2B4)),
             ],
           ),
         ],
@@ -1320,9 +1319,9 @@ class _BillsGridPreview extends StatelessWidget {
               child: Icon(icon, color: color, size: 20),
             ),
             const SizedBox(height: 12),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kInkDark)),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kElumoDark)),
             const SizedBox(height: 4),
-            Text(sub, style: const TextStyle(color: kMutedGray, fontSize: 10)),
+            Text(sub, style: const TextStyle(color: kElumoMuted, fontSize: 10)),
           ],
         ),
       ),
@@ -1342,7 +1341,7 @@ class _SecurityComplianceSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      color: const Color(0xFF111111),
+      color: kElumoDark,
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 64 : 24,
         vertical: isDesktop ? 100 : 60,
@@ -1439,10 +1438,10 @@ class _SecurityCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: kGoldAccent.withOpacity(0.12),
+              color: kElumoGreen.withOpacity(0.15),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: kGoldAccent, size: 24),
+            child: Icon(icon, color: kElumoGreen, size: 24),
           ),
           const SizedBox(height: 20),
           Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
@@ -1464,7 +1463,7 @@ class _DownloadCtaSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: kPurplePrimary,
+      color: kElumoDeepGreen,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 80),
       child: Column(
         children: [
@@ -1494,11 +1493,13 @@ class _DownloadCtaSection extends StatelessWidget {
                 icon: Icons.android_rounded,
                 label: 'Get on Android',
                 onTap: () => Navigator.pushNamed(context, '/login'),
+                backgroundColor: kElumoDark,
               ),
               _StoreButton(
                 icon: Icons.apple_rounded,
                 label: 'Get on iPhone',
                 onTap: () => Navigator.pushNamed(context, '/login'),
+                backgroundColor: kElumoDark,
               ),
             ],
           ),
@@ -1523,19 +1524,14 @@ class _FooterSection extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
-                    child: const Icon(Icons.bolt_rounded, color: Colors.black, size: 18),
-                  ),
+                  const NautikLogoMark(size: 28),
                   const SizedBox(width: 10),
                   const Text('ElumoPay', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                 ],
               ),
-              Text(
+              const Text(
                 '© 2024 Elumopay. A Paynautik Limited Product. All rights reserved.',
-                style: const TextStyle(color: Color(0xFF71717A), fontSize: 12),
+                style: TextStyle(color: Color(0xFF71717A), fontSize: 12),
               ),
             ],
           ),
@@ -1609,11 +1605,11 @@ class _SingleHeroPhone extends StatelessWidget {
               const SizedBox(height: 4),
               const Text('₦14,820,000.00', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
-              _balancePill('NGN Wallet', '₦10,400,000.00', kMintGreen),
+              _balancePill('NGN Wallet', '₦10,400,000.00', kElumoGreen),
               const SizedBox(height: 8),
-              _balancePill('USD Account', '\$5,420.00', kPurplePrimary),
+              _balancePill('USD Account', '\$5,420.00', kElumoBlue),
               const SizedBox(height: 8),
-              _balancePill('GBP Account', '£1,850.00', kGoldAccent),
+              _balancePill('GBP Account', '£1,850.00', kElumoAmber),
             ],
           ),
         );
@@ -1644,11 +1640,11 @@ class _SingleHeroPhone extends StatelessWidget {
             children: [
               const Text('Smart Invoices & Ledgers', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 11)),
               const SizedBox(height: 12),
-              _invoiceItem('Skill School (skill-sch.com)', 'Amara Johnson · Inst 2/4', '₦100,000', kMintGreen),
+              _invoiceItem('Skill School (skill-sch.com)', 'Amara Johnson · Inst 2/4', '₦100,000', kElumoGreen),
               const SizedBox(height: 8),
-              _invoiceItem('SolarGrid Energy', 'Emmanuel A. · Inst 4/6', '₦200,000', kGoldAccent),
+              _invoiceItem('SolarGrid Energy', 'Emmanuel A. · Inst 4/6', '₦200,000', kElumoAmber),
               const SizedBox(height: 8),
-              _invoiceItem('Acme Corp Software', 'Q3 Retainer', '\$1,200', kPurplePrimary),
+              _invoiceItem('Acme Corp Software', 'Q3 Retainer', '\$1,200', kElumoBlue),
             ],
           ),
         );
@@ -1662,7 +1658,7 @@ class _SingleHeroPhone extends StatelessWidget {
               const Text('Instant Currency Swap', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 11)),
               const SizedBox(height: 16),
               _swapBox('You Pay', '1,500.00', 'USD (\$)'),
-              const Center(child: Icon(Icons.swap_vert_rounded, color: kGoldAccent, size: 24)),
+              const Center(child: Icon(Icons.swap_vert_rounded, color: kElumoAmber, size: 24)),
               _swapBox('You Get', '2,400,000.00', 'NGN (₦)'),
             ],
           ),
@@ -1691,7 +1687,7 @@ class _SingleHeroPhone extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(color: Color(0xFFA1A1AA), fontSize: 11)),
-          Text(val, style: TextStyle(color: isStatus ? kMintGreen : Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+          Text(val, style: TextStyle(color: isStatus ? kElumoGreen : Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -1725,7 +1721,7 @@ class _SingleHeroPhone extends StatelessWidget {
             Text(label, style: const TextStyle(color: Color(0xFFA1A1AA), fontSize: 9.5)),
             Text(amount, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
           ]),
-          Text(curr, style: const TextStyle(color: kPurplePrimary, fontSize: 12, fontWeight: FontWeight.bold)),
+          Text(curr, style: const TextStyle(color: kElumoGreen, fontSize: 12, fontWeight: FontWeight.bold)),
         ],
       ),
     );
