@@ -692,12 +692,17 @@ class _DualAngledHeroMockups extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(6),
+                    width: 28,
+                    height: 28,
                     decoration: BoxDecoration(
                       color: kElumoGreen.withOpacity(0.15),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.check_rounded, color: kElumoGreen, size: 16),
+                    alignment: Alignment.center,
+                    child: CustomPaint(
+                      size: const Size(14, 14),
+                      painter: _VectorCheckPainter(color: kElumoGreen),
+                    ),
                   ),
                   const SizedBox(width: 10),
                   const Column(
@@ -773,12 +778,17 @@ class _FloatingInflowBadge extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            width: 32,
+            height: 32,
             decoration: BoxDecoration(
               color: color.withOpacity(0.12),
               shape: BoxShape.circle,
             ),
-            child: Icon(Icons.arrow_downward_rounded, color: color, size: 18),
+            alignment: Alignment.center,
+            child: CustomPaint(
+              size: const Size(14, 14),
+              painter: _VectorArrowDownPainter(color: color),
+            ),
           ),
           const SizedBox(width: 12),
           Column(
@@ -797,6 +807,56 @@ class _FloatingInflowBadge extends StatelessWidget {
       ),
     );
   }
+}
+
+class _VectorCheckPainter extends CustomPainter {
+  final Color color;
+  const _VectorCheckPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final path = Path()
+      ..moveTo(size.width * 0.15, size.height * 0.50)
+      ..lineTo(size.width * 0.42, size.height * 0.80)
+      ..lineTo(size.width * 0.88, size.height * 0.20);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _VectorArrowDownPainter extends CustomPainter {
+  final Color color;
+  const _VectorArrowDownPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    final path = Path()
+      ..moveTo(size.width * 0.50, size.height * 0.15)
+      ..lineTo(size.width * 0.50, size.height * 0.85)
+      ..moveTo(size.width * 0.20, size.height * 0.55)
+      ..lineTo(size.width * 0.50, size.height * 0.85)
+      ..lineTo(size.width * 0.80, size.height * 0.55);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ============================================================================
@@ -1655,7 +1715,7 @@ class _FooterSection extends StatelessWidget {
 }
 
 // ============================================================================
-// REALISTIC PHONE MOCKUP RENDERER
+// REALISTIC PHONE MOCKUP RENDERER (Titanium iPhone 15 Pro + Official ElumoPay Logo)
 // ============================================================================
 enum _MockupType { walletBalances, usdAccount, smartInvoices, currencySwap }
 
@@ -1665,40 +1725,181 @@ class _SingleHeroPhone extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double w = 280;
-    const double h = 560;
+    const double w = 295;
+    const double h = 600;
 
     return Container(
       width: w,
       height: h,
       decoration: BoxDecoration(
-        color: const Color(0xFF09090B),
-        borderRadius: BorderRadius.circular(44),
-        border: Border.all(color: const Color(0xFF27272A), width: 6),
+        color: const Color(0xFF0F172A),
+        borderRadius: BorderRadius.circular(48),
+        border: Border.all(color: const Color(0xFF64748B), width: 4.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
+            color: Colors.black.withOpacity(0.4),
+            blurRadius: 36,
+            spreadRadius: 2,
+            offset: const Offset(0, 18),
+          ),
+          BoxShadow(
+            color: kElumoGreen.withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(38),
+        borderRadius: BorderRadius.circular(42),
         child: Column(
           children: [
-            // Phone Notch / Island
+            // Status Bar + Dynamic Island
             Container(
-              height: 24,
-              color: const Color(0xFF09090B),
-              alignment: Alignment.center,
-              child: Container(
-                width: 70,
-                height: 10,
-                decoration: BoxDecoration(color: const Color(0xFF27272A), borderRadius: BorderRadius.circular(10)),
+              height: 38,
+              color: const Color(0xFF090D16),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    '9:41',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  // Dynamic Island
+                  Container(
+                    width: 76,
+                    height: 18,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: const Color(0xFF1E293B), width: 0.8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          margin: const EdgeInsets.only(right: 6),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF0F172A),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Signal & Battery
+                  Row(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Container(width: 2, height: 4, color: Colors.white),
+                          const SizedBox(width: 1),
+                          Container(width: 2, height: 6, color: Colors.white),
+                          const SizedBox(width: 1),
+                          Container(width: 2, height: 8, color: Colors.white),
+                          const SizedBox(width: 1),
+                          Container(width: 2, height: 10, color: Colors.white),
+                        ],
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        width: 18,
+                        height: 9,
+                        padding: const EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white, width: 1),
+                          borderRadius: BorderRadius.circular(2.5),
+                        ),
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          width: 12,
+                          decoration: BoxDecoration(
+                            color: kElumoGreen,
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
-            Expanded(child: _buildScreenContent(type)),
+
+            // In-App Header with Real ElumoPay Logo
+            Container(
+              color: const Color(0xFF090D16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/logo_mark.png',
+                        width: 24,
+                        height: 24,
+                        fit: BoxFit.contain,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'ElumoPay',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: kElumoGreen.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text(
+                      'Verified',
+                      style: TextStyle(
+                        color: kElumoGreen,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Screen Content
+            Expanded(
+              child: Container(
+                color: const Color(0xFF090D16),
+                child: _buildScreenContent(type),
+              ),
+            ),
+
+            // Bottom Home Indicator Bar
+            Container(
+              height: 18,
+              color: const Color(0xFF090D16),
+              alignment: Alignment.center,
+              child: Container(
+                width: 100,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.35),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -1709,15 +1910,43 @@ class _SingleHeroPhone extends StatelessWidget {
     switch (type) {
       case _MockupType.walletBalances:
         return Container(
-          color: const Color(0xFF09090B),
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Total Net Balance', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 11)),
               const SizedBox(height: 4),
-              const Text('₦14,820,000.00', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
+              const Text('₦14,820,000.00', style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 14),
+              // Action Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: kElumoGreen,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text('Send', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1E293B),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.center,
+                      child: const Text('Receive', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
               _balancePill('NGN Wallet', '₦10,400,000.00', kElumoGreen),
               const SizedBox(height: 8),
               _balancePill('USD Account', '\$5,420.00', kElumoBlue),
@@ -1728,51 +1957,93 @@ class _SingleHeroPhone extends StatelessWidget {
         );
       case _MockupType.usdAccount:
         return Container(
-          color: const Color(0xFF09090B),
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('USD Checking Details', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 11)),
-              const SizedBox(height: 6),
-              const Text('\$8,450.00', style: TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
+              const SizedBox(height: 4),
+              const Text('\$8,450.00', style: TextStyle(color: Colors.white, fontSize: 23, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 14),
               _detailRow('Bank Name', 'Lead Bank US'),
               _detailRow('Routing Number', '021000021'),
               _detailRow('Account Number', '•••• 4920'),
               _detailRow('Status', 'Active & Verified', isStatus: true),
+              const SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: kElumoBlue,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: const Text('Copy Account Details', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
             ],
           ),
         );
       case _MockupType.smartInvoices:
         return Container(
-          color: const Color(0xFF09090B),
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Smart Invoices & Ledgers', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 11)),
               const SizedBox(height: 12),
-              _invoiceItem('Skill School (skill-sch.com)', 'Amara Johnson · Inst 2/4', '₦100,000', kElumoGreen),
+              _invoiceItem('Skill School (skill-sch.com)', 'Amara Johnson · Inst 2/4', '₦100,000', kElumoGreen, isPaid: true),
               const SizedBox(height: 8),
-              _invoiceItem('SolarGrid Energy', 'Emmanuel A. · Inst 4/6', '₦200,000', kElumoAmber),
+              _invoiceItem('SolarGrid Energy', 'Emmanuel A. · Inst 4/6', '₦200,000', kElumoAmber, isPaid: false),
               const SizedBox(height: 8),
-              _invoiceItem('Acme Corp Software', 'Q3 Retainer', '\$1,200', kElumoBlue),
+              _invoiceItem('Acme Corp Software', 'Q3 Retainer', '\$1,200', kElumoBlue, isPaid: true),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: kElumoGreen.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: kElumoGreen.withOpacity(0.3)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.bolt_rounded, color: kElumoGreen, size: 14),
+                    SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        '10-Day Automated SMS Reminders Active',
+                        style: TextStyle(color: kElumoGreen, fontSize: 9.5, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         );
       case _MockupType.currencySwap:
         return Container(
-          color: const Color(0xFF09090B),
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text('Instant Currency Swap', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 11)),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               _swapBox('You Pay', '1,500.00', 'USD (\$)'),
+              const SizedBox(height: 8),
               const Center(child: Icon(Icons.swap_vert_rounded, color: kElumoAmber, size: 24)),
+              const SizedBox(height: 8),
               _swapBox('You Get', '2,400,000.00', 'NGN (₦)'),
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: kElumoGreen,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                alignment: Alignment.center,
+                child: const Text('Convert Instantly', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
             ],
           ),
         );
@@ -1806,18 +2077,27 @@ class _SingleHeroPhone extends StatelessWidget {
     );
   }
 
-  Widget _invoiceItem(String title, String sub, String amount, Color color) {
+  Widget _invoiceItem(String title, String sub, String amount, Color color, {bool isPaid = true}) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(color: const Color(0xFF18181B), borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFF27272A))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-            Text(sub, style: const TextStyle(color: Color(0xFF71717A), fontSize: 9.5)),
-          ]),
-          Text(amount, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: const TextStyle(color: Colors.white, fontSize: 10.5, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
+              Text(sub, style: const TextStyle(color: Color(0xFF71717A), fontSize: 9)),
+            ]),
+          ),
+          const SizedBox(width: 8),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(amount, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
+              Text(isPaid ? 'PAID' : 'DUE', style: TextStyle(color: isPaid ? kElumoGreen : kElumoAmber, fontSize: 8.5, fontWeight: FontWeight.w900)),
+            ],
+          ),
         ],
       ),
     );
@@ -1832,7 +2112,7 @@ class _SingleHeroPhone extends StatelessWidget {
         children: [
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(label, style: const TextStyle(color: Color(0xFFA1A1AA), fontSize: 9.5)),
-            Text(amount, style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
+            Text(amount, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
           ]),
           Text(curr, style: const TextStyle(color: kElumoGreen, fontSize: 12, fontWeight: FontWeight.bold)),
         ],
