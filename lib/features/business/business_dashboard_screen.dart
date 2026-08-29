@@ -245,9 +245,9 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
     final isDesktop = width > 750;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF070F1E),
+      backgroundColor: const Color(0xFF09090B),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF070F1E),
+        backgroundColor: const Color(0xFF09090B),
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Row(
@@ -255,15 +255,15 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(colors: [Color(0xFF2563EB), Color(0xFF00D2FF)]),
-                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(6),
               ),
-              child: const Icon(Icons.business_center_rounded, color: Colors.white, size: 16),
+              child: const Icon(Icons.business_center_rounded, color: Colors.black, size: 16),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             const Text(
-              'ELUMO BUSINESS SUITE',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 0.5),
+              'Elumo Business',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16, letterSpacing: -0.5),
             ),
           ],
         ),
@@ -274,27 +274,37 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
               onPressed: () {
                 ref.read(isBusinessModeProvider.notifier).state = false;
               },
-              icon: const Icon(Icons.swap_horiz_rounded, color: Color(0xFF22D3EE), size: 18),
+              icon: const Icon(Icons.swap_horiz_rounded, color: Color(0xFFA1A1AA), size: 16),
               label: const Text(
                 'Personal Account',
-                style: TextStyle(color: Color(0xFF22D3EE), fontWeight: FontWeight.bold, fontSize: 12.5),
+                style: TextStyle(color: Color(0xFFA1A1AA), fontWeight: FontWeight.w500, fontSize: 13),
               ),
             ),
           ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          indicatorColor: const Color(0xFF22D3EE),
-          labelColor: Colors.white,
-          unselectedLabelColor: const Color(0xFF64748B),
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-          tabs: const [
-            Tab(text: 'Overview & Forecast'),
-            Tab(text: 'AI Reconciliation'),
-            Tab(text: 'Invoices & Installments'),
-            Tab(text: 'Tax & Compliance'),
-            Tab(text: 'Developer & Search'),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            decoration: const BoxDecoration(
+              border: Border(bottom: BorderSide(color: Color(0xFF27272A), width: 1)),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              indicatorColor: Colors.white,
+              indicatorWeight: 2,
+              labelColor: Colors.white,
+              unselectedLabelColor: const Color(0xFFA1A1AA),
+              labelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+              isScrollable: !isDesktop,
+              tabs: const [
+                Tab(text: 'Overview'),
+                Tab(text: 'Reconciliation'),
+                Tab(text: 'Invoices & Installments'),
+                Tab(text: 'Tax & Compliance'),
+                Tab(text: 'Developer & Search'),
+              ],
+            ),
+          ),
         ),
       ),
       body: TabBarView(
@@ -319,7 +329,7 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
   // ============================================================
   Widget _buildOverviewTab(bool isDesktop) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -329,35 +339,49 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
             children: [
               const Text(
                 'Financial Console',
-                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: -0.5),
               ),
-              Row(
-                children: ['Today', 'This Week', 'This Month', 'This Year'].map((String p) {
-                  final active = _overviewPeriod == p;
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: ChoiceChip(
-                      label: Text(p, style: TextStyle(color: active ? Colors.black : Colors.white70, fontSize: 11, fontWeight: FontWeight.bold)),
-                      selected: active,
-                      selectedColor: const Color(0xFF22D3EE),
-                      backgroundColor: const Color(0xFF1E293B),
-                      onSelected: (val) {
-                        if (val) {
-                          setState(() {
-                            _overviewPeriod = p;
-                            _updatePeriodValues();
-                          });
-                        }
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF18181B),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFF27272A)),
+                ),
+                padding: const EdgeInsets.all(4),
+                child: Row(
+                  children: ['Today', 'This Week', 'This Month', 'This Year'].map((String p) {
+                    final active = _overviewPeriod == p;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _overviewPeriod = p;
+                          _updatePeriodValues();
+                        });
                       },
-                    ),
-                  );
-                }).toList(),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: active ? const Color(0xFF27272A) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          p,
+                          style: TextStyle(
+                            color: active ? Colors.white : const Color(0xFFA1A1AA),
+                            fontSize: 12,
+                            fontWeight: active ? FontWeight.w600 : FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           
-          _buildMetricsGrid(),
+          _buildMetricsGrid(isDesktop),
           const SizedBox(height: 24),
           
           if (isDesktop)
@@ -432,12 +456,11 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
     required Color color,
   }) {
     return Container(
-      width: 280,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        color: const Color(0xFF18181B),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF27272A)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -445,157 +468,198 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontWeight: FontWeight.bold)),
-              Icon(icon, color: color, size: 18),
+              Text(title, style: const TextStyle(color: Color(0xFFA1A1AA), fontSize: 13, fontWeight: FontWeight.w500)),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Icon(icon, color: color, size: 14),
+              ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Text(
             value,
-            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: -0.5),
+            style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w600, letterSpacing: -1.0),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             change,
-            style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w800),
+            style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w500),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMetricsGrid() {
+  Widget _buildMetricsGrid(bool isDesktop) {
     String changeText = '+18.4% vs July';
     if (_overviewPeriod == 'Today') changeText = '+8.5% vs Yesterday';
     else if (_overviewPeriod == 'This Week') changeText = '+12.1% vs Last Week';
     else if (_overviewPeriod == 'This Year') changeText = '+28.4% YoY Growth';
 
-    return Wrap(
-      spacing: 16,
-      runSpacing: 16,
+    final cards = [
+      _buildMetricBox(
+        title: 'Total Collected',
+        value: '₦${_formatMoney(_totalCollectedValue)}',
+        change: changeText,
+        icon: Icons.trending_up_rounded,
+        color: const Color(0xFF10B981), // Emerald 500
+      ),
+      _buildMetricBox(
+        title: 'Reconciled Matches',
+        value: '$_reconciledMatchesValue',
+        change: 'Health: 100%',
+        icon: Icons.check_circle_outline_rounded,
+        color: const Color(0xFF3B82F6), // Blue 500
+      ),
+      _buildMetricBox(
+        title: 'Unreconciled Invoices',
+        value: '$_unreconciledInvoicesValue',
+        change: _unreconciledInvoicesValue > 0 ? 'Action Required' : 'All Clear',
+        icon: Icons.warning_amber_rounded,
+        color: _unreconciledInvoicesValue > 0 ? const Color(0xFFF59E0B) : const Color(0xFF10B981), // Amber 500
+      ),
+    ];
+
+    if (isDesktop) {
+      return Row(
+        children: [
+          Expanded(child: cards[0]),
+          const SizedBox(width: 16),
+          Expanded(child: cards[1]),
+          const SizedBox(width: 16),
+          Expanded(child: cards[2]),
+        ],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _buildMetricBox(
-          title: 'Total Collected',
-          value: '₦' + _formatMoney(_totalCollectedValue),
-          change: changeText,
-          icon: Icons.trending_up_rounded,
-          color: const Color(0xFF10B981),
-        ),
-        _buildMetricBox(
-          title: 'AI Reconciled Matches',
-          value: '$_reconciledMatchesValue Matches',
-          change: 'Reconciliation Health: 100%',
-          icon: Icons.verified_user_rounded,
-          color: const Color(0xFF22D3EE),
-        ),
-        _buildMetricBox(
-          title: 'Unreconciled Invoices',
-          value: '$_unreconciledInvoicesValue pending',
-          change: _unreconciledInvoicesValue > 0 ? 'Action Required' : 'All Clear',
-          icon: Icons.warning_amber_rounded,
-          color: _unreconciledInvoicesValue > 0 ? const Color(0xFFFBBF24) : const Color(0xFF10B981),
-        ),
+        cards[0],
+        const SizedBox(height: 16),
+        cards[1],
+        const SizedBox(height: 16),
+        cards[2],
       ],
     );
   }
 
   String _formatMoney(double val) {
     if (val >= 1000000) {
-      return (val / 1000000).toStringAsFixed(2) + 'M';
+      return '${(val / 1000000).toStringAsFixed(2)}M';
     } else if (val >= 1000) {
-      return (val / 1000).toStringAsFixed(0) + 'K';
+      return '${(val / 1000).toStringAsFixed(0)}K';
     }
     return val.toStringAsFixed(0);
   }
 
   Widget _buildForecasterCard() {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        color: const Color(0xFF18181B),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF27272A)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.timeline_rounded, color: Color(0xFF22D3EE), size: 20),
-              SizedBox(width: 8),
-              Text('AI Cash-Flow Forecasting Simulator', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3B82F6).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.timeline_rounded, color: Color(0xFF3B82F6), size: 14),
+              ),
+              const SizedBox(width: 12),
+              const Text('Cash-Flow Simulator', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
             ],
           ),
           const SizedBox(height: 12),
           const Text(
             'Expected cash position in 30 days based on historic patterns, outstanding receivables, and custom seasonal factors.',
-            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, height: 1.35),
+            style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 13, height: 1.5),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('CURRENT BALANCE', style: TextStyle(color: Color(0xFF64748B), fontSize: 11, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text('₦' + _formatMoney(_totalCollectedValue), style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 18, fontWeight: FontWeight.bold)),
+                  const Text('CURRENT BALANCE', style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 11, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  Text('₦${_formatMoney(_totalCollectedValue)}', style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w600, letterSpacing: -0.5)),
                 ],
               ),
-              const Icon(Icons.arrow_forward_rounded, color: Color(0xFF22D3EE), size: 20),
+              const Icon(Icons.arrow_forward_rounded, color: Color(0xFF3B82F6), size: 20),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text('ELUMO 30-DAY FORECAST', style: TextStyle(color: Color(0xFF22D3EE), fontSize: 11, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text('₦' + _formatMoney(_simulatedForecast), style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 22, fontWeight: FontWeight.w900)),
+                  const Text('30-DAY FORECAST', style: TextStyle(color: Color(0xFF3B82F6), fontSize: 11, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  Text('₦${_formatMoney(_simulatedForecast)}', style: const TextStyle(color: Color(0xFF3B82F6), fontSize: 28, fontWeight: FontWeight.w700, letterSpacing: -0.5)),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 40),
           
           // Seasonal Booster Simulator Slider
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Seasonal Sales Booster Impact:', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
-              Text('${_seasonalFactor.toStringAsFixed(0)}% boost', style: const TextStyle(color: Color(0xFF22D3EE), fontSize: 12, fontWeight: FontWeight.bold)),
+              const Text('Seasonal Growth Factor', style: TextStyle(color: Color(0xFFE4E4E7), fontSize: 13, fontWeight: FontWeight.w500)),
+              Text('+${_seasonalFactor.toStringAsFixed(0)}%', style: const TextStyle(color: Color(0xFF3B82F6), fontSize: 13, fontWeight: FontWeight.w600)),
             ],
           ),
-          Slider(
-            value: _seasonalFactor,
-            min: 0.0,
-            max: 50.0,
-            divisions: 10,
-            activeColor: const Color(0xFF22D3EE),
-            inactiveColor: Colors.white.withValues(alpha: 0.08),
-            onChanged: (val) {
-              setState(() {
-                _seasonalFactor = val;
-                _recalculateForecast();
-              });
-            },
-          ),
           const SizedBox(height: 16),
+          SliderTheme(
+            data: SliderThemeData(
+              trackHeight: 4,
+              activeTrackColor: const Color(0xFF3B82F6),
+              inactiveTrackColor: const Color(0xFF27272A),
+              thumbColor: Colors.white,
+              overlayColor: const Color(0xFF3B82F6).withOpacity(0.1),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+            ),
+            child: Slider(
+              value: _seasonalFactor,
+              min: 0.0,
+              max: 50.0,
+              divisions: 10,
+              onChanged: (val) {
+                setState(() {
+                  _seasonalFactor = val;
+                  _recalculateForecast();
+                });
+              },
+            ),
+          ),
+          const SizedBox(height: 32),
           
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.02),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+              color: const Color(0xFF09090B),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF27272A)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Gemini Prediction Factors:', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
+                const Text('AI Prediction Factors', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 12),
                 _predictionRow('Outstanding invoice collections estimated.', true),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 _predictionRow('Scheduled payroll expenses locked.', true),
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
                 _predictionRow('Seasonal sales booster model activated.', _seasonalFactor > 0),
               ],
             ),
@@ -609,17 +673,17 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
     return Row(
       children: [
         Icon(
-          active ? Icons.check_circle_rounded : Icons.circle_outlined,
-          color: active ? const Color(0xFF10B981) : const Color(0xFF475569),
+          active ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+          color: active ? const Color(0xFF10B981) : const Color(0xFF3F3F46),
           size: 14,
         ),
         const SizedBox(width: 8),
         Text(
           label,
           style: TextStyle(
-            color: active ? const Color(0xFF94A3B8) : const Color(0xFF475569),
-            fontSize: 11.5,
-            fontWeight: active ? FontWeight.bold : FontWeight.normal,
+            color: active ? const Color(0xFFA1A1AA) : const Color(0xFF52525B),
+            fontSize: 12,
+            fontWeight: active ? FontWeight.w500 : FontWeight.w400,
           ),
         ),
       ],
@@ -628,30 +692,30 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
 
   Widget _buildOverviewActivityChart() {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        color: const Color(0xFF18181B),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF27272A)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Weekly Sales Performance', style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 20),
+          const Text('Weekly Sales Performance', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 32),
           SizedBox(
-            height: 120,
+            height: 140,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                _barColumn('Mon', 45, const Color(0xFF22D3EE)),
-                _barColumn('Tue', 70, const Color(0xFF22D3EE)),
-                _barColumn('Wed', 55, const Color(0xFF22D3EE)),
-                _barColumn('Thu', 85, const Color(0xFF22D3EE)),
-                _barColumn('Fri', 100, const Color(0xFF10B981)),
-                _barColumn('Sat', 90, const Color(0xFF22D3EE)),
-                _barColumn('Sun', 60, const Color(0xFF22D3EE)),
+                _barColumn('Mon', 45, const Color(0xFF3B82F6)),
+                _barColumn('Tue', 70, const Color(0xFF3B82F6)),
+                _barColumn('Wed', 55, const Color(0xFF3B82F6)),
+                _barColumn('Thu', 85, const Color(0xFF3B82F6)),
+                _barColumn('Fri', 100, const Color(0xFF10B981)), // Peak day
+                _barColumn('Sat', 90, const Color(0xFF3B82F6)),
+                _barColumn('Sun', 60, const Color(0xFF3B82F6)),
               ],
             ),
           ),
@@ -666,46 +730,55 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
       children: [
         AnimatedContainer(
           duration: const Duration(milliseconds: 600),
-          width: 24,
-          height: heightPercent,
+          width: 32,
+          height: heightPercent * 1.2,
           decoration: BoxDecoration(
             color: barColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
+            borderRadius: BorderRadius.circular(4),
           ),
         ),
-        const SizedBox(height: 8),
-        Text(label, style: const TextStyle(color: Color(0xFF64748B), fontSize: 10, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 12),
+        Text(label, style: const TextStyle(color: Color(0xFFA1A1AA), fontSize: 11, fontWeight: FontWeight.w500)),
       ],
     );
   }
 
-
-    Widget _buildInsightsSummaryCard() {
+  Widget _buildInsightsSummaryCard() {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        color: const Color(0xFF18181B),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF27272A)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.insights_rounded, color: Color(0xFF10B981), size: 20),
-              SizedBox(width: 8),
-              Text('Elumo Financial Insights', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Icon(Icons.insights_rounded, color: Color(0xFF10B981), size: 14),
+              ),
+              const SizedBox(width: 12),
+              const Text('Financial Insights', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           const Text(
             'Actionable, data-driven financial health summaries compiled directly from your sales patterns.',
-            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, height: 1.35),
+            style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 13, height: 1.5),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           _insightRow('Unpaid Receivables', 'Your outstanding customer invoices grew by 31% this month. Reconciling them will increase cash reserves by ₦2.8M.'),
-          const Divider(color: Colors.white10),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Divider(color: Color(0xFF27272A)),
+          ),
           _insightRow('Failed Payment Recovery', 'Automatic payment recovery links successfully re-billed and secured ₦120K in previously failed card payments.'),
         ],
       ),
@@ -713,16 +786,13 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
   }
 
   Widget _insightRow(String title, String desc) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 4),
-          Text(desc, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11.5, height: 1.4)),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500)),
+        const SizedBox(height: 6),
+        Text(desc, style: const TextStyle(color: Color(0xFFA1A1AA), fontSize: 12, height: 1.5)),
+      ],
     );
   }
 
