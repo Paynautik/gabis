@@ -17,6 +17,11 @@ const Color kAmber      = Color(0xFFF59E0B);
 const Color kGreenLight = Color(0xFFDCFCE7);
 const Color kBlueLight  = Color(0xFFDBEAFE);
 
+// ─── Keys for Navigation ────────────────────────────────────────
+final _featuresKey = GlobalKey();
+final _aiKey = GlobalKey();
+final _complianceKey = GlobalKey();
+
 // ─── Landing Screen ───────────────────────────────────────────
 class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
@@ -26,14 +31,14 @@ class LandingScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: kCanvas,
       body: SingleChildScrollView(
-        child: Column(children: const [
-          _Nav(),
-          _Hero(),
-          _ForEveryoneSection(),
-          _AISection(),
-          _ComplianceSection(),
-          _CtaBanner(),
-          _Footer(),
+        child: Column(children: [
+          const _Nav(),
+          const _Hero(),
+          _ForEveryoneSection(key: _featuresKey),
+          _AISection(key: _aiKey),
+          _ComplianceSection(key: _complianceKey),
+          const _CtaBanner(),
+          const _Footer(),
         ]),
       ),
     );
@@ -45,6 +50,12 @@ class LandingScreen extends StatelessWidget {
 // ─────────────────────────────────────────────────────────────
 class _Nav extends StatelessWidget {
   const _Nav();
+
+  void _scrollTo(GlobalKey key) {
+    if (key.currentContext != null) {
+      Scrollable.ensureVisible(key.currentContext!, duration: const Duration(milliseconds: 600), curve: Curves.easeOut);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,36 +74,54 @@ class _Nav extends StatelessWidget {
             style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: kInkSoft, letterSpacing: -0.3)),
         const Spacer(),
         if (!mobile) ...[
-          _Link('Personal'),
+          _Link('Personal', onTap: () => _scrollTo(_featuresKey)),
           const SizedBox(width: 28),
-          _Link('Business'),
+          _Link('Business', onTap: () => _scrollTo(_featuresKey)),
           const SizedBox(width: 28),
-          _Link('AI Features'),
+          _Link('AI Features', onTap: () => _scrollTo(_aiKey)),
           const SizedBox(width: 28),
-          _Link('Compliance'),
+          _Link('Compliance', onTap: () => _scrollTo(_complianceKey)),
           const SizedBox(width: 32),
-          _Link('Log In'),
+          _Link('Log In', onTap: () => Navigator.pushNamed(context, '/login')),
           const SizedBox(width: 14),
         ],
-        _Btn('Get Started', kBlue, kSurface),
+        _Btn('Get Started', kBlue, kSurface, onTap: () => Navigator.pushNamed(context, '/login')),
       ]),
     );
   }
 }
 
-class _Link extends StatelessWidget {
+class _Link extends StatefulWidget {
   final String t;
-  const _Link(this.t);
+  final VoidCallback onTap;
+  const _Link(this.t, {required this.onTap});
   @override
-  Widget build(BuildContext context) => Text(t,
-      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: kMuted));
+  State<_Link> createState() => _LinkState();
+}
+
+class _LinkState extends State<_Link> {
+  bool _hov = false;
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hov = true),
+      onExit: (_) => setState(() => _hov = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Text(widget.t,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: _hov ? kInkSoft : kMuted)),
+      ),
+    );
+  }
 }
 
 class _Btn extends StatefulWidget {
   final String label;
   final Color bg;
   final Color fg;
-  const _Btn(this.label, this.bg, this.fg);
+  final VoidCallback onTap;
+  const _Btn(this.label, this.bg, this.fg, {required this.onTap});
   @override
   State<_Btn> createState() => _BtnState();
 }
@@ -106,7 +135,7 @@ class _BtnState extends State<_Btn> {
       onEnter: (_) => setState(() => _hov = true),
       onExit:  (_) => setState(() => _hov = false),
       child: GestureDetector(
-        onTap: () {},
+        onTap: widget.onTap,
         child: AnimatedScale(
           scale: _hov ? 0.97 : 1,
           duration: const Duration(milliseconds: 100),
@@ -1193,7 +1222,7 @@ class _CtaBanner extends StatelessWidget {
           style: TextStyle(fontSize: 16, color: Color(0xAAFFFFFF), height: 1.6),
         ),
         const SizedBox(height: 36),
-        const _Btn('Create Your Free Account', Colors.white, kGreenDark),
+        _Btn('Create Your Free Account', Colors.white, kGreenDark, onTap: () => Navigator.pushNamed(context, '/login')),
       ]),
     );
   }
@@ -1213,7 +1242,7 @@ class _Footer extends StatelessWidget {
       child: Column(children: [
         mobile
             ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                _FooterBrand(),
+                const _FooterBrand(),
                 const SizedBox(height: 40),
                 Wrap(spacing: 40, runSpacing: 28, children: const [
                   _FooterCol('Product', ['Payments', 'Corporate Cards', 'Tax Filing', 'API Docs']),
@@ -1222,17 +1251,17 @@ class _Footer extends StatelessWidget {
                   _FooterCol('Support', ['Help Center', 'Contact Us', 'Status']),
                 ]),
               ])
-            : Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            : Row(crossAxisAlignment: CrossAxisAlignment.start, children: const [
                 Expanded(flex: 2, child: _FooterBrand()),
-                const Expanded(child: _FooterCol('Product', ['Payments', 'Corporate Cards', 'Tax Filing', 'API Docs'])),
-                const Expanded(child: _FooterCol('Company', ['About Us', 'Careers', 'Blog', 'Press'])),
-                const Expanded(child: _FooterCol('Legal', ['Privacy Policy', 'Terms of Service', 'Compliance'])),
-                const Expanded(child: _FooterCol('Support', ['Help Center', 'Contact Us', 'Status'])),
+                Expanded(child: _FooterCol('Product', ['Payments', 'Corporate Cards', 'Tax Filing', 'API Docs'])),
+                Expanded(child: _FooterCol('Company', ['About Us', 'Careers', 'Blog', 'Press'])),
+                Expanded(child: _FooterCol('Legal', ['Privacy Policy', 'Terms of Service', 'Compliance'])),
+                Expanded(child: _FooterCol('Support', ['Help Center', 'Contact Us', 'Status'])),
               ]),
         const SizedBox(height: 48),
         const Divider(color: Color(0xFF1F2937)),
         const SizedBox(height: 20),
-        const Text('© 2024 Elumopay Technologies. All rights reserved.',
+        const Text('© 2024 Elumopay Technologies. A Paynautik Limited Product. All rights reserved.',
             style: TextStyle(fontSize: 12, color: Color(0xFF374151))),
       ]),
     );
