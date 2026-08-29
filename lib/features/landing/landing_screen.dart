@@ -1261,7 +1261,7 @@ class _Footer extends StatelessWidget {
         const SizedBox(height: 48),
         const Divider(color: Color(0xFF1F2937)),
         const SizedBox(height: 20),
-        const Text('© 2024 Elumopay Technologies. A Paynautik Limited Product. All rights reserved.',
+        const Text('© 2024 Elumopay. A Paynautik Limited Product. All rights reserved.',
             style: TextStyle(fontSize: 12, color: Color(0xFF374151))),
       ]),
     );
