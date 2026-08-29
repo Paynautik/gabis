@@ -3398,7 +3398,7 @@ class _FooterSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      color: const Color(0xFF07090E),
+      color: const Color(0xFF0F172A),
       child: Column(
         children: [
           // 1. "Stay ahead of the curve" Newsletter Section
@@ -3409,10 +3409,10 @@ class _FooterSection extends StatelessWidget {
               vertical: isDesktop ? 90 : 60,
             ),
             decoration: BoxDecoration(
-              color: const Color(0xFF07090E),
+              color: const Color(0xFF0F172A),
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.06),
+                  color: Colors.white.withValues(alpha: 0.08),
                 ),
               ),
             ),
@@ -3450,9 +3450,9 @@ class _FooterSection extends StatelessWidget {
                       constraints: const BoxConstraints(maxWidth: 520),
                       padding: const EdgeInsets.only(left: 18, top: 4, bottom: 4, right: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF141923),
+                        color: const Color(0xFF1E293B),
                         borderRadius: BorderRadius.circular(50),
-                        border: Border.all(color: const Color(0xFF232A3B)),
+                        border: Border.all(color: const Color(0xFF334155)),
                       ),
                       child: Row(
                         children: [
