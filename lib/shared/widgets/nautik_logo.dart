@@ -13,19 +13,20 @@ class NautikLogoMark extends StatelessWidget {
 
 class GabismWordmark extends StatelessWidget {
   final double height;
-  const GabismWordmark({super.key, this.height = 32});
+  final bool isWhite;
+  const GabismWordmark({super.key, this.height = 32, this.isWhite = false});
 
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      'assets/gabism_logo.png',
+      isWhite ? 'assets/gabism_logo_white.png' : 'assets/gabism_logo.png',
       height: height,
       fit: BoxFit.contain,
       errorBuilder: (context, error, stackTrace) {
         return Text(
           'gabism',
           style: TextStyle(
-            color: const Color(0xFF1E0E62),
+            color: isWhite ? Colors.white : const Color(0xFF1E0E62),
             fontSize: height * 0.75,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.5,

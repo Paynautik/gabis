@@ -2289,7 +2289,7 @@ class _FooterSection extends StatelessWidget {
             children: [
               Row(
                 children: const [
-                  GabismWordmark(height: 28),
+                  GabismWordmark(height: 28, isWhite: true),
                 ],
               ),
               const Text(
