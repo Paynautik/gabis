@@ -263,27 +263,46 @@ class _HeroText extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'The Pan-African Business Operating System.',
-          style: TextStyle(
-            fontSize: mobile ? 36 : 48,
-            fontWeight: FontWeight.w900,
-            color: kOnBackground,
-            letterSpacing: -0.04 * (mobile ? 36 : 48),
-            height: mobile ? 40 / 36 : 52 / 48,
+        // ── Label chip above headline ──
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: kButtonBlue.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(9999),
+            border: Border.all(color: kButtonBlue.withValues(alpha: 0.2)),
+          ),
+          child: const Text(
+            'Built for Africa. Made for Everyone.',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: kButtonBlue,
+              letterSpacing: 0.2,
+            ),
           ),
         ),
-        const SizedBox(height: 24),
-        const Text(
-          'Empowering African sellers with seamless receipts, instant refunds, flexible installments, and automated reconciliation — all in one place.',
+        const SizedBox(height: 20),
+        Text(
+          'Send, Receive & Grow — Your Money, Your Way.',
           style: TextStyle(
-            fontSize: 18,
-            height: 1.6,
+            fontSize: mobile ? 36 : 52,
+            fontWeight: FontWeight.w900,
+            color: kOnBackground,
+            letterSpacing: mobile ? -1.2 : -2.0,
+            height: 1.1,
+          ),
+        ),
+        const SizedBox(height: 20),
+        const Text(
+          'Whether you run a business or just want smarter money — ElumoPay lets you send money, get paid instantly, pay bills, track spending, and stay tax-compliant, all in one place.',
+          style: TextStyle(
+            fontSize: 17,
+            height: 1.65,
             color: kOnSurfaceVariant,
             fontWeight: FontWeight.w400,
           ),
         ),
-        const SizedBox(height: 36),
+        const SizedBox(height: 32),
         Wrap(
           spacing: 12,
           runSpacing: 12,
@@ -380,9 +399,10 @@ class _HeroImage extends StatelessWidget {
                 ],
               ),
               clipBehavior: Clip.antiAlias,
-              child: Image.asset(
-                'assets/images/hero_person.jpg',
+              child: Image.network(
+                'hero_person.jpg',
                 fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(color: const Color(0xFF1E293B)),
               ),
             ),
           ),
