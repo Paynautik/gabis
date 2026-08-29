@@ -1034,7 +1034,7 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
 }
 
 // ============================================================================
-// 4. USE CASES SECTION ("Built For Every Ambition")
+// 4. USE CASES SECTION ("Made for Hustlers, Movers & Shakers")
 // ============================================================================
 class _UseCasesSection extends StatelessWidget {
   const _UseCasesSection({super.key});
@@ -1045,127 +1045,152 @@ class _UseCasesSection extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      color: const Color(0xFFF8FAFC),
+      color: Colors.white,
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 80 : 24,
-        vertical: isDesktop ? 80 : 50,
+        horizontal: isDesktop ? 64 : 24,
+        vertical: isDesktop ? 90 : 60,
       ),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1200),
+        constraints: const BoxConstraints(maxWidth: 1240),
         child: Column(
           children: [
-            const Text(
-              'Tailored For Your Needs',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.5,
-                color: kElumoGreen,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+              decoration: BoxDecoration(
+                color: kElumoGreen.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: kElumoGreen.withOpacity(0.25)),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Built For Africa\'s Builders & Global Citizens',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 34,
-                fontWeight: FontWeight.w800,
-                color: kElumoDark,
-                letterSpacing: -1.0,
+              child: const Text(
+                'Built for Africa\'s Builders',
+                style: TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                  color: kElumoGreen,
+                ),
               ),
             ),
             const SizedBox(height: 12),
             const Text(
-              'From individual freelancers to scaling schools and cross-border enterprises.',
+              'Made for Hustlers, Movers & Shakers',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF64748B), fontSize: 15),
+              style: TextStyle(
+                fontSize: 38,
+                fontWeight: FontWeight.w800,
+                color: kElumoDark,
+                letterSpacing: -1.2,
+              ),
             ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 12),
+            const Text(
+              'From ambitious students and tech freelancers to borderless merchants and scaling institutions.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Color(0xFF64748B), fontSize: 16),
+            ),
+            const SizedBox(height: 52),
 
-            // 3 Enhanced Use Case Cards with Mini UI Previews
+            // 4 Photo Cards Grid
             isDesktop
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                ? Column(
                     children: [
-                      Expanded(
-                        child: _UseCaseCard(
-                          icon: Icons.school_rounded,
-                          title: 'Schools & Education',
-                          subtitle: 'Tuition Installment Management',
-                          description: 'Track structured student tuition plans, send automated SMS reminders, and trigger conversational AI phone calls.',
-                          color: kElumoGreen,
-                          highlight: 'Zero Late Payment Defaults',
-                          statBadge: '99.4% Collection',
-                          previewWidget: _schoolPreviewWidget(),
-                          actionText: 'Explore Invoicing',
-                        ),
+                      Row(
+                        children: const [
+                          Expanded(
+                            child: _PhotoUseCaseCard(
+                              imagePath: 'assets/images/usecase_schools.jpg',
+                              tag: 'Schools & Universities',
+                              title: 'Tuition & Smart Installments',
+                              description: 'Flexible 2-to-6 part installment plans with automated 10-day SMS reminders and instant receipts.',
+                              statBadge: '99.4% Inflow Rate',
+                              accentColor: kElumoGreen,
+                              ctaText: 'Explore School Invoicing',
+                            ),
+                          ),
+                          SizedBox(width: 24),
+                          Expanded(
+                            child: _PhotoUseCaseCard(
+                              imagePath: 'assets/images/usecase_freelancers.jpg',
+                              tag: 'Freelancers & Tech Talent',
+                              title: 'Direct Global Client Payouts',
+                              description: 'Receive USD, GBP, and EUR from Upwork, Stripe, and Deel with dedicated US checking and routing details.',
+                              statBadge: '0.3% Mid-Market FX',
+                              accentColor: kElumoBlue,
+                              ctaText: 'Get US Bank Account',
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        child: _UseCaseCard(
-                          icon: Icons.laptop_mac_rounded,
-                          title: 'Freelancers & Tech',
-                          subtitle: 'Direct Global Payments',
-                          description: 'Receive USD, GBP, and EUR from international clients on Upwork, Deel, and Stripe with dedicated US routing details.',
-                          color: kElumoBlue,
-                          highlight: 'Bank-Beating FX Rates',
-                          statBadge: '0.3% Mid-Market',
-                          previewWidget: _freelancerPreviewWidget(),
-                          actionText: 'Get US Account',
-                        ),
-                      ),
-                      const SizedBox(width: 24),
-                      Expanded(
-                        child: _UseCaseCard(
-                          icon: Icons.storefront_rounded,
-                          title: 'Cross-Border Traders',
-                          subtitle: 'Pan-African Commerce',
-                          description: 'Instant multi-currency settlement across Nigeria, Ghana, and Kenya with virtual cards and automated tax filing.',
-                          color: kElumoAmber,
-                          highlight: 'Zero Decline Virtual Cards',
-                          statBadge: '< 0.1% Declines',
-                          previewWidget: _traderPreviewWidget(),
-                          actionText: 'Start Trading',
-                        ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: const [
+                          Expanded(
+                            child: _PhotoUseCaseCard(
+                              imagePath: 'assets/images/usecase_traders.jpg',
+                              tag: 'Pan-African Commerce',
+                              title: 'Cross-Border Settlement & Cards',
+                              description: 'Pay suppliers across China, US, Kenya, and Ghana with zero-decline multi-currency virtual cards.',
+                              statBadge: '< 0.1% Declines',
+                              accentColor: kElumoAmber,
+                              ctaText: 'Start Cross-Border Trading',
+                            ),
+                          ),
+                          SizedBox(width: 24),
+                          Expanded(
+                            child: _PhotoUseCaseCard(
+                              imagePath: 'assets/images/usecase_creators.jpg',
+                              tag: 'Digital Creators & Remote Pros',
+                              title: 'Global Monetization & Payroll',
+                              description: 'Collect earnings from YouTube, Patreon, and global employers directly into multi-currency accounts.',
+                              statBadge: 'Instant Settlements',
+                              accentColor: Color(0xFF00D2B4),
+                              ctaText: 'Explore Creator Monetization',
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   )
                 : Column(
-                    children: [
-                      _UseCaseCard(
-                        icon: Icons.school_rounded,
-                        title: 'Schools & Education',
-                        subtitle: 'Tuition Installment Management',
-                        description: 'Track structured student tuition plans, send automated SMS reminders, and trigger conversational AI phone calls.',
-                        color: kElumoGreen,
-                        highlight: 'Zero Late Payment Defaults',
-                        statBadge: '99.4% Collection',
-                        previewWidget: _schoolPreviewWidget(),
-                        actionText: 'Explore Invoicing',
+                    children: const [
+                      _PhotoUseCaseCard(
+                        imagePath: 'assets/images/usecase_schools.jpg',
+                        tag: 'Schools & Universities',
+                        title: 'Tuition & Smart Installments',
+                        description: 'Flexible 2-to-6 part installment plans with automated 10-day SMS reminders and instant receipts.',
+                        statBadge: '99.4% Inflow Rate',
+                        accentColor: kElumoGreen,
+                        ctaText: 'Explore School Invoicing',
                       ),
-                      const SizedBox(height: 20),
-                      _UseCaseCard(
-                        icon: Icons.laptop_mac_rounded,
-                        title: 'Freelancers & Tech',
-                        subtitle: 'Direct Global Payments',
-                        description: 'Receive USD, GBP, and EUR from international clients on Upwork, Deel, and Stripe with dedicated US routing details.',
-                        color: kElumoBlue,
-                        highlight: 'Bank-Beating FX Rates',
-                        statBadge: '0.3% Mid-Market',
-                        previewWidget: _freelancerPreviewWidget(),
-                        actionText: 'Get US Account',
+                      SizedBox(height: 20),
+                      _PhotoUseCaseCard(
+                        imagePath: 'assets/images/usecase_freelancers.jpg',
+                        tag: 'Freelancers & Tech Talent',
+                        title: 'Direct Global Client Payouts',
+                        description: 'Receive USD, GBP, and EUR from Upwork, Stripe, and Deel with dedicated US checking and routing details.',
+                        statBadge: '0.3% Mid-Market FX',
+                        accentColor: kElumoBlue,
+                        ctaText: 'Get US Bank Account',
                       ),
-                      const SizedBox(height: 20),
-                      _UseCaseCard(
-                        icon: Icons.storefront_rounded,
-                        title: 'Cross-Border Traders',
-                        subtitle: 'Pan-African Commerce',
-                        description: 'Instant multi-currency settlement across Nigeria, Ghana, and Kenya with virtual cards and automated tax filing.',
-                        color: kElumoAmber,
-                        highlight: 'Zero Decline Virtual Cards',
+                      SizedBox(height: 20),
+                      _PhotoUseCaseCard(
+                        imagePath: 'assets/images/usecase_traders.jpg',
+                        tag: 'Pan-African Commerce',
+                        title: 'Cross-Border Settlement & Cards',
+                        description: 'Pay suppliers across China, US, Kenya, and Ghana with zero-decline multi-currency virtual cards.',
                         statBadge: '< 0.1% Declines',
-                        previewWidget: _traderPreviewWidget(),
-                        actionText: 'Start Trading',
+                        accentColor: kElumoAmber,
+                        ctaText: 'Start Cross-Border Trading',
+                      ),
+                      SizedBox(height: 20),
+                      _PhotoUseCaseCard(
+                        imagePath: 'assets/images/usecase_creators.jpg',
+                        tag: 'Digital Creators & Remote Pros',
+                        title: 'Global Monetization & Payroll',
+                        description: 'Collect earnings from YouTube, Patreon, and global employers directly into multi-currency accounts.',
+                        statBadge: 'Instant Settlements',
+                        accentColor: Color(0xFF00D2B4),
+                        ctaText: 'Explore Creator Monetization',
                       ),
                     ],
                   ),
@@ -1174,167 +1199,32 @@ class _UseCasesSection extends StatelessWidget {
       ),
     );
   }
-
-  Widget _schoolPreviewWidget() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text('skill-sch.com', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: kElumoDark)),
-              Text('Inst. 2/4 · 50%', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: kElumoGreen)),
-            ],
-          ),
-          const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: const LinearProgressIndicator(
-              value: 0.50,
-              backgroundColor: Color(0xFFE2E8F0),
-              valueColor: AlwaysStoppedAnimation(kElumoGreen),
-              minHeight: 5,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text('Amara J. (Grade 11)', style: TextStyle(fontSize: 10.5, color: Color(0xFF64748B))),
-              Text('₦100,000 PAID', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: kElumoGreen)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _freelancerPreviewWidget() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Row(
-                children: [
-                  Icon(Icons.account_balance_rounded, size: 13, color: kElumoBlue),
-                  SizedBox(width: 4),
-                  Text('Lead Bank US Checking', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10.5, color: kElumoDark)),
-                ],
-              ),
-              Text('ACH Verified', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 9.5, color: kElumoBlue)),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text('Upwork Global Escrow', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF334155))),
-                Text('+\$1,200.00', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: kElumoGreen)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _traderPreviewWidget() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text('Cross-Border Settlement Route', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10.5, color: kElumoDark)),
-              Text('Instant Swap', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 9.5, color: kElumoAmber)),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _countryChip('🇳🇬 NGN', kElumoGreen),
-              const Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF94A3B8)),
-              _countryChip('🇰🇪 KES', kElumoAmber),
-              const Icon(Icons.arrow_forward_rounded, size: 12, color: Color(0xFF94A3B8)),
-              _countryChip('🇬🇭 GHS', kElumoBlue),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _countryChip(String label, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(label, style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: color)),
-    );
-  }
 }
 
-class _UseCaseCard extends StatefulWidget {
-  final IconData icon;
+class _PhotoUseCaseCard extends StatefulWidget {
+  final String imagePath;
+  final String tag;
   final String title;
-  final String subtitle;
   final String description;
-  final Color color;
-  final String highlight;
   final String statBadge;
-  final Widget previewWidget;
-  final String actionText;
+  final Color accentColor;
+  final String ctaText;
 
-  const _UseCaseCard({
-    required this.icon,
+  const _PhotoUseCaseCard({
+    required this.imagePath,
+    required this.tag,
     required this.title,
-    required this.subtitle,
     required this.description,
-    required this.color,
-    required this.highlight,
     required this.statBadge,
-    required this.previewWidget,
-    required this.actionText,
+    required this.accentColor,
+    required this.ctaText,
   });
 
   @override
-  State<_UseCaseCard> createState() => _UseCaseCardState();
+  State<_PhotoUseCaseCard> createState() => _PhotoUseCaseCardState();
 }
 
-class _UseCaseCardState extends State<_UseCaseCard> {
+class _PhotoUseCaseCardState extends State<_PhotoUseCaseCard> {
   bool _hovered = false;
 
   @override
@@ -1346,130 +1236,155 @@ class _UseCaseCardState extends State<_UseCaseCard> {
       child: GestureDetector(
         onTap: () => Navigator.pushNamed(context, '/login'),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
+          duration: const Duration(milliseconds: 260),
+          curve: Curves.easeOutCubic,
+          height: 380,
           transform: Matrix4.translationValues(0, _hovered ? -6 : 0, 0),
-          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white,
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: _hovered ? widget.color.withOpacity(0.5) : const Color(0xFFE2E8F0),
-              width: _hovered ? 2 : 1.2,
+              color: _hovered ? widget.accentColor : Colors.black.withOpacity(0.08),
+              width: _hovered ? 2.0 : 1.0,
             ),
             boxShadow: [
               BoxShadow(
-                color: _hovered ? widget.color.withOpacity(0.12) : Colors.black.withOpacity(0.04),
-                blurRadius: _hovered ? 24 : 12,
+                color: _hovered ? widget.accentColor.withOpacity(0.22) : Colors.black.withOpacity(0.08),
+                blurRadius: _hovered ? 28 : 14,
                 offset: Offset(0, _hovered ? 12 : 6),
               ),
             ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Top Row: Icon + Stat Pill
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: widget.color.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: widget.color.withOpacity(0.2)),
-                    ),
-                    child: Icon(widget.icon, color: widget.color, size: 22),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: widget.color.withOpacity(0.09),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: widget.color.withOpacity(0.25)),
-                    ),
-                    child: Text(
-                      widget.statBadge,
-                      style: TextStyle(
-                        color: widget.color,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Background Human Photo with zoom on hover
+                AnimatedScale(
+                  scale: _hovered ? 1.06 : 1.0,
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeOutCubic,
+                  child: Image.asset(
+                    widget.imagePath,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: kElumoDark,
+                      child: Center(
+                        child: Icon(Icons.person_rounded, size: 60, color: widget.accentColor.withOpacity(0.4)),
                       ),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 18),
-
-              // Title & Subtitle
-              Text(
-                widget.title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 19,
-                  color: kElumoDark,
-                  letterSpacing: -0.4,
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                widget.subtitle,
-                style: TextStyle(
-                  color: widget.color,
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                widget.description,
-                style: const TextStyle(
-                  color: Color(0xFF64748B),
-                  fontSize: 13,
-                  height: 1.5,
-                ),
-              ),
-              const SizedBox(height: 18),
 
-              // Mini UI Preview Component
-              widget.previewWidget,
-              const SizedBox(height: 18),
-
-              // Bottom Highlight & Action Arrow
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF1F5F9),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      widget.highlight,
-                      style: const TextStyle(
-                        color: Color(0xFF334155),
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w700,
-                      ),
+                // Multi-stop Gradient overlay for contrast
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.40),
+                        Colors.black.withOpacity(0.15),
+                        Colors.black.withOpacity(0.70),
+                        Colors.black.withOpacity(0.92),
+                      ],
+                      stops: const [0.0, 0.35, 0.65, 1.0],
                     ),
                   ),
-                  Row(
+                ),
+
+                // Card Content
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        widget.actionText,
-                        style: TextStyle(
-                          color: widget.color,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12.5,
-                        ),
+                      // Top Row: Category Badge + Stat Badge
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.45),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.white.withOpacity(0.25), width: 0.8),
+                            ),
+                            child: Text(
+                              widget.tag,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: widget.accentColor.withOpacity(0.25),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: widget.accentColor, width: 0.8),
+                            ),
+                            child: Text(
+                              widget.statBadge,
+                              style: TextStyle(
+                                color: widget.accentColor,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 4),
-                      Icon(Icons.arrow_forward_rounded, color: widget.color, size: 14),
+
+                      // Bottom Content
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.title,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: -0.5,
+                              height: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.description,
+                            style: const TextStyle(
+                              fontSize: 13.5,
+                              color: Color(0xFFE2E8F0),
+                              height: 1.45,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Text(
+                                widget.ctaText,
+                                style: TextStyle(
+                                  color: widget.accentColor,
+                                  fontSize: 13.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Icon(Icons.arrow_forward_rounded, color: widget.accentColor, size: 15),
+                            ],
+                          ),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
