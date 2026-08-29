@@ -2481,206 +2481,384 @@ class _DarkCardsShowcaseSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width >= 900;
+    final isDesktop = MediaQuery.of(context).size.width >= 960;
 
     return Container(
       width: double.infinity,
-      color: kElumoDark,
+      color: const Color(0xFFFAFBFD),
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 64 : 24,
-        vertical: isDesktop ? 100 : 60,
+        horizontal: isDesktop ? 48 : 20,
+        vertical: isDesktop ? 90 : 50,
       ),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1200),
-        child: Column(
-          children: [
-            const Text(
-              'Virtual Cards for Global Ambition',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 40,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -1.0,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1160),
+          child: Column(
+            children: [
+              // Top Brand Logo
+              Image.asset(
+                'assets/gabis_pay_logo.png',
+                height: 42,
+                fit: BoxFit.contain,
               ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Create instant multi-currency cards for Netflix, AWS, Apple, and international vendor spending with zero decline rates.',
-              style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 48),
+              const SizedBox(height: 16),
 
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(isDesktop ? 48 : 24),
-              decoration: BoxDecoration(
-                color: const Color(0xFF18181B),
-                borderRadius: BorderRadius.circular(32),
-                border: Border.all(color: const Color(0xFF27272A)),
+              // Section Headline
+              const Text(
+                'Virtual Cards for Global Ambition',
+                style: TextStyle(
+                  color: Color(0xFF11163F),
+                  fontSize: 38,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -1.2,
+                ),
+                textAlign: TextAlign.center,
               ),
-              child: isDesktop
-                  ? Row(
-                      children: [
-                        Expanded(
-                          flex: 5,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(text: 'A '),
-                                    TextSpan(text: 'Better ', style: TextStyle(color: kElumoAmber)),
-                                    TextSpan(text: 'Way\n', style: TextStyle(color: kElumoGreen)),
-                                    TextSpan(text: 'to Spend Globally'),
-                                  ],
-                                ),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 38,
-                                  fontWeight: FontWeight.w800,
-                                  height: 1.1,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              const Text(
-                                'Instant 3D-secure virtual debit cards in USD, GBP, EUR, and NGN. Set custom transaction limits, freeze cards in 1-tap, and eliminate payment rejections.',
-                                style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 15, height: 1.6),
-                              ),
-                              const SizedBox(height: 32),
-                              GestureDetector(
-                                onTap: () => Navigator.pushNamed(context, '/login'),
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [AppColors.purple, AppColors.violet],
-                                    ),
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.purple.withOpacity(0.35),
-                                        blurRadius: 20,
-                                        offset: const Offset(0, 8),
-                                      ),
-                                    ],
-                                  ),
-                                  child: const Text(
-                                    'Get a Virtual Card',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 14,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 40),
-                        const Expanded(flex: 6, child: _VirtualCardsFan()),
-                      ],
-                    )
-                  : Column(
-                      children: [
-                        const Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(text: 'A '),
-                              TextSpan(text: 'Better ', style: TextStyle(color: kElumoAmber)),
-                              TextSpan(text: 'Way ', style: TextStyle(color: kElumoGreen)),
-                              TextSpan(text: 'to Spend'),
-                            ],
-                          ),
-                          style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800),
-                        ),
-                        const SizedBox(height: 14),
-                        const Text(
-                          'Create instant multi-currency virtual cards for global subscriptions.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 14),
-                        ),
-                        const SizedBox(height: 32),
-                        const _VirtualCardsFan(),
-                      ],
+              const SizedBox(height: 12),
+
+              // Section Subtitle
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: const Text(
+                  'Create instant multi-currency cards for Netflix, AWS, Apple, and international vendor spending with zero decline rates.',
+                  style: TextStyle(
+                    color: Color(0xFF64748B),
+                    fontSize: 16,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 44),
+
+              // Main Card Showcase White Container
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  horizontal: isDesktop ? 48 : 24,
+                  vertical: isDesktop ? 50 : 36,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(32),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF11163F).withOpacity(0.06),
+                      blurRadius: 36,
+                      offset: const Offset(0, 16),
                     ),
-            ),
-          ],
+                  ],
+                ),
+                child: isDesktop
+                    ? Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            flex: 5,
+                            child: _buildLeftCardCopy(context),
+                          ),
+                          const SizedBox(width: 40),
+                          const Expanded(
+                            flex: 6,
+                            child: _RealisticVirtualCardsFan(),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          _buildLeftCardCopy(context),
+                          const SizedBox(height: 44),
+                          const _RealisticVirtualCardsFan(),
+                        ],
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
+  Widget _buildLeftCardCopy(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        RichText(
+          text: const TextSpan(
+            style: TextStyle(
+              fontSize: 42,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF11163F),
+              letterSpacing: -1.5,
+              height: 1.15,
+            ),
+            children: [
+              TextSpan(text: 'A '),
+              TextSpan(
+                text: 'Better ',
+                style: TextStyle(color: Color(0xFF5535E8)),
+              ),
+              TextSpan(text: 'Way\nto Spend Globally'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 18),
+        const Text(
+          'Instant 3D-secure virtual debit cards in USD, GBP, EUR, and NGN. Set custom transaction limits, freeze cards in 1-tap, and eliminate payment rejections.',
+          style: TextStyle(
+            color: Color(0xFF64748B),
+            fontSize: 15,
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 32),
+        GestureDetector(
+          onTap: () => Navigator.pushNamed(context, '/login'),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 15),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4322DC),
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4322DC).withOpacity(0.35),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Get a Virtual Card',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                  ),
+                ),
+                SizedBox(width: 10),
+                Icon(Icons.arrow_forward, color: Colors.white, size: 18),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
-class _VirtualCardsFan extends StatelessWidget {
-  const _VirtualCardsFan();
+// ─── 4 Realistic Fanned Virtual Cards ─────────────────────────────────────────
+class _RealisticVirtualCardsFan extends StatelessWidget {
+  const _RealisticVirtualCardsFan();
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 260,
+      height: 320,
       child: Stack(
         alignment: Alignment.center,
+        clipBehavior: Clip.none,
         children: [
+          // 1. Bottom Matte Black Card
           Positioned(
-            bottom: 0,
-            left: 20,
+            left: 0,
+            bottom: 10,
             child: Transform.rotate(
-              angle: -0.12,
-              child: const _SingleVirtualCard(color: Color(0xFF1E1E1E), title: 'gabism Black', currency: 'USD CARD'),
+              angle: -0.14,
+              child: _buildMatteBlackCard(),
             ),
           ),
+
+          // 2. Pure White Card (Mastercard)
           Positioned(
-            bottom: 20,
-            left: 60,
+            left: 30,
+            bottom: 35,
             child: Transform.rotate(
-              angle: -0.04,
-              child: const _SingleVirtualCard(color: kElumoDeepGreen, title: 'gabism Business', currency: 'EUR CARD'),
+              angle: -0.06,
+              child: _buildWhiteMastercard(),
             ),
           ),
+
+          // 3. Deep Slate Blue Card
           Positioned(
-            bottom: 40,
-            left: 100,
+            left: 110,
+            bottom: 55,
             child: Transform.rotate(
-              angle: 0.04,
-              child: const _SingleVirtualCard(color: kElumoAmber, title: 'gabism Premier', currency: 'GBP CARD'),
+              angle: 0.02,
+              child: _buildSlateBlueCard(),
             ),
           ),
+
+          // 4. Front Royal Indigo Metallic Card (Visa)
           Positioned(
-            bottom: 60,
-            left: 140,
+            left: 170,
+            bottom: 45,
             child: Transform.rotate(
-              angle: 0.12,
-              child: const _SingleVirtualCard(color: kElumoGreen, title: 'gabism Global', currency: 'NGN CARD'),
+              angle: 0.08,
+              child: _buildFrontRoyalIndigoCard(),
             ),
           ),
         ],
       ),
     );
   }
-}
 
-class _SingleVirtualCard extends StatelessWidget {
-  final Color color;
-  final String title;
-  final String currency;
-  const _SingleVirtualCard({required this.color, required this.title, required this.currency});
-
-  @override
-  Widget build(BuildContext context) {
+  // Card 1: Matte Black
+  Widget _buildMatteBlackCard() {
     return Container(
-      width: 260,
-      height: 155,
+      width: 270,
+      height: 165,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color,
+        color: const Color(0xFF18181B),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.15), width: 1.5),
+        border: Border.all(color: const Color(0xFF27272A)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.5), blurRadius: 16, offset: const Offset(0, 8)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.35),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          _buildEmvChip(size: 28),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('4279 8820 •••• 1042', style: TextStyle(color: Colors.white70, fontSize: 11, letterSpacing: 1.0, fontFamily: 'monospace')),
+                  SizedBox(height: 2),
+                  Text('VALID THRU 12/28', style: TextStyle(color: Colors.white38, fontSize: 8)),
+                ],
+              ),
+              _buildVisaTextLogo(color: Colors.white),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Card 2: Pure White Mastercard
+  Widget _buildWhiteMastercard() {
+    return Container(
+      width: 270,
+      height: 165,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFBFBFE),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF11163F).withOpacity(0.12),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Image.asset('assets/gabis_pay_logo.png', height: 20, fit: BoxFit.contain),
+          _buildEmvChip(size: 28),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('5170 1200 4882 9912', style: TextStyle(color: Color(0xFF334155), fontSize: 11, letterSpacing: 1.0, fontWeight: FontWeight.w600, fontFamily: 'monospace')),
+                  SizedBox(height: 2),
+                  Text('VALID THRU 12/28', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 8)),
+                ],
+              ),
+              _buildMastercardLogo(size: 26),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Card 3: Deep Slate Blue Card
+  Widget _buildSlateBlueCard() {
+    return Container(
+      width: 270,
+      height: 165,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withOpacity(0.35),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Image.asset('assets/gabis_pay_logo_white.png', height: 18, fit: BoxFit.contain),
+          _buildEmvChip(size: 28),
+          const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('4829 9920 1834 5501', style: TextStyle(color: Colors.white, fontSize: 11, letterSpacing: 1.0, fontWeight: FontWeight.w600, fontFamily: 'monospace')),
+              SizedBox(height: 2),
+              Text('VALID THRU 12/28', style: TextStyle(color: Colors.white54, fontSize: 8)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Card 4: Top Royal Indigo Card (Main Feature Card)
+  Widget _buildFrontRoyalIndigoCard() {
+    return Container(
+      width: 285,
+      height: 175,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFF1E0E62),
+            Color(0xFF292083),
+            Color(0xFF381EA5),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withOpacity(0.18), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF1E0E62).withOpacity(0.40),
+            blurRadius: 30,
+            offset: const Offset(0, 16),
+          ),
         ],
       ),
       child: Column(
@@ -2690,16 +2868,134 @@ class _SingleVirtualCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-              Text(currency, style: const TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold)),
+              Image.asset('assets/gabis_pay_logo_white.png', height: 22, fit: BoxFit.contain),
+              const Text(
+                'NGN CARD',
+                style: TextStyle(color: Colors.white70, fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.8),
+              ),
             ],
           ),
-          const Icon(Icons.nfc_rounded, color: Colors.white70, size: 20),
-          const Text('•••• •••• •••• 8842', style: TextStyle(color: Colors.white, fontSize: 14, letterSpacing: 2.0, fontWeight: FontWeight.w600)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildEmvChip(size: 32),
+              const Icon(Icons.wifi_rounded, color: Colors.white70, size: 20),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '5591  2320  7701  8842',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 13,
+                      letterSpacing: 1.8,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text('VALID THRU 12/28', style: TextStyle(color: Colors.white60, fontSize: 8.5)),
+                ],
+              ),
+              _buildVisaTextLogo(color: Colors.white),
+            ],
+          ),
         ],
       ),
     );
   }
+
+  // Realistic EMV Chip
+  Widget _buildEmvChip({double size = 30}) {
+    return Container(
+      width: size * 1.25,
+      height: size,
+      decoration: BoxDecoration(
+        color: const Color(0xFFD4AF37),
+        borderRadius: BorderRadius.circular(5),
+        gradient: const LinearGradient(
+          colors: [Color(0xFFFFDF73), Color(0xFFB8860B), Color(0xFFE6CA65)],
+        ),
+      ),
+      child: CustomPaint(
+        painter: _ChipGridPainter(),
+      ),
+    );
+  }
+
+  // Mastercard Interlocking Circles Logo
+  Widget _buildMastercardLogo({double size = 26}) {
+    return SizedBox(
+      width: size * 1.5,
+      height: size,
+      child: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            child: Container(
+              width: size,
+              height: size,
+              decoration: const BoxDecoration(
+                color: Color(0xFFEB001B),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            right: 0,
+            child: Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF79E1B).withOpacity(0.88),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // VISA Text Logo
+  Widget _buildVisaTextLogo({required Color color}) {
+    return Text(
+      'VISA',
+      style: TextStyle(
+        color: color,
+        fontWeight: FontWeight.w900,
+        fontSize: 18,
+        letterSpacing: 0.5,
+        fontStyle: FontStyle.italic,
+      ),
+    );
+  }
+}
+
+class _ChipGridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFF785900).withOpacity(0.6)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8;
+
+    final w = size.width;
+    final h = size.height;
+
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(w * 0.2, h * 0.2, w * 0.6, h * 0.6), const Radius.circular(2)), paint);
+    canvas.drawLine(Offset(0, h * 0.5), Offset(w, h * 0.5), paint);
+    canvas.drawLine(Offset(w * 0.5, 0), Offset(w * 0.5, h), paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ============================================================================
