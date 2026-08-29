@@ -2250,124 +2250,331 @@ class _ChipGridPainter extends CustomPainter {
 }
 
 // ============================================================================
-// 7. SECURITY & PAN-AFRICAN TAX COMPLIANCE SECTION
+// 7. SECURITY SECTION (TRUSTED ACROSS AFRICA)
 // ============================================================================
 class _SecurityComplianceSection extends StatelessWidget {
   const _SecurityComplianceSection({super.key});
 
+  static const List<Map<String, dynamic>> _securityFeatures = [
+    {
+      'icon': Icons.shield_rounded,
+      'title': 'Top-Notch Security',
+      'description':
+          'End-to-end 256-bit AES encryption, biometric authentication, zero-knowledge architecture, and enterprise-grade infrastructure.',
+    },
+    {
+      'icon': Icons.receipt_long_rounded,
+      'title': 'Pan-African Tax Compliance',
+      'description':
+          'Automated VAT, withholding tax, and regulatory compliance across Nigeria, Kenya, Ghana, and South Africa.',
+    },
+    {
+      'icon': Icons.headset_mic_rounded,
+      'title': '24/7 Dedicated Support',
+      'description':
+          'Dedicated customer intelligence via chat, email, phone, and WhatsApp whenever you need help.',
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width >= 900;
+    final width = MediaQuery.of(context).size.width;
+    final isDesktop = width >= 992;
 
     return Container(
       width: double.infinity,
-      color: kElumoDark,
+      color: const Color(0xFF05070A),
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 64 : 24,
-        vertical: isDesktop ? 100 : 60,
+        vertical: isDesktop ? 128 : 80,
       ),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1200),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Keeping your money safe is our business.',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 42,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -1.0,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Background Emerald Glow
+          Positioned(
+            right: -200,
+            top: -150,
+            child: Container(
+              width: 650,
+              height: 650,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF10B981).withValues(alpha: 0.08),
               ),
             ),
-            const SizedBox(height: 12),
-            const Text(
-              'Trust is our currency. We are committed to institutional security and pan-African compliance.',
-              style: TextStyle(color: Color(0xFFA1A1AA), fontSize: 16),
-            ),
-            const SizedBox(height: 48),
+          ),
 
-            isDesktop
-                ? Row(
-                    children: const [
-                      Expanded(child: _SecurityCard(
-                        icon: Icons.shield_rounded,
-                        title: 'Top-Notch Security',
-                        desc: 'End-to-end 256-bit AES encryption, biometric 2FA authentication, and zero-knowledge ledger safety.',
-                      )),
-                      SizedBox(width: 24),
-                      Expanded(child: _SecurityCard(
-                        icon: Icons.account_balance_rounded,
-                        title: 'Pan-African Tax Compliance',
-                        desc: 'Automated VAT and withholding tax filings across Nigeria (FIRS), Kenya (KRA), Ghana (GRA), and South Africa (SARS).',
-                      )),
-                      SizedBox(width: 24),
-                      Expanded(child: _SecurityCard(
-                        icon: Icons.support_agent_rounded,
-                        title: '24/7 Dedicated Support',
-                        desc: 'Live customer intelligence available via in-app chat, email, phone, and WhatsApp around the clock.',
-                      )),
-                    ],
-                  )
-                : Column(
-                    children: const [
-                      _SecurityCard(
-                        icon: Icons.shield_rounded,
-                        title: 'Top-Notch Security',
-                        desc: 'End-to-end 256-bit AES encryption and 2FA authentication.',
+          Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1280),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.03),
+                      borderRadius: BorderRadius.circular(50),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.10),
                       ),
-                      SizedBox(height: 16),
-                      _SecurityCard(
-                        icon: Icons.account_balance_rounded,
-                        title: 'Pan-African Tax Compliance',
-                        desc: 'Automated VAT and tax filings across Nigeria, Kenya, Ghana, and South Africa.',
-                      ),
-                      SizedBox(height: 16),
-                      _SecurityCard(
-                        icon: Icons.support_agent_rounded,
-                        title: '24/7 Dedicated Support',
-                        desc: 'Live customer intelligence available around the clock.',
-                      ),
-                    ],
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.shield_outlined,
+                          size: 16,
+                          color: Color(0xFF34D399),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          'TRUSTED ACROSS AFRICA',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 3.0,
+                            color: Color(0xFFA1A1AA),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-          ],
-        ),
+
+                  const SizedBox(height: 32),
+
+                  // Heading
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 760),
+                    child: RichText(
+                      text: TextSpan(
+                        style: TextStyle(
+                          fontSize: isDesktop ? 64 : 40,
+                          fontWeight: FontWeight.w600,
+                          height: 0.98,
+                          letterSpacing: -2.5,
+                          color: Colors.white,
+                          fontFamily: 'Arial',
+                        ),
+                        children: const [
+                          TextSpan(text: 'Keeping your money '),
+                          TextSpan(
+                            text: 'safe',
+                            style: TextStyle(
+                              color: Color(0xFF34D399),
+                            ),
+                          ),
+                          TextSpan(text: ' is our business.'),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 32),
+
+                  // Subtitle
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 680),
+                    child: const Text(
+                      'Trust is our currency. We are committed to institutional security, pan-African compliance, and always-on support for businesses across Africa.',
+                      style: TextStyle(
+                        fontSize: 18,
+                        height: 1.6,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFFA1A1AA),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 80),
+
+                  // Cards Grid
+                  isDesktop
+                      ? Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: _securityFeatures.map((f) {
+                            return Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 10),
+                                child: _InteractiveSecurityCard(feature: f),
+                              ),
+                            );
+                          }).toList(),
+                        )
+                      : Column(
+                          children: _securityFeatures.map((f) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 24),
+                              child: _InteractiveSecurityCard(feature: f),
+                            );
+                          }).toList(),
+                        ),
+
+                  const SizedBox(height: 70),
+
+                  // Bottom Trust Bar
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.only(top: 32),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.06),
+                        ),
+                      ),
+                    ),
+                    child: Wrap(
+                      spacing: 32,
+                      runSpacing: 16,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: const [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.shield_outlined,
+                              size: 16,
+                              color: Color(0xFF34D399),
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Bank-grade Security',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF71717A),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Text(
+                          'ISO 27001 Aligned',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF71717A),
+                          ),
+                        ),
+                        Text(
+                          'Built for Africa',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF71717A),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class _SecurityCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String desc;
-  const _SecurityCard({required this.icon, required this.title, required this.desc});
+class _InteractiveSecurityCard extends StatefulWidget {
+  final Map<String, dynamic> feature;
+  const _InteractiveSecurityCard({required this.feature});
+
+  @override
+  State<_InteractiveSecurityCard> createState() => _InteractiveSecurityCardState();
+}
+
+class _InteractiveSecurityCardState extends State<_InteractiveSecurityCard> {
+  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: const Color(0xFF18181B),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF27272A)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: kElumoGreen.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(icon, color: kElumoGreen, size: 24),
+    final f = widget.feature;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: _isHovered
+              ? Colors.white.withValues(alpha: 0.04)
+              : Colors.white.withValues(alpha: 0.02),
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(
+            color: _isHovered
+                ? const Color(0xFF34D399).withValues(alpha: 0.20)
+                : Colors.white.withValues(alpha: 0.05),
           ),
-          const SizedBox(height: 20),
-          Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 10),
-          Text(desc, style: const TextStyle(color: Color(0xFFA1A1AA), fontSize: 13, height: 1.5)),
-        ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Icon
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(
+                f['icon'] as IconData,
+                color: const Color(0xFF34D399),
+                size: 28,
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
+            // Title
+            Text(
+              f['title'] as String,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.5,
+                color: Colors.white,
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Description
+            Text(
+              f['description'] as String,
+              style: const TextStyle(
+                fontSize: 16,
+                height: 1.65,
+                color: Color(0xFFA1A1AA),
+              ),
+            ),
+
+            const SizedBox(height: 40),
+
+            // Arrow Button
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: _isHovered
+                      ? const Color(0xFF34D399)
+                      : Colors.white.withValues(alpha: 0.10),
+                ),
+              ),
+              child: Icon(
+                Icons.arrow_outward_rounded,
+                size: 20,
+                color: _isHovered
+                    ? const Color(0xFF34D399)
+                    : const Color(0xFF71717A),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
