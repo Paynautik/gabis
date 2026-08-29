@@ -556,7 +556,7 @@ class _DualAngledHeroMockups extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Payment Successful', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: kInkDark)),
-                      Text('USD Debit Card · $45.00', style: TextStyle(fontSize: 10, color: kMutedGray)),
+                      Text('USD Debit Card · \$45.00', style: TextStyle(fontSize: 10, color: kMutedGray)),
                     ],
                   ),
                 ],
