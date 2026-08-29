@@ -158,12 +158,12 @@ class _Hero extends StatelessWidget {
             ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 _HeroCopy(mobile: true),
                 const SizedBox(height: 56),
-                Center(child: _PhoneMockup()),
+                const _PremiumHeroImage(mobile: true),
               ])
             : Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                 Expanded(flex: 5, child: _HeroCopy(mobile: false)),
                 const SizedBox(width: 48),
-                Expanded(flex: 4, child: Center(child: _PhoneMockup())),
+                const Expanded(flex: 4, child: _PremiumHeroImage(mobile: false)),
               ]),
       ),
     );
@@ -245,7 +245,7 @@ class _HeroCopy extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
-              Text('12,000+ active users',
+              Text('12,000+ waitlisters',
                   style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kInkSoft)),
               Text('across Nigeria, Kenya, Ghana & SA',
                   style: TextStyle(fontSize: 12, color: kMuted)),
@@ -319,6 +319,66 @@ class _AvatarStack extends StatelessWidget {
                 style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900)),
           ),
         )),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// PREMIUM HERO IMAGE COMPOSITION
+// ─────────────────────────────────────────────────────────────
+class _PremiumHeroImage extends StatelessWidget {
+  final bool mobile;
+  const _PremiumHeroImage({required this.mobile});
+
+  @override
+  Widget build(BuildContext context) {
+    const double compositionH = 640.0;
+    const double photoW       = 320.0;
+    const double phoneScale   = 0.95;
+
+    return SizedBox(
+      width: double.infinity,
+      height: mobile ? 520 : compositionH,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          // ── Person photo card (left, behind) ──
+          Positioned(
+            left: mobile ? 0 : -20,
+            top: mobile ? 20 : 20,
+            bottom: mobile ? 60 : 40,
+            child: Container(
+              width: mobile ? 220 : photoW,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                boxShadow: [
+                  BoxShadow(color: kGreen.withValues(alpha: 0.1), blurRadius: 60, spreadRadius: 10),
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.12), blurRadius: 40, offset: const Offset(0, 16)),
+                ],
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Image.network(
+                'hero_person.jpg',
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(color: kBorder),
+              ),
+            ),
+          ),
+
+          // ── Phone mockup (right, in front) ──
+          Positioned(
+            right: mobile ? -10 : 0,
+            top: mobile ? 0 : 40,
+            bottom: mobile ? 20 : 0,
+            child: Transform.scale(
+              scale: mobile ? 0.75 : phoneScale,
+              alignment: Alignment.centerRight,
+              child: const _PhoneMockup(),
+            ),
+          ),
+        ],
       ),
     );
   }
