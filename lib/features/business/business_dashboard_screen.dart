@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/providers/app_providers.dart';
+import '../../core/services/africas_talking_service.dart';
 import 'dart:async';
 
 // ============================================================================
@@ -17,6 +18,7 @@ class PaymentRecord {
 class Payer {
   String name;
   String email;
+  String phone;
   double totalAmount;
   double amountPaid;
   int installments;
@@ -28,6 +30,7 @@ class Payer {
   Payer({
     required this.name,
     required this.email,
+    this.phone = '+2348012345678',
     required this.totalAmount,
     this.amountPaid = 0.0,
     required this.installments,
@@ -295,11 +298,13 @@ class _ConnectedPaymentsTab extends StatefulWidget {
 }
 
 class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
+  final _atService = AfricasTalkingService();
   final _nameCtrl = TextEditingController();
   final _domainCtrl = TextEditingController();
   final _typeCtrl = TextEditingController();
   final _payerNameCtrl = TextEditingController();
   final _payerEmailCtrl = TextEditingController();
+  final _payerPhoneCtrl = TextEditingController();
   final _payerAmountCtrl = TextEditingController();
   final _payerInstCtrl = TextEditingController();
 
@@ -314,19 +319,52 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
       domain: 'skill-sch.com',
       paymentType: 'Tuition Fees',
       payers: [
-        Payer(name: 'Amara Johnson', email: 'amara@gmail.com', totalAmount: 500000, amountPaid: 200000, installments: 4, currentInstallment: 2, nextDueDate: DateTime.now().add(const Duration(days: 8)), status: 'reminder_sent', payments: [
-          PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 60)), amount: 100000, note: 'Installment 1 of 4'),
-          PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 30)), amount: 100000, note: 'Installment 2 of 4'),
-        ]),
-        Payer(name: 'Chukwudi Eze', email: 'chukwudi@outlook.com', totalAmount: 500000, amountPaid: 500000, installments: 4, currentInstallment: 4, nextDueDate: DateTime.now().subtract(const Duration(days: 5)), status: 'settled', payments: [
-          PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 90)), amount: 125000, note: 'Installment 1 of 4'),
-          PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 60)), amount: 125000, note: 'Installment 2 of 4'),
-          PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 30)), amount: 125000, note: 'Installment 3 of 4'),
-          PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 5)), amount: 125000, note: 'Installment 4 of 4'),
-        ]),
-        Payer(name: 'Fatima Bello', email: 'fatima.b@yahoo.com', totalAmount: 500000, amountPaid: 125000, installments: 4, currentInstallment: 1, nextDueDate: DateTime.now().subtract(const Duration(days: 3)), status: 'defaulted', payments: [
-          PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 45)), amount: 125000, note: 'Installment 1 of 4'),
-        ]),
+        Payer(
+          name: 'Amara Johnson',
+          email: 'amara@gmail.com',
+          phone: '+2348012345678',
+          totalAmount: 500000,
+          amountPaid: 200000,
+          installments: 4,
+          currentInstallment: 2,
+          nextDueDate: DateTime.now().add(const Duration(days: 8)),
+          status: 'reminder_sent',
+          payments: [
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 60)), amount: 100000, note: 'Installment 1 of 4'),
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 30)), amount: 100000, note: 'Installment 2 of 4'),
+          ],
+        ),
+        Payer(
+          name: 'Chukwudi Eze',
+          email: 'chukwudi@outlook.com',
+          phone: '+2348023456789',
+          totalAmount: 500000,
+          amountPaid: 500000,
+          installments: 4,
+          currentInstallment: 4,
+          nextDueDate: DateTime.now().subtract(const Duration(days: 5)),
+          status: 'settled',
+          payments: [
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 90)), amount: 125000, note: 'Installment 1 of 4'),
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 60)), amount: 125000, note: 'Installment 2 of 4'),
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 30)), amount: 125000, note: 'Installment 3 of 4'),
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 5)), amount: 125000, note: 'Installment 4 of 4'),
+          ],
+        ),
+        Payer(
+          name: 'Fatima Bello',
+          email: 'fatima.b@yahoo.com',
+          phone: '+2348034567890',
+          totalAmount: 500000,
+          amountPaid: 125000,
+          installments: 4,
+          currentInstallment: 1,
+          nextDueDate: DateTime.now().subtract(const Duration(days: 3)),
+          status: 'defaulted',
+          payments: [
+            PaymentRecord(timestamp: DateTime.now().subtract(const Duration(days: 45)), amount: 125000, note: 'Installment 1 of 4'),
+          ],
+        ),
       ],
     ),
   ];
@@ -364,15 +402,19 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
       backgroundColor: const Color(0xFF18181B),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text('Add Student / Customer to ${_companies[companyIndex].name}', style: const TextStyle(color: Colors.white, fontSize: 16)),
-      content: Column(mainAxisSize: MainAxisSize.min, children: [
-        _buildField('Full Name', 'e.g. Amara Johnson', _payerNameCtrl),
-        const SizedBox(height: 12),
-        _buildField('Email', 'e.g. amara@gmail.com', _payerEmailCtrl),
-        const SizedBox(height: 12),
-        _buildField('Total Fee', 'e.g. 500000', _payerAmountCtrl, isNumber: true),
-        const SizedBox(height: 12),
-        _buildField('Installments', 'e.g. 4', _payerInstCtrl, isNumber: true),
-      ]),
+      content: SingleChildScrollView(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          _buildField('Full Name', 'e.g. Amara Johnson', _payerNameCtrl),
+          const SizedBox(height: 12),
+          _buildField('Email', 'e.g. amara@gmail.com', _payerEmailCtrl),
+          const SizedBox(height: 12),
+          _buildField('Phone Number', 'e.g. +2348012345678', _payerPhoneCtrl),
+          const SizedBox(height: 12),
+          _buildField('Total Fee', 'e.g. 500000', _payerAmountCtrl, isNumber: true),
+          const SizedBox(height: 12),
+          _buildField('Installments', 'e.g. 4', _payerInstCtrl, isNumber: true),
+        ]),
+      ),
       actions: [
         TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel', style: TextStyle(color: Color(0xFFA1A1AA)))),
         ElevatedButton(
@@ -380,16 +422,21 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
           onPressed: () {
             final name = _payerNameCtrl.text.trim();
             final email = _payerEmailCtrl.text.trim();
+            final phone = _payerPhoneCtrl.text.trim().isEmpty ? '+2348012345678' : _payerPhoneCtrl.text.trim();
             final amount = double.tryParse(_payerAmountCtrl.text.trim()) ?? 0;
             final inst = int.tryParse(_payerInstCtrl.text.trim()) ?? 1;
             if (name.isEmpty || amount <= 0) return;
             setState(() {
               _companies[companyIndex].payers.insert(0, Payer(
-                name: name, email: email, totalAmount: amount, installments: inst,
+                name: name,
+                email: email,
+                phone: phone,
+                totalAmount: amount,
+                installments: inst,
                 nextDueDate: DateTime.now().add(const Duration(days: 30)),
               ));
             });
-            _payerNameCtrl.clear(); _payerEmailCtrl.clear(); _payerAmountCtrl.clear(); _payerInstCtrl.clear();
+            _payerNameCtrl.clear(); _payerEmailCtrl.clear(); _payerPhoneCtrl.clear(); _payerAmountCtrl.clear(); _payerInstCtrl.clear();
             Navigator.pop(ctx);
           },
           child: const Text('Add'),
@@ -428,8 +475,16 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
     final company = _companies[companyIdx];
     setState(() => payer.status = 'reminder_sent');
 
+    final smsMessage = 'Reminder from ${company.name}: Your ${company.paymentType} installment of ${_formatCurrency(payer.perInstallment)} is due in ${payer.daysUntilDue} days. Pay online: https://${company.domain}/pay';
+
+    // Trigger Africa's Talking SMS API
+    _atService.sendReminderSMS(
+      recipientPhone: payer.phone,
+      message: smsMessage,
+    );
+
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Reminder sent to ${payer.name} (${payer.email}) — ${company.paymentType} payment of ${_formatCurrency(payer.perInstallment)} due in ${payer.daysUntilDue} days.'),
+      content: Text('SMS Reminder dispatched via Africa\'s Talking to ${payer.name} (${payer.phone}): "${company.paymentType} due in ${payer.daysUntilDue}d"'),
       backgroundColor: const Color(0xFF3B82F6),
       duration: const Duration(seconds: 4),
     ));
@@ -441,13 +496,18 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
 
     setState(() {
       _isCallingDefaulter = true;
-      _callStatus = 'Dialing ${payer.name}...';
+      _callStatus = 'Dialing ${payer.name} (${payer.phone}) via Africa\'s Talking Voice Gateway...';
       _callTranscript = [];
     });
 
+    // Trigger Africa's Talking Voice Call API
+    _atService.initiateVoiceCall(
+      recipientPhone: payer.phone,
+    );
+
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
-    setState(() => _callStatus = 'Call Connected — AI Agent speaking');
+    setState(() => _callStatus = 'Call Connected (${payer.phone}) — AI Agent speaking');
 
     final lines = [
       "AI: Hello, am I speaking with ${payer.name}?",
@@ -469,7 +529,7 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
     await Future.delayed(const Duration(seconds: 1));
     if (!mounted) return;
     setState(() {
-      _callStatus = 'Call completed — Payment link sent to ${payer.name}';
+      _callStatus = 'Call completed with ${payer.name} — Payment link sent';
       _isCallingDefaulter = false;
     });
   }
@@ -477,7 +537,7 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
   @override
   void dispose() {
     _nameCtrl.dispose(); _domainCtrl.dispose(); _typeCtrl.dispose();
-    _payerNameCtrl.dispose(); _payerEmailCtrl.dispose(); _payerAmountCtrl.dispose(); _payerInstCtrl.dispose();
+    _payerNameCtrl.dispose(); _payerEmailCtrl.dispose(); _payerPhoneCtrl.dispose(); _payerAmountCtrl.dispose(); _payerInstCtrl.dispose();
     super.dispose();
   }
 
@@ -633,7 +693,7 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(p.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 15)),
             const SizedBox(height: 2),
-            Text(p.email, style: const TextStyle(color: Color(0xFF71717A), fontSize: 12)),
+            Text('${p.email} · ${p.phone}', style: const TextStyle(color: Color(0xFF71717A), fontSize: 12)),
           ])),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -673,7 +733,7 @@ class _ConnectedPaymentsTabState extends State<_ConnectedPaymentsTab> {
               TextButton.icon(
                 onPressed: () => _sendReminder(ci, pi),
                 icon: const Icon(Icons.notifications, size: 14, color: Color(0xFFF59E0B)),
-                label: const Text('Send Reminder', style: TextStyle(color: Color(0xFFF59E0B), fontSize: 12, fontWeight: FontWeight.w600)),
+                label: const Text('Send Reminder (SMS)', style: TextStyle(color: Color(0xFFF59E0B), fontSize: 12, fontWeight: FontWeight.w600)),
               ),
             if (p.isDefaulted)
               TextButton.icon(
@@ -741,24 +801,31 @@ class _AIDebtCollectionTab extends StatefulWidget {
 }
 
 class _AIDebtCollectionTabState extends State<_AIDebtCollectionTab> {
+  final _atService = AfricasTalkingService();
   bool _isCalling = false;
   String _callStatus = '';
   final List<String> _transcript = [];
   String _selectedTone = 'Polite & Helpful';
 
   final List<Map<String, String>> _debtors = [
-    {'name': 'David O.', 'invoice': 'INV-492', 'amount': '₦150,000', 'days': '14 days'},
-    {'name': 'Sarah K.', 'invoice': 'INV-501', 'amount': '₦85,000', 'days': '7 days'},
-    {'name': 'Michael A.', 'invoice': 'INV-478', 'amount': '₦320,000', 'days': '30 days'},
+    {'name': 'David O.', 'phone': '+2348012345678', 'invoice': 'INV-492', 'amount': '₦150,000', 'days': '14 days'},
+    {'name': 'Sarah K.', 'phone': '+2348023456789', 'invoice': 'INV-501', 'amount': '₦85,000', 'days': '7 days'},
+    {'name': 'Michael A.', 'phone': '+2348034567890', 'invoice': 'INV-478', 'amount': '₦320,000', 'days': '30 days'},
   ];
   int _selectedDebtor = 0;
 
   void _startCall() async {
     final debtor = _debtors[_selectedDebtor];
-    setState(() { _isCalling = true; _callStatus = 'Dialing ${debtor['name']}...'; _transcript.clear(); });
+    setState(() { _isCalling = true; _callStatus = 'Dialing ${debtor['name']} (${debtor['phone']}) via Africa\'s Talking Voice Gateway...'; _transcript.clear(); });
+    
+    // Call Africa's Talking Voice endpoint
+    _atService.initiateVoiceCall(
+      recipientPhone: debtor['phone'] ?? '+2348012345678',
+    );
+
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
-    setState(() => _callStatus = 'Call Connected — AI Agent speaking');
+    setState(() => _callStatus = 'Call Connected (${debtor['phone']}) — AI Agent speaking');
     final lines = [
       "AI: Hello, am I speaking with ${debtor['name']}?",
       "${debtor['name']}: Yes, who is this?",
@@ -771,7 +838,7 @@ class _AIDebtCollectionTabState extends State<_AIDebtCollectionTab> {
     for (final line in lines) { await Future.delayed(const Duration(milliseconds: 1500)); if (!mounted) return; setState(() => _transcript.add(line)); }
     await Future.delayed(const Duration(seconds: 1));
     if (!mounted) return;
-    setState(() { _callStatus = 'Call completed — Payment link sent to ${debtor['name']}'; _isCalling = false; });
+    setState(() { _callStatus = 'Call completed with ${debtor['name']} — Payment link sent'; _isCalling = false; });
   }
 
   @override
