@@ -92,6 +92,7 @@ class _LandingScreenState extends State<LandingScreen> {
             _ValueComparisonSection(key: _comparisonKey),
             _DarkCardsShowcaseSection(key: _cardsKey),
             _SecurityComplianceSection(key: _securityKey),
+            const _TestimonialsSection(),
             _FaqSection(key: _faqKey),
             const _DownloadCtaSection(),
             const _FooterSection(),
@@ -2723,64 +2724,416 @@ class _FaqSectionState extends State<_FaqSection> {
 }
 
 // ============================================================================
-// 10. DOWNLOAD CTA & FOOTER
+// 8. TESTIMONIALS SECTION (BENCHMARKED FROM BITSO)
+// ============================================================================
+class _TestimonialsSection extends StatelessWidget {
+  const _TestimonialsSection();
+
+  static const List<Map<String, String>> _reviews = [
+    {
+      'title': 'My favorite app since day one.',
+      'body': '"For me, the most reliable multi-currency account, 10/10."',
+      'store': 'App Store',
+      'icon': 'apple',
+    },
+    {
+      'title': 'Excellent',
+      'body':
+          '"I like the sense of security that comes from how fast deposits, transfers, and real-time rates are."',
+      'store': 'App Store',
+      'icon': 'apple',
+    },
+    {
+      'title': 'Great app',
+      'body':
+          '"It\'s super practical, and I see it as a portable tool for my business. Congrats, let\'s keep moving forward!"',
+      'store': 'Google Play',
+      'icon': 'google',
+    },
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final isDesktop = width >= 992;
+
+    return Container(
+      width: double.infinity,
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(
+        horizontal: isDesktop ? 64 : 24,
+        vertical: isDesktop ? 90 : 60,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: Column(
+            children: [
+              // Top Sand/Beige Hero Card
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE5E0D8),
+                  borderRadius: BorderRadius.circular(32),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(32),
+                  child: isDesktop
+                      ? Row(
+                          children: [
+                            // Left Content
+                            Expanded(
+                              flex: 55,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 56,
+                                  vertical: 64,
+                                ),
+                                child: _buildHeroLeftContent(context),
+                              ),
+                            ),
+
+                            // Right Image
+                            Expanded(
+                              flex: 45,
+                              child: SizedBox(
+                                height: 420,
+                                child: Image.asset(
+                                  'assets/images/testimonial_hero_african.jpg',
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: _buildHeroLeftContent(context),
+                            ),
+                            SizedBox(
+                              height: 280,
+                              width: double.infinity,
+                              child: Image.asset(
+                                'assets/images/testimonial_hero_african.jpg',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
+              ),
+
+              const SizedBox(height: 48),
+
+              // Bottom 3 Review Cards Grid
+              isDesktop
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: _reviews.map((r) {
+                        return Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: _ReviewCard(review: r),
+                          ),
+                        );
+                      }).toList(),
+                    )
+                  : Column(
+                      children: _reviews.map((r) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: _ReviewCard(review: r),
+                        );
+                      }).toList(),
+                    ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeroLeftContent(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          'gabis: where Africa\nmoves money',
+          style: TextStyle(
+            fontSize: 42,
+            height: 1.08,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -1.5,
+            color: Color(0xFF1E1E24),
+            fontFamily: 'Arial',
+          ),
+        ),
+        const SizedBox(height: 20),
+        const Text(
+          'A record that speaks for itself: gabis has been protecting your money with top security and multi-currency licenses. With gabis, you\'re in trusted hands.',
+          style: TextStyle(
+            fontSize: 15.5,
+            height: 1.55,
+            color: Color(0xFF4A4A52),
+          ),
+        ),
+        const SizedBox(height: 28),
+        GestureDetector(
+          onTap: () => Navigator.pushNamed(context, '/login'),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
+            decoration: BoxDecoration(
+              color: const Color(0xFF4F46E5),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF4F46E5).withValues(alpha: 0.25),
+                  blurRadius: 15,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: const Text(
+              'Create your account',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+                fontSize: 14.5,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ReviewCard extends StatelessWidget {
+  final Map<String, String> review;
+  const _ReviewCard({required this.review});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFBF9F5),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFEDE8DF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 5 Purple/Blue Stars
+          Row(
+            children: List.generate(
+              5,
+              (index) => const Padding(
+                padding: EdgeInsets.only(right: 3),
+                child: Icon(
+                  Icons.star_rounded,
+                  color: Color(0xFF4F46E5),
+                  size: 18,
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Title
+          Text(
+            review['title']!,
+            style: const TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF1E2442),
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          // Body
+          Text(
+            review['body']!,
+            style: const TextStyle(
+              fontSize: 13.5,
+              height: 1.5,
+              color: Color(0xFF64748B),
+            ),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Store Badge
+          Row(
+            children: [
+              Container(
+                width: 18,
+                height: 18,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF059669),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check,
+                  size: 12,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                review['store']!,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF64748B),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+// 10. BITSO-BENCHMARKED CTA SECTION
 // ============================================================================
 class _DownloadCtaSection extends StatelessWidget {
   const _DownloadCtaSection();
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final isDesktop = width >= 900;
+
     return Container(
       width: double.infinity,
-      color: const Color(0xFF0B0F2A),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 90),
-      child: Column(
-        children: [
-          const Text(
-            'Download the gabism app,\nyour money will thank you',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 44,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -1.2,
-              height: 1.15,
+      color: Colors.white,
+      padding: EdgeInsets.symmetric(
+        horizontal: isDesktop ? 64 : 24,
+        vertical: isDesktop ? 70 : 40,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: Container(
+            width: double.infinity,
+            height: isDesktop ? 340 : 440,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(32),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.10),
+                  blurRadius: 30,
+                  offset: const Offset(0, 12),
+                ),
+              ],
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 18),
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 620),
-            child: const Text(
-              'Thousands of users are already on gabism, and they love it. Once you try it, you\'ll understand the hype. Do it now.',
-              style: TextStyle(
-                color: Color(0xFF94A3B8),
-                fontSize: 16,
-                height: 1.6,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(32),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Photography Background
+                  Image.asset(
+                    'assets/images/cta_hero_cozy_african.jpg',
+                    fit: BoxFit.cover,
+                  ),
+
+                  // Contrast Gradient Overlay
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.82),
+                          Colors.black.withValues(alpha: 0.55),
+                          Colors.black.withValues(alpha: 0.10),
+                        ],
+                        stops: const [0.0, 0.55, 1.0],
+                      ),
+                    ),
+                  ),
+
+                  // Left Hero Copy Content
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isDesktop ? 56 : 28,
+                      vertical: isDesktop ? 44 : 32,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Try gabis. Start with\njust \$10 USD.',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: isDesktop ? 44 : 30,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -1.5,
+                            height: 1.05,
+                            fontFamily: 'Arial',
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 480),
+                          child: const Text(
+                            'Discover what your money is capable of: send, receive, earn, and move money globally in minutes.',
+                            style: TextStyle(
+                              color: Color(0xFFE2E8F0),
+                              fontSize: 15,
+                              height: 1.5,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        GestureDetector(
+                          onTap: () => Navigator.pushNamed(context, '/login'),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 28,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF4F46E5),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF4F46E5).withValues(alpha: 0.35),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: const Text(
+                              'Start now',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 38),
-          Wrap(
-            spacing: 16,
-            runSpacing: 12,
-            alignment: WrapAlignment.center,
-            children: [
-              _StoreButton(
-                iconWidget: const _GooglePlayLogoWidget(size: 20),
-                label: 'Google Play',
-                onTap: () => Navigator.pushNamed(context, '/login'),
-                backgroundColor: const Color(0xFF1E1B4B),
-              ),
-              _StoreButton(
-                iconWidget: const _AppleLogoWidget(size: 20),
-                label: 'App Store',
-                onTap: () => Navigator.pushNamed(context, '/login'),
-                backgroundColor: const Color(0xFF1E1B4B),
-              ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
