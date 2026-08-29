@@ -632,49 +632,53 @@ class _DualAngledHeroMockups extends StatelessWidget {
       );
     }
 
-    return SizedBox(
-      height: 600,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Background decorative green/blue glow
-          Positioned(
-            bottom: 0,
-            child: Container(
-              width: 800,
-              height: 220,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(400),
-                gradient: RadialGradient(
-                  colors: [
-                    kElumoGreen.withOpacity(0.12),
-                    Colors.transparent,
-                  ],
+    return Center(
+      child: SizedBox(
+        width: 560,
+        height: 600,
+        child: Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+            // Background ambient glow
+            Positioned(
+              bottom: 20,
+              child: Container(
+                width: 540,
+                height: 200,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(270),
+                  gradient: RadialGradient(
+                    colors: [
+                      kElumoGreen.withOpacity(0.16),
+                      Colors.transparent,
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // Left Tilted Phone (-6 degrees)
-          Positioned(
-            left: (MediaQuery.of(context).size.width - 560) / 2 - 120,
-            top: 20,
-            child: Transform.rotate(
-              angle: -0.08,
-              child: const _SingleHeroPhone(type: _MockupType.walletBalances),
+            // Left Tilted Phone (-6 degrees)
+            Positioned(
+              left: 0,
+              top: 20,
+              child: Transform.rotate(
+                angle: -0.09,
+                child: const _SingleHeroPhone(type: _MockupType.walletBalances),
+              ),
             ),
-          ),
 
-          // Right Tilted Phone (+6 degrees)
-          Positioned(
-            left: (MediaQuery.of(context).size.width - 560) / 2 + 120,
-            top: 40,
-            child: Transform.rotate(
-              angle: 0.08,
-              child: const _SingleHeroPhone(type: _MockupType.smartInvoices),
+            // Right Tilted Phone (+6 degrees, overlapping left phone)
+            Positioned(
+              right: 0,
+              top: 40,
+              child: Transform.rotate(
+                angle: 0.09,
+                child: const _SingleHeroPhone(type: _MockupType.smartInvoices),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
