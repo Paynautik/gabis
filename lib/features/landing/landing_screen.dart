@@ -755,7 +755,7 @@ class _AISection extends StatelessWidget {
   Widget build(BuildContext context) {
     final mobile = MediaQuery.of(context).size.width < 860;
     return Container(
-      color: kInk,
+      color: Colors.white,
       padding: EdgeInsets.symmetric(horizontal: mobile ? 24 : 64, vertical: 88),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 1200),
@@ -768,11 +768,11 @@ class _AISection extends StatelessWidget {
           const SizedBox(height: 20),
           const Text('AI does the work for you',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 36, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -1.2)),
+              style: TextStyle(fontSize: 36, fontWeight: FontWeight.w900, color: kInkSoft, letterSpacing: -1.2)),
           const SizedBox(height: 12),
           const Text('Stop chasing customers. Stop doing manual bookkeeping. ElumoPay\'s AI layer handles it.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15, color: Color(0xFF6B7280), height: 1.6)),
+              style: TextStyle(fontSize: 15, color: kMuted, height: 1.6)),
           const SizedBox(height: 56),
         mobile
             ? Column(children: const [
@@ -827,9 +827,10 @@ class _AICard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF0F1929),
+        color: kSurface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF1E2A3A)),
+        border: Border.all(color: kBorder),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 24, offset: const Offset(0, 8))],
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -850,9 +851,9 @@ class _AICard extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 28, right: 28, bottom: 28),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: -0.3)),
+            Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: kInkSoft, letterSpacing: -0.3)),
             const SizedBox(height: 10),
-            Text(body, style: const TextStyle(fontSize: 13, color: Color(0xFF6B7280), height: 1.65)),
+            Text(body, style: const TextStyle(fontSize: 13, color: kMuted, height: 1.65)),
           ]),
         ),
       ]),
