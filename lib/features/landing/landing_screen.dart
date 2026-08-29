@@ -368,78 +368,7 @@ class _NavButton extends StatelessWidget {
   }
 }
 
-// ============================================================
-// GABISPAY / GABISM LOGO
-// ============================================================
 
-class GabisLogo extends StatelessWidget {
-  final bool showingPay;
-  final double size;
-
-  const GabisLogo({
-    super.key,
-    required this.showingPay,
-    this.size = 60,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.baseline,
-      textBaseline: TextBaseline.alphabetic,
-      children: [
-        Text(
-          'gabis',
-          style: TextStyle(
-            fontSize: size,
-            height: 0.9,
-            fontWeight: FontWeight.w500,
-            letterSpacing: -size * .075,
-            color: AppColors.indigo,
-          ),
-        ),
-
-        // ----------------------------------------------------
-        // ONLY THIS SECTION ANIMATES
-        // ----------------------------------------------------
-
-        AnimatedSwitcher(
-          duration: const Duration(milliseconds: 500),
-          switchInCurve: Curves.easeOutCubic,
-          switchOutCurve: Curves.easeInCubic,
-
-          transitionBuilder: (child, animation) {
-            return FadeTransition(
-              opacity: animation,
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, .12),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
-              ),
-            );
-          },
-
-          child: Text(
-            showingPay ? 'Pay' : 'm',
-            key: ValueKey(showingPay),
-            style: TextStyle(
-              fontSize: size,
-              height: 0.9,
-              fontWeight: FontWeight.w500,
-              letterSpacing: -size * .075,
-              color: showingPay
-                  ? AppColors.purple
-                  : AppColors.indigo,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
 
 // ============================================================
 // HERO COPY
