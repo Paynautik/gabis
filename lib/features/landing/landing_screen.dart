@@ -234,7 +234,7 @@ class _TextButton extends StatelessWidget {
   }
 }
 
-class _PrimaryPillButton extends StatelessWidget {
+class _PrimaryPillButton extends StatefulWidget {
   final String text;
   final VoidCallback onTap;
   final Color backgroundColor;
@@ -247,19 +247,36 @@ class _PrimaryPillButton extends StatelessWidget {
   });
 
   @override
+  State<_PrimaryPillButton> createState() => _PrimaryPillButtonState();
+}
+
+class _PrimaryPillButtonState extends State<_PrimaryPillButton> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        foregroundColor: textColor,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-      ),
-      onPressed: onTap,
-      child: Text(
-        text,
-        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          decoration: BoxDecoration(
+            color: _hovered ? widget.backgroundColor.withOpacity(0.9) : widget.backgroundColor,
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Text(
+            widget.text,
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+              color: widget.textColor,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -418,7 +435,7 @@ class _HeroSection extends StatelessWidget {
   }
 }
 
-class _StoreButton extends StatelessWidget {
+class _StoreButton extends StatefulWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
@@ -429,23 +446,44 @@ class _StoreButton extends StatelessWidget {
   });
 
   @override
+  State<_StoreButton> createState() => _StoreButtonState();
+}
+
+class _StoreButtonState extends State<_StoreButton> {
+  bool _hovered = false;
+
+  @override
   Widget build(BuildContext context) {
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: kPurplePrimary,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: const BorderSide(color: Colors.black, width: 1.5),
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          decoration: BoxDecoration(
+            color: _hovered ? kPurplePrimary.withOpacity(0.9) : kPurplePrimary,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.black, width: 1.5),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(widget.icon, size: 22, color: Colors.white),
+              const SizedBox(width: 10),
+              Text(
+                widget.label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
-        elevation: 0,
-      ),
-      onPressed: onTap,
-      icon: Icon(icon, size: 22),
-      label: Text(
-        label,
-        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
       ),
     );
   }
@@ -870,15 +908,9 @@ class _DarkShowcaseSection extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 32),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: kPurplePrimary,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                                ),
-                                onPressed: () => Navigator.pushNamed(context, '/login'),
-                                child: const Text('Get a Virtual Card', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                              _PrimaryPillButton(
+                                'Get a Virtual Card',
+                                onTap: () => Navigator.pushNamed(context, '/login'),
                               ),
                             ],
                           ),
