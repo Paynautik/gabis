@@ -145,7 +145,7 @@ class _Hero extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF0B0F1A), Color(0xFF0F1929), Color(0xFF0A1628)],
+          colors: [kCanvas, kSurface],
         ),
       ),
       padding: EdgeInsets.symmetric(
@@ -200,7 +200,7 @@ class _HeroCopy extends StatelessWidget {
               style: TextStyle(
                 fontSize: mobile ? 44 : 60,
                 fontWeight: FontWeight.w900,
-                color: Colors.white,
+                color: kInkSoft,
                 letterSpacing: -2.5,
                 height: 1.05,
               ),
@@ -225,7 +225,7 @@ class _HeroCopy extends StatelessWidget {
           style: TextStyle(
             fontSize: 16,
             height: 1.7,
-            color: Color(0xFF94A3B8),
+            color: kMuted,
             fontWeight: FontWeight.w400,
           ),
         ),
@@ -240,15 +240,15 @@ class _HeroCopy extends StatelessWidget {
 
         // Social proof row
         Row(children: [
-          _AvatarStack(),
+          const _AvatarStack(),
           const SizedBox(width: 14),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: const [
               Text('12,000+ active users',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Colors.white)),
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: kInkSoft)),
               Text('across Nigeria, Kenya, Ghana & SA',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
+                  style: TextStyle(fontSize: 12, color: kMuted)),
             ],
           ),
         ]),
@@ -279,15 +279,15 @@ class _GhostBtnState extends State<_GhostBtn> {
           height: 44,
           padding: const EdgeInsets.symmetric(horizontal: 22),
           decoration: BoxDecoration(
-            color: _hov ? Colors.white.withValues(alpha: 0.07) : Colors.transparent,
-            border: Border.all(color: const Color(0xFF334155)),
+            color: _hov ? Colors.black.withValues(alpha: 0.04) : Colors.transparent,
+            border: Border.all(color: kBorder),
             borderRadius: BorderRadius.circular(9999),
           ),
           alignment: Alignment.center,
           child: Row(mainAxisSize: MainAxisSize.min, children: const [
-            Icon(Icons.play_circle_rounded, color: Color(0xFF94A3B8), size: 18),
+            Icon(Icons.play_circle_rounded, color: kMuted, size: 18),
             SizedBox(width: 6),
-            Text('Watch Demo', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF94A3B8))),
+            Text('Watch Demo', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: kInkSoft)),
           ]),
         ),
       ),
@@ -312,7 +312,7 @@ class _AvatarStack extends StatelessWidget {
             decoration: BoxDecoration(
               color: colors[i],
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF0B0F1A), width: 2),
+              border: Border.all(color: kCanvas, width: 2),
             ),
             alignment: Alignment.center,
             child: Text(initials[i],
