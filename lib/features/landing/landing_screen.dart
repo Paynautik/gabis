@@ -331,12 +331,12 @@ class _HeroSection extends StatelessWidget {
           ),
           const SizedBox(height: 24),
 
-          // Main Multi-Color Headline (ElumoPay Colors)
+          // Main Multi-Color Headline (ElumoPay's Value Proposition)
           Text.rich(
             TextSpan(
               children: [
                 const TextSpan(
-                  text: 'Instant ',
+                  text: 'Borderless ',
                   style: TextStyle(
                     color: kElumoGreen,
                     fontWeight: FontWeight.w800,
@@ -344,7 +344,7 @@ class _HeroSection extends StatelessWidget {
                   ),
                 ),
                 const TextSpan(
-                  text: 'Payments\n',
+                  text: 'Payments,\n',
                   style: TextStyle(
                     color: kElumoDark,
                     fontWeight: FontWeight.w800,
@@ -352,24 +352,17 @@ class _HeroSection extends StatelessWidget {
                   ),
                 ),
                 const TextSpan(
-                  text: 'Anywhere',
+                  text: 'Smart Installments & ',
                   style: TextStyle(
-                    color: kElumoBlue,
+                    color: kElumoDark,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -1.5,
                   ),
                 ),
                 const TextSpan(
-                  text: ', ',
+                  text: 'Global Banking',
                   style: TextStyle(
-                    color: kElumoAmber,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const TextSpan(
-                  text: 'Anytime',
-                  style: TextStyle(
-                    color: kElumoGreen,
+                    color: kElumoBlue,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -1.5,
                   ),
@@ -378,8 +371,8 @@ class _HeroSection extends StatelessWidget {
             ),
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: isDesktop ? 62 : 38,
-              height: 1.1,
+              fontSize: isDesktop ? 58 : 36,
+              height: 1.15,
             ),
           ),
           const SizedBox(height: 20),
@@ -407,13 +400,13 @@ class _HeroSection extends StatelessWidget {
             alignment: WrapAlignment.center,
             children: [
               _StoreButton(
-                icon: Icons.android_rounded,
+                iconWidget: const _GooglePlayLogoWidget(size: 22),
                 label: 'Get on Android',
                 onTap: () => Navigator.pushNamed(context, '/login'),
                 backgroundColor: kElumoDark,
               ),
               _StoreButton(
-                icon: Icons.apple_rounded,
+                iconWidget: const _AppleLogoWidget(size: 22),
                 label: 'Get on iPhone',
                 onTap: () => Navigator.pushNamed(context, '/login'),
                 backgroundColor: kElumoDark,
@@ -431,12 +424,12 @@ class _HeroSection extends StatelessWidget {
 }
 
 class _StoreButton extends StatefulWidget {
-  final IconData icon;
+  final Widget iconWidget;
   final String label;
   final VoidCallback onTap;
   final Color backgroundColor;
   const _StoreButton({
-    required this.icon,
+    required this.iconWidget,
     required this.label,
     required this.onTap,
     this.backgroundColor = kElumoDark,
@@ -468,7 +461,7 @@ class _StoreButtonState extends State<_StoreButton> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(widget.icon, size: 22, color: Colors.white),
+              widget.iconWidget,
               const SizedBox(width: 10),
               Text(
                 widget.label,
@@ -484,6 +477,126 @@ class _StoreButtonState extends State<_StoreButton> {
       ),
     );
   }
+}
+
+// ─── Custom Pixel-Perfect Vector Store Icons ──────────────────────────────────
+class _GooglePlayLogoWidget extends StatelessWidget {
+  final double size;
+  const _GooglePlayLogoWidget({this.size = 22});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(
+        painter: _GooglePlayPainter(),
+      ),
+    );
+  }
+}
+
+class _GooglePlayPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    // Blue Left Triangle
+    final bluePath = Path()
+      ..moveTo(w * 0.08, h * 0.04)
+      ..lineTo(w * 0.62, h * 0.50)
+      ..lineTo(w * 0.08, h * 0.96)
+      ..close();
+    canvas.drawPath(bluePath, Paint()..color = const Color(0xFF00D2FF)..style = PaintingStyle.fill);
+
+    // Green Top Triangle
+    final greenPath = Path()
+      ..moveTo(w * 0.08, h * 0.04)
+      ..lineTo(w * 0.78, h * 0.36)
+      ..lineTo(w * 0.62, h * 0.50)
+      ..close();
+    canvas.drawPath(greenPath, Paint()..color = const Color(0xFF00E676)..style = PaintingStyle.fill);
+
+    // Red Bottom Triangle
+    final redPath = Path()
+      ..moveTo(w * 0.08, h * 0.96)
+      ..lineTo(w * 0.62, h * 0.50)
+      ..lineTo(w * 0.78, h * 0.64)
+      ..close();
+    canvas.drawPath(redPath, Paint()..color = const Color(0xFFFF334B)..style = PaintingStyle.fill);
+
+    // Yellow Right Arrow
+    final yellowPath = Path()
+      ..moveTo(w * 0.62, h * 0.50)
+      ..lineTo(w * 0.78, h * 0.36)
+      ..lineTo(w * 0.96, h * 0.50)
+      ..lineTo(w * 0.78, h * 0.64)
+      ..close();
+    canvas.drawPath(yellowPath, Paint()..color = const Color(0xFFFFD400)..style = PaintingStyle.fill);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _AppleLogoWidget extends StatelessWidget {
+  final double size;
+  final Color color;
+  const _AppleLogoWidget({this.size = 22, this.color = Colors.white});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(
+        painter: _AppleLogoPainter(color: color),
+      ),
+    );
+  }
+}
+
+class _AppleLogoPainter extends CustomPainter {
+  final Color color;
+  const _AppleLogoPainter({this.color = Colors.white});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final w = size.width;
+    final h = size.height;
+
+    // Leaf
+    final leafPath = Path();
+    leafPath.moveTo(w * 0.53, h * 0.20);
+    leafPath.cubicTo(w * 0.54, h * 0.10, w * 0.64, h * 0.02, w * 0.73, h * 0.02);
+    leafPath.cubicTo(w * 0.74, h * 0.13, w * 0.65, h * 0.22, w * 0.53, h * 0.20);
+    leafPath.close();
+    canvas.drawPath(leafPath, paint);
+
+    // Apple Body with curved bottom and bite cutout
+    final bodyPath = Path();
+    bodyPath.moveTo(w * 0.53, h * 0.24);
+    bodyPath.cubicTo(w * 0.42, h * 0.24, w * 0.33, h * 0.30, w * 0.27, h * 0.30);
+    bodyPath.cubicTo(w * 0.16, h * 0.30, w * 0.06, h * 0.42, w * 0.06, h * 0.62);
+    bodyPath.cubicTo(w * 0.06, h * 0.79, w * 0.17, h * 0.98, w * 0.28, h * 0.98);
+    bodyPath.cubicTo(w * 0.35, h * 0.98, w * 0.39, h * 0.92, w * 0.49, h * 0.92);
+    bodyPath.cubicTo(w * 0.59, h * 0.92, w * 0.63, h * 0.98, w * 0.71, h * 0.98);
+    bodyPath.cubicTo(w * 0.81, h * 0.98, w * 0.92, h * 0.81, w * 0.95, h * 0.71);
+    // Bite cutout
+    bodyPath.cubicTo(w * 0.82, h * 0.67, w * 0.80, h * 0.47, w * 0.94, h * 0.42);
+    bodyPath.cubicTo(w * 0.85, h * 0.27, w * 0.70, h * 0.24, w * 0.63, h * 0.24);
+    bodyPath.cubicTo(w * 0.58, h * 0.24, w * 0.56, h * 0.26, w * 0.53, h * 0.24);
+    bodyPath.close();
+    canvas.drawPath(bodyPath, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 // ============================================================================
@@ -1490,13 +1603,13 @@ class _DownloadCtaSection extends StatelessWidget {
             alignment: WrapAlignment.center,
             children: [
               _StoreButton(
-                icon: Icons.android_rounded,
+                iconWidget: const _GooglePlayLogoWidget(size: 22),
                 label: 'Get on Android',
                 onTap: () => Navigator.pushNamed(context, '/login'),
                 backgroundColor: kElumoDark,
               ),
               _StoreButton(
-                icon: Icons.apple_rounded,
+                iconWidget: const _AppleLogoWidget(size: 22),
                 label: 'Get on iPhone',
                 onTap: () => Navigator.pushNamed(context, '/login'),
                 backgroundColor: kElumoDark,
