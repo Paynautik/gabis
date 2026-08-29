@@ -875,50 +875,54 @@ class _PastelFeatureSection extends StatelessWidget {
       ],
     );
 
-    final mockupContainer = Container(
-      width: isDesktop ? 480 : double.infinity,
-      height: 480,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: Colors.black, width: 4),
-      ),
-      child: Center(
-        child: Transform.scale(
-          scale: 0.76,
-          child: _SingleHeroPhone(type: screenType),
-        ),
-      ),
+    final mockupContainer = Center(
+      child: _SingleHeroPhone(type: screenType),
     );
 
     return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            backgroundColor.withOpacity(0.40),
+            backgroundColor.withOpacity(0.12),
+            Colors.white,
+          ],
+          stops: const [0.0, 0.45, 1.0],
+        ),
+      ),
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 80 : 24,
-        vertical: isDesktop ? 80 : 40,
+        vertical: isDesktop ? 100 : 50,
       ),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 1200),
-        child: isDesktop
-            ? Row(
-                children: isImageRight
-                    ? [
-                        Expanded(flex: 5, child: copyContent),
-                        const SizedBox(width: 60),
-                        Expanded(flex: 5, child: mockupContainer),
-                      ]
-                    : [
-                        Expanded(flex: 5, child: mockupContainer),
-                        const SizedBox(width: 60),
-                        Expanded(flex: 5, child: copyContent),
-                      ],
-              )
-            : Column(
-                children: [
-                  copyContent,
-                  const SizedBox(height: 36),
-                  mockupContainer,
-                ],
-              ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: isDesktop
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: isImageRight
+                      ? [
+                          Expanded(flex: 6, child: copyContent),
+                          const SizedBox(width: 60),
+                          Expanded(flex: 5, child: mockupContainer),
+                        ]
+                      : [
+                          Expanded(flex: 5, child: mockupContainer),
+                          const SizedBox(width: 60),
+                          Expanded(flex: 6, child: copyContent),
+                        ],
+                )
+              : Column(
+                  children: [
+                    copyContent,
+                    const SizedBox(height: 48),
+                    mockupContainer,
+                  ],
+                ),
+        ),
       ),
     );
   }
