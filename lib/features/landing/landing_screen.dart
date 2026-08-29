@@ -997,14 +997,32 @@ class _ComplianceSection extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 1200),
         child: mobile
             ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                _ComplianceText(),
+                const _ComplianceText(),
                 const SizedBox(height: 48),
-                Center(child: _ComplianceCard()),
+                SizedBox(
+                  height: 520,
+                  child: Center(
+                    child: Transform.scale(
+                      scale: 0.85,
+                      child: const _ComplianceCard(),
+                    ),
+                  ),
+                ),
               ])
             : Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                Expanded(child: _ComplianceText()),
+                const Expanded(child: _ComplianceText()),
                 const SizedBox(width: 64),
-                Expanded(child: _ComplianceCard()),
+                Expanded(
+                  child: SizedBox(
+                    height: 640,
+                    child: Center(
+                      child: Transform.scale(
+                        scale: 0.95,
+                        child: const _ComplianceCard(),
+                      ),
+                    ),
+                  ),
+                ),
               ]),
       ),
     );
