@@ -3073,15 +3073,27 @@ class _DownloadCtaSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          'Try gabis. Start with\njust \$10 USD.',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: isDesktop ? 44 : 30,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -1.5,
-                            height: 1.05,
-                            fontFamily: 'Arial',
+                        RichText(
+                          text: TextSpan(
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: isDesktop ? 44 : 30,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: -1.5,
+                              height: 1.08,
+                              fontFamily: 'Arial',
+                            ),
+                            children: [
+                              const TextSpan(text: 'Download '),
+                              WidgetSpan(
+                                alignment: PlaceholderAlignment.middle,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  child: GabisLogo(size: isDesktop ? 36 : 24, isWhite: true),
+                                ),
+                              ),
+                              const TextSpan(text: '\nfor free.'),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -3513,7 +3525,7 @@ class _FooterSection extends StatelessWidget {
             ),
           ),
 
-          // 2. Links & Columns Section
+          // 2. Links & Columns Section (Bitso-styled gabis layout)
           Container(
             width: double.infinity,
             padding: EdgeInsets.symmetric(
@@ -3533,114 +3545,107 @@ class _FooterSection extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                const GabisLogo(size: 32, isWhite: true),
+                                const SizedBox(height: 18),
+                                const Text(
+                                  'Discover what your money is capable of.',
+                                  style: TextStyle(
+                                    color: Color(0xFF94A3B8),
+                                    fontSize: 14,
+                                    height: 1.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 24),
                                 Row(
                                   children: [
-                                    Container(
-                                      width: 22,
-                                      height: 22,
-                                      decoration: const BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        gradient: LinearGradient(
-                                          colors: [Color(0xFF10B981), Color(0xFF06B6D4)],
-                                        ),
-                                      ),
-                                      child: const Center(
-                                        child: Icon(Icons.waves, size: 13, color: Colors.white),
-                                      ),
-                                    ),
+                                    _storeMiniIcon('🍏 App Store', () => Navigator.pushNamed(context, '/login')),
                                     const SizedBox(width: 10),
-                                    const Text(
-                                      'paynautik',
-                                      style: TextStyle(
-                                        fontSize: 21,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: -0.5,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    const Text(
-                                      ' *',
-                                      style: TextStyle(
-                                        fontSize: 21,
-                                        fontWeight: FontWeight.w800,
-                                        color: Color(0xFF10B981),
-                                      ),
-                                    ),
+                                    _storeMiniIcon('▶ Google Play', () => Navigator.pushNamed(context, '/login')),
                                   ],
-                                ),
-                                const SizedBox(height: 20),
-                                const Text(
-                                  'The future of finance, today.',
-                                  style: TextStyle(
-                                    color: Color(0xFF64748B),
-                                    fontSize: 14,
-                                  ),
                                 ),
                               ],
                             ),
                           ),
 
-                          // 5 Nav Columns
-                          Expanded(flex: 2, child: _buildFooterCol('SOLUTIONS', ['Escrow', 'Group Savings', 'Paynautik Business', 'Asset Tokenization'])),
-                          Expanded(flex: 2, child: _buildFooterCol('COMPANY', ['About Us', 'Careers', 'Press', 'Blog'])),
-                          Expanded(flex: 2, child: _buildFooterCol('LEGAL', ['Terms of Service', 'Privacy Policy', 'Licenses'])),
-                          Expanded(flex: 2, child: _buildFooterCol('SUPPORT', ['Help Center', 'Contact Us', 'FAQ'])),
-                          Expanded(flex: 2, child: _buildFooterCol('DEVELOPERS', ['API Documentation', 'API Status', 'GitHub', 'Twitter'])),
+                          // 5 gabis Nav Columns
+                          Expanded(
+                            flex: 2,
+                            child: _buildFooterCol('PRODUCTS', [
+                              'Multi-Currency Wallet',
+                              'Global USD Account',
+                              'Virtual Cards',
+                              'Smart Invoicing',
+                              'Instant FX Swaps',
+                              'Bills & Airtime',
+                            ]),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: _buildFooterCol('FOR BUSINESS', [
+                              'gabis Business',
+                              'Tuition Invoicing',
+                              'AI Debt Recovery',
+                              'Developer APIs',
+                              'Bulk Payouts',
+                            ]),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: _buildFooterCol('COMPANY', [
+                              'About gabis',
+                              'Careers',
+                              'Press & News',
+                              'Blog',
+                              'Brand Assets',
+                            ]),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: _buildFooterCol('LEGAL', [
+                              'Terms of Service',
+                              'Privacy Policy',
+                              'Security & Licenses',
+                              'Tax Compliance',
+                            ]),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: _buildFooterCol('SUPPORT', [
+                              'Help Center',
+                              'Contact Support',
+                              'System Status',
+                              'WhatsApp Live Chat',
+                            ]),
+                          ),
                         ],
                       )
                     : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 22,
-                                height: 22,
-                                decoration: const BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    colors: [Color(0xFF10B981), Color(0xFF06B6D4)],
-                                  ),
-                                ),
-                                child: const Center(
-                                  child: Icon(Icons.waves, size: 13, color: Colors.white),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'paynautik',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: -0.5,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              const Text(
-                                ' *',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF10B981),
-                                ),
-                              ),
-                            ],
-                          ),
+                          const GabisLogo(size: 30, isWhite: true),
                           const SizedBox(height: 12),
                           const Text(
-                            'The future of finance, today.',
-                            style: TextStyle(color: Color(0xFF64748B), fontSize: 13.5),
+                            'Discover what your money is capable of.',
+                            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13.5),
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              _storeMiniIcon('🍏 App Store', () => Navigator.pushNamed(context, '/login')),
+                              const SizedBox(width: 10),
+                              _storeMiniIcon('▶ Google Play', () => Navigator.pushNamed(context, '/login')),
+                            ],
                           ),
                           const SizedBox(height: 36),
                           Wrap(
                             spacing: 36,
                             runSpacing: 28,
                             children: [
-                              _buildFooterCol('SOLUTIONS', ['Escrow', 'Group Savings', 'Paynautik Business', 'Asset Tokenization']),
-                              _buildFooterCol('COMPANY', ['About Us', 'Careers', 'Press', 'Blog']),
-                              _buildFooterCol('LEGAL', ['Terms of Service', 'Privacy Policy', 'Licenses']),
-                              _buildFooterCol('SUPPORT', ['Help Center', 'Contact Us', 'FAQ']),
-                              _buildFooterCol('DEVELOPERS', ['API Documentation', 'API Status', 'GitHub', 'Twitter']),
+                              _buildFooterCol('PRODUCTS', ['Multi-Currency Wallet', 'Global USD Account', 'Virtual Cards', 'Smart Invoicing', 'Instant FX Swaps']),
+                              _buildFooterCol('FOR BUSINESS', ['gabis Business', 'Tuition Invoicing', 'AI Debt Recovery', 'Developer APIs']),
+                              _buildFooterCol('COMPANY', ['About gabis', 'Careers', 'Press', 'Blog']),
+                              _buildFooterCol('LEGAL', ['Terms of Service', 'Privacy Policy', 'Security & Licenses']),
+                              _buildFooterCol('SUPPORT', ['Help Center', 'Contact Support', 'WhatsApp Live Chat']),
                             ],
                           ),
                         ],
@@ -3670,7 +3675,7 @@ class _FooterSection extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      '© 2026 Paynautik Limited. All rights reserved.',
+                      '© 2026 gabis. All rights reserved.',
                       style: TextStyle(
                         color: Color(0xFF64748B),
                         fontSize: 12.5,
@@ -3691,6 +3696,31 @@ class _FooterSection extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  static Widget _storeMiniIcon(String label, VoidCallback onTap) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 11.5,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
       ),
     );
   }
