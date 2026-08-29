@@ -3,17 +3,18 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class AfricasTalkingService {
-  // Credentials configured from .env (sandbox mode)
-  static const String _defaultApiKey = 'atsk_01473b32929a59d945723b08e45b7d06c42776c0f3ed04657c11b3d42b3869b10009ef30';
-  static const String _defaultUsername = 'sandbox';
+  // Credentials configured safely via environment variables or runtime injection
+  static const String _defaultApiKey = String.fromEnvironment('AFRICAS_TALKING_API_KEY', defaultValue: '');
+  static const String _defaultUsername = String.fromEnvironment('AFRICAS_TALKING_USERNAME', defaultValue: 'sandbox');
 
   final String apiKey;
   final String username;
 
   AfricasTalkingService({
-    this.apiKey = _defaultApiKey,
-    this.username = _defaultUsername,
-  });
+    String? apiKey,
+    String? username,
+  })  : apiKey = apiKey ?? _defaultApiKey,
+        username = username ?? _defaultUsername;
 
   bool get isSandbox => username.toLowerCase() == 'sandbox';
 

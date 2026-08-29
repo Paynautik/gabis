@@ -2228,27 +2228,35 @@ class _DownloadCtaSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      color: kElumoDeepGreen,
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 80),
+      color: const Color(0xFF0B0F2A),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 90),
       child: Column(
         children: [
           const Text(
-            'Ready to take control of your finances?',
+            'Download the gabism app,\nyour money will thank you',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 38,
+              fontSize: 44,
               fontWeight: FontWeight.w800,
-              letterSpacing: -1.0,
+              letterSpacing: -1.2,
+              height: 1.15,
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 14),
-          const Text(
-            'Join thousands of freelancers, students, and businesses scaling with gabism.',
-            style: TextStyle(color: Colors.white70, fontSize: 16),
-            textAlign: TextAlign.center,
+          const SizedBox(height: 18),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 620),
+            child: const Text(
+              'Thousands of users are already on gabism, and they love it. Once you try it, you\'ll understand the hype. Do it now.',
+              style: TextStyle(
+                color: Color(0xFF94A3B8),
+                fontSize: 16,
+                height: 1.6,
+              ),
+              textAlign: TextAlign.center,
+            ),
           ),
-          const SizedBox(height: 36),
+          const SizedBox(height: 38),
           Wrap(
             spacing: 16,
             runSpacing: 12,
@@ -2256,15 +2264,15 @@ class _DownloadCtaSection extends StatelessWidget {
             children: [
               _StoreButton(
                 iconWidget: const _GooglePlayLogoWidget(size: 20),
-                label: 'Get on Android',
+                label: 'Google Play',
                 onTap: () => Navigator.pushNamed(context, '/login'),
-                backgroundColor: kElumoDark,
+                backgroundColor: const Color(0xFF1E1B4B),
               ),
               _StoreButton(
                 iconWidget: const _AppleLogoWidget(size: 20),
-                label: 'Get on iPhone',
+                label: 'App Store',
                 onTap: () => Navigator.pushNamed(context, '/login'),
-                backgroundColor: kElumoDark,
+                backgroundColor: const Color(0xFF1E1B4B),
               ),
             ],
           ),
