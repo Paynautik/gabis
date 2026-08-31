@@ -4238,6 +4238,137 @@ class _SingleHeroPhone extends StatelessWidget {
   }
 
 
+
+
+
+  static Widget _swapLine(String label, String value, {bool bold = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(label,
+                style: const TextStyle(fontSize: 9.5, color: Color(0xFF64748B))),
+          ),
+          Text(value,
+              style: TextStyle(
+                fontSize: bold ? 11 : 9.5,
+                fontWeight: bold ? FontWeight.w800 : FontWeight.w700,
+                color: const Color(0xFF0F172A),
+              )),
+        ],
+      ),
+    );
+  }
+
+  static Widget _miniActivity(String name, String detail, String amount, bool credit) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Container(
+            width: 19,
+            height: 19,
+            decoration: BoxDecoration(
+              color: credit ? const Color(0xFFECFDF5) : const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Icon(
+              credit ? Icons.south_west_rounded : Icons.north_east_rounded,
+              size: 10,
+              color: credit ? kGabisDeepGreen : const Color(0xFF64748B),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(name, style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+                Text(detail, style: const TextStyle(fontSize: 8, color: Color(0xFF94A3B8))),
+              ],
+            ),
+          ),
+          Text(amount,
+              style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  color: credit ? kGabisDeepGreen : const Color(0xFF334155))),
+        ],
+      ),
+    );
+  }
+
+  static Widget _instalment(String label, String due, String amount, bool paid) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Container(
+            width: 13,
+            height: 13,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: paid ? kGabisGreen.withValues(alpha: 0.15) : const Color(0xFFF1F5F9),
+              border: Border.all(color: paid ? kGabisGreen : const Color(0xFFCBD5E1), width: 1.2),
+            ),
+            child: paid ? const Icon(Icons.check_rounded, size: 8, color: kGabisDeepGreen) : null,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(label,
+                style: TextStyle(
+                    fontSize: 9.5,
+                    fontWeight: paid ? FontWeight.w600 : FontWeight.w500,
+                    color: paid ? const Color(0xFF334155) : const Color(0xFF94A3B8))),
+          ),
+          Text(due, style: const TextStyle(fontSize: 8.5, color: Color(0xFF94A3B8))),
+          const SizedBox(width: 8),
+          Text(amount,
+              style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  color: paid ? const Color(0xFF334155) : const Color(0xFF94A3B8))),
+        ],
+      ),
+    );
+  }
+
+  static Widget _callStep(String label, bool done) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Container(
+            width: 13,
+            height: 13,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: done ? kGabisGreen.withValues(alpha: 0.15) : const Color(0xFFF1F5F9),
+              border: Border.all(
+                color: done ? kGabisGreen : const Color(0xFFCBD5E1),
+                width: 1.2,
+              ),
+            ),
+            child: done
+                ? const Icon(Icons.check_rounded, size: 8, color: kGabisDeepGreen)
+                : null,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 9.5,
+              color: done ? const Color(0xFF334155) : const Color(0xFF94A3B8),
+              fontWeight: done ? FontWeight.w600 : FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   static Widget _commitmentRow(String name, String category, String amount) {
     return Row(
       children: [
@@ -4307,6 +4438,33 @@ class _SingleHeroPhone extends StatelessWidget {
               _balancePill('USD Account', '\$5,420.00', kGabisBlue),
               const SizedBox(height: 6),
               _balancePill('GBP Account', '£1,850.00', kGabisAmber),
+              const SizedBox(height: 12),
+              const Text('RECENT ACTIVITY',
+                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: Color(0xFF94A3B8))),
+              const SizedBox(height: 7),
+              _miniActivity('Acme Ltd', 'Invoice payment', '+₦450,000', true),
+              _miniActivity('Lekki Gardens', 'Rent', '-₦180,000', false),
+              _miniActivity('MTN', 'Airtime & data', '-₦34,000', false),
+              const SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(9),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.trending_up_rounded, size: 11, color: kGabisGreen),
+                    SizedBox(width: 6),
+                    Expanded(
+                      child: Text('USD/NGN 1,524.00 · mid-market',
+                          style: TextStyle(fontSize: 9, color: Color(0xFF475569), fontWeight: FontWeight.w600)),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         );
@@ -4338,6 +4496,49 @@ class _SingleHeroPhone extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: const Text('Copy Account Details', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11.5)),
+              ),
+              const SizedBox(height: 14),
+              const Text('RECEIVES FROM',
+                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: Color(0xFF94A3B8))),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: ['Stripe', 'Upwork', 'Deel', 'Amazon', 'PayPal', 'Wise']
+                    .map((n) => Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF1F5F9),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                          ),
+                          child: Text(n,
+                              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: Color(0xFF475569))),
+                        ))
+                    .toList(),
+              ),
+              const SizedBox(height: 12),
+              _miniActivity('Stripe US', 'ACH settlement', '+\$850.00', true),
+              _miniActivity('Upwork', 'Contract payout', '+\$1,240.00', true),
+              const SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDCFCE7),
+                  borderRadius: BorderRadius.circular(9),
+                  border: Border.all(color: kGabisGreen.withValues(alpha: 0.3)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.check_circle_rounded, size: 11, color: kGabisDeepGreen),
+                    SizedBox(width: 6),
+                    Expanded(
+                      child: Text('Zero receiving fees on ACH & Wire',
+                          style: TextStyle(fontSize: 9, color: kGabisDeepGreen, fontWeight: FontWeight.w700)),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -4377,6 +4578,46 @@ class _SingleHeroPhone extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 14),
+              const Text('INSTALLMENT SCHEDULE · AMARA J.',
+                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: Color(0xFF94A3B8))),
+              const SizedBox(height: 8),
+              _instalment('Instalment 1', '12 Jun', '₦100,000', true),
+              _instalment('Instalment 2', '12 Jul', '₦100,000', true),
+              _instalment('Instalment 3', '12 Aug', '₦100,000', false),
+              _instalment('Instalment 4', '12 Sep', '₦100,000', false),
+              const SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(9),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: const Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Collected', style: TextStyle(fontSize: 8.5, color: Color(0xFF94A3B8))),
+                          Text('₦200,000', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Outstanding', style: TextStyle(fontSize: 8.5, color: Color(0xFF94A3B8))),
+                          Text('₦200,000', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Color(0xFFEA580C))),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         );
@@ -4408,6 +4649,36 @@ class _SingleHeroPhone extends StatelessWidget {
                 alignment: Alignment.center,
                 child: const Text('Convert Instantly', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11.5)),
               ),
+              const SizedBox(height: 14),
+              _swapLine('Mid-market rate', '₦1,524.00 / \$1'),
+              _swapLine('gabis margin (0.3%)', '₦4,572'),
+              _swapLine('You receive', '\$1,500.00', bold: true),
+              const SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFDCFCE7),
+                  borderRadius: BorderRadius.circular(9),
+                  border: Border.all(color: kGabisGreen.withValues(alpha: 0.3)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.savings_rounded, size: 12, color: kGabisDeepGreen),
+                    SizedBox(width: 7),
+                    Expanded(
+                      child: Text('₦71,000 cheaper than a 5% bank spread',
+                          style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: kGabisDeepGreen)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text('RECENT SWAPS',
+                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: Color(0xFF94A3B8))),
+              const SizedBox(height: 7),
+              _miniActivity('NGN → USD', 'Settled instantly', '\$820.00', true),
+              _miniActivity('USD → GHS', 'Settled instantly', 'GH₵ 3,200', true),
             ],
           ),
         );
@@ -4448,6 +4719,26 @@ class _SingleHeroPhone extends StatelessWidget {
                 child: const Text('Live Call · 00:42', style: TextStyle(color: kGabisDeepGreen, fontSize: 9, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 10),
+              // Voice activity while the agent is speaking
+              SizedBox(
+                height: 22,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(21, (i) {
+                    const heights = [5.0, 9.0, 14.0, 20.0, 12.0, 7.0, 16.0];
+                    return Container(
+                      width: 3,
+                      height: heights[i % heights.length],
+                      margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                      decoration: BoxDecoration(
+                        color: kGabisAmber.withValues(alpha: i.isEven ? 0.85 : 0.45),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.all(9),
                 decoration: BoxDecoration(
@@ -4485,6 +4776,47 @@ class _SingleHeroPhone extends StatelessWidget {
                     child: const Icon(Icons.call_end_rounded, color: Colors.white, size: 14),
                   ),
                 ],
+              ),
+              const SizedBox(height: 14),
+
+              // What the agent has done on this call, and what is still open
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('CALL PROGRESS',
+                        style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: Color(0xFF94A3B8))),
+                    const SizedBox(height: 8),
+                    _callStep('Dialled via Africa\'s Talking', true),
+                    _callStep('Identified invoice INV-2481', true),
+                    _callStep('Explained balance in Pidgin', true),
+                    _callStep('WhatsApp payment link sent', true),
+                    _callStep('Awaiting settlement', false),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(9),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.schedule_rounded, size: 11, color: Color(0xFF64748B)),
+                    SizedBox(width: 6),
+                    Expanded(
+                      child: Text('Attempt 1 of 3 · retries tomorrow 10:00',
+                          style: TextStyle(fontSize: 9, color: Color(0xFF475569), fontWeight: FontWeight.w600)),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -4571,6 +4903,59 @@ class _SingleHeroPhone extends StatelessWidget {
                   ],
                 ),
               ),
+              const SizedBox(height: 12),
+
+              const Text('SUGGESTED',
+                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: Color(0xFF94A3B8))),
+              const SizedBox(height: 7),
+              ...engine.trimmableSubscriptions().take(2).map((c) => Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('Cancel ${c.counterparty}',
+                                    style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+                                Text('Frees ${CopilotEngine.formatNaira(c.monthlyNaira)} every month',
+                                    style: const TextStyle(fontSize: 8, color: Color(0xFF94A3B8))),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right_rounded, size: 14, color: Color(0xFF94A3B8)),
+                        ],
+                      ),
+                    ),
+                  )),
+              const SizedBox(height: 6),
+
+              // Composer, so the panel reads as a conversation surface
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Row(
+                  children: [
+                    Expanded(
+                      child: Text('Ask about your money…',
+                          style: TextStyle(fontSize: 9.5, color: Color(0xFF94A3B8))),
+                    ),
+                    Icon(Icons.arrow_upward_rounded, size: 12, color: Color(0xFF5145E5)),
+                  ],
+                ),
+              ),
             ],
           ),
         );
@@ -4592,6 +4977,44 @@ class _SingleHeroPhone extends StatelessWidget {
               _settlementItem('Kenya (KES)', 'Supplier Payout', '+KSh 45,000.00', kGabisAmber),
               const SizedBox(height: 6),
               _settlementItem('Ghana (GHS)', 'Freelance Merchant', '+GH₵ 3,200.00', const Color(0xFF00D2B4)),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(9),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: const Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Settled today', style: TextStyle(fontSize: 8.5, color: Color(0xFF94A3B8))),
+                          Text('₦2,410,000', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Countries', style: TextStyle(fontSize: 8.5, color: Color(0xFF94A3B8))),
+                          Text('4 live', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w800, color: Color(0xFF0F172A))),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text('WEBHOOKS',
+                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: Color(0xFF94A3B8))),
+              const SizedBox(height: 7),
+              _swapLine('settlement.completed', 'delivered'),
+              _swapLine('payout.initiated', 'delivered'),
             ],
           ),
         );
@@ -4625,6 +5048,32 @@ class _SingleHeroPhone extends StatelessWidget {
               _invoiceItem('MTN 20GB Data Bundle', '0803••••821', '₦5,000', kGabisBlue, isPaid: true),
               const SizedBox(height: 6),
               _invoiceItem('DStv Premium Renewal', 'Smartcard: 2018••••49', '₦29,000', kGabisAmber, isPaid: true),
+              const SizedBox(height: 12),
+              const Text('SCHEDULED',
+                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: Color(0xFF94A3B8))),
+              const SizedBox(height: 7),
+              _instalment('IKEDC electricity', '12 Sep', '₦42,000', false),
+              _instalment('MTN data bundle', '22 Sep', '₦20,400', false),
+              const SizedBox(height: 10),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(9),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.receipt_long_rounded, size: 11, color: Color(0xFF64748B)),
+                    SizedBox(width: 6),
+                    Expanded(
+                      child: Text('Tokens and receipts issued instantly',
+                          style: TextStyle(fontSize: 9, color: Color(0xFF475569), fontWeight: FontWeight.w600)),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         );
