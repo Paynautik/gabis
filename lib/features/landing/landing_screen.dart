@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'gabis_hero_section.dart';
 import 'landing_ui.dart';
 import 'landing_sections_extra.dart';
@@ -4036,6 +4037,7 @@ class _FooterSection extends StatelessWidget {
                             flex: 2,
                             child: _buildFooterCol('COMPANY', [
                               'About gabis',
+                              'Investor Deck',
                               'Careers',
                               'Press & News',
                               'Blog',
@@ -4193,12 +4195,24 @@ class _FooterSection extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 12),
               child: MouseRegion(
                 cursor: SystemMouseCursors.click,
-                child: Text(
-                  link,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF64748B),
-                    fontWeight: FontWeight.w400,
+                child: GestureDetector(
+                  onTap: () {
+                    if (link == 'Investor Deck') {
+                      launchUrl(Uri.parse('/gabis-deck.pdf'),
+                          mode: LaunchMode.externalApplication);
+                    }
+                  },
+                  child: Text(
+                    link,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: link == 'Investor Deck'
+                          ? const Color(0xFF5145E5)
+                          : const Color(0xFF64748B),
+                      fontWeight: link == 'Investor Deck'
+                          ? FontWeight.w700
+                          : FontWeight.w400,
+                    ),
                   ),
                 ),
               ),
