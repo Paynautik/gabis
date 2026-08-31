@@ -193,9 +193,9 @@ class _AccountsScreenState extends ConsumerState<AccountsScreen> {
   Widget _buildDetailedAccountCard(BuildContext context, Account account, double fxRate) {
     final isNgn = account.currency == 'NGN';
     final flag = _getFlag(account.currency);
-    final accountName = isNgn ? 'Elumo Nigerian Naira Account' : 'Elumo Global USD Multi-Currency Account';
+    final accountName = isNgn ? 'gabis Nigerian Naira Account' : 'gabis Global USD Multi-Currency Account';
     final accountNumber = isNgn ? '9928371102' : '0294817492';
-    final bankName = isNgn ? 'Elumo Partner Bank (Providus)' : 'Evolve Bank & Trust / Elumo US';
+    final bankName = isNgn ? 'gabis Partner Bank (Providus)' : 'Evolve Bank & Trust / gabis US';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),

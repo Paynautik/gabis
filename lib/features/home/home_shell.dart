@@ -8,6 +8,7 @@ import '../cards/cards_screen.dart';
 import '../profile/profile_screen.dart';
 import 'home_screen.dart';
 import 'sidebar_screens.dart';
+import '../copilot/copilot_screen.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../shared/providers/app_providers.dart';
@@ -32,6 +33,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     BeneficiariesScreen(),
     SettingsScreen(),
     SupportScreen(),
+    CopilotScreen(),
   ];
 
   @override
@@ -61,20 +63,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                   // Logo
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Row(
-                      children: [
-                        const NautikLogoMark(size: 32),
-                        const SizedBox(width: 10),
-                        const Text(
-                          'Elumo',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ],
+                    child: const Align(
+                      alignment: Alignment.centerLeft,
+                      child: NautikLogoMark(size: 34, isWhite: true),
                     ),
                   ),
                   const SizedBox(height: 36),
@@ -84,6 +75,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                     child: ListView(
                       children: [
                         _buildSidebarItem(0, Icons.home_rounded, 'Dashboard'),
+                        _buildSidebarItem(9, Icons.auto_awesome_rounded, 'Copilot'),
                         _buildSidebarItem(1, Icons.wallet_rounded, 'Accounts'),
                         _buildSidebarItem(2, Icons.credit_card_rounded, 'Cards'),
                         _buildSidebarItem(4, Icons.receipt_long_rounded, 'Transactions'),

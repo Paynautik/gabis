@@ -88,7 +88,7 @@ class _FxScreenState extends ConsumerState<FxScreen> {
             ),
             const SizedBox(height: 24),
             _row('Exchange Rate', '1 USD = ₦${rate.toStringAsFixed(0)}'),
-            _row('Elumo Fee (0.2%)', '₦${fee.toStringAsFixed(2)}'),
+            _row('gabis Fee (0.2%)', '₦${fee.toStringAsFixed(2)}'),
             _row('Total Cost', '₦${amountWithFee.toStringAsFixed(2)}'),
             const Spacer(),
             ElevatedButton(

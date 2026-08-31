@@ -37,7 +37,7 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
       if (mounted && !_notificationShown) {
         InAppNotification.show(
           context,
-          title: 'New Contact on Elumo! 🎉',
+          title: 'New Contact on gabis! 🎉',
           message: 'Your friend Sarah Jenkins just joined. Send her a welcome gift!',
         );
         _notificationShown = true;
@@ -72,8 +72,8 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
       return c.name.toLowerCase().contains(_searchQuery) || c.phone.contains(_searchQuery);
     }).toList();
 
-    final onElumo = filteredContacts.where((c) => c.hasElumo).toList();
-    final notOnElumo = filteredContacts.where((c) => !c.hasElumo).toList();
+    final onGabis = filteredContacts.where((c) => c.hasGabis).toList();
+    final notOnGabis = filteredContacts.where((c) => !c.hasGabis).toList();
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -105,17 +105,17 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
           Expanded(
             child: ListView(
               children: [
-                if (onElumo.isNotEmpty) ...[
-                  Text('On Elumo', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: context.colors.inkSoft, letterSpacing: 0.5)),
+                if (onGabis.isNotEmpty) ...[
+                  Text('On gabis', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: context.colors.inkSoft, letterSpacing: 0.5)),
                   const SizedBox(height: 12),
-                  ...onElumo.map((c) => _buildContactTile(c)),
+                  ...onGabis.map((c) => _buildContactTile(c)),
                   const SizedBox(height: 24),
                 ],
                 
-                if (notOnElumo.isNotEmpty) ...[
-                  Text('Invite to Elumo', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: context.colors.inkSoft, letterSpacing: 0.5)),
+                if (notOnGabis.isNotEmpty) ...[
+                  Text('Invite to gabis', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: context.colors.inkSoft, letterSpacing: 0.5)),
                   const SizedBox(height: 12),
-                  ...notOnElumo.map((c) => _buildContactTile(c)),
+                  ...notOnGabis.map((c) => _buildContactTile(c)),
                 ],
               ],
             ),
@@ -128,7 +128,7 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
   Widget _buildContactTile(AppContact contact) {
     return GestureDetector(
       onTap: () {
-        if (contact.hasElumo) {
+        if (contact.hasGabis) {
           setState(() => _selectedContact = contact);
         } else {
           // Trigger invite logic mock
@@ -149,10 +149,10 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
           children: [
             CircleAvatar(
               radius: 22,
-              backgroundColor: contact.hasElumo ? context.colors.bluePrimary : context.colors.inkSoft.withValues(alpha: 0.2),
+              backgroundColor: contact.hasGabis ? context.colors.bluePrimary : context.colors.inkSoft.withValues(alpha: 0.2),
               child: Text(
                 contact.initials,
-                style: TextStyle(color: contact.hasElumo ? Colors.white : context.colors.ink, fontWeight: FontWeight.w800),
+                style: TextStyle(color: contact.hasGabis ? Colors.white : context.colors.ink, fontWeight: FontWeight.w800),
               ),
             ),
             const SizedBox(width: 16),
@@ -166,7 +166,7 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
                 ],
               ),
             ),
-            if (contact.hasElumo)
+            if (contact.hasGabis)
               Icon(Icons.arrow_forward_ios_rounded, size: 14, color: context.colors.inkSoft)
             else
               Container(

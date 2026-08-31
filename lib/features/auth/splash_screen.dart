@@ -27,17 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const NautikLogoMark(size: 80),
-              const SizedBox(height: 20),
-              const Text(
-                'Elumo',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -0.5,
-                ),
-              ),
+              const NautikLogoMark(size: 96, isWhite: true),
             ],
           ),
         ),

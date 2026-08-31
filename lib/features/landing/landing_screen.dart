@@ -1,19 +1,22 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'gabis_hero_section.dart';
+import 'landing_ui.dart';
+import '../../shared/widgets/gabis_phone_frame.dart';
 import '../../shared/widgets/nautik_logo.dart';
 
-// ─── Brand Colors (ElumoPay Official Palette) ─────────────────────────────────
-const Color kElumoGreen       = Color(0xFF00C16A); // Vibrant ElumoPay Green
-const Color kElumoBlue        = Color(0xFF2563EB); // Signature Cobalt Blue
-const Color kElumoAmber       = Color(0xFFF59E0B); // Warm Gold / Amber Accent
-const Color kElumoDeepGreen   = Color(0xFF006D44); // Deep Forest Green
-const Color kElumoDark        = Color(0xFF0B0F1A); // Slate Black / Dark
-const Color kElumoNavy        = Color(0xFF141B2C); // Soft Dark Charcoal
-const Color kElumoSurface     = Color(0xFFFFFFFF);
-const Color kElumoCanvas      = Color(0xFFF8FAFC); // Main page background
-const Color kElumoMuted       = Color(0xFF64748B); // Slate 500
-const Color kElumoBorder      = Color(0xFFE2E8F0); // Slate 200
+// ─── Brand Colors (gabis Official Palette) ─────────────────────────────────
+const Color kGabisGreen       = Color(0xFF00C16A); // Vibrant gabis Green
+const Color kGabisBlue        = Color(0xFF2563EB); // Signature Cobalt Blue
+const Color kGabisAmber       = Color(0xFFF59E0B); // Warm Gold / Amber Accent
+const Color kGabisDeepGreen   = Color(0xFF006D44); // Deep Forest Green
+const Color kGabisDark        = Color(0xFF0B0F1A); // Slate Black / Dark
+const Color kGabisNavy        = Color(0xFF141B2C); // Soft Dark Charcoal
+const Color kGabisSurface     = Color(0xFFFFFFFF);
+const Color kGabisCanvas      = Color(0xFFF8FAFC); // Main page background
+const Color kGabisMuted       = Color(0xFF64748B); // Slate 500
+const Color kGabisBorder      = Color(0xFFE2E8F0); // Slate 200
 
 // Pastel Card Backgrounds
 const Color kPastelMint       = Color(0xFFDCFCE7);
@@ -79,14 +82,7 @@ class _LandingScreenState extends State<LandingScreen> {
         controller: _scrollController,
         child: Column(
           children: [
-            GabisPayHero(
-              onScrollTo: _scrollTo,
-              showcaseKey: _showcaseKey,
-              useCasesKey: _useCasesKey,
-              cardsKey: _cardsKey,
-              comparisonKey: _comparisonKey,
-              faqKey: _faqKey,
-            ),
+            const GabisHeroSection(),
             _InteractiveFeatureSlideSection(key: _showcaseKey),
             _UseCasesSection(key: _useCasesKey),
             _ValueComparisonSection(key: _comparisonKey),
@@ -135,15 +131,19 @@ class _GabisPayHeroState extends State<GabisPayHero> {
 
   final List<Map<String, String>> slides = [
     {
-      'headline': 'Discover what your\nmoney\nis capable of',
+      'badge': 'Modern finance for everyone',
+      'headline': 'One account.\nEvery currency.\n',
+      'accent': 'Zero borders.',
       'body':
-          'One app, every opportunity to build your future. Send, receive, earn, and spend globally in just a few taps.',
+          'One app, every opportunity to build your future.\nSend, receive, earn, and spend globally in just a few taps.',
       'cta': 'Open your account',
     },
     {
-      'headline': 'New gabis app:\npowerfully simple',
+      'badge': 'Redesigned for you',
+      'headline': 'New gabis app:\n',
+      'accent': 'powerfully simple',
       'body':
-          'The gabis app has a new look. It\'s been redesigned to simplify and enhance your global multi-currency payments, evolving with you and the future of your finances.',
+          'The gabis app has a new look. It\'s been redesigned to simplify and\nenhance your global multi-currency payments.',
       'cta': 'Download the new app',
     },
   ];
@@ -176,13 +176,13 @@ class _GabisPayHeroState extends State<GabisPayHero> {
         return Container(
           width: double.infinity,
           decoration: const BoxDecoration(
-            color: Color(0xFFFAF9F6),
+            color: Color(0xFFFFFFFF),
             gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
               colors: [
                 Color(0xFFFFFFFF),
-                Color(0xFFF7F5F0),
+                Color(0xFFF4F2FE),
               ],
             ),
           ),
@@ -219,8 +219,8 @@ class _GabisPayHeroState extends State<GabisPayHero> {
                           ),
                         ],
                       )
-                    : SizedBox(
-                        height: 560,
+                    : ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: 560),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -451,6 +451,8 @@ class _NavDropdownItem extends StatelessWidget {
 // HERO SLIDE COPY
 // ============================================================
 
+const Color _kHeroIndigo = Color(0xFF5B4BE8);
+
 class _HeroSlideCopy extends StatelessWidget {
   final Map<String, String> slide;
   final bool isMobile;
@@ -466,69 +468,310 @@ class _HeroSlideCopy extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Large Bold Headline
+        // Eyebrow pill
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          decoration: BoxDecoration(
+            color: _kHeroIndigo.withValues(alpha: 0.09),
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.auto_awesome, size: 13, color: _kHeroIndigo),
+              const SizedBox(width: 7),
+              Text(
+                slide['badge'] ?? '',
+                style: const TextStyle(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w700,
+                  color: _kHeroIndigo,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(height: 22),
+
+        // Headline — trailing fragment in indigo
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 350),
-          child: Text(
-            slide['headline'] ?? '',
+          child: RichText(
             key: ValueKey(slide['headline']),
-            style: TextStyle(
-              fontSize: isMobile ? 40 : 58,
-              height: 1.08,
-              fontWeight: FontWeight.w800,
-              letterSpacing: -2.0,
-              color: const Color(0xFF0F172A),
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: isMobile ? 42 : 64,
+                height: 1.06,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -2.4,
+                color: const Color(0xFF0F172A),
+              ),
+              children: [
+                TextSpan(text: slide['headline'] ?? ''),
+                TextSpan(
+                  text: slide['accent'] ?? '',
+                  style: const TextStyle(color: _kHeroIndigo),
+                ),
+              ],
             ),
           ),
         ),
 
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
 
-        // Subtitle Description
+        // Sub-copy
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 350),
           child: Text(
             slide['body'] ?? '',
             key: ValueKey(slide['body']),
             style: const TextStyle(
-              fontSize: 17,
-              height: 1.55,
+              fontSize: 16.5,
+              height: 1.6,
               fontWeight: FontWeight.w400,
               color: Color(0xFF475569),
             ),
           ),
         ),
 
-        const SizedBox(height: 34),
+        const SizedBox(height: 28),
 
-        // Pill CTA Button
-        GestureDetector(
-          onTap: () => Navigator.pushNamed(context, '/login'),
-          child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 30,
-              vertical: 16,
-            ),
-            decoration: BoxDecoration(
-              color: const Color(0xFF4F46E5),
-              borderRadius: BorderRadius.circular(14),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF4F46E5).withValues(alpha: 0.30),
-                  blurRadius: 20,
-                  offset: const Offset(0, 8),
+        // Four capability items
+        const _HeroCapabilityRow(),
+
+        const SizedBox(height: 30),
+
+        // CTA + social proof
+        Wrap(
+          spacing: 26,
+          runSpacing: 18,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () => Navigator.pushNamed(context, '/login'),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 17),
+                decoration: BoxDecoration(
+                  color: _kHeroIndigo,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _kHeroIndigo.withValues(alpha: 0.32),
+                      blurRadius: 22,
+                      offset: const Offset(0, 9),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Text(
-              slide['cta'] ?? 'Open your account',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      slide['cta'] ?? 'Open your account',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    const Icon(Icons.arrow_forward_rounded, size: 17, color: Colors.white),
+                  ],
+                ),
               ),
             ),
+            const _HeroSocialProof(),
+          ],
+        ),
+
+        const SizedBox(height: 34),
+
+        // Trust stats bar
+        const _HeroStatsBar(),
+      ],
+    );
+  }
+}
+
+class _HeroCapabilityRow extends StatelessWidget {
+  const _HeroCapabilityRow();
+
+  static const _items = [
+    [Icons.swap_horiz_rounded, 'Send', 'Money globally'],
+    [Icons.south_rounded, 'Receive', 'Money instantly'],
+    [Icons.trending_up_rounded, 'Earn', 'Grow your money'],
+    [Icons.credit_card_rounded, 'Spend', 'Pay anywhere'],
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 0,
+      runSpacing: 14,
+      children: List.generate(_items.length, (i) {
+        final item = _items[i];
+        return IntrinsicHeight(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (i != 0) const SizedBox(width: 26),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: _kHeroIndigo.withValues(alpha: 0.09),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: Icon(item[0] as IconData, size: 16, color: _kHeroIndigo),
+              ),
+              const SizedBox(width: 9),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item[1] as String,
+                    style: const TextStyle(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF0F172A),
+                    ),
+                  ),
+                  Text(
+                    item[2] as String,
+                    style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+                  ),
+                ],
+              ),
+            ],
           ),
+        );
+      }),
+    );
+  }
+}
+
+class _HeroSocialProof extends StatelessWidget {
+  const _HeroSocialProof();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          width: 56,
+          height: 34,
+          child: Stack(
+            children: [
+              _avatar(0, const [Color(0xFF8B7CF6), Color(0xFF5B4BE8)], 'A'),
+              Positioned(left: 22, child: _avatar(0, const [Color(0xFFF59E0B), Color(0xFFEA580C)], 'K')),
+            ],
+          ),
+        ),
+        const SizedBox(width: 10),
+        const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Join 100,000+ people',
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: Color(0xFF0F172A)),
+            ),
+            Text(
+              'building their future with gabis',
+              style: TextStyle(fontSize: 11.5, color: Color(0xFF64748B)),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _avatar(double left, List<Color> colors, String initial) {
+    return Container(
+      width: 34,
+      height: 34,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(colors: colors),
+        border: Border.all(color: Colors.white, width: 2),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        initial,
+        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800),
+      ),
+    );
+  }
+}
+
+class _HeroStatsBar extends StatelessWidget {
+  const _HeroStatsBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFEEF0F6)),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0F172A).withValues(alpha: 0.05),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: IntrinsicHeight(
+        child: Wrap(
+          runSpacing: 14,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            _stat(Icons.people_alt_rounded, const Color(0xFF5B4BE8), '100K+', 'Happy users'),
+            _divider(),
+            _stat(Icons.public_rounded, const Color(0xFF0EA5E9), '180+', 'Countries supported'),
+            _divider(),
+            _stat(Icons.verified_user_rounded, const Color(0xFF5B4BE8), 'Secure', 'Your trust, our priority'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _divider() => Container(
+        width: 1,
+        height: 34,
+        margin: const EdgeInsets.symmetric(horizontal: 20),
+        color: const Color(0xFFEEF0F6),
+      );
+
+  Widget _stat(IconData icon, Color tint, String value, String label) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: tint.withValues(alpha: 0.10),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, size: 17, color: tint),
+        ),
+        const SizedBox(width: 10),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              value,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+            ),
+            Text(label, style: const TextStyle(fontSize: 11.5, color: Color(0xFF64748B))),
+          ],
         ),
       ],
     );
@@ -548,102 +791,331 @@ class _HeroLifestyleVisual extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: isMobile ? 360 : 520,
+    final h = isMobile ? 430.0 : 560.0;
+    return SizedBox(
+      height: h,
       width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 40,
-            offset: const Offset(0, 16),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            // Lifestyle Photography Image
-            Image.asset(
-              'assets/images/hero_bitso_holding_phone.jpg',
-              fit: BoxFit.cover,
-            ),
-
-            // Subtle Glassmorphism Live Notification Badge
-            Positioned(
-              bottom: 24,
-              left: 24,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.94),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.8),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 25,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF4F46E5),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.trending_up,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Total Balance',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                            color: Color(0xFF64748B),
-                          ),
-                        ),
-                        Text(
-                          '₦14,850,500.00',
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF0F172A),
-                          ),
-                        ),
-                      ],
-                    ),
+      child: Stack(
+        alignment: Alignment.center,
+        clipBehavior: Clip.none,
+        children: [
+          // Soft lilac wash behind the composition
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(0.15, 0.0),
+                  radius: 0.85,
+                  colors: [
+                    const Color(0xFFEDEAFE).withValues(alpha: 0.95),
+                    const Color(0xFFF7F5FF).withValues(alpha: 0.0),
                   ],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+
+          // Pedestal disc under the phone
+          Positioned(
+            bottom: h * 0.14,
+            child: Container(
+              width: isMobile ? 210 : 280,
+              height: isMobile ? 34 : 44,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(200),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF5B4BE8).withValues(alpha: 0.13),
+                    blurRadius: 30,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Visa card, tilted behind the phone
+          Positioned(
+            right: isMobile ? 4 : 18,
+            top: h * 0.30,
+            child: Transform.rotate(
+              angle: -0.16,
+              child: _HeroVisaCard(width: isMobile ? 150 : 200),
+            ),
+          ),
+
+          // Paper plane
+          Positioned(
+            left: isMobile ? 6 : 18,
+            top: h * 0.22,
+            child: Transform.rotate(
+              angle: -0.35,
+              child: Icon(
+                Icons.send_rounded,
+                size: isMobile ? 34 : 46,
+                color: const Color(0xFF8B7CF6),
+              ),
+            ),
+          ),
+
+          // The phone
+          Align(
+            alignment: const Alignment(-0.05, -0.08),
+            child: Transform.rotate(
+              angle: -0.035,
+              child: _HeroPhone(height: isMobile ? 330 : 430),
+            ),
+          ),
+
+          // "Your money is safe" tooltip
+          Positioned(
+            right: isMobile ? 0 : 6,
+            bottom: h * 0.13,
+            child: Container(
+              width: isMobile ? 190 : 226,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF0F172A).withValues(alpha: 0.10),
+                    blurRadius: 26,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 26,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF5B4BE8).withValues(alpha: 0.10),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.verified_user_rounded,
+                        size: 14, color: Color(0xFF5B4BE8)),
+                  ),
+                  const SizedBox(width: 10),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Your money is safe',
+                            style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF0F172A))),
+                        SizedBox(height: 3),
+                        Text('Bank-level security to protect what matters most.',
+                            style: TextStyle(
+                                fontSize: 10.5,
+                                height: 1.35,
+                                color: Color(0xFF64748B))),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Container(
+                    width: 22,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF1F5F9),
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    child: const Icon(Icons.lock_rounded,
+                        size: 11, color: Color(0xFF64748B)),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-// ============================================================
-// CAROUSEL CONTROLS
-// ============================================================
+class _HeroVisaCard extends StatelessWidget {
+  final double width;
+  const _HeroVisaCard({required this.width});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: width * 0.63,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF9E8BF5), Color(0xFF7C63EE)],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF5B4BE8).withValues(alpha: 0.30),
+            blurRadius: 26,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('gabis',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.4)),
+          const SizedBox(height: 8),
+          Container(
+            width: 26,
+            height: 19,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5C86B),
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const Spacer(),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text('••••  ••••  ••••  5678',
+                  style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.92),
+                      fontSize: 9.5,
+                      letterSpacing: 0.4,
+                      fontWeight: FontWeight.w600)),
+              const Spacer(),
+              const Text('VISA',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.5)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HeroPhone extends StatelessWidget {
+  final double height;
+  const _HeroPhone({required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    return GabisPhoneFrame(
+      width: height * 0.53,
+      height: height,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Center(
+              child: Text('Total Balance',
+                  style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF64748B))),
+            ),
+            const SizedBox(height: 3),
+            const Center(
+              child: Text('\u20A614,850.50',
+                  style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.8,
+                      color: Color(0xFF0F172A))),
+            ),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                _action(Icons.arrow_upward_rounded, 'Send'),
+                const SizedBox(width: 7),
+                _action(Icons.arrow_downward_rounded, 'Receive'),
+                const SizedBox(width: 7),
+                _action(Icons.swap_horiz_rounded, 'Transfer'),
+              ],
+            ),
+            const SizedBox(height: 16),
+            const Text('Recent Activity',
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0F172A))),
+            const SizedBox(height: 9),
+            _activity(const Color(0xFFEEF2FF), Icons.phone_iphone_rounded,
+                const Color(0xFF6366F1), 'MTN Top-up', '-\u20A62,000.00',
+                const Color(0xFF0F172A)),
+            const SizedBox(height: 8),
+            _activity(const Color(0xFFECFDF5), Icons.south_west_rounded,
+                const Color(0xFF10B981), 'Funds Received', '+\u20A65,000.00',
+                const Color(0xFF10B981)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _action(IconData icon, String label) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 9),
+        decoration: BoxDecoration(
+          color: const Color(0xFF6D5AE6),
+          borderRadius: BorderRadius.circular(11),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 13, color: Colors.white),
+            const SizedBox(height: 3),
+            Text(label,
+                style: const TextStyle(
+                    fontSize: 8, color: Colors.white, fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _activity(Color chipBg, IconData icon, Color tint, String label,
+      String amount, Color amountColor) {
+    return Row(
+      children: [
+        Container(
+          width: 21,
+          height: 21,
+          decoration:
+              BoxDecoration(color: chipBg, borderRadius: BorderRadius.circular(7)),
+          child: Icon(icon, size: 11, color: tint),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(label,
+              style: const TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xFF334155))),
+        ),
+        Text(amount,
+            style: TextStyle(
+                fontSize: 9.5, fontWeight: FontWeight.w800, color: amountColor)),
+      ],
+    );
+  }
+}
 
 class _CarouselControls extends StatelessWidget {
   final int currentIndex;
@@ -772,7 +1244,7 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
         'Real-time automated conversion ledgers',
       ],
       ctaText: 'Open a Multi-Currency Account →',
-      accentColor: kElumoGreen,
+      accentColor: kGabisGreen,
       bgGradientStart: Color(0xFFDCFCE7),
       mockupType: _MockupType.walletBalances,
     ),
@@ -787,7 +1259,7 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
         'Instant withdrawal directly to local African currency accounts',
       ],
       ctaText: 'Get Your US Account →',
-      accentColor: kElumoBlue,
+      accentColor: kGabisBlue,
       bgGradientStart: Color(0xFFDBEAFE),
       mockupType: _MockupType.usdAccount,
     ),
@@ -802,7 +1274,7 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
         'Instant automated receipts and real-time reconciliation',
       ],
       ctaText: 'Explore Smart Invoicing →',
-      accentColor: kElumoAmber,
+      accentColor: kGabisAmber,
       bgGradientStart: Color(0xFFFEF3C7),
       mockupType: _MockupType.smartInvoices,
     ),
@@ -832,7 +1304,7 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
         'One-click instant payment link sent directly to customer WhatsApp',
       ],
       ctaText: 'Learn About AI Debt Recovery →',
-      accentColor: kElumoDeepGreen,
+      accentColor: kGabisDeepGreen,
       bgGradientStart: Color(0xFFD1FAE5),
       mockupType: _MockupType.aiVoiceCall,
     ),
@@ -847,7 +1319,7 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
         'Zero paperwork for cross-border African commerce',
       ],
       ctaText: 'View Settlement Infrastructure →',
-      accentColor: kElumoBlue,
+      accentColor: kGabisBlue,
       bgGradientStart: Color(0xFFEDE9FE),
       mockupType: _MockupType.crossBorderFeed,
     ),
@@ -862,7 +1334,7 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
         'Instant cable TV renewals (DStv, GOtv, StarTimes) & fiber internet',
       ],
       ctaText: 'Explore Bill Payments →',
-      accentColor: kElumoAmber,
+      accentColor: kGabisAmber,
       bgGradientStart: Color(0xFFFEF3C7),
       mockupType: _MockupType.billPayments,
     ),
@@ -899,21 +1371,10 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
 
     return Container(
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
-          colors: [
-            currentSlide.bgGradientStart.withOpacity(0.45),
-            currentSlide.bgGradientStart.withOpacity(0.12),
-            Colors.white,
-          ],
-          stops: const [0.0, 0.45, 1.0],
-        ),
-      ),
+      decoration: const BoxDecoration(color: LandingUi.canvas),
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 80 : 24,
-        vertical: isDesktop ? 80 : 40,
+        vertical: isDesktop ? 72 : 40,
       ),
       child: Center(
         child: ConstrainedBox(
@@ -921,102 +1382,77 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
           child: Column(
             children: [
               // Section Header
-              const Text(
-                'Explore the Platform',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.5,
-                  color: kElumoGreen,
-                ),
+              SectionHeading(
+                eyebrow: 'EXPLORE THE PLATFORM',
+                title: 'Everything you need to move money',
+                circled: 'globally',
+                titleSize: isDesktop ? 36 : 26,
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Everything You Need to Move Money Globally',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: isDesktop ? 36 : 26,
-                  fontWeight: FontWeight.w800,
-                  color: kElumoDark,
-                  letterSpacing: -1.0,
-                ),
-              ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 34),
 
-              // Interactive Slide Selector Tabs
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(_slides.length, (index) {
-                    final item = _slides[index];
-                    final isSelected = index == _selectedIndex;
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4),
-                      child: MouseRegion(
+              // Minimal underline tabs
+              SizedBox(
+                height: 44,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(_slides.length, (index) {
+                      final item = _slides[index];
+                      final isSelected = index == _selectedIndex;
+                      return MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: GestureDetector(
                           onTap: () {
                             setState(() => _selectedIndex = index);
-                            _startAutoSlide(); // Reset timer on user click
+                            _startAutoSlide();
                           },
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 200),
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            margin: const EdgeInsets.symmetric(horizontal: 14),
+                            padding: const EdgeInsets.only(bottom: 10),
                             decoration: BoxDecoration(
-                              color: isSelected ? kElumoDark : Colors.white.withOpacity(0.8),
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: isSelected ? kElumoDark : const Color(0xFFE2E8F0),
-                                width: 1.5,
+                              border: Border(
+                                bottom: BorderSide(
+                                  color: isSelected ? kGabisDark : Colors.transparent,
+                                  width: 2,
+                                ),
                               ),
-                              boxShadow: isSelected
-                                  ? [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.12),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 4),
-                                      ),
-                                    ]
-                                  : [],
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: isSelected ? item.accentColor : const Color(0xFF94A3B8),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  item.tag,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                                    color: isSelected ? Colors.white : const Color(0xFF475569),
-                                  ),
-                                ),
-                              ],
+                            child: Text(
+                              item.tag,
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                                color: isSelected
+                                    ? kGabisDark
+                                    : const Color(0xFF94A3B8),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }),
+                      );
+                    }),
+                  ),
                 ),
               ),
-              const SizedBox(height: 48),
 
-              // Slide Body (Left Copy + Right Immersive Photo Mockup Showcase)
+              SizedBox(height: isDesktop ? 56 : 36),
+
+              // Slide body
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 400),
                 transitionBuilder: (child, animation) {
-                  return FadeTransition(opacity: animation, child: child);
+                  return FadeTransition(
+                    opacity: animation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.03),
+                        end: Offset.zero,
+                      ).animate(animation),
+                      child: child,
+                    ),
+                  );
                 },
                 child: isDesktop
                     ? Row(
@@ -1025,55 +1461,14 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
                         children: [
                           Expanded(
                             flex: 6,
-                            child: _buildSlideCopy(currentSlide),
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 40),
+                              child: _buildSlideCopy(currentSlide),
+                            ),
                           ),
-                          const SizedBox(width: 50),
                           Expanded(
                             flex: 5,
-                            child: Center(
-                              child: Container(
-                                width: double.infinity,
-                                height: 600,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(32),
-                                  border: Border.all(color: const Color(0xFFF1F5F9)),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.04),
-                                      blurRadius: 32,
-                                      offset: const Offset(0, 16),
-                                    ),
-                                    BoxShadow(
-                                      color: currentSlide.accentColor.withValues(alpha: 0.06),
-                                      blurRadius: 40,
-                                      offset: const Offset(0, 20),
-                                    ),
-                                  ],
-                                ),
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    // Soft ambient studio glow in background
-                                    Positioned(
-                                      top: 40,
-                                      child: Container(
-                                        width: 280,
-                                        height: 280,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: currentSlide.accentColor.withValues(alpha: 0.10),
-                                        ),
-                                      ),
-                                    ),
-                                    // High-Definition Standing Phone Mockup
-                                    Center(
-                                      child: _SingleHeroPhone(type: currentSlide.mockupType),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
+                            child: _buildSlideVisual(currentSlide, 1.0),
                           ),
                         ],
                       )
@@ -1081,53 +1476,106 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
                         key: ValueKey<int>(_selectedIndex),
                         children: [
                           _buildSlideCopy(currentSlide),
-                          const SizedBox(height: 36),
-                          Center(
-                            child: Container(
-                              width: double.infinity,
-                              height: 540,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(28),
-                                border: Border.all(color: const Color(0xFFF1F5F9)),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.04),
-                                    blurRadius: 24,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Positioned(
-                                    top: 30,
-                                    child: Container(
-                                      width: 220,
-                                      height: 220,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: currentSlide.accentColor.withValues(alpha: 0.08),
-                                      ),
-                                    ),
-                                  ),
-                                  Center(
-                                    child: Transform.scale(
-                                      scale: 0.88,
-                                      child: _SingleHeroPhone(type: currentSlide.mockupType),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
+                          const SizedBox(height: 40),
+                          _buildSlideVisual(currentSlide, 0.88),
                         ],
                       ),
+              ),
+
+              SizedBox(height: isDesktop ? 48 : 32),
+
+              // Slide progress bars + arrows
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _slideArrow(Icons.arrow_back_rounded, () {
+                    setState(() {
+                      _selectedIndex =
+                          (_selectedIndex - 1 + _slides.length) % _slides.length;
+                    });
+                    _startAutoSlide();
+                  }),
+                  const SizedBox(width: 20),
+                  ...List.generate(_slides.length, (i) {
+                    final isSelected = i == _selectedIndex;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() => _selectedIndex = i);
+                        _startAutoSlide();
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                        width: isSelected ? 26 : 8,
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: isSelected ? kGabisDark : const Color(0xFFD8DEE7),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    );
+                  }),
+                  const SizedBox(width: 20),
+                  _slideArrow(Icons.arrow_forward_rounded, () {
+                    setState(() {
+                      _selectedIndex = (_selectedIndex + 1) % _slides.length;
+                    });
+                    _startAutoSlide();
+                  }),
+                ],
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _slideArrow(IconData icon, VoidCallback onTap) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: const Color(0xFFE2E8F0)),
+          ),
+          child: Icon(icon, size: 15, color: const Color(0xFF64748B)),
+        ),
+      ),
+    );
+  }
+
+  /// Free-floating phone on a soft ambient wash — no card, no border.
+  Widget _buildSlideVisual(_FeatureSlideItem slide, double scale) {
+    return SizedBox(
+      height: 600,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 360,
+            height: 360,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  slide.accentColor.withValues(alpha: 0.16),
+                  slide.accentColor.withValues(alpha: 0.0),
+                ],
+              ),
+            ),
+          ),
+          Center(
+            child: Transform.scale(
+              scale: scale,
+              child: _SingleHeroPhone(type: slide.mockupType),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1137,66 +1585,65 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-          decoration: BoxDecoration(
-            color: slide.accentColor.withOpacity(0.12),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: slide.accentColor.withOpacity(0.3)),
-          ),
-          child: Text(
-            slide.tag,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: slide.accentColor,
-            ),
+        // Eyebrow — plain uppercase label, no pill
+        Text(
+          slide.tag.toUpperCase(),
+          style: TextStyle(
+            fontSize: 11.5,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.6,
+            color: slide.accentColor,
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
+
         Text.rich(
           TextSpan(
             children: [
               TextSpan(text: '${slide.title}\n'),
               TextSpan(
                 text: slide.subtitle,
-                style: TextStyle(color: slide.accentColor),
+                style: const TextStyle(color: Color(0xFF64748B)),
               ),
             ],
           ),
           style: const TextStyle(
-            fontSize: 40,
+            fontSize: 44,
             fontWeight: FontWeight.w800,
-            color: kElumoDark,
-            letterSpacing: -1.2,
-            height: 1.15,
+            color: kGabisDark,
+            letterSpacing: -1.8,
+            height: 1.1,
           ),
         ),
-        const SizedBox(height: 16),
-        Text(
-          slide.description,
-          style: const TextStyle(
-            fontSize: 16,
-            color: Color(0xFF4B5563),
-            height: 1.6,
+        const SizedBox(height: 18),
+
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 470),
+          child: Text(
+            slide.description,
+            style: const TextStyle(
+              fontSize: 16.5,
+              color: Color(0xFF5B6675),
+              height: 1.6,
+            ),
           ),
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: 26),
+
+        // Understated supporting points — thin rule, no chips
         ...slide.bulletPoints.map((point) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: 11),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    margin: const EdgeInsets.only(top: 3),
-                    width: 18,
-                    height: 18,
+                    margin: const EdgeInsets.only(top: 8),
+                    width: 5,
+                    height: 5,
                     decoration: BoxDecoration(
-                      color: slide.accentColor.withOpacity(0.15),
                       shape: BoxShape.circle,
+                      color: slide.accentColor,
                     ),
-                    alignment: Alignment.center,
-                    child: Icon(Icons.check_rounded, size: 12, color: slide.accentColor),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -1204,32 +1651,43 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
                       point,
                       style: const TextStyle(
                         fontSize: 14.5,
-                        color: Color(0xFF334155),
-                        fontWeight: FontWeight.w500,
-                        height: 1.4,
+                        color: Color(0xFF475569),
+                        height: 1.5,
                       ),
                     ),
                   ),
                 ],
               ),
             )),
-        const SizedBox(height: 24),
+        const SizedBox(height: 30),
+
+        // Solid CTA — one clear action per slide
         MouseRegion(
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
             onTap: () => Navigator.pushNamed(context, '/login'),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  slide.ctaText,
-                  style: TextStyle(
-                    color: slide.accentColor,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 16,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 16),
+              decoration: BoxDecoration(
+                color: kGabisDark,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    slide.ctaText.replaceAll(' →', ''),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: 10),
+                  const Icon(Icons.arrow_forward_rounded,
+                      size: 16, color: Colors.white),
+                ],
+              ),
             ),
           ),
         ),
@@ -1239,7 +1697,7 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
 }
 
 // ============================================================================
-// 4. USE CASES SECTION ("Made for Hustlers, Movers & Shakers")
+// 4. USE CASES SECTION ("One account, every stage of the journey")
 // ============================================================================
 class _UseCasesSection extends StatelessWidget {
   const _UseCasesSection({super.key});
@@ -1259,39 +1717,13 @@ class _UseCasesSection extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 1240),
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: kElumoGreen.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: kElumoGreen.withOpacity(0.25)),
-              ),
-              child: const Text(
-                'Built for Africa\'s Builders',
-                style: TextStyle(
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                  color: kElumoGreen,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Made for Hustlers, Movers & Shakers',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 38,
-                fontWeight: FontWeight.w800,
-                color: kElumoDark,
-                letterSpacing: -1.2,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'From ambitious students and tech freelancers to borderless merchants and scaling institutions.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Color(0xFF64748B), fontSize: 16),
+            const SectionHeading(
+              eyebrow: 'WHO GABIS IS FOR',
+              title: 'One account, every stage of the',
+              circled: 'journey',
+              subtitle:
+                  'Whether you are paying school fees, invoicing clients abroad, or running payroll across borders — gabis handles it in one place.',
+              titleSize: 38,
             ),
             const SizedBox(height: 52),
 
@@ -1308,7 +1740,7 @@ class _UseCasesSection extends StatelessWidget {
                               title: 'Tuition & Smart Installments',
                               description: 'Flexible 2-to-6 part installment plans with automated 10-day SMS reminders and instant receipts.',
                               statBadge: '99.4% Inflow Rate',
-                              accentColor: kElumoGreen,
+                              accentColor: kGabisGreen,
                               ctaText: 'Explore School Invoicing',
                             ),
                           ),
@@ -1320,7 +1752,7 @@ class _UseCasesSection extends StatelessWidget {
                               title: 'Direct Global Client Payouts',
                               description: 'Receive USD, GBP, and EUR from Upwork, Stripe, and Deel with dedicated US checking and routing details.',
                               statBadge: '0.3% Mid-Market FX',
-                              accentColor: kElumoBlue,
+                              accentColor: kGabisBlue,
                               ctaText: 'Get US Bank Account',
                             ),
                           ),
@@ -1336,7 +1768,7 @@ class _UseCasesSection extends StatelessWidget {
                               title: 'Cross-Border Settlement & Cards',
                               description: 'Pay suppliers across China, US, Kenya, and Ghana with zero-decline multi-currency virtual cards.',
                               statBadge: '< 0.1% Declines',
-                              accentColor: kElumoAmber,
+                              accentColor: kGabisAmber,
                               ctaText: 'Start Cross-Border Trading',
                             ),
                           ),
@@ -1364,7 +1796,7 @@ class _UseCasesSection extends StatelessWidget {
                         title: 'Tuition & Smart Installments',
                         description: 'Flexible 2-to-6 part installment plans with automated 10-day SMS reminders and instant receipts.',
                         statBadge: '99.4% Inflow Rate',
-                        accentColor: kElumoGreen,
+                        accentColor: kGabisGreen,
                         ctaText: 'Explore School Invoicing',
                       ),
                       SizedBox(height: 20),
@@ -1374,7 +1806,7 @@ class _UseCasesSection extends StatelessWidget {
                         title: 'Direct Global Client Payouts',
                         description: 'Receive USD, GBP, and EUR from Upwork, Stripe, and Deel with dedicated US checking and routing details.',
                         statBadge: '0.3% Mid-Market FX',
-                        accentColor: kElumoBlue,
+                        accentColor: kGabisBlue,
                         ctaText: 'Get US Bank Account',
                       ),
                       SizedBox(height: 20),
@@ -1384,7 +1816,7 @@ class _UseCasesSection extends StatelessWidget {
                         title: 'Cross-Border Settlement & Cards',
                         description: 'Pay suppliers across China, US, Kenya, and Ghana with zero-decline multi-currency virtual cards.',
                         statBadge: '< 0.1% Declines',
-                        accentColor: kElumoAmber,
+                        accentColor: kGabisAmber,
                         ctaText: 'Start Cross-Border Trading',
                       ),
                       SizedBox(height: 20),
@@ -1473,7 +1905,7 @@ class _PhotoUseCaseCardState extends State<_PhotoUseCaseCard> {
                     widget.imagePath,
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) => Container(
-                      color: kElumoDark,
+                      color: kGabisDark,
                       child: Center(
                         child: Icon(Icons.person_rounded, size: 60, color: widget.accentColor.withOpacity(0.4)),
                       ),
@@ -1598,7 +2030,7 @@ class _PhotoUseCaseCardState extends State<_PhotoUseCaseCard> {
 }
 
 // ============================================================================
-// 5. VALUE COMPARISON SECTION ("Why Choose ElumoPay")
+// 5. VALUE COMPARISON SECTION ("Why Choose gabis")
 // ============================================================================
 class _ValueComparisonSection extends StatelessWidget {
   const _ValueComparisonSection({super.key});
@@ -1624,7 +2056,7 @@ class _ValueComparisonSection extends StatelessWidget {
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.5,
-                color: kElumoGreen,
+                color: kGabisGreen,
               ),
             ),
             const SizedBox(height: 8),
@@ -1634,7 +2066,7 @@ class _ValueComparisonSection extends StatelessWidget {
               style: TextStyle(
                 fontSize: 34,
                 fontWeight: FontWeight.w800,
-                color: kElumoDark,
+                color: kGabisDark,
                 letterSpacing: -1.0,
               ),
             ),
@@ -1660,12 +2092,12 @@ class _ValueComparisonSection extends StatelessWidget {
                   children: [
                     // Table Header
                     Container(
-                      color: kElumoDark,
+                      color: kGabisDark,
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                       child: Row(
                         children: const [
                           Expanded(flex: 4, child: Text('Features & Capabilities', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))),
-                          Expanded(flex: 3, child: Text('gabism', style: TextStyle(color: kElumoGreen, fontWeight: FontWeight.w800, fontSize: 14))),
+                          Expanded(flex: 3, child: Text('gabism', style: TextStyle(color: kGabisGreen, fontWeight: FontWeight.w800, fontSize: 14))),
                           Expanded(flex: 3, child: Text('Traditional Banks', style: TextStyle(color: Color(0xFFA1A1AA), fontWeight: FontWeight.w600, fontSize: 13))),
                         ],
                       ),
@@ -1685,7 +2117,7 @@ class _ValueComparisonSection extends StatelessWidget {
     );
   }
 
-  Widget _comparisonRow(String feature, String elumoVal, String traditionalVal, bool isEven) {
+  Widget _comparisonRow(String feature, String gabisVal, String traditionalVal, bool isEven) {
     return Container(
       color: isEven ? const Color(0xFFF8FAFC) : Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -1693,16 +2125,16 @@ class _ValueComparisonSection extends StatelessWidget {
         children: [
           Expanded(
             flex: 4,
-            child: Text(feature, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5, color: kElumoDark)),
+            child: Text(feature, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5, color: kGabisDark)),
           ),
           Expanded(
             flex: 3,
             child: Row(
               children: [
-                const Icon(Icons.check_circle_rounded, color: kElumoGreen, size: 16),
+                const Icon(Icons.check_circle_rounded, color: kGabisGreen, size: 16),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: Text(elumoVal, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kElumoGreen)),
+                  child: Text(gabisVal, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: kGabisGreen)),
                 ),
               ],
             ),
@@ -2287,7 +2719,7 @@ class _SecurityComplianceSection extends StatelessWidget {
       color: const Color(0xFF05070A),
       padding: EdgeInsets.symmetric(
         horizontal: isDesktop ? 48 : 20,
-        vertical: isDesktop ? 68 : 44,
+        vertical: isDesktop ? 44 : 30,
       ),
       child: Stack(
         clipBehavior: Clip.none,
@@ -2344,7 +2776,7 @@ class _SecurityComplianceSection extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 14),
 
                   // Heading
                   ConstrainedBox(
@@ -2352,9 +2784,9 @@ class _SecurityComplianceSection extends StatelessWidget {
                     child: RichText(
                       text: TextSpan(
                         style: TextStyle(
-                          fontSize: isDesktop ? 42 : 28,
+                          fontSize: isDesktop ? 34 : 25,
                           fontWeight: FontWeight.w700,
-                          height: 1.05,
+                          height: 1.08,
                           letterSpacing: -1.5,
                           color: Colors.white,
                           fontFamily: 'Arial',
@@ -2373,7 +2805,7 @@ class _SecurityComplianceSection extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
 
                   // Subtitle
                   ConstrainedBox(
@@ -2381,15 +2813,15 @@ class _SecurityComplianceSection extends StatelessWidget {
                     child: const Text(
                       'Trust is our currency. We are committed to institutional security, pan-African compliance, and always-on support for businesses across Africa.',
                       style: TextStyle(
-                        fontSize: 15,
-                        height: 1.5,
+                        fontSize: 14,
+                        height: 1.45,
                         fontWeight: FontWeight.w400,
                         color: Color(0xFFA1A1AA),
                       ),
                     ),
                   ),
 
-                  const SizedBox(height: 38),
+                  const SizedBox(height: 24),
 
                   // Cards Grid
                   isDesktop
@@ -2413,7 +2845,7 @@ class _SecurityComplianceSection extends StatelessWidget {
                           }).toList(),
                         ),
 
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 24),
 
                   // Bottom Trust Bar
                   Container(
@@ -2496,7 +2928,7 @@ class _InteractiveSecurityCardState extends State<_InteractiveSecurityCard> {
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.all(22),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: _isHovered
               ? Colors.white.withValues(alpha: 0.04)
@@ -2526,38 +2958,38 @@ class _InteractiveSecurityCardState extends State<_InteractiveSecurityCard> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
 
             // Title
             Text(
               f['title'] as String,
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.3,
                 color: Colors.white,
               ),
             ),
 
-            const SizedBox(height: 10),
+            const SizedBox(height: 7),
 
             // Description
             Text(
               f['description'] as String,
               style: const TextStyle(
-                fontSize: 13.5,
-                height: 1.5,
+                fontSize: 12.5,
+                height: 1.45,
                 color: Color(0xFFA1A1AA),
               ),
             ),
 
-            const SizedBox(height: 22),
+            const SizedBox(height: 14),
 
             // Arrow Button
             AnimatedContainer(
               duration: const Duration(milliseconds: 250),
-              width: 34,
-              height: 34,
+              width: 30,
+              height: 30,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
@@ -2632,27 +3064,13 @@ class _FaqSectionState extends State<_FaqSection> {
         constraints: const BoxConstraints(maxWidth: 900),
         child: Column(
           children: [
-            const Text(
-              'Frequently Asked Questions',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.5,
-                color: kElumoGreen,
-              ),
+            const SectionHeading(
+              eyebrow: 'FREQUENTLY ASKED QUESTIONS',
+              title: 'Got questions? We have',
+              circled: 'answers',
+              titleSize: 34,
             ),
-            const SizedBox(height: 8),
-            const Text(
-              'Got Questions? We\'ve Got Answers.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 34,
-                fontWeight: FontWeight.w800,
-                color: kElumoDark,
-                letterSpacing: -1.0,
-              ),
-            ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 44),
 
             ...List.generate(_faqs.length, (i) {
               final isExpanded = _expandedIndex == i;
@@ -2661,14 +3079,25 @@ class _FaqSectionState extends State<_FaqSection> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 14),
                 decoration: BoxDecoration(
-                  color: isExpanded ? const Color(0xFFF0FDF4) : const Color(0xFFF8FAFC),
-                  borderRadius: BorderRadius.circular(16),
+                  color: isExpanded ? Colors.white : const Color(0xFFFAFBFC),
+                  borderRadius: BorderRadius.circular(18),
                   border: Border.all(
-                    color: isExpanded ? kElumoGreen.withOpacity(0.4) : const Color(0xFFE2E8F0),
+                    color: isExpanded
+                        ? LandingUi.accent.withValues(alpha: 0.30)
+                        : LandingUi.border,
                   ),
+                  boxShadow: isExpanded
+                      ? [
+                          BoxShadow(
+                            color: LandingUi.ink.withValues(alpha: 0.05),
+                            blurRadius: 22,
+                            offset: const Offset(0, 8),
+                          ),
+                        ]
+                      : null,
                 ),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(18),
                   onTap: () {
                     setState(() {
                       _expandedIndex = isExpanded ? null : i;
@@ -2688,14 +3117,16 @@ class _FaqSectionState extends State<_FaqSection> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 15,
-                                  color: isExpanded ? kElumoDeepGreen : kElumoDark,
+                                  color: isExpanded ? LandingUi.accent : kGabisDark,
                                 ),
                               ),
                             ),
                             Icon(
                               isExpanded ? Icons.remove_circle_outline_rounded : Icons.add_circle_outline_rounded,
-                              color: isExpanded ? kElumoGreen : const Color(0xFF64748B),
-                              size: 20,
+                              color: isExpanded
+                                  ? LandingUi.accent
+                                  : const Color(0xFF94A3B8),
+                              size: 21,
                             ),
                           ],
                         ),
@@ -2861,8 +3292,10 @@ class _TestimonialsSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        const GabisLogo(size: 54),
+        const SizedBox(height: 12),
         const Text(
-          'gabis: where Africa\nmoves money',
+          'where Africa\nmoves money',
           style: TextStyle(
             fontSize: 42,
             height: 1.08,
@@ -2972,19 +3405,9 @@ class _ReviewCard extends StatelessWidget {
           // Store Badge
           Row(
             children: [
-              Container(
-                width: 18,
-                height: 18,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF059669),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check,
-                  size: 12,
-                  color: Colors.white,
-                ),
-              ),
+              review['icon'] == 'apple'
+                  ? const _AppleLogoWidget(size: 16, color: Color(0xFF0F172A))
+                  : const _GooglePlayLogoWidget(size: 16),
               const SizedBox(width: 8),
               Text(
                 review['store']!,
@@ -3100,7 +3523,7 @@ class _DownloadCtaSection extends StatelessWidget {
                         ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 480),
                           child: const Text(
-                            'Discover what your money is capable of: send, receive, earn, and move money globally in minutes.',
+                            'One account, every currency, zero borders: send, receive, earn, and move money globally in minutes.',
                             style: TextStyle(
                               color: Color(0xFFE2E8F0),
                               fontSize: 15,
@@ -3548,7 +3971,7 @@ class _FooterSection extends StatelessWidget {
                                 const GabisLogo(size: 32, isWhite: true),
                                 const SizedBox(height: 18),
                                 const Text(
-                                  'Discover what your money is capable of.',
+                                  'One account. Every currency. Zero borders.',
                                   style: TextStyle(
                                     color: Color(0xFF94A3B8),
                                     fontSize: 14,
@@ -3558,9 +3981,9 @@ class _FooterSection extends StatelessWidget {
                                 const SizedBox(height: 24),
                                 Row(
                                   children: [
-                                    _storeMiniIcon('🍏 App Store', () => Navigator.pushNamed(context, '/login')),
+                                    _storeMiniIcon(const _AppleLogoWidget(size: 14, color: Colors.white), 'App Store', () => Navigator.pushNamed(context, '/login')),
                                     const SizedBox(width: 10),
-                                    _storeMiniIcon('▶ Google Play', () => Navigator.pushNamed(context, '/login')),
+                                    _storeMiniIcon(const _GooglePlayLogoWidget(size: 14), 'Google Play', () => Navigator.pushNamed(context, '/login')),
                                   ],
                                 ),
                               ],
@@ -3625,15 +4048,15 @@ class _FooterSection extends StatelessWidget {
                           const GabisLogo(size: 30, isWhite: true),
                           const SizedBox(height: 12),
                           const Text(
-                            'Discover what your money is capable of.',
+                            'One account. Every currency. Zero borders.',
                             style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13.5),
                           ),
                           const SizedBox(height: 20),
                           Row(
                             children: [
-                              _storeMiniIcon('🍏 App Store', () => Navigator.pushNamed(context, '/login')),
+                              _storeMiniIcon(const _AppleLogoWidget(size: 14, color: Colors.white), 'App Store', () => Navigator.pushNamed(context, '/login')),
                               const SizedBox(width: 10),
-                              _storeMiniIcon('▶ Google Play', () => Navigator.pushNamed(context, '/login')),
+                              _storeMiniIcon(const _GooglePlayLogoWidget(size: 14), 'Google Play', () => Navigator.pushNamed(context, '/login')),
                             ],
                           ),
                           const SizedBox(height: 36),
@@ -3700,7 +4123,7 @@ class _FooterSection extends StatelessWidget {
     );
   }
 
-  static Widget _storeMiniIcon(String label, VoidCallback onTap) {
+  static Widget _storeMiniIcon(Widget logo, String label, VoidCallback onTap) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -3712,13 +4135,20 @@ class _FooterSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
           ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 11.5,
-              fontWeight: FontWeight.w600,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              logo,
+              const SizedBox(width: 7),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -3780,168 +4210,10 @@ class _SingleHeroPhone extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double w = 295;
-    const double h = 570;
-
-    return Container(
-      width: w,
-      height: h,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(48),
-        border: Border.all(color: const Color(0xFF1E293B), width: 5.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.35),
-            blurRadius: 36,
-            spreadRadius: 1,
-            offset: const Offset(0, 18),
-          ),
-          BoxShadow(
-            color: kElumoGreen.withOpacity(0.15),
-            blurRadius: 20,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(42),
-        child: Column(
-          children: [
-            // Status Bar + Dynamic Island (Crisp White Mode)
-            Container(
-              height: 36,
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    '9:41',
-                    style: TextStyle(
-                      color: Color(0xFF0F172A),
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  // Dynamic Island (Black Pill)
-                  Container(
-                    width: 74,
-                    height: 18,
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                          width: 6,
-                          height: 6,
-                          margin: const EdgeInsets.only(right: 6),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF1E293B),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Signal & Battery (Dark theme for white screen)
-                  Row(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Container(width: 2, height: 4, color: const Color(0xFF0F172A)),
-                          const SizedBox(width: 1),
-                          Container(width: 2, height: 6, color: const Color(0xFF0F172A)),
-                          const SizedBox(width: 1),
-                          Container(width: 2, height: 8, color: const Color(0xFF0F172A)),
-                          const SizedBox(width: 1),
-                          Container(width: 2, height: 10, color: const Color(0xFF0F172A)),
-                        ],
-                      ),
-                      const SizedBox(width: 6),
-                      Container(
-                        width: 18,
-                        height: 9,
-                        padding: const EdgeInsets.all(1),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: const Color(0xFF0F172A), width: 1),
-                          borderRadius: BorderRadius.circular(2.5),
-                        ),
-                        alignment: Alignment.centerLeft,
-                        child: Container(
-                          width: 12,
-                          decoration: BoxDecoration(
-                            color: kElumoGreen,
-                            borderRadius: BorderRadius.circular(1),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // In-App Header with Official Gabism Logo (White Mode)
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const GabismWordmark(height: 22),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: kElumoGreen.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: kElumoGreen.withOpacity(0.3)),
-                    ),
-                    child: const Text(
-                      'Live',
-                      style: TextStyle(
-                        color: kElumoDeepGreen,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Screen Content (Clean White Theme)
-            Expanded(
-              child: Container(
-                color: Colors.white,
-                child: SingleChildScrollView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  child: _buildScreenContent(type),
-                ),
-              ),
-            ),
-
-            // Bottom Home Indicator Bar (White Mode)
-            Container(
-              height: 16,
-              color: Colors.white,
-              alignment: Alignment.center,
-              child: Container(
-                width: 100,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF0F172A).withOpacity(0.25),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    return GabisPhoneFrame(
+      width: 295,
+      height: 570,
+      child: _buildScreenContent(type),
     );
   }
 
@@ -3964,10 +4236,10 @@ class _SingleHeroPhone extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 7),
                       decoration: BoxDecoration(
-                        color: kElumoGreen,
+                        color: kGabisGreen,
                         borderRadius: BorderRadius.circular(8),
                         boxShadow: [
-                          BoxShadow(color: kElumoGreen.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3)),
+                          BoxShadow(color: kGabisGreen.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3)),
                         ],
                       ),
                       alignment: Alignment.center,
@@ -3990,11 +4262,11 @@ class _SingleHeroPhone extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              _balancePill('NGN Wallet', '₦10,400,000.00', kElumoGreen),
+              _balancePill('NGN Wallet', '₦10,400,000.00', kGabisGreen),
               const SizedBox(height: 6),
-              _balancePill('USD Account', '\$5,420.00', kElumoBlue),
+              _balancePill('USD Account', '\$5,420.00', kGabisBlue),
               const SizedBox(height: 6),
-              _balancePill('GBP Account', '£1,850.00', kElumoAmber),
+              _balancePill('GBP Account', '£1,850.00', kGabisAmber),
             ],
           ),
         );
@@ -4018,10 +4290,10 @@ class _SingleHeroPhone extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 9),
                 decoration: BoxDecoration(
-                  color: kElumoBlue,
+                  color: kGabisBlue,
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
-                    BoxShadow(color: kElumoBlue.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3)),
+                    BoxShadow(color: kGabisBlue.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3)),
                   ],
                 ),
                 alignment: Alignment.center,
@@ -4039,27 +4311,27 @@ class _SingleHeroPhone extends StatelessWidget {
             children: [
               const Text('Smart Invoices & Ledgers', style: TextStyle(color: Color(0xFF64748B), fontSize: 10.5, fontWeight: FontWeight.w500)),
               const SizedBox(height: 8),
-              _invoiceItem('Skill School (skill-sch.com)', 'Amara J. · Inst 2/4', '₦100,000', kElumoGreen, isPaid: true),
+              _invoiceItem('Skill School (skill-sch.com)', 'Amara J. · Inst 2/4', '₦100,000', kGabisGreen, isPaid: true),
               const SizedBox(height: 6),
-              _invoiceItem('SolarGrid Energy', 'Emmanuel A. · Inst 4/6', '₦200,000', kElumoAmber, isPaid: false),
+              _invoiceItem('SolarGrid Energy', 'Emmanuel A. · Inst 4/6', '₦200,000', kGabisAmber, isPaid: false),
               const SizedBox(height: 6),
-              _invoiceItem('Acme Corp Software', 'Q3 Retainer', '\$1,200', kElumoBlue, isPaid: true),
+              _invoiceItem('Acme Corp Software', 'Q3 Retainer', '\$1,200', kGabisBlue, isPaid: true),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.all(7),
                 decoration: BoxDecoration(
                   color: const Color(0xFFDCFCE7),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: kElumoGreen.withOpacity(0.3)),
+                  border: Border.all(color: kGabisGreen.withOpacity(0.3)),
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.bolt_rounded, color: kElumoDeepGreen, size: 14),
+                    Icon(Icons.bolt_rounded, color: kGabisDeepGreen, size: 14),
                     SizedBox(width: 6),
                     Expanded(
                       child: Text(
                         '10-Day Automated SMS Reminders Active',
-                        style: TextStyle(color: kElumoDeepGreen, fontSize: 9, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: kGabisDeepGreen, fontSize: 9, fontWeight: FontWeight.bold),
                       ),
                     ),
                   ],
@@ -4079,7 +4351,7 @@ class _SingleHeroPhone extends StatelessWidget {
               const SizedBox(height: 10),
               _swapBox('You Pay', '1,500.00', 'USD (\$)'),
               const SizedBox(height: 6),
-              const Center(child: Icon(Icons.swap_vert_rounded, color: kElumoAmber, size: 20)),
+              const Center(child: Icon(Icons.swap_vert_rounded, color: kGabisAmber, size: 20)),
               const SizedBox(height: 6),
               _swapBox('You Get', '2,400,000.00', 'NGN (₦)'),
               const SizedBox(height: 10),
@@ -4087,10 +4359,10 @@ class _SingleHeroPhone extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 9),
                 decoration: BoxDecoration(
-                  color: kElumoGreen,
+                  color: kGabisGreen,
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
-                    BoxShadow(color: kElumoGreen.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3)),
+                    BoxShadow(color: kGabisGreen.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 3)),
                   ],
                 ),
                 alignment: Alignment.center,
@@ -4112,9 +4384,9 @@ class _SingleHeroPhone extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xFFFEF3C7),
-                  border: Border.all(color: kElumoAmber, width: 2),
+                  border: Border.all(color: kGabisAmber, width: 2),
                 ),
-                child: const Icon(Icons.record_voice_over_rounded, color: kElumoAmber, size: 24),
+                child: const Icon(Icons.record_voice_over_rounded, color: kGabisAmber, size: 24),
               ),
               const SizedBox(height: 8),
               const Text(
@@ -4133,7 +4405,7 @@ class _SingleHeroPhone extends StatelessWidget {
                   color: const Color(0xFFDCFCE7),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Text('Live Call · 00:42', style: TextStyle(color: kElumoDeepGreen, fontSize: 9, fontWeight: FontWeight.bold)),
+                child: const Text('Live Call · 00:42', style: TextStyle(color: kGabisDeepGreen, fontSize: 9, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 10),
               Container(
@@ -4156,7 +4428,7 @@ class _SingleHeroPhone extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8),
                       decoration: BoxDecoration(
-                        color: kElumoGreen,
+                        color: kGabisGreen,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       alignment: Alignment.center,
@@ -4188,11 +4460,11 @@ class _SingleHeroPhone extends StatelessWidget {
               const SizedBox(height: 2),
               const Text('Live Inflow Stream', style: TextStyle(color: Color(0xFF0F172A), fontSize: 17, fontWeight: FontWeight.w800)),
               const SizedBox(height: 8),
-              _settlementItem('Nigeria (NGN)', 'Tuition · skill-sch.com', '+₦120,000.00', kElumoGreen),
+              _settlementItem('Nigeria (NGN)', 'Tuition · skill-sch.com', '+₦120,000.00', kGabisGreen),
               const SizedBox(height: 6),
-              _settlementItem('United States (USD)', 'Stripe US Settlement', '+\$850.00', kElumoBlue),
+              _settlementItem('United States (USD)', 'Stripe US Settlement', '+\$850.00', kGabisBlue),
               const SizedBox(height: 6),
-              _settlementItem('Kenya (KES)', 'Supplier Payout', '+KSh 45,000.00', kElumoAmber),
+              _settlementItem('Kenya (KES)', 'Supplier Payout', '+KSh 45,000.00', kGabisAmber),
               const SizedBox(height: 6),
               _settlementItem('Ghana (GHS)', 'Freelance Merchant', '+GH₵ 3,200.00', const Color(0xFF00D2B4)),
             ],
@@ -4211,11 +4483,11 @@ class _SingleHeroPhone extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  _quickBillChip(Icons.phone_android_rounded, 'Airtime', kElumoGreen),
+                  _quickBillChip(Icons.phone_android_rounded, 'Airtime', kGabisGreen),
                   const SizedBox(width: 6),
-                  _quickBillChip(Icons.electric_bolt_rounded, 'Power', kElumoAmber),
+                  _quickBillChip(Icons.electric_bolt_rounded, 'Power', kGabisAmber),
                   const SizedBox(width: 6),
-                  _quickBillChip(Icons.tv_rounded, 'Cable TV', kElumoBlue),
+                  _quickBillChip(Icons.tv_rounded, 'Cable TV', kGabisBlue),
                   const SizedBox(width: 6),
                   _quickBillChip(Icons.wifi_rounded, 'Internet', const Color(0xFF00D2B4)),
                 ],
@@ -4223,11 +4495,11 @@ class _SingleHeroPhone extends StatelessWidget {
               const SizedBox(height: 10),
               const Text('Recent Token Receipts', style: TextStyle(color: Color(0xFF64748B), fontSize: 10, fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
-              _invoiceItem('IKEDC Prepaid Token', 'Token: 4920-1182-9930', '₦15,000', kElumoGreen, isPaid: true),
+              _invoiceItem('IKEDC Prepaid Token', 'Token: 4920-1182-9930', '₦15,000', kGabisGreen, isPaid: true),
               const SizedBox(height: 6),
-              _invoiceItem('MTN 20GB Data Bundle', '0803••••821', '₦5,000', kElumoBlue, isPaid: true),
+              _invoiceItem('MTN 20GB Data Bundle', '0803••••821', '₦5,000', kGabisBlue, isPaid: true),
               const SizedBox(height: 6),
-              _invoiceItem('DStv Premium Renewal', 'Smartcard: 2018••••49', '₦29,000', kElumoAmber, isPaid: true),
+              _invoiceItem('DStv Premium Renewal', 'Smartcard: 2018••••49', '₦29,000', kGabisAmber, isPaid: true),
             ],
           ),
         );
@@ -4302,7 +4574,7 @@ class _SingleHeroPhone extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(color: Color(0xFF64748B), fontSize: 10.5)),
-          Text(val, style: TextStyle(color: isStatus ? kElumoGreen : const Color(0xFF0F172A), fontSize: 10.5, fontWeight: FontWeight.bold)),
+          Text(val, style: TextStyle(color: isStatus ? kGabisGreen : const Color(0xFF0F172A), fontSize: 10.5, fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -4330,7 +4602,7 @@ class _SingleHeroPhone extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(amount, style: TextStyle(color: color, fontSize: 10.5, fontWeight: FontWeight.bold)),
-              Text(isPaid ? 'PAID' : 'DUE', style: TextStyle(color: isPaid ? kElumoDeepGreen : kElumoAmber, fontSize: 8, fontWeight: FontWeight.w900)),
+              Text(isPaid ? 'PAID' : 'DUE', style: TextStyle(color: isPaid ? kGabisDeepGreen : kGabisAmber, fontSize: 8, fontWeight: FontWeight.w900)),
             ],
           ),
         ],
@@ -4353,7 +4625,7 @@ class _SingleHeroPhone extends StatelessWidget {
             Text(label, style: const TextStyle(color: Color(0xFF64748B), fontSize: 9)),
             Text(amount, style: const TextStyle(color: Color(0xFF0F172A), fontSize: 13, fontWeight: FontWeight.bold)),
           ]),
-          Text(curr, style: const TextStyle(color: kElumoGreen, fontSize: 11, fontWeight: FontWeight.bold)),
+          Text(curr, style: const TextStyle(color: kGabisGreen, fontSize: 11, fontWeight: FontWeight.bold)),
         ],
       ),
     );

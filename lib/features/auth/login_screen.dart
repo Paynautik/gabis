@@ -49,12 +49,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 8),
-                  const NautikLogoMark(size: 36),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Elumo',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: context.colors.ink),
-                  ),
+                  const NautikLogoMark(size: 40),
                 ],
               ),
               const SizedBox(height: 48),
@@ -64,11 +59,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Log in to your Elumo account',
+                'Log in to your gabis account',
                 style: TextStyle(color: context.colors.inkSoft, fontSize: 15),
               ),
               const SizedBox(height: 32),
-              const Text('Email, phone or Elumo ID', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+              const Text('Email, phone or gabis ID', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
               const SizedBox(height: 8),
               TextField(
                 controller: _identifierController,
@@ -107,7 +102,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   text: TextSpan(
                     style: TextStyle(color: context.colors.inkSoft, fontSize: 14.5),
                     children: [
-                      const TextSpan(text: 'New to Elumo? '),
+                      const TextSpan(text: 'New to gabis? '),
                       TextSpan(
                         text: 'Create an account',
                         style: TextStyle(color: context.colors.bluePrimary, fontWeight: FontWeight.w700),

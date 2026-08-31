@@ -12,8 +12,8 @@ import '../features/transfers/send_money_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../shared/providers/app_providers.dart';
 
-class ElumoApp extends ConsumerWidget {
-  const ElumoApp({super.key});
+class GabisApp extends ConsumerWidget {
+  const GabisApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

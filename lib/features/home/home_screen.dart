@@ -852,7 +852,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               ],
                             ),
                             const Text(
-                              'ELUMO',
+                              'GABIS',
                               style: TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.w900, letterSpacing: 1.2),
                             ),
                           ],
@@ -917,8 +917,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               // Slide 1: PayNautik Global Payroll
               _buildPayrollSlide(),
-              // Slide 2: Elumo Promo (Pay Smarter, Live Better)
-              _buildElumoPromoSlide(),
+              // Slide 2: gabis Promo (Pay Smarter, Live Better)
+              _buildGabisPromoSlide(),
             ],
           ),
         ),
@@ -1041,8 +1041,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // --- Slide 2: Elumo Promo ---
-  Widget _buildElumoPromoSlide() {
+  // --- Slide 2: gabis Promo ---
+  Widget _buildGabisPromoSlide() {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -1066,7 +1066,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 const Text('Pay smarter. Live better.', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Colors.white)),
                 const SizedBox(height: 4),
                 const Text(
-                  'Make seamless payments, send money, and manage your finances effortlessly on Elumo.',
+                  'Make seamless payments, send money, and manage your finances effortlessly on gabis.',
                   style: TextStyle(color: Colors.white70, fontSize: 11, height: 1.3, fontWeight: FontWeight.w600),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -1082,7 +1082,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   icon: const Icon(Icons.arrow_outward_rounded, size: 12),
-                  label: const Text('Visit Elumo.com', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
+                  label: const Text('Visit gabis.com', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
                 ),
               ],
             ),
@@ -1217,7 +1217,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      const Text('ELUMO', style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w900)),
+                      const Text('GABIS', style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w900)),
                     ],
                   ),
                   const Text('•••• 4821', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900)),
@@ -1911,7 +1911,7 @@ void _showReceiveSheet(BuildContext context) {
                 ),
                 child: const Column(
                   children: [
-                    _DetailRow('Bank Name', 'Elumo Partner Bank'),
+                    _DetailRow('Bank Name', 'gabis Partner Bank'),
                     SizedBox(height: 8),
                     _DetailRow('Account Number', '9928371102'),
                     SizedBox(height: 8),
@@ -1923,7 +1923,7 @@ void _showReceiveSheet(BuildContext context) {
               ElevatedButton.icon(
                 onPressed: () {
                   Clipboard.setData(const ClipboardData(
-                    text: 'Bank: Elumo Partner Bank\nAcct: 9928371102\nName: Raphael G. Momoh',
+                    text: 'Bank: gabis Partner Bank\nAcct: 9928371102\nName: Raphael G. Momoh',
                   ));
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(

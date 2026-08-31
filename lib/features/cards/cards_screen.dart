@@ -305,7 +305,7 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
                       ),
                     ),
                     const Text(
-                      'ELUMO',
+                      'GABIS',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,

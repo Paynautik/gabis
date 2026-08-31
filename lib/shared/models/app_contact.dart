@@ -2,14 +2,14 @@ class AppContact {
   final String id;
   final String name;
   final String phone;
-  final bool hasElumo;
+  final bool hasGabis;
   final String? avatarUrl;
 
   const AppContact({
     required this.id,
     required this.name,
     required this.phone,
-    required this.hasElumo,
+    required this.hasGabis,
     this.avatarUrl,
   });
 

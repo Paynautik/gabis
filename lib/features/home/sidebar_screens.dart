@@ -937,7 +937,7 @@ class SupportScreen extends StatelessWidget {
                         radius: 6,
                       ),
                       const SizedBox(width: 8),
-                      Text('Elumo Support Bot', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900, fontSize: 16)),
+                      Text('gabis Support Bot', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900, fontSize: 16)),
                     ],
                   ),
                   IconButton(icon: Icon(Icons.close_rounded, color: context.colors.inkSoft), onPressed: () => Navigator.pop(ctx)),
@@ -947,7 +947,7 @@ class SupportScreen extends StatelessWidget {
               Expanded(
                 child: ListView(
                   children: [
-                    _chatBubble(context, 'Hi Raphael! How can I assist you with your Elumo account today?', false),
+                    _chatBubble(context, 'Hi Raphael! How can I assist you with your gabis account today?', false),
                     _chatBubble(context, 'You can ask about transfer speeds, FX rates, or card limits.', false),
                   ],
                 ),

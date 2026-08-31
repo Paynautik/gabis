@@ -146,7 +146,7 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
               child: const Icon(Icons.business_center_rounded, color: Colors.black, size: 16),
             ),
             const SizedBox(width: 12),
-            const Text('Elumo Business', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16, letterSpacing: -0.5)),
+            const Text('gabis Business', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16, letterSpacing: -0.5)),
           ],
         ),
         actions: [
@@ -867,7 +867,7 @@ class _AIDebtCollectionTabState extends State<_AIDebtCollectionTab> {
     final lines = [
       "AI: Hello, am I speaking with ${debtor['name']}?",
       "${debtor['name']}: Yes, who is this?",
-      "AI: Hi ${debtor['name']}, I'm calling on behalf of Elumo Business regarding invoice ${debtor['invoice']} for ${debtor['amount']}.",
+      "AI: Hi ${debtor['name']}, I'm calling on behalf of gabis Business regarding invoice ${debtor['invoice']} for ${debtor['amount']}.",
       "${debtor['name']}: Oh right, I forgot about that.",
       "AI: No problem at all. I can send a quick payment link to your phone right now. Would that work?",
       "${debtor['name']}: Yes, please send it.",

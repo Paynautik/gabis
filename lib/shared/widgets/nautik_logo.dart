@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 
 class NautikLogoMark extends StatelessWidget {
   final double size;
-  const NautikLogoMark({super.key, this.size = 32});
+  final bool isWhite;
+  const NautikLogoMark({super.key, this.size = 32, this.isWhite = false});
 
   @override
   Widget build(BuildContext context) {
-    return GabismWordmark(height: size);
+    return GabismWordmark(height: size, isWhite: isWhite);
   }
 }
 
