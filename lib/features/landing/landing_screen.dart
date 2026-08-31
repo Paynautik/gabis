@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'gabis_hero_section.dart';
 import 'landing_ui.dart';
 import 'landing_sections_extra.dart';
+import '../copilot/copilot_engine.dart';
+import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/gabis_phone_frame.dart';
 import '../../shared/widgets/nautik_logo.dart';
 
@@ -4488,6 +4490,16 @@ class _SingleHeroPhone extends StatelessWidget {
           ),
         );
       case _MockupType.copilotInsights:
+        // Derived from the same engine and seed data the product runs on,
+        // so this panel cannot drift away from what the copilot reports.
+        final engine = CopilotEngine(
+          transactions: TransactionsNotifier().state,
+          balanceNaira: 1250000,
+        );
+        final shifts = engine.categoryShifts();
+        final commitments = engine.recurringCommitments().take(4).toList();
+        final safe = engine.canIAfford(0).safeToSpendNaira;
+
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           child: Column(
@@ -4499,40 +4511,43 @@ class _SingleHeroPhone extends StatelessWidget {
               const Text('I read your last 3 months', style: TextStyle(color: Color(0xFF0F172A), fontSize: 15.5, fontWeight: FontWeight.w800)),
               const SizedBox(height: 10),
 
-              // The insight that proves it understands behaviour.
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF7ED),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFFED7AA)),
+              if (shifts.isNotEmpty)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF7ED),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFFED7AA)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.trending_up_rounded, size: 13, color: Color(0xFFEA580C)),
+                      const SizedBox(width: 7),
+                      Expanded(
+                        child: Text(
+                          '${shifts.first.category.label} is ${shifts.first.isIncrease ? 'up' : 'down'} ${shifts.first.percentChange.abs().toStringAsFixed(0)}% on last month',
+                          style: const TextStyle(fontSize: 10, height: 1.35, fontWeight: FontWeight.w700, color: Color(0xFF9A3412)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(Icons.trending_up_rounded, size: 13, color: Color(0xFFEA580C)),
-                    SizedBox(width: 7),
-                    Expanded(
-                      child: Text('Airtime & data is up 31% on last month',
-                          style: TextStyle(fontSize: 10, height: 1.35, fontWeight: FontWeight.w700, color: Color(0xFF9A3412))),
-                    ),
-                  ],
-                ),
-              ),
               const SizedBox(height: 10),
 
               const Text('RECURRING COMMITMENTS',
                   style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: Color(0xFF94A3B8))),
               const SizedBox(height: 7),
-              _commitmentRow('Lekki Gardens', 'Rent & housing', '₦180,000'),
+              ...commitments.map((c) => Padding(
+                    padding: const EdgeInsets.only(bottom: 5),
+                    child: _commitmentRow(
+                      c.counterparty,
+                      c.category.label,
+                      CopilotEngine.formatNaira(c.monthlyNaira),
+                    ),
+                  )),
               const SizedBox(height: 5),
-              _commitmentRow('Mrs Gab-Momoh', 'Family support', '₦80,000'),
-              const SizedBox(height: 5),
-              _commitmentRow('MTN', 'Airtime & data', '₦43,200'),
-              const SizedBox(height: 5),
-              _commitmentRow('IKEDC', 'Utilities', '₦42,000'),
-              const SizedBox(height: 10),
 
               Container(
                 width: double.infinity,
@@ -4542,16 +4557,16 @@ class _SingleHeroPhone extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: const Color(0xFFDDD6FE)),
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Safe to spend before payday',
+                    const Text('Safe to spend before payday',
                         style: TextStyle(fontSize: 9, color: Color(0xFF6D28D9), fontWeight: FontWeight.w600)),
-                    SizedBox(height: 2),
-                    Text('₦669,178',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF4C1D95))),
-                    SizedBox(height: 2),
-                    Text('after commitments and a one-week buffer',
+                    const SizedBox(height: 2),
+                    Text(CopilotEngine.formatNaira(safe),
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF4C1D95))),
+                    const SizedBox(height: 2),
+                    const Text('after commitments and a one-week buffer',
                         style: TextStyle(fontSize: 8.5, color: Color(0xFF7C3AED))),
                   ],
                 ),
