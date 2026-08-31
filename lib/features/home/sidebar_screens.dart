@@ -873,7 +873,7 @@ class SupportScreen extends StatelessWidget {
             context,
             Icons.email_rounded,
             'Email Us',
-            'support@nautikone.com',
+            'Live chat & ticket support',
             () => _showEmailTicketDialog(context),
           ),
           const SizedBox(height: 12),
@@ -1013,7 +1013,7 @@ class SupportScreen extends StatelessWidget {
         backgroundColor: context.colors.bgSoft,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text('Contact Support by Email', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900)),
-        content: Text('You can send an email directly to support@nautikone.com or submit a ticket from this app.',
+        content: Text('Submit a ticket from this app or start a live chat and our team will respond.',
             style: TextStyle(color: context.colors.inkSoft)),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),

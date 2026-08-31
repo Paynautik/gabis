@@ -1,11 +1,11 @@
 {
-    "name": "nautik_money",
-    "short_name": "nautik_money",
+    "name": "gabis",
+    "short_name": "gabis",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "One account for every currency — send, receive, earn and spend across borders.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

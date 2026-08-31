@@ -528,7 +528,12 @@ class _HeroVisual extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    // The composition is laid out at a fixed 520x600; scale it down rather
+    // than letting the phone and card run past a narrow viewport.
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      child: SizedBox(
+      width: 520,
       height: 600,
       child: Stack(
         alignment: Alignment.center,
@@ -564,6 +569,7 @@ class _HeroVisual extends StatelessWidget {
           ),
 
         ],
+      ),
       ),
     );
   }

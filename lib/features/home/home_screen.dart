@@ -1082,7 +1082,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   icon: const Icon(Icons.arrow_outward_rounded, size: 12),
-                  label: const Text('Visit gabis.com', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
+                  label: const Text('Visit gabis', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
                 ),
               ],
             ),

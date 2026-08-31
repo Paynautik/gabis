@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'gabis_hero_section.dart';
 import 'landing_ui.dart';
+import 'landing_sections_extra.dart';
 import '../../shared/widgets/gabis_phone_frame.dart';
 import '../../shared/widgets/nautik_logo.dart';
 
@@ -83,6 +84,7 @@ class _LandingScreenState extends State<LandingScreen> {
         child: Column(
           children: [
             const GabisHeroSection(),
+            const RailsStripSection(),
             _InteractiveFeatureSlideSection(key: _showcaseKey),
             _UseCasesSection(key: _useCasesKey),
             _ValueComparisonSection(key: _comparisonKey),
@@ -90,6 +92,7 @@ class _LandingScreenState extends State<LandingScreen> {
             _SecurityComplianceSection(key: _securityKey),
             const _TestimonialsSection(),
             _FaqSection(key: _faqKey),
+            const ContactSection(),
             const _DownloadCtaSection(),
             const _FooterSection(),
           ],
@@ -1234,6 +1237,21 @@ class _InteractiveFeatureSlideSectionState extends State<_InteractiveFeatureSlid
 
   static const List<_FeatureSlideItem> _slides = [
     _FeatureSlideItem(
+      tag: 'AI Financial Copilot',
+      title: 'It reads your money',
+      subtitle: 'and tells you what to do.',
+      description: 'Ask in plain language and the copilot answers from your own transaction history — commitments, trends, and what is genuinely free to spend before payday.',
+      bulletPoints: [
+        'Finds recurring commitments on its own — rent, family support, airtime, utilities',
+        'Flags what changed: "airtime is up 31% on last month"',
+        'Answers "can I afford this?" with a plan, and acts only once you approve',
+      ],
+      ctaText: 'Meet your copilot →',
+      accentColor: Color(0xFF5145E5),
+      bgGradientStart: Color(0xFFEDE9FE),
+      mockupType: _MockupType.copilotInsights,
+    ),
+    _FeatureSlideItem(
       tag: 'Multi-Currency Accounts',
       title: 'One Global Account,',
       subtitle: 'Infinite Currencies.',
@@ -2061,7 +2079,7 @@ class _ValueComparisonSection extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             const Text(
-              'Why Thousands Switch to gabism',
+              'Why Thousands Switch to gabis',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 34,
@@ -2097,7 +2115,7 @@ class _ValueComparisonSection extends StatelessWidget {
                       child: Row(
                         children: const [
                           Expanded(flex: 4, child: Text('Features & Capabilities', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13))),
-                          Expanded(flex: 3, child: Text('gabism', style: TextStyle(color: kGabisGreen, fontWeight: FontWeight.w800, fontSize: 14))),
+                          Expanded(flex: 3, child: Text('gabis', style: TextStyle(color: kGabisGreen, fontWeight: FontWeight.w800, fontSize: 14))),
                           Expanded(flex: 3, child: Text('Traditional Banks', style: TextStyle(color: Color(0xFFA1A1AA), fontWeight: FontWeight.w600, fontSize: 13))),
                         ],
                       ),
@@ -3028,23 +3046,23 @@ class _FaqSectionState extends State<_FaqSection> {
 
   static const List<Map<String, String>> _faqs = [
     {
-      'q': 'How quickly can I open a US Bank Account on gabism?',
+      'q': 'How quickly can I open a US Bank Account on gabis?',
       'a': 'Your USD checking account and dedicated ACH routing details are generated in under 2 minutes upon completing instant biometric KYC verification.',
     },
     {
       'q': 'How does the Smart Invoice & Tuition Installment tracking work?',
-      'a': 'Schools (such as skill-sch.com) and businesses can create structured 2, 4, or 6-installment payment plans. gabism automatically schedules automated SMS reminders and reconciles inflows in real-time.',
+      'a': 'Schools (such as skill-sch.com) and businesses can create structured 2, 4, or 6-installment payment plans. gabis automatically schedules automated SMS reminders and reconciles inflows in real-time.',
     },
     {
       'q': 'How do the automated AI Debt Collection phone calls work?',
-      'a': 'When an invoice exceeds its due date, gabism can automatically dispatch an AI conversational phone caller powered by Africa\'s Talking telecom infrastructure to follow up politely with the student/customer and dispatch a direct 1-tap WhatsApp payment settlement link.',
+      'a': 'When an invoice exceeds its due date, gabis can automatically dispatch an AI conversational phone caller powered by Africa\'s Talking telecom infrastructure to follow up politely with the student/customer and dispatch a direct 1-tap WhatsApp payment settlement link.',
     },
     {
       'q': 'Which currencies can I hold, convert, and swap?',
       'a': 'You can instantly hold and convert Nigerian Naira (NGN), US Dollars (USD), British Pounds (GBP), and Euros (EUR), with real-time settlement across Kenyan Shillings (KSh) and Ghanaian Cedis (GH₵).',
     },
     {
-      'q': 'Are gabism virtual cards accepted globally?',
+      'q': 'Are gabis virtual cards accepted globally?',
       'a': 'Yes! Our USD and EUR virtual cards are 3D-secure enabled and work seamlessly for Apple, Netflix, AWS, Google Cloud, Facebook Ads, Shopify, and millions of global merchants with near-zero decline rates.',
     },
   ];
@@ -4202,7 +4220,7 @@ class _FooterSection extends StatelessWidget {
 // ============================================================================
 // REALISTIC PHONE MOCKUP RENDERER (Titanium iPhone 15 Pro + White Mode UI + Gabism Branding)
 // ============================================================================
-enum _MockupType { walletBalances, usdAccount, smartInvoices, currencySwap, aiVoiceCall, crossBorderFeed, billPayments }
+enum _MockupType { copilotInsights, walletBalances, usdAccount, smartInvoices, currencySwap, aiVoiceCall, crossBorderFeed, billPayments }
 
 class _SingleHeroPhone extends StatelessWidget {
   final _MockupType type;
@@ -4214,6 +4232,26 @@ class _SingleHeroPhone extends StatelessWidget {
       width: 295,
       height: 570,
       child: _buildScreenContent(type),
+    );
+  }
+
+
+  static Widget _commitmentRow(String name, String category, String amount) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(name, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Color(0xFF0F172A))),
+              Text(category, style: const TextStyle(fontSize: 8.5, color: Color(0xFF94A3B8))),
+            ],
+          ),
+        ),
+        Text('$amount/mo',
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Color(0xFF334155))),
+      ],
     );
   }
 
@@ -4416,7 +4454,7 @@ class _SingleHeroPhone extends StatelessWidget {
                   border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
                 child: const Text(
-                  '"Hello David, this is gabism AI following up on your Skill School invoice. I have dispatched a secure WhatsApp payment link to your phone."',
+                  '"Hello David, this is gabis AI following up on your Skill School invoice. I have dispatched a secure WhatsApp payment link to your phone."',
                   style: TextStyle(color: Color(0xFF334155), fontSize: 9.5, height: 1.35, fontStyle: FontStyle.italic),
                   textAlign: TextAlign.center,
                 ),
@@ -4445,6 +4483,78 @@ class _SingleHeroPhone extends StatelessWidget {
                     child: const Icon(Icons.call_end_rounded, color: Colors.white, size: 14),
                   ),
                 ],
+              ),
+            ],
+          ),
+        );
+      case _MockupType.copilotInsights:
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Financial Copilot', style: TextStyle(color: Color(0xFF64748B), fontSize: 10.5, fontWeight: FontWeight.w500)),
+              const SizedBox(height: 2),
+              const Text('I read your last 3 months', style: TextStyle(color: Color(0xFF0F172A), fontSize: 15.5, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 10),
+
+              // The insight that proves it understands behaviour.
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF7ED),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFFED7AA)),
+                ),
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.trending_up_rounded, size: 13, color: Color(0xFFEA580C)),
+                    SizedBox(width: 7),
+                    Expanded(
+                      child: Text('Airtime & data is up 31% on last month',
+                          style: TextStyle(fontSize: 10, height: 1.35, fontWeight: FontWeight.w700, color: Color(0xFF9A3412))),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              const Text('RECURRING COMMITMENTS',
+                  style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: Color(0xFF94A3B8))),
+              const SizedBox(height: 7),
+              _commitmentRow('Lekki Gardens', 'Rent & housing', '₦180,000'),
+              const SizedBox(height: 5),
+              _commitmentRow('Mrs Gab-Momoh', 'Family support', '₦80,000'),
+              const SizedBox(height: 5),
+              _commitmentRow('MTN', 'Airtime & data', '₦43,200'),
+              const SizedBox(height: 5),
+              _commitmentRow('IKEDC', 'Utilities', '₦42,000'),
+              const SizedBox(height: 10),
+
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F3FF),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFDDD6FE)),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Safe to spend before payday',
+                        style: TextStyle(fontSize: 9, color: Color(0xFF6D28D9), fontWeight: FontWeight.w600)),
+                    SizedBox(height: 2),
+                    Text('₦669,178',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF4C1D95))),
+                    SizedBox(height: 2),
+                    Text('after commitments and a one-week buffer',
+                        style: TextStyle(fontSize: 8.5, color: Color(0xFF7C3AED))),
+                  ],
+                ),
               ),
             ],
           ),

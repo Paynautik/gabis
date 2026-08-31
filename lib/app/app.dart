@@ -20,7 +20,7 @@ class GabisApp extends ConsumerWidget {
     final themeMode = ref.watch(themeModeProvider);
 
     return MaterialApp(
-      title: 'gabism',
+      title: 'gabis — One account. Every currency. Zero borders.',
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
       theme: AppTheme.getTheme(Brightness.light),
