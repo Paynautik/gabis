@@ -1,6 +1,23 @@
 # Environment / Secrets
+# Africa's Talking, and anything else with a credential in it. These never
+# reach the repo: the app reads them via --dart-define at build time.
 .env
 *.env
+.env.*
+!.env.example
+secrets.json
+*.key
+*.pem
+*.p12
+*.jks
+*.keystore
+
+# Firebase / Google service credentials
+google-services.json
+GoogleService-Info.plist
+*service-account*.json
+firebase-debug.log
+.firebase/
 
 # Miscellaneous
 *.class
