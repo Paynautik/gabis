@@ -683,6 +683,30 @@ class SettingsScreen extends ConsumerWidget {
                   trailing: Icon(Icons.chevron_right_rounded, color: context.colors.inkSoft),
                   onTap: () => _showSecuritySettings(context),
                 ),
+                Divider(height: 1, color: context.colors.border),
+                // Off for a real account, on for a demo. Explicit either way,
+                // so nobody mistakes example figures for their own money.
+                ListTile(
+                  leading: Icon(Icons.science_outlined, color: context.colors.ink),
+                  title: Text('Example data',
+                      style: TextStyle(
+                          color: context.colors.ink, fontWeight: FontWeight.w700)),
+                  subtitle: Text(
+                      'Fill the app with sample balances, transactions and a business book — for demos, not your real money',
+                      style: TextStyle(color: context.colors.inkSoft, fontSize: 12)),
+                  trailing: Switch(
+                    value: ref.watch(demoDataProvider),
+                    activeThumbColor: context.colors.bluePrimary,
+                    onChanged: (v) {
+                      ref.read(demoDataProvider.notifier).set(v);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(v
+                            ? 'Example data on. Reload to see it.'
+                            : 'Example data off. Reload for a clean account.'),
+                      ));
+                    },
+                  ),
+                ),
               ],
             ),
           ),

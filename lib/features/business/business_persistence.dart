@@ -13,6 +13,9 @@ class BusinessPersistence {
 
   static String? read() => readRaw(_key);
 
+  /// Whether the operator has asked for the example book.
+  static bool get demoEnabled => readRaw('gabis.demoData') == 'on';
+
   static void write(BusinessState state) => writeRaw(_key, jsonEncode(encode(state)));
 
   static void clear() => removeRaw(_key);

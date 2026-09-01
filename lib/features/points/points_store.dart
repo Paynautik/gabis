@@ -257,8 +257,15 @@ class PointsNotifier extends StateNotifier<PointsState> {
     }
   }
 
-  /// A first-run balance so the wallet is not an empty room.
+  /// A new account starts at zero — the wallet fills as the person uses it,
+  /// or from points caught on the landing page. Example entries only appear
+  /// when demo data is switched on.
   static PointsState _seed() {
+    if (readRaw('gabis.demoData') != 'on') return const PointsState();
+    return _demoSeed();
+  }
+
+  static PointsState _demoSeed() {
     final now = DateTime.now();
     final entries = [
       PointsEntry(
