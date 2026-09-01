@@ -3458,7 +3458,7 @@ class _FooterState extends State<_Footer> {
       ('Help centre', '/help'),
       ('Contact support', '/contact'),
       ('System status', '/status'),
-      ('WhatsApp live chat', 'https://wa.me/2347000000000'),
+      ('WhatsApp live chat', 'https://wa.me/2347018888303'),
     ],
   };
 

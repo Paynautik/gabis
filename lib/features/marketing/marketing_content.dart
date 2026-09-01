@@ -547,17 +547,17 @@ const marketingPages = <String, MarketingPage>{
           'Contact support with the reference. Failed payments are returned to your balance automatically; we will tell you when and why.'),
     ],
     ctaTitle: 'Still stuck?',
-    ctaBody: 'support@gabis.app, or WhatsApp live chat — both reach a person.',
+    ctaBody: 'support@gabis.app, or WhatsApp +234 701 888 8303 — both reach a person.',
   ),
   '/contact': MarketingPage(
     route: '/contact',
     eyebrow: 'Support',
     title: 'Contact support.',
     lede:
-        'Real people, sensible hours, and no phone tree. Tell us what happened and include a reference if you have one.',
+        'Real people, sensible hours, and no phone tree. WhatsApp +234 701 888 8303, or write to support@gabis.app — tell us what happened and include a reference if you have one.',
     features: [
       MarketingFeature(Icons.chat_rounded, 'WhatsApp live chat',
-          'The fastest route for anything urgent — a stuck payment, a card you need frozen.'),
+          '+234 701 888 8303 — the fastest route for anything urgent, like a stuck payment or a card you need frozen.'),
       MarketingFeature(Icons.mail_outline_rounded, 'Email support',
           'support@gabis.app for anything that needs a paper trail or a document attached.'),
       MarketingFeature(Icons.business_center_rounded, 'Business enquiries',
@@ -570,7 +570,7 @@ const marketingPages = <String, MarketingPage>{
           'The transaction reference, the amount, the date, and what you expected to happen. That is usually enough for us to find it on the first reply instead of the third.'),
     ],
     ctaTitle: 'Message us',
-    ctaBody: 'support@gabis.app, or start a WhatsApp chat from the footer.',
+    ctaBody: 'support@gabis.app, or WhatsApp +234 701 888 8303.',
   ),
   '/status': MarketingPage(
     route: '/status',
