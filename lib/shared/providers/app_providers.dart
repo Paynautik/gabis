@@ -4,6 +4,45 @@ import '../models/account.dart';
 import '../models/money.dart';
 import '../models/payment_card.dart';
 import '../models/transaction.dart';
+import '../../core/firebase/user_sync.dart';
+import '../../features/business/business_persistence_stub.dart'
+    if (dart.library.js_interop) '../../features/business/business_persistence_web.dart';
+
+/// Whether to fill the app with example data.
+///
+/// Off by default: someone who has just opened an account should see their own
+/// empty account, not a stranger's ₦2.5m and three months of somebody else's
+/// groceries. Kept on for demos and screenshots, and remembered per browser.
+class DemoDataNotifier extends StateNotifier<bool> {
+  DemoDataNotifier() : super(readRaw(_key) == 'on') {
+    _pullRemote();
+  }
+
+  static const _key = 'gabis.demoData';
+
+  final _sync = UserSync();
+
+  /// The local copy is read synchronously at startup so the first frame is
+  /// correct; the account's own setting then arrives and wins, so signing in
+  /// on a borrowed machine does not inherit its demo state.
+  Future<void> _pullRemote() async {
+    final prefs = await _sync.get('prefs');
+    final remote = prefs?['demoData'];
+    if (remote is! bool || remote == state) return;
+
+    state = remote;
+    writeRaw(_key, remote ? 'on' : 'off');
+  }
+
+  void set(bool value) {
+    state = value;
+    writeRaw(_key, value ? 'on' : 'off');
+    _sync.put('prefs', {'demoData': value});
+  }
+}
+
+final demoDataProvider =
+    StateNotifierProvider<DemoDataNotifier, bool>((ref) => DemoDataNotifier());
 
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
 final authStateProvider = StateProvider<bool>((ref) => false);
@@ -17,18 +56,19 @@ final userNameProvider = Provider<String>((ref) => 'Raphael');
 
 // --- Accounts Stateful StateNotifier ---
 class AccountsNotifier extends StateNotifier<List<Account>> {
-  AccountsNotifier()
+  AccountsNotifier({bool demo = false})
       : super([
           Account(
             id: 'acc_ngn',
             currency: 'NGN',
-            balance: const Money(minorUnits: 125000000, currency: 'NGN'),
+            balance:
+                Money(minorUnits: demo ? 125000000 : 0, currency: 'NGN'),
             type: AccountType.personal,
           ),
           Account(
             id: 'acc_usd',
             currency: 'USD',
-            balance: const Money(minorUnits: 82000, currency: 'USD'),
+            balance: Money(minorUnits: demo ? 82000 : 0, currency: 'USD'),
             type: AccountType.personal,
           ),
         ]);
@@ -60,8 +100,9 @@ class AccountsNotifier extends StateNotifier<List<Account>> {
   }
 }
 
-final accountsProvider = StateNotifierProvider<AccountsNotifier, List<Account>>((ref) {
-  return AccountsNotifier();
+final accountsProvider =
+    StateNotifierProvider<AccountsNotifier, List<Account>>((ref) {
+  return AccountsNotifier(demo: ref.watch(demoDataProvider));
 });
 
 // --- Dynamic Net Worth Calculation ---
@@ -81,7 +122,8 @@ final totalBalanceNgnProvider = Provider<Money>((ref) {
 
 // --- Transactions Stateful StateNotifier ---
 class TransactionsNotifier extends StateNotifier<List<AppTransaction>> {
-  TransactionsNotifier() : super(_seedHistory());
+  TransactionsNotifier({bool demo = false})
+      : super(demo ? _seedHistory() : const []);
 
   /// Three months of activity so the copilot has real behaviour to reason over:
   /// salary credits, recurring bills and subscriptions, telecom top-ups,
@@ -176,21 +218,25 @@ class TransactionsNotifier extends StateNotifier<List<AppTransaction>> {
   }
 }
 
-final transactionsProvider = StateNotifierProvider<TransactionsNotifier, List<AppTransaction>>((ref) {
-  return TransactionsNotifier();
+final transactionsProvider =
+    StateNotifierProvider<TransactionsNotifier, List<AppTransaction>>((ref) {
+  return TransactionsNotifier(demo: ref.watch(demoDataProvider));
 });
 
 // --- Cards Stateful StateNotifier ---
 class CardsNotifier extends StateNotifier<List<PaymentCard>> {
-  CardsNotifier()
-      : super([
-          const PaymentCard(
-            id: 'card_1',
-            last4: '4821',
-            scheme: CardScheme.visa,
-            balance: Money(minorUnits: 82000, currency: 'USD'),
-          ),
-        ]);
+  /// A new account has no cards until one is created.
+  CardsNotifier({bool demo = false})
+      : super(demo
+            ? const [
+                PaymentCard(
+                  id: 'card_1',
+                  last4: '4821',
+                  scheme: CardScheme.visa,
+                  balance: Money(minorUnits: 82000, currency: 'USD'),
+                ),
+              ]
+            : const []);
 
   void toggleFrozen(String cardId) {
     state = [
@@ -204,8 +250,9 @@ class CardsNotifier extends StateNotifier<List<PaymentCard>> {
   }
 }
 
-final cardsProvider = StateNotifierProvider<CardsNotifier, List<PaymentCard>>((ref) {
-  return CardsNotifier();
+final cardsProvider =
+    StateNotifierProvider<CardsNotifier, List<PaymentCard>>((ref) {
+  return CardsNotifier(demo: ref.watch(demoDataProvider));
 });
 
 final fxRateProvider = Provider<double>((ref) => 1524.0);

@@ -356,8 +356,23 @@ class BusinessNotifier extends StateNotifier<BusinessState> {
   /// first run or unreadable data.
   static BusinessState _restore() {
     final raw = BusinessPersistence.read();
-    if (raw == null) return _seed();
-    return BusinessPersistence.decode(raw) ?? _seed();
+    if (raw != null) {
+      final decoded = BusinessPersistence.decode(raw);
+      if (decoded != null) return decoded;
+    }
+    return _firstRun();
+  }
+
+  /// A business that has just signed up has no companies, invoices or calls.
+  /// The seeded example book is for demos, and only when asked for.
+  static BusinessState _firstRun() {
+    if (BusinessPersistence.demoEnabled) return _seed();
+    return const BusinessState(
+      companies: [],
+      invoices: [],
+      calls: [],
+      filings: [],
+    );
   }
 
   /// Every mutation goes through here, so nothing can change on screen without

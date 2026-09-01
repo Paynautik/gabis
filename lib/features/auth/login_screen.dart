@@ -58,6 +58,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
       if (!mounted) return;
       ref.read(authStateProvider.notifier).state = true;
+      // The account's own preferences, not whatever this browser had.
+      ref.invalidate(demoDataProvider);
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
     } catch (error) {
       if (!mounted) return;
