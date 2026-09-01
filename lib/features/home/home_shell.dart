@@ -23,6 +23,16 @@ class HomeShell extends ConsumerStatefulWidget {
 class _HomeShellState extends ConsumerState<HomeShell> {
   int _index = 0;
 
+  /// Kept in step with homeTabProvider so other screens can switch tabs.
+  void _syncFromProvider() {
+    final wanted = ref.watch(homeTabProvider);
+    if (wanted != _index) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() => _index = wanted);
+      });
+    }
+  }
+
   static const _screens = [
     HomeScreen(),
     AccountsScreen(),
@@ -38,6 +48,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    _syncFromProvider();
     final isBusinessMode = ref.watch(isBusinessModeProvider);
     if (isBusinessMode) {
       return const BusinessDashboardScreen();
@@ -257,7 +268,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
       body: IndexedStack(index: _index, children: _screens),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
-        onDestinationSelected: (i) => setState(() => _index = i),
+        onDestinationSelected: (i) {
+          ref.read(homeTabProvider.notifier).state = i;
+          setState(() => _index = i);
+        },
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
@@ -424,7 +438,10 @@ class _HomeShellState extends ConsumerState<HomeShell> {
   Widget _buildSidebarItem(int index, IconData icon, String label) {
     final isSelected = _index == index;
     return GestureDetector(
-      onTap: () => setState(() => _index = index),
+      onTap: () {
+        ref.read(homeTabProvider.notifier).state = index;
+        setState(() => _index = index);
+      },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),

@@ -1,4 +1,10 @@
-import '../features/landing/landing_screen.dart';
+// V3 landing. The previous page is still at landing_screen.dart —
+// swap this import back to revert.
+import '../features/landing/gabis_landing_v3.dart';
+import '../features/marketing/marketing_content.dart';
+import '../features/points/points_screen.dart';
+import '../features/business/business_dashboard_screen.dart';
+import '../features/marketing/marketing_screen.dart';
 import '../features/bills/bills_screen.dart';
 import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
@@ -36,7 +42,24 @@ class GabisApp extends ConsumerWidget {
         '/cards': (_) => const CardsScreen(),
         '/fx': (_) => const FxScreen(),
         '/bills': (_) => const BillsScreen(),
+        '/points': (_) => const PointsScreen(),
+        // Direct link to the business dashboard — deep-linkable, and the only
+        // way to reach it without walking the whole personal shell.
+        '/business-dashboard': (_) => const BusinessDashboardScreen(),
       },
+      // Every footer destination is a real route with its own page.
+      onGenerateRoute: (settings) {
+        final page = marketingPages[settings.name];
+        if (page == null) return null;
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => MarketingScreen(page: page),
+        );
+      },
+      onUnknownRoute: (settings) => MaterialPageRoute(
+        settings: settings,
+        builder: (_) => const LandingScreen(),
+      ),
     );
   }
 }

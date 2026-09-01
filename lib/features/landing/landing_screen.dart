@@ -86,7 +86,20 @@ class _LandingScreenState extends State<LandingScreen> {
         controller: _scrollController,
         child: Column(
           children: [
-            const GabisHeroSection(),
+            GabisHeroSection(
+              onNavTap: (label) {
+                switch (label) {
+                  case 'Personal':
+                    _scrollTo(_showcaseKey);
+                  case 'Business':
+                    _scrollTo(_useCasesKey);
+                  case 'Cards':
+                    _scrollTo(_cardsKey);
+                  case 'About':
+                    _scrollTo(_comparisonKey);
+                }
+              },
+            ),
             const RailsStripSection(),
             _InteractiveFeatureSlideSection(key: _showcaseKey),
             _UseCasesSection(key: _useCasesKey),
