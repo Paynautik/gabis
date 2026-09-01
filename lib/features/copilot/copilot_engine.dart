@@ -98,6 +98,29 @@ class AffordabilityVerdict {
   });
 }
 
+/// What a payday sweep would move, and the reasoning behind the figure.
+class SweepPlan {
+  final int recommendedNaira;
+  final int safeToSpendNaira;
+  final int committedNaira;
+  final int reserveNaira;
+  final DateTime payday;
+  final int daysToPayday;
+  final List<String> reasoning;
+
+  const SweepPlan({
+    required this.recommendedNaira,
+    required this.safeToSpendNaira,
+    required this.committedNaira,
+    required this.reserveNaira,
+    required this.payday,
+    required this.daysToPayday,
+    required this.reasoning,
+  });
+
+  bool get hasHeadroom => recommendedNaira > 0;
+}
+
 /// Something the copilot can carry out, once the user approves it.
 class CopilotAction {
   final String label;
@@ -335,6 +358,42 @@ class CopilotEngine {
       daysToPayday: daysToPayday,
       reasoning: reasoning,
       actions: actions,
+    );
+  }
+
+  /// What is genuinely spare on payday, after commitments still due, normal
+  /// spending, and a reserve the user keeps back. Rounded down to the nearest
+  /// thousand so the number reads like a decision rather than a calculation.
+  SweepPlan computeSweep({double reserveWeeks = 2}) {
+    final committed = recurringCommitments()
+        .where((c) => c.lastSeen.month != now.month)
+        .fold(0, (s, c) => s + c.monthlyNaira);
+
+    final burn = dailyBurnNaira * daysToPayday;
+    final reserve = (dailyBurnNaira * 7 * reserveWeeks).round();
+    final projected = balanceNaira - burn - committed;
+    final spare = projected - reserve;
+    final recommended = spare <= 0 ? 0 : (spare ~/ 1000) * 1000;
+
+    final reasoning = <String>[
+      'Balance today is ${_fmt(balanceNaira)}.',
+      if (committed > 0)
+        'Still due before payday: ${_fmt(committed)}.',
+      'Normal spending over $daysToPayday days at ${_fmt(dailyBurnNaira)}/day comes to ${_fmt(burn)}.',
+      'Keeping a ${reserveWeeks.toStringAsFixed(0)}-week reserve of ${_fmt(reserve)} back.',
+      recommended > 0
+          ? 'That leaves ${_fmt(recommended)} genuinely spare to move.'
+          : 'Nothing is spare this cycle — the sweep will sit out.',
+    ];
+
+    return SweepPlan(
+      recommendedNaira: recommended,
+      safeToSpendNaira: spare,
+      committedNaira: committed,
+      reserveNaira: reserve,
+      payday: nextPayday,
+      daysToPayday: daysToPayday,
+      reasoning: reasoning,
     );
   }
 

@@ -1,764 +1,771 @@
 import 'package:flutter/material.dart';
-import '../../shared/widgets/nautik_logo.dart';
 import '../../shared/widgets/gabis_phone_frame.dart';
+import '../../shared/widgets/nautik_logo.dart';
 
+/// Gabis landing hero — V2
+///
+/// Drop-in replacement for the current `GabisHeroSection`.
+/// The public API is intentionally unchanged, so the existing LandingScreen can
+/// continue to use `const GabisHeroSection()`.
 class GabisHeroSection extends StatelessWidget {
-  const GabisHeroSection({super.key});
+  /// Called with a nav label so the page can scroll to the matching section.
+  final void Function(String label)? onNavTap;
 
-  static const purple = Color(0xFF5145E5);
-  static const dark = Color(0xFF0D1830);
-  static const textGrey = Color(0xFF58677E);
-  static const softPurple = Color(0xFFF2F0FF);
+  const GabisHeroSection({super.key, this.onNavTap});
 
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final isDesktop = width >= 1050;
-
-    return Container(
-      width: double.infinity,
-      constraints: const BoxConstraints(minHeight: 850),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white,
-            Color(0xFFFCFBFF),
-            Color(0xFFF4F1FF),
-          ],
-          stops: [0, .55, 1],
-        ),
-      ),
-      child: Stack(
-        children: [
-          // Decorative background glow
-          Positioned(
-            right: -120,
-            top: 90,
-            child: Container(
-              width: 700,
-              height: 700,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    purple.withOpacity(.14),
-                    purple.withOpacity(.03),
-                    Colors.transparent,
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          SafeArea(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: isDesktop ? 64 : 24,
-              ),
-              child: Column(
-                children: [
-                  _Navbar(isDesktop: isDesktop),
-                  const SizedBox(height: 60),
-
-                  if (isDesktop)
-                    const Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          flex: 10,
-                          child: _HeroContent(),
-                        ),
-                        SizedBox(width: 48),
-                        Expanded(
-                          flex: 9,
-                          child: _HeroVisual(),
-                        ),
-                      ],
-                    )
-                  else
-                    const Column(
-                      children: [
-                        _HeroContent(),
-                        SizedBox(height: 56),
-                        _HeroVisual(),
-                      ],
-                    ),
-
-                  const SizedBox(height: 46),
-
-                  const _StatsBar(),
-
-                  const SizedBox(height: 32),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Navbar extends StatelessWidget {
-  final bool isDesktop;
-
-  const _Navbar({required this.isDesktop});
+  static const accent = Color(0xFF2F4BFF);
+  static const accentDark = Color(0xFF2439CF);
+  static const ink = Color(0xFF0D1830);
+  static const muted = Color(0xFF667385);
+  static const canvas = Color(0xFFF7F8FC);
+  static const softAccent = Color(0xFFEEF1FF);
+  static const border = Color(0xFFE8EBF2);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 74,
-      child: Row(
-        children: [
-          const GabisLogo(size: 36),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final desktop = width >= 1040;
+        final tablet = width >= 720 && !desktop;
 
-          if (isDesktop) ...[
-            const SizedBox(width: 28),
-
-            Flexible(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: const [
-                    _NavItem('About gabis'),
-                    _NavItem('Products'),
-                    _NavItem('Cards'),
-                    _NavItem('Business'),
-                    _NavItem('Support'),
-                  ],
-                ),
-              ),
+        return DecoratedBox(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFFFFFFFF),
+                Color(0xFFFAFAFE),
+                Color(0xFFF1F3FF),
+              ],
+              stops: [0, .52, 1],
             ),
-
-            const SizedBox(width: 12),
-
-            const _NavItem('Download app'),
-            const SizedBox(width: 14),
-
-            const Icon(
-              Icons.language_rounded,
-              size: 21,
-              color: GabisHeroSection.dark,
-            ),
-            const SizedBox(width: 6),
-
-            const Text(
-              'US',
-              style: TextStyle(
-                color: GabisHeroSection.dark,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(width: 16),
-
-            TextButton(
-              onPressed: () {},
-              style: TextButton.styleFrom(
-                backgroundColor: const Color(0xFFF1EFFF),
-                foregroundColor: GabisHeroSection.purple,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 17,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              child: const Text(
-                'Log in',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
-            ),
-
-            const SizedBox(width: 12),
-
-            FilledButton(
-              onPressed: () {},
-              style: FilledButton.styleFrom(
-                backgroundColor: GabisHeroSection.purple,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 22,
-                  vertical: 17,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                ),
-              ),
-              child: const Text(
-                'Sign up',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
-            ),
-          ] else ...[
-            const Spacer(),
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.menu_rounded),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final String label;
-
-  const _NavItem(this.label);
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 9),
-      child: InkWell(
-        onTap: () {},
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 4,
-            vertical: 12,
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+          child: Stack(
+            clipBehavior: Clip.none,
             children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  color: GabisHeroSection.dark,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
+              const Positioned.fill(child: _HeroBackdrop()),
+              SafeArea(
+                bottom: false,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: desktop ? 48 : (tablet ? 32 : 20),
+                      ),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 1280),
+                          child: _Navbar(onNavTap: onNavTap),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        desktop ? 48 : (tablet ? 32 : 20),
+                        desktop ? 28 : 22,
+                        desktop ? 48 : (tablet ? 32 : 20),
+                        0,
+                      ),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 1280),
+                          child: desktop
+                              ? SizedBox(
+                                  height: 620,
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Expanded(
+                                        flex: 10,
+                                        child: _HeroCopy(onNavTap: onNavTap),
+                                      ),
+                                      SizedBox(width: 26),
+                                      Expanded(
+                                        flex: 10,
+                                        child: _ProductVisual(),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Column(
+                                  children: [
+                                    _HeroCopy(onNavTap: onNavTap),
+                                    SizedBox(height: 34),
+                                    _ProductVisual(),
+                                  ],
+                                ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    const _TrustStrip(),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 5),
-              const Icon(
-                Icons.keyboard_arrow_down_rounded,
-                size: 18,
               ),
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
 
-class _HeroContent extends StatelessWidget {
-  const _HeroContent();
+class _HeroBackdrop extends StatelessWidget {
+  const _HeroBackdrop();
 
   @override
   Widget build(BuildContext context) {
-    final desktop = MediaQuery.of(context).size.width >= 1050;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
       children: [
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
+        Positioned(
+          right: -190,
+          top: 70,
           child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 17,
-            vertical: 11,
-          ),
-          decoration: BoxDecoration(
-            color: GabisHeroSection.softPurple,
-            borderRadius: BorderRadius.circular(100),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.auto_awesome_rounded,
-                color: GabisHeroSection.purple,
-                size: 18,
-              ),
-              SizedBox(width: 9),
-              Text(
-                'Modern finance for everyone',
-                style: TextStyle(
-                  color: GabisHeroSection.purple,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          ),
-        ),
-
-        const SizedBox(height: 25),
-
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          alignment: Alignment.centerLeft,
-          child: RichText(
-          text: TextSpan(
-            style: TextStyle(
-              fontFamily: 'Arial',
-              fontSize: desktop ? 72 : 50,
-              height: .98,
-              letterSpacing: -3.5,
-              fontWeight: FontWeight.w800,
-              color: GabisHeroSection.dark,
-            ),
-            children: const [
-              TextSpan(text: 'One account.\n'),
-              TextSpan(text: 'Every currency.\n'),
-              TextSpan(
-                text: 'Zero borders.',
-                style: TextStyle(
-                  color: GabisHeroSection.purple,
-                ),
-              ),
-            ],
-          ),
-          ),
-        ),
-
-        const SizedBox(height: 28),
-
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 630),
-          child: Text(
-            'One app, every opportunity to build your future. '
-            'Send, receive, earn, and spend globally in just a few taps.',
-            style: TextStyle(
-              color: GabisHeroSection.textGrey,
-              fontSize: 19,
-              height: 1.6,
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 34),
-
-        const Row(
-          children: [
-            Expanded(
-              child: _Feature(
-                icon: Icons.swap_horiz_rounded,
-                title: 'Send',
-                subtitle: 'Money globally',
-              ),
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: _Feature(
-                icon: Icons.file_download_outlined,
-                title: 'Receive',
-                subtitle: 'Money instantly',
-              ),
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: _Feature(
-                icon: Icons.trending_up_rounded,
-                title: 'Earn',
-                subtitle: 'Grow your money',
-              ),
-            ),
-            SizedBox(width: 10),
-            Expanded(
-              child: _Feature(
-                icon: Icons.wallet_outlined,
-                title: 'Spend',
-                subtitle: 'Pay anywhere',
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 38),
-
-        Wrap(
-          crossAxisAlignment: WrapCrossAlignment.center,
-          spacing: 28,
-          runSpacing: 20,
-          children: [
-            FilledButton(
-              onPressed: () {},
-              style: FilledButton.styleFrom(
-                backgroundColor: GabisHeroSection.purple,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 29,
-                  vertical: 22,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 10,
-                shadowColor:
-                    GabisHeroSection.purple.withOpacity(.25),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Open your account',
-                    style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  SizedBox(width: 14),
-                  Icon(Icons.arrow_forward_rounded),
+            width: 720,
+            height: 720,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  GabisHeroSection.accent.withValues(alpha: .11),
+                  GabisHeroSection.accent.withValues(alpha: .025),
+                  Colors.transparent,
                 ],
               ),
             ),
-
-            const _SecurityMiniCard(),
-          ],
+          ),
+        ),
+        Positioned(
+          left: -220,
+          bottom: -300,
+          child: Container(
+            width: 640,
+            height: 640,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFF7ED8FF).withValues(alpha: .06),
+            ),
+          ),
         ),
       ],
     );
   }
 }
 
-class _Feature extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
-
-  const _Feature({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-  });
+class _Navbar extends StatelessWidget {
+  final void Function(String label)? onNavTap;
+  const _Navbar({this.onNavTap});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: GabisHeroSection.softPurple,
-              borderRadius: BorderRadius.circular(13),
-            ),
-            child: Icon(
-              icon,
-              color: GabisHeroSection.purple,
-              size: 21,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: GabisHeroSection.dark,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final desktop = constraints.maxWidth >= 980;
+
+        return SizedBox(
+          height: 76,
+          child: Row(
+            children: [
+              const Padding(
+                padding: EdgeInsets.only(right: 6),
+                child: GabisLogo(size: 36),
+              ),
+              if (desktop) ...[
+                const SizedBox(width: 34),
+                _NavLink(label: 'Personal', onTap: onNavTap),
+                _NavLink(label: 'Business', onTap: onNavTap),
+                _NavLink(label: 'Cards', onTap: onNavTap),
+                _NavLink(label: 'About', onTap: onNavTap),
+                const Spacer(),
+                TextButton(
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: GabisHeroSection.ink,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 15,
+                    ),
+                  ),
+                  child: const Text(
+                    'Log in',
+                    style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
-                const SizedBox(height: 3),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: GabisHeroSection.textGrey,
-                    fontSize: 11,
+                const SizedBox(width: 8),
+                FilledButton(
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: GabisHeroSection.accent,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 22,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
+                  child: const Text(
+                    'Get Gabis',
+                    style: TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                ),
+              ] else ...[
+                const Spacer(),
+                FilledButton(
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: GabisHeroSection.accent,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 13,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(13),
+                    ),
+                  ),
+                  child: const Text(
+                    'Get Gabis',
+                    style: TextStyle(fontWeight: FontWeight.w800),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                IconButton(
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  tooltip: 'Menu',
+                  icon: const Icon(Icons.menu_rounded),
                 ),
               ],
-            ),
+            ],
           ),
-        ],
+        );
+      },
     );
   }
 }
 
-class _SecurityMiniCard extends StatelessWidget {
-  const _SecurityMiniCard();
+class _NavLink extends StatelessWidget {
+  final String label;
+  final void Function(String label)? onTap;
+
+  const _NavLink({required this.label, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: TextButton(
+        onPressed: () => onTap?.call(label),
+        style: TextButton.styleFrom(
+          foregroundColor: GabisHeroSection.ink,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        ),
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14.5,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HeroCopy extends StatelessWidget {
+  final void Function(String label)? onNavTap;
+  const _HeroCopy({this.onNavTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    final desktop = width >= 1040;
+    final mobile = width < 620;
+
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 650),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const _Eyebrow(),
+            SizedBox(height: desktop ? 24 : 20),
+            Text.rich(
+              TextSpan(
+                children: const [
+                  TextSpan(text: 'Your money should move\n'),
+                  TextSpan(text: 'as freely as '),
+                  TextSpan(
+                    text: 'you do.',
+                    style: TextStyle(color: GabisHeroSection.accent),
+                  ),
+                ],
+              ),
+              style: TextStyle(
+                color: GabisHeroSection.ink,
+                fontSize: desktop ? 67 : (mobile ? 45 : 57),
+                height: 1.015,
+                letterSpacing: desktop ? -3.1 : -2.2,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 23),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 590),
+              child: Text(
+                'Send, spend and receive money across Africa and beyond — from one beautifully simple account.',
+                style: TextStyle(
+                  color: GabisHeroSection.muted,
+                  fontSize: mobile ? 17 : 18.5,
+                  height: 1.55,
+                  letterSpacing: -.15,
+                ),
+              ),
+            ),
+            const SizedBox(height: 28),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                FilledButton(
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: GabisHeroSection.accent,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: mobile ? 23 : 27,
+                      vertical: 19,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Get Gabis',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                      Icon(Icons.arrow_forward_rounded, size: 19),
+                    ],
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () => onNavTap?.call('Personal'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: GabisHeroSection.ink,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 18,
+                    ),
+                  ),
+                  icon: const Icon(
+                    Icons.play_circle_outline_rounded,
+                    size: 21,
+                  ),
+                  label: const Text(
+                    'See how it works',
+                    style: TextStyle(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 27),
+            const Wrap(
+              spacing: 22,
+              runSpacing: 12,
+              children: [
+                _MicroBenefit(
+                  icon: Icons.swap_horiz_rounded,
+                  label: 'Send & receive',
+                ),
+                _MicroBenefit(
+                  icon: Icons.credit_card_rounded,
+                  label: 'Spend globally',
+                ),
+                _MicroBenefit(
+                  icon: Icons.shield_outlined,
+                  label: 'Secure by design',
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Eyebrow extends StatelessWidget {
+  const _Eyebrow();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: .74),
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: GabisHeroSection.border),
+        boxShadow: [
+          BoxShadow(
+            color: GabisHeroSection.ink.withValues(alpha: .035),
+            blurRadius: 18,
+            offset: const Offset(0, 7),
+          ),
+        ],
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _LiveDot(),
+          SizedBox(width: 9),
+          Text(
+            'MONEY WITHOUT BORDERS',
+            style: TextStyle(
+              color: GabisHeroSection.ink,
+              fontSize: 11.5,
+              letterSpacing: 1.25,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LiveDot extends StatelessWidget {
+  const _LiveDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 9,
+      height: 9,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: Color(0xFF12B76A),
+      ),
+    );
+  }
+}
+
+class _MicroBenefit extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _MicroBenefit({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 50,
-          height: 50,
-          decoration: BoxDecoration(
-            color: GabisHeroSection.softPurple,
-            borderRadius: BorderRadius.circular(15),
+        Icon(icon, size: 17, color: GabisHeroSection.accent),
+        const SizedBox(width: 7),
+        Text(
+          label,
+          style: const TextStyle(
+            color: GabisHeroSection.muted,
+            fontSize: 13.5,
+            fontWeight: FontWeight.w600,
           ),
-          child: const Icon(
-            Icons.verified_user_rounded,
-            color: GabisHeroSection.purple,
-          ),
-        ),
-        const SizedBox(width: 12),
-        const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Your money is safe',
-              style: TextStyle(
-                color: GabisHeroSection.dark,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            SizedBox(height: 3),
-            Text(
-              'Bank-level security',
-              style: TextStyle(
-                color: GabisHeroSection.textGrey,
-                fontSize: 12,
-              ),
-            ),
-          ],
         ),
       ],
     );
   }
 }
 
-class _HeroVisual extends StatelessWidget {
-  const _HeroVisual();
+class _ProductVisual extends StatelessWidget {
+  const _ProductVisual();
 
   @override
   Widget build(BuildContext context) {
-    // The composition is laid out at a fixed 520x600; scale it down rather
-    // than letting the phone and card run past a narrow viewport.
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      child: SizedBox(
-      width: 520,
-      height: 600,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Purple circle behind everything
-          Container(
-            width: 520,
-            height: 520,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: GabisHeroSection.purple.withOpacity(.07),
-            ),
-          ),
+    final width = MediaQuery.sizeOf(context).width;
+    final desktop = width >= 1040;
+    final mobile = width < 600;
+    final height = desktop ? 600.0 : (mobile ? 510.0 : 570.0);
 
-          // Bank card behind phone
-          Positioned(
-            right: 10,
-            top: 185,
-            child: Transform.rotate(
-              angle: .16,
-              child: const _BankCard(),
-            ),
-          ),
+    return SizedBox(
+      height: height,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final visualWidth = constraints.maxWidth;
+          final phoneWidth = desktop
+              ? 306.0
+              : (visualWidth < 390 ? visualWidth * .68 : 286.0);
+          final phoneHeight = phoneWidth * 1.84;
 
-          // Phone
-          Positioned(
-            left: 40,
-            top: 20,
-            child: Transform.rotate(
-              angle: .10,
-              child: const _PhoneMockup(),
-            ),
-          ),
-
-        ],
-      ),
-      ),
-    );
-  }
-}
-
-class _BankCard extends StatelessWidget {
-  const _BankCard();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 300,
-      height: 185,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF907EFF),
-            Color(0xFF5546D9),
-          ],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: GabisHeroSection.purple.withOpacity(.25),
-            blurRadius: 35,
-            offset: const Offset(0, 18),
-          ),
-        ],
-      ),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: GabisLogo(size: 26, isWhite: true),
-          ),
-          SizedBox(height: 14),
-          Icon(
-            Icons.memory_rounded,
-            color: Color(0xFFFFD561),
-            size: 31,
-          ),
-          Spacer(),
-          Text(
-            '••••  ••••  ••••  5678',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 13,
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          SizedBox(height: 10),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          return Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'CARDHOLDER',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 7.5,
-                      letterSpacing: 1.4,
-                      fontWeight: FontWeight.w600,
+              Positioned(
+                top: desktop ? 45 : 30,
+                child: Container(
+                  width: desktop ? 510 : 430,
+                  height: desktop ? 510 : 430,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        GabisHeroSection.accent.withValues(alpha: .12),
+                        GabisHeroSection.accent.withValues(alpha: .035),
+                        Colors.transparent,
+                      ],
                     ),
                   ),
-                  SizedBox(height: 2),
-                  Text(
-                    'RAPHAEL GABRIELS',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      letterSpacing: 0.8,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ],
-              ),
-              Spacer(),
-              Text(
-                'VISA',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  fontStyle: FontStyle.italic,
-                  letterSpacing: -0.5,
                 ),
               ),
+              if (!mobile)
+                Positioned(
+                  left: desktop ? 4 : 0,
+                  top: desktop ? 118 : 95,
+                  child: const _FloatingBalanceCard(),
+                ),
+              if (!mobile)
+                Positioned(
+                  right: desktop ? 0 : 6,
+                  top: desktop ? 220 : 205,
+                  child: const _FloatingTransferCard(),
+                ),
+              Positioned(
+                top: desktop ? 28 : 20,
+                child: Transform.rotate(
+                  angle: desktop ? .035 : .02,
+                  child: _PhoneMockup(
+                    width: phoneWidth,
+                    height: phoneHeight,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: mobile ? 3 : (desktop ? 25 : 22),
+                bottom: desktop ? 46 : 22,
+                child: const _FloatingCardPreview(),
+              ),
+              Positioned(
+                right: mobile ? 2 : (desktop ? 16 : 18),
+                bottom: desktop ? 96 : 78,
+                child: const _FloatingSuccessChip(),
+              ),
             ],
-          ),
-        ],
+          );
+        },
       ),
     );
   }
 }
 
 class _PhoneMockup extends StatelessWidget {
-  const _PhoneMockup();
+  final double width;
+  final double height;
+
+  const _PhoneMockup({required this.width, required this.height});
 
   @override
   Widget build(BuildContext context) {
-    return GabisPhoneFrame(
-      width: 310,
-      height: 560,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),
-        child: Column(
-          children: [
-            const Text(
-              'Total Balance',
-              style: TextStyle(
-                color: GabisHeroSection.textGrey,
-                fontSize: 12,
+    final scale = width / 306;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(44 * scale),
+        boxShadow: [
+          BoxShadow(
+            color: GabisHeroSection.ink.withValues(alpha: .18),
+            blurRadius: 48,
+            offset: const Offset(0, 24),
+          ),
+        ],
+      ),
+      child: GabisPhoneFrame(
+        width: width,
+        height: height,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            18 * scale,
+            16 * scale,
+            18 * scale,
+            18 * scale,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 35 * scale,
+                    height: 35 * scale,
+                    decoration: BoxDecoration(
+                      color: GabisHeroSection.softAccent,
+                      borderRadius: BorderRadius.circular(11 * scale),
+                    ),
+                    child: Icon(
+                      Icons.person_rounded,
+                      size: 18 * scale,
+                      color: GabisHeroSection.accent,
+                    ),
+                  ),
+                  SizedBox(width: 10 * scale),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Good morning',
+                          style: TextStyle(
+                            fontSize: 10.5 * scale,
+                            color: GabisHeroSection.muted,
+                          ),
+                        ),
+                        Text(
+                          'Your Gabis account',
+                          style: TextStyle(
+                            fontSize: 12 * scale,
+                            fontWeight: FontWeight.w800,
+                            color: GabisHeroSection.ink,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.notifications_none_rounded,
+                    size: 21 * scale,
+                    color: GabisHeroSection.ink,
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 5),
-            const Text(
-              '\u20A614,850.50',
-              style: TextStyle(
-                color: GabisHeroSection.dark,
-                fontSize: 29,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            const Row(
-              children: [
-                Expanded(
-                  child: _PhoneAction(
-                    icon: Icons.arrow_upward_rounded,
-                    label: 'Send',
-                  ),
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: _PhoneAction(
-                    icon: Icons.arrow_downward_rounded,
-                    label: 'Receive',
-                  ),
-                ),
-                SizedBox(width: 8),
-                Expanded(
-                  child: _PhoneAction(
-                    icon: Icons.swap_horiz_rounded,
-                    label: 'Transfer',
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 28),
-
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Recent Activity',
+              SizedBox(height: 22 * scale),
+              Text(
+                'TOTAL BALANCE',
                 style: TextStyle(
-                  color: GabisHeroSection.dark,
+                  fontSize: 9.5 * scale,
+                  letterSpacing: 1.2,
                   fontWeight: FontWeight.w800,
-                  fontSize: 15,
+                  color: GabisHeroSection.muted,
                 ),
               ),
-            ),
-
-            const SizedBox(height: 12),
-
-            const _Transaction(
-              icon: Icons.phone_android_rounded,
-              title: 'MTN Top-up',
-              amount: '-\u20A62,000.00',
-            ),
-
-            const Divider(height: 24),
-
-            const _Transaction(
-              icon: Icons.people_outline_rounded,
-              title: 'Funds Received',
-              amount: '+\u20A65,000.00',
-            ),
-          ],
+              SizedBox(height: 6 * scale),
+              Text(
+                '₦1,485,050.50',
+                style: TextStyle(
+                  fontSize: 27 * scale,
+                  letterSpacing: -1.1,
+                  fontWeight: FontWeight.w900,
+                  color: GabisHeroSection.ink,
+                ),
+              ),
+              SizedBox(height: 22 * scale),
+              Row(
+                children: [
+                  Expanded(
+                    child: _PhoneAction(
+                      icon: Icons.arrow_upward_rounded,
+                      label: 'Send',
+                      scale: scale,
+                    ),
+                  ),
+                  SizedBox(width: 8 * scale),
+                  Expanded(
+                    child: _PhoneAction(
+                      icon: Icons.arrow_downward_rounded,
+                      label: 'Receive',
+                      scale: scale,
+                    ),
+                  ),
+                  SizedBox(width: 8 * scale),
+                  Expanded(
+                    child: _PhoneAction(
+                      icon: Icons.credit_card_rounded,
+                      label: 'Cards',
+                      scale: scale,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 24 * scale),
+              Text(
+                'Your wallets',
+                style: TextStyle(
+                  fontSize: 14 * scale,
+                  fontWeight: FontWeight.w900,
+                  color: GabisHeroSection.ink,
+                ),
+              ),
+              SizedBox(height: 10 * scale),
+              _WalletTile(
+                flag: '🇳🇬',
+                code: 'NGN',
+                name: 'Nigerian Naira',
+                amount: '₦1,320,000',
+                scale: scale,
+              ),
+              SizedBox(height: 8 * scale),
+              _WalletTile(
+                flag: '🇺🇸',
+                code: 'USD',
+                name: 'US Dollar',
+                amount: r'$98.25',
+                scale: scale,
+              ),
+              const Spacer(),
+              Container(
+                width: double.infinity,
+                padding: EdgeInsets.all(13 * scale),
+                decoration: BoxDecoration(
+                  color: GabisHeroSection.softAccent,
+                  borderRadius: BorderRadius.circular(16 * scale),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 33 * scale,
+                      height: 33 * scale,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10 * scale),
+                      ),
+                      child: Icon(
+                        Icons.auto_awesome_rounded,
+                        size: 16 * scale,
+                        color: GabisHeroSection.accent,
+                      ),
+                    ),
+                    SizedBox(width: 9 * scale),
+                    Expanded(
+                      child: Text(
+                        'Everything you need in one account',
+                        style: TextStyle(
+                          fontSize: 10.5 * scale,
+                          height: 1.3,
+                          fontWeight: FontWeight.w700,
+                          color: GabisHeroSection.ink,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -768,35 +775,32 @@ class _PhoneMockup extends StatelessWidget {
 class _PhoneAction extends StatelessWidget {
   final IconData icon;
   final String label;
+  final double scale;
 
   const _PhoneAction({
     required this.icon,
     required this.label,
+    required this.scale,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 74,
+      padding: EdgeInsets.symmetric(vertical: 11 * scale),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFF6B45C7),
-            Color(0xFF4A2A9D),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(14),
+        color: GabisHeroSection.accent,
+        borderRadius: BorderRadius.circular(13 * scale),
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.white, size: 19),
-          const SizedBox(height: 7),
+          Icon(icon, color: Colors.white, size: 17 * scale),
+          SizedBox(height: 5 * scale),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
-              fontSize: 10,
+              fontSize: 9.5 * scale,
+              fontWeight: FontWeight.w800,
             ),
           ),
         ],
@@ -805,104 +809,256 @@ class _PhoneAction extends StatelessWidget {
   }
 }
 
-class _Transaction extends StatelessWidget {
-  final IconData icon;
-  final String title;
+class _WalletTile extends StatelessWidget {
+  final String flag;
+  final String code;
+  final String name;
   final String amount;
+  final double scale;
 
-  const _Transaction({
-    required this.icon,
-    required this.title,
+  const _WalletTile({
+    required this.flag,
+    required this.code,
+    required this.name,
     required this.amount,
+    required this.scale,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: const BoxDecoration(
-            color: Color(0xFFE9F9EE),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            size: 16,
-            color: const Color(0xFF44B868),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 11,
-              color: GabisHeroSection.dark,
+    return Container(
+      padding: EdgeInsets.all(11 * scale),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFAFBFD),
+        borderRadius: BorderRadius.circular(14 * scale),
+        border: Border.all(color: GabisHeroSection.border),
+      ),
+      child: Row(
+        children: [
+          Text(flag, style: TextStyle(fontSize: 20 * scale)),
+          SizedBox(width: 9 * scale),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  code,
+                  style: TextStyle(
+                    fontSize: 11 * scale,
+                    fontWeight: FontWeight.w900,
+                    color: GabisHeroSection.ink,
+                  ),
+                ),
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontSize: 9 * scale,
+                    color: GabisHeroSection.muted,
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        Text(
-          amount,
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: GabisHeroSection.dark,
+          Text(
+            amount,
+            style: TextStyle(
+              fontSize: 10.5 * scale,
+              fontWeight: FontWeight.w800,
+              color: GabisHeroSection.ink,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
 
-class _StatsBar extends StatelessWidget {
-  const _StatsBar();
+class _FloatingBalanceCard extends StatelessWidget {
+  const _FloatingBalanceCard();
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 820),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 27,
-          vertical: 20,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(.88),
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: Colors.white,
+    return const _GlassCard(
+      width: 185,
+      child: Row(
+        children: [
+          _FloatIcon(icon: Icons.account_balance_wallet_outlined),
+          SizedBox(width: 11),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Multi-currency',
+                style: TextStyle(
+                  color: GabisHeroSection.muted,
+                  fontSize: 11,
+                ),
+              ),
+              SizedBox(height: 3),
+              Text(
+                'NGN  •  USD',
+                style: TextStyle(
+                  color: GabisHeroSection.ink,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FloatingTransferCard extends StatelessWidget {
+  const _FloatingTransferCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return const _GlassCard(
+      width: 190,
+      child: Row(
+        children: [
+          _FloatIcon(icon: Icons.south_west_rounded),
+          SizedBox(width: 11),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Money received',
+                  style: TextStyle(
+                    color: GabisHeroSection.muted,
+                    fontSize: 11,
+                  ),
+                ),
+                SizedBox(height: 3),
+                Text(
+                  '+ ₦85,000',
+                  style: TextStyle(
+                    color: GabisHeroSection.ink,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FloatIcon extends StatelessWidget {
+  final IconData icon;
+
+  const _FloatIcon({required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: GabisHeroSection.softAccent,
+        borderRadius: BorderRadius.circular(11),
+      ),
+      child: Icon(icon, size: 18, color: GabisHeroSection.accent),
+    );
+  }
+}
+
+class _GlassCard extends StatelessWidget {
+  final double width;
+  final Widget child;
+
+  const _GlassCard({required this.width, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: .92),
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: Colors.white),
+        boxShadow: [
+          BoxShadow(
+            color: GabisHeroSection.ink.withValues(alpha: .09),
+            blurRadius: 28,
+            offset: const Offset(0, 13),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _FloatingCardPreview extends StatelessWidget {
+  const _FloatingCardPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    final mobile = MediaQuery.sizeOf(context).width < 600;
+    final width = mobile ? 155.0 : 188.0;
+
+    return Transform.rotate(
+      angle: -.08,
+      child: Container(
+        width: width,
+        height: width * .59,
+        padding: EdgeInsets.all(mobile ? 13 : 16),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF17223F),
+              Color(0xFF2F4BFF),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: GabisHeroSection.purple.withOpacity(.07),
-              blurRadius: 30,
-              offset: const Offset(0, 14),
+              color: GabisHeroSection.ink.withValues(alpha: .18),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
             ),
           ],
         ),
-
-        // Notice: the 100K+ metric is completely removed.
-        child: const Wrap(
-          spacing: 34,
-          runSpacing: 20,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _Stat(
-              icon: Icons.public_rounded,
-              title: '180+',
-              subtitle: 'Countries supported',
+            const Row(
+              children: [
+                GabisLogo(size: 20, isWhite: true),
+                Spacer(),
+                Icon(Icons.contactless_rounded, color: Colors.white70, size: 19),
+              ],
             ),
-            _Stat(
-              icon: Icons.verified_user_rounded,
-              title: 'Secure',
-              subtitle: 'Your trust, our priority',
+            const Spacer(),
+            Text(
+              '••••  4821',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: mobile ? 10.5 : 12,
+                letterSpacing: .7,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            _Stat(
-              icon: Icons.bolt_rounded,
-              title: 'Fast',
-              subtitle: 'Transactions in seconds',
+            const SizedBox(height: 6),
+            Text(
+              'VIRTUAL CARD',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: mobile ? 7.5 : 8.5,
+                letterSpacing: 1.1,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),
@@ -911,36 +1067,141 @@ class _StatsBar extends StatelessWidget {
   }
 }
 
-class _Stat extends StatelessWidget {
+class _FloatingSuccessChip extends StatelessWidget {
+  const _FloatingSuccessChip();
+
+  @override
+  Widget build(BuildContext context) {
+    final mobile = MediaQuery.sizeOf(context).width < 600;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: mobile ? 10 : 13,
+        vertical: mobile ? 8 : 10,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(100),
+        border: Border.all(color: GabisHeroSection.border),
+        boxShadow: [
+          BoxShadow(
+            color: GabisHeroSection.ink.withValues(alpha: .08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 22,
+            height: 22,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color(0xFFEAFBF2),
+            ),
+            child: const Icon(
+              Icons.check_rounded,
+              size: 14,
+              color: Color(0xFF079455),
+            ),
+          ),
+          const SizedBox(width: 7),
+          Text(
+            'Transfer complete',
+            style: TextStyle(
+              color: GabisHeroSection.ink,
+              fontSize: mobile ? 9.5 : 11,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TrustStrip extends StatelessWidget {
+  const _TrustStrip();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(
+          top: BorderSide(color: GabisHeroSection.border),
+          bottom: BorderSide(color: GabisHeroSection.border),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1120),
+          child: const Wrap(
+            alignment: WrapAlignment.spaceEvenly,
+            runAlignment: WrapAlignment.center,
+            spacing: 24,
+            runSpacing: 13,
+            children: [
+              _TrustItem(
+                icon: Icons.language_rounded,
+                title: 'Multi-currency',
+                caption: 'One account, more reach',
+              ),
+              _TrustItem(
+                icon: Icons.bolt_rounded,
+                title: 'Fast transfers',
+                caption: 'Built for everyday movement',
+              ),
+              _TrustItem(
+                icon: Icons.credit_card_rounded,
+                title: 'Cards that travel',
+                caption: 'Pay online and on the go',
+              ),
+              _TrustItem(
+                icon: Icons.shield_outlined,
+                title: 'Secure by design',
+                caption: 'Protection at every step',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TrustItem extends StatelessWidget {
   final IconData icon;
   final String title;
-  final String subtitle;
+  final String caption;
 
-  const _Stat({
+  const _TrustItem({
     required this.icon,
     required this.title,
-    required this.subtitle,
+    required this.caption,
   });
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 220,
+      width: 230,
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 49,
-            height: 49,
+            width: 39,
+            height: 39,
             decoration: BoxDecoration(
-              color: GabisHeroSection.softPurple,
-              borderRadius: BorderRadius.circular(14),
+              color: GabisHeroSection.softAccent,
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              icon,
-              color: GabisHeroSection.purple,
-            ),
+            child: Icon(icon, size: 18, color: GabisHeroSection.accent),
           ),
-          const SizedBox(width: 13),
+          const SizedBox(width: 11),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -948,17 +1209,19 @@ class _Stat extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                    color: GabisHeroSection.dark,
-                    fontSize: 18,
+                    color: GabisHeroSection.ink,
+                    fontSize: 13,
                     fontWeight: FontWeight.w800,
                   ),
                 ),
-                const SizedBox(height: 3),
+                const SizedBox(height: 2),
                 Text(
-                  subtitle,
+                  caption,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: GabisHeroSection.textGrey,
-                    fontSize: 11,
+                    color: GabisHeroSection.muted,
+                    fontSize: 10.5,
                   ),
                 ),
               ],

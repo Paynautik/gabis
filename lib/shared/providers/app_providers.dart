@@ -7,6 +7,10 @@ import '../models/transaction.dart';
 
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
 final authStateProvider = StateProvider<bool>((ref) => false);
+
+/// Which tab the home shell is showing. Held here so anything on screen — a
+/// promo card, a snackbar action — can send the user to the right place.
+final homeTabProvider = StateProvider<int>((ref) => 0);
 final isBusinessModeProvider = StateProvider<bool>((ref) => false);
 final userAvatarProvider = StateProvider<String?>((ref) => null);
 final userNameProvider = Provider<String>((ref) => 'Raphael');

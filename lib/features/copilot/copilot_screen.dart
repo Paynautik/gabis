@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../shared/providers/app_providers.dart';
 import 'copilot_engine.dart';
+import 'sweep_store.dart';
 
 /// Conversational financial copilot.
 ///
@@ -300,6 +301,7 @@ class _CopilotScreenState extends ConsumerState<CopilotScreen> {
                 controller: _scroll,
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
                 children: [
+                  _sweepPanel(engine),
                   if (_turns.isEmpty) _intro(engine),
                   ..._turns.map(_bubble),
                   if (_thinking) _thinkingRow(),
@@ -378,6 +380,219 @@ class _CopilotScreenState extends ConsumerState<CopilotScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Payday sweep. The figure comes from the engine; the money only moves when
+  /// the user approves it, and never above their cap.
+  Widget _sweepPanel(CopilotEngine engine) {
+    final sweep = ref.watch(sweepProvider);
+    final plan = engine.computeSweep(reserveWeeks: sweep.reserveWeeks);
+    final amount = sweep.applyCap(plan.recommendedNaira);
+    final capped = plan.recommendedNaira > sweep.capNaira;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 14),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFE3DEFF)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: _purple.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(9),
+                ),
+                child: const Icon(Icons.savings_rounded, size: 16, color: _purple),
+              ),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Payday sweep',
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14.5, color: _ink)),
+                    Text('Moves what is genuinely spare into savings',
+                        style: TextStyle(fontSize: 11.5, color: _muted)),
+                  ],
+                ),
+              ),
+              Switch(
+                value: sweep.armed,
+                activeThumbColor: _purple,
+                onChanged: (v) => ref.read(sweepProvider.notifier).setArmed(v),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF7F5FF),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Spare this cycle',
+                              style: TextStyle(fontSize: 11, color: Color(0xFF6D28D9), fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 2),
+                          Text(CopilotEngine.formatNaira(amount),
+                              style: const TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.w800, color: Color(0xFF4C1D95))),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('In savings', style: const TextStyle(fontSize: 10.5, color: _muted)),
+                        Text(CopilotEngine.formatNaira(sweep.savingsNaira),
+                            style: const TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.w800, color: _ink)),
+                      ],
+                    ),
+                  ],
+                ),
+                if (capped) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'Held to your ${CopilotEngine.formatNaira(sweep.capNaira)} cap — ${CopilotEngine.formatNaira(plan.recommendedNaira)} was spare.',
+                    style: const TextStyle(fontSize: 10.5, color: Color(0xFF7C3AED)),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 12),
+          ...plan.reasoning.take(3).map((r) => Padding(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 4,
+                      margin: const EdgeInsets.only(top: 6, right: 8),
+                      decoration: BoxDecoration(
+                          color: _muted.withValues(alpha: 0.45), shape: BoxShape.circle),
+                    ),
+                    Expanded(
+                      child: Text(r,
+                          style: const TextStyle(fontSize: 11.5, color: Color(0xFF475569), height: 1.4)),
+                    ),
+                  ],
+                ),
+              )),
+
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton(
+                  onPressed: amount > 0 ? () => _confirmSweep(amount, plan) : null,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: _purple,
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11)),
+                  ),
+                  child: Text(
+                    amount > 0
+                        ? 'Sweep ${CopilotEngine.formatNaira(amount)} to savings'
+                        : 'Nothing spare this cycle',
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5),
+                  ),
+                ),
+              ),
+              if (sweep.history.isNotEmpty) ...[
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: () {
+                    final last = sweep.history.first;
+                    ref.read(sweepProvider.notifier).undoLast();
+                    ref.read(accountsProvider.notifier)
+                        .addBalance('NGN', last.amountNaira * 100);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Returned ${CopilotEngine.formatNaira(last.amountNaira)} to your balance.')),
+                    );
+                  },
+                  child: const Text('Undo', style: TextStyle(fontSize: 12.5)),
+                ),
+              ],
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmSweep(int amount, SweepPlan plan) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: const Text('Move this to savings?', style: TextStyle(fontWeight: FontWeight.w800)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(CopilotEngine.formatNaira(amount),
+                style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: _purple)),
+            const SizedBox(height: 10),
+            ...plan.reasoning.map((r) => Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Text('· $r',
+                      style: const TextStyle(fontSize: 12.5, color: _muted, height: 1.4)),
+                )),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Not now')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: _purple),
+            onPressed: () {
+              Navigator.pop(ctx);
+              final moved = ref.read(sweepProvider.notifier).sweep(amount);
+              // The money leaves the spending balance, so the copilot's next
+              // answer reflects it.
+              ref.read(accountsProvider.notifier).subtractBalance('NGN', moved * 100);
+              setState(() {
+                _turns.add(_Turn.assistant(
+                  headline: 'Swept ${CopilotEngine.formatNaira(moved)} into savings.',
+                  lines: [
+                    'Your spending balance is updated, so everything I tell you from here accounts for it.',
+                    'You can undo this from the sweep panel.',
+                  ],
+                  tone: _Tone.positive,
+                ));
+              });
+              _jump();
+            },
+            child: const Text('Approve'),
+          ),
+        ],
       ),
     );
   }

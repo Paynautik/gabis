@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import '../points/points_store.dart';
 import 'dart:convert';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,6 +24,9 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  /// Cleared once the notifications sheet has been opened.
+  bool _notificationsRead = false;
+
   void _showAvatarUploadDialog(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -124,19 +129,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentSlide = 0;
   Timer? _carouselTimer;
 
+  /// Kept next to the PageView children below; the autoplay timer reads it.
+  static const _slideCount = 4;
+
+  /// Set while the user is driving the carousel, so autoplay does not fight
+  /// a manual swipe or a tapped dot.
+  DateTime _lastManualNudge = DateTime.fromMillisecondsSinceEpoch(0);
+
+  bool _autoAdvancing = false;
+
+  void _pauseAutoplay() {
+    if (_autoAdvancing) return;
+    _lastManualNudge = DateTime.now();
+  }
+
   @override
   void initState() {
     super.initState();
+
+    // Points caught on the landing page before signing in land here, so the
+    // first thing the user sees is that the catch was kept.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final claimed = ref.read(pointsProvider).justClaimed;
+      if (claimed <= 0 || !mounted) return;
+      ref.read(pointsProvider.notifier).acknowledgeClaim();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: const Color(0xFF101010),
+        duration: const Duration(seconds: 6),
+        content: Row(children: [
+          const Icon(Icons.auto_awesome_rounded,
+              size: 16, color: Color(0xFFD9FF43)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text('$claimed gabis points from the orbs added to your wallet.',
+                style: const TextStyle(
+                    color: Color(0xFFF4F0E8), fontWeight: FontWeight.w600)),
+          ),
+        ]),
+        action: SnackBarAction(
+          label: 'View',
+          textColor: const Color(0xFFD9FF43),
+          onPressed: () => Navigator.pushNamed(context, '/points'),
+        ),
+      ));
+    });
+
     _pageController = PageController();
     _carouselTimer = Timer.periodic(const Duration(seconds: 6), (timer) {
-      if (_pageController.hasClients) {
-        final next = (_currentSlide + 1) % 2;
-        _pageController.animateToPage(
-          next,
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeInOut,
-        );
-      }
+      if (!_pageController.hasClients) return;
+      if (DateTime.now().difference(_lastManualNudge).inSeconds < 10) return;
+      final next = (_currentSlide + 1) % _slideCount;
+      _autoAdvancing = true;
+      _pageController
+          .animateToPage(
+            next,
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeInOut,
+          )
+          .whenComplete(() => _autoAdvancing = false);
     });
   }
 
@@ -276,10 +326,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 clipBehavior: Clip.none,
                 children: [
                   IconButton(
-                    onPressed: () => _showNotificationsSheet(context),
+                    onPressed: () {
+                      setState(() => _notificationsRead = true);
+                      _showNotificationsSheet(context);
+                    },
                     icon: Icon(Icons.notifications_none_rounded, color: context.colors.ink, size: 26),
                   ),
-                  Positioned(
+                  if (!_notificationsRead) Positioned(
                     right: 6,
                     top: 6,
                     child: Container(
@@ -913,11 +966,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           height: 180,
           child: PageView(
             controller: _pageController,
-            onPageChanged: (idx) => setState(() => _currentSlide = idx),
+            onPageChanged: (idx) {
+              setState(() => _currentSlide = idx);
+              _pauseAutoplay();
+            },
             children: [
               // Slide 1: PayNautik Global Payroll
               _buildPayrollSlide(),
-              // Slide 2: gabis Promo (Pay Smarter, Live Better)
+              // Slide 2: collections — the reason to switch to Business
+              _buildCollectionsSlide(),
+              // Slide 3: points and rewards
+              _buildPointsSlide(),
+              // Slide 4: gabis Promo (Pay Smarter, Live Better)
               _buildGabisPromoSlide(),
             ],
           ),
@@ -925,16 +985,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(2, (index) {
+          children: List.generate(_slideCount, (index) {
             final isSel = _currentSlide == index;
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              width: isSel ? 18 : 6,
-              height: 6,
-              decoration: BoxDecoration(
-                color: isSel ? context.colors.bluePrimary : context.colors.inkSoft.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(3),
+            return GestureDetector(
+              onTap: () {
+                _pauseAutoplay();
+                _pageController.animateToPage(
+                  index,
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                );
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: isSel ? 18 : 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: isSel
+                        ? context.colors.bluePrimary
+                        : context.colors.inkSoft.withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
               ),
             );
           }),
@@ -1026,14 +1102,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ],
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             flex: 3,
-            child: Center(
-              child: CustomPaint(
-                size: const Size(120, 90),
-                painter: _PayrollNodesPainter(),
-              ),
+            child: _BannerPhoto(
+              asset: 'assets/images/usecase_freelancers.jpg',
+              scrim: Color(0xFF0E1A24),
             ),
           ),
         ],
@@ -1041,7 +1115,191 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // --- Slide 2: gabis Promo ---
+
+  // --- Slide 2: get paid what you are owed ---
+  Widget _buildCollectionsSlide() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF101010), Color(0xFF1C2416)],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD9FF43),
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: const Text('FOR BUSINESS',
+                      style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.1,
+                          color: Color(0xFF101010))),
+                ),
+                const SizedBox(height: 10),
+                const Text('Get paid what you are owed.',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 17,
+                        height: 1.15,
+                        color: Colors.white)),
+                const SizedBox(height: 5),
+                const Text(
+                  'Connect your business, import your debtors, and let gabis chase them — reminders, a call in their own language, then a payment link.',
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: Color(0xB3FFFFFF), fontSize: 11.5, height: 1.4),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () =>
+                      ref.read(isBusinessModeProvider.notifier).state = true,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD9FF43),
+                    foregroundColor: const Color(0xFF101010),
+                    minimumSize: const Size(150, 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  icon: const Icon(Icons.business_center_rounded, size: 13),
+                  label: const Text('Open gabis Business',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 14),
+          const Expanded(
+            flex: 3,
+            child: _BannerPhoto(
+              asset: 'assets/images/banner_collections.jpg',
+              scrim: Color(0xFF101010),
+              alignment: Alignment(-0.15, 0),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+  // --- Slide 3: points you can actually spend ---
+  Widget _buildPointsSlide() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF2B2F12), Color(0xFF101010)],
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFD9FF43).withValues(alpha: 0.35)),
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD9FF43),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: const Text('GABIS POINTS',
+                          style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.1,
+                              color: Color(0xFF101010))),
+                    ),
+                    const SizedBox(width: 8),
+                    Consumer(
+                      builder: (context, ref, _) => Text(
+                        '${ref.watch(pointsProvider).balance} pts',
+                        style: const TextStyle(
+                            color: Color(0xFFD9FF43),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Text('Earn points. Spend them on real things.',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 17,
+                        height: 1.15,
+                        color: Colors.white)),
+                const SizedBox(height: 5),
+                const Text(
+                  'Every transfer, bill and invoice paid earns points — trade them for airtime, data, fee-free transfers and cashback.',
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: Color(0xB3FFFFFF), fontSize: 11.5, height: 1.4),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/points'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD9FF43),
+                    foregroundColor: const Color(0xFF101010),
+                    minimumSize: const Size(140, 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  icon: const Icon(Icons.redeem_rounded, size: 13),
+                  label: const Text('Redeem points',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 14),
+          const Expanded(
+            flex: 3,
+            child: _BannerPhoto(
+              asset: 'assets/images/african_person_mockup.jpg',
+              scrim: Color(0xFF101010),
+              alignment: Alignment(0.1, 0),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- Slide 4: gabis Promo ---
   Widget _buildGabisPromoSlide() {
     return Container(
       decoration: BoxDecoration(
@@ -1063,17 +1321,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Pay smarter. Live better.', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Colors.white)),
+                const Text('Ask where your money went.', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Colors.white)),
                 const SizedBox(height: 4),
                 const Text(
-                  'Make seamless payments, send money, and manage your finances effortlessly on gabis.',
+                  'The copilot answers from your own transactions — what is recurring, what changed, what you can safely spend.',
                   style: TextStyle(color: Colors.white70, fontSize: 11, height: 1.3, fontWeight: FontWeight.w600),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  // Already inside the app — send them somewhere useful rather
+                  // than inviting them to visit the site they are standing on.
+                  onPressed: () =>
+                      ref.read(homeTabProvider.notifier).state = 1,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: context.colors.bluePrimary,
@@ -1081,30 +1342,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  icon: const Icon(Icons.arrow_outward_rounded, size: 12),
-                  label: const Text('Visit gabis', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
+                  icon: const Icon(Icons.auto_awesome_rounded, size: 12),
+                  label: const Text('Ask the copilot', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 12),
-          // Overlapping card mockup
-          const SizedBox(
-            width: 80,
-            height: 50,
-            child: Stack(
-              children: [
-                Positioned(
-                  left: 0,
-                  top: 6,
-                  child: _MockCard(color: Color(0xFF1761E9)),
-                ),
-                Positioned(
-                  left: 15,
-                  top: 0,
-                  child: _MockCard(color: Colors.white10),
-                ),
-              ],
+          const SizedBox(width: 14),
+          const Expanded(
+            flex: 3,
+            child: _BannerPhoto(
+              asset: 'assets/images/usecase_creators.jpg',
+              scrim: Color(0xFF2856E8),
             ),
           ),
         ],
@@ -1956,6 +2205,46 @@ class _DetailRow extends StatelessWidget {
         Text(label, style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 13)),
         Text(value, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w800, fontSize: 13.5)),
       ],
+    );
+  }
+}
+
+
+/// A photograph filling the right of a promo banner, with a scrim on the
+/// inner edge so the headline beside it stays readable.
+class _BannerPhoto extends StatelessWidget {
+  final String asset;
+  final Color scrim;
+  final Alignment alignment;
+
+  const _BannerPhoto({
+    required this.asset,
+    required this.scrim,
+    this.alignment = Alignment.center,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(asset, fit: BoxFit.cover, alignment: alignment),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  scrim.withValues(alpha: .55),
+                  scrim.withValues(alpha: .0),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
