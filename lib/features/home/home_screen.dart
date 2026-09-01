@@ -178,6 +178,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _carouselTimer = Timer.periodic(const Duration(seconds: 6), (timer) {
       if (!_pageController.hasClients) return;
       if (DateTime.now().difference(_lastManualNudge).inSeconds < 10) return;
+      // Never start a second animation on top of one already running.
+      if (_autoAdvancing) return;
+      final page = _pageController.page;
+      if (page != null && (page - page.round()).abs() > 0.01) return;
+
       final next = (_currentSlide + 1) % _slideCount;
       _autoAdvancing = true;
       _pageController
@@ -990,11 +995,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             return GestureDetector(
               onTap: () {
                 _pauseAutoplay();
-                _pageController.animateToPage(
-                  index,
-                  duration: const Duration(milliseconds: 400),
-                  curve: Curves.easeInOut,
-                );
+                if (_pageController.hasClients) {
+                  _pageController.jumpToPage(index);
+                  setState(() => _currentSlide = index);
+                }
               },
               behavior: HitTestBehavior.opaque,
               child: Padding(
@@ -1299,17 +1303,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // --- Slide 4: gabis Promo ---
+  // --- Slide 4: the copilot ---
   Widget _buildGabisPromoSlide() {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF2856E8), Color(0xFF4949E8)],
+          colors: [Color(0xFF1B1740), Color(0xFF101010)],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        border: Border.all(color: const Color(0xFF4C45FF).withValues(alpha: 0.45)),
       ),
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -1321,12 +1325,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Ask where your money went.', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Colors.white)),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4C45FF),
+                    borderRadius: BorderRadius.circular(100),
+                  ),
+                  child: const Text('AI COPILOT',
+                      style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 1.1,
+                          color: Colors.white)),
+                ),
+                const SizedBox(height: 10),
+                const Text('Ask where your money went.',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 17,
+                        height: 1.15,
+                        color: Colors.white)),
                 const SizedBox(height: 4),
                 const Text(
                   'The copilot answers from your own transactions — what is recurring, what changed, what you can safely spend.',
-                  style: TextStyle(color: Colors.white70, fontSize: 11, height: 1.3, fontWeight: FontWeight.w600),
-                  maxLines: 2,
+                  style: TextStyle(
+                      color: Color(0xB3FFFFFF),
+                      fontSize: 11.5,
+                      height: 1.4,
+                      fontWeight: FontWeight.w500),
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 12),
@@ -1336,13 +1364,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   onPressed: () =>
                       ref.read(homeTabProvider.notifier).state = 1,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: context.colors.bluePrimary,
-                    minimumSize: const Size(120, 36),
+                    backgroundColor: const Color(0xFFD9FF43),
+                    foregroundColor: const Color(0xFF101010),
+                    minimumSize: const Size(140, 36),
                     padding: const EdgeInsets.symmetric(horizontal: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
                   ),
-                  icon: const Icon(Icons.auto_awesome_rounded, size: 12),
+                  icon: const Icon(Icons.auto_awesome_rounded, size: 13),
                   label: const Text('Ask the copilot', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
                 ),
               ],
@@ -1353,7 +1382,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             flex: 3,
             child: _BannerPhoto(
               asset: 'assets/images/usecase_creators.jpg',
-              scrim: Color(0xFF2856E8),
+              scrim: Color(0xFF101010),
             ),
           ),
         ],
