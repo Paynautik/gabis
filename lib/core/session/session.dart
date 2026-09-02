@@ -18,6 +18,8 @@ class LocalData {
   static const points = 'gabis.points.v1';
   static const pendingPoints = 'gabis.points.pending';
   static const demoData = 'gabis.demoData';
+  static const profileName = 'gabis.profile.name';
+  static const profileAvatar = 'gabis.profile.avatar';
 
   /// Who the local copy belongs to, so a different account can be detected.
   static const owner = 'gabis.owner';
@@ -29,6 +31,8 @@ class LocalData {
     points,
     pendingPoints,
     demoData,
+    profileName,
+    profileAvatar,
     owner,
   ];
 
@@ -83,6 +87,8 @@ class SessionService {
     _ref.invalidate(accountsProvider);
     _ref.invalidate(transactionsProvider);
     _ref.invalidate(cardsProvider);
+    _ref.invalidate(profileNameProvider);
+    _ref.invalidate(userAvatarProvider);
   }
 }
 

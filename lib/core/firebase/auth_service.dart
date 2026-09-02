@@ -32,6 +32,15 @@ class AuthService {
     return result.user!;
   }
 
+  /// Renames the account. Firebase caches the profile locally, so the user is
+  /// reloaded before anything reads displayName back.
+  Future<void> updateName(String name) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+    await user.updateDisplayName(name.trim());
+    await user.reload();
+  }
+
   Future<void> sendReset(String email) =>
       _auth.sendPasswordResetEmail(email: email.trim());
 

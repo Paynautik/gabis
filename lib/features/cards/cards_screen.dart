@@ -341,7 +341,7 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'RAPHAEL G. MOMOH',
+                          ref.watch(userCardNameProvider),
                           style: TextStyle(
                             color: skin['textColor'],
                             fontSize: 12,
@@ -408,8 +408,8 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
                     color: Colors.white70,
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: const Text(
-                      'Raphael G. Momoh',
+                    child: Text(
+                      ref.watch(userNameProvider),
                       style: TextStyle(
                         fontFamily: 'Courier',
                         fontSize: 14,
