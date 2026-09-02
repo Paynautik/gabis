@@ -2,7 +2,6 @@ import 'dart:async';
 
 import '../points/points_store.dart';
 import 'dart:convert';
-import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
@@ -14,6 +13,7 @@ import '../../shared/models/transaction.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/coming_soon.dart';
 import '../../shared/widgets/transaction_tile.dart';
+import '../../shared/widgets/user_avatar.dart';
 import '../../shared/widgets/glowing_background.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -27,104 +27,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// Cleared once the notifications sheet has been opened.
   bool _notificationsRead = false;
 
-  void _showAvatarUploadDialog(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: context.colors.bgSoft,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
-        return Consumer(
-          builder: (context, ref, _) {
-            final hasPhoto = ref.watch(userAvatarProvider) != null;
-            return SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(height: 12),
-                  Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: context.colors.border,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'Profile Photo',
-                    style: TextStyle(
-                      color: context.colors.ink,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ListTile(
-                    leading: Icon(Icons.photo_library_rounded, color: context.colors.bluePrimary),
-                    title: Text('Upload from Gallery', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w600)),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      try {
-                        final picker = ImagePicker();
-                        final XFile? image = await picker.pickImage(source: ImageSource.gallery, maxWidth: 300, maxHeight: 300);
-                        if (image != null) {
-                          final bytes = await image.readAsBytes();
-                          ref.read(userAvatarProvider.notifier).state = base64Encode(bytes);
-                        }
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error picking image: $e')),
-                        );
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: Icon(Icons.camera_alt_rounded, color: context.colors.bluePrimary),
-                    title: Text('Take a Photo', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w600)),
-                    onTap: () async {
-                      Navigator.pop(context);
-                      try {
-                        final picker = ImagePicker();
-                        final XFile? image = await picker.pickImage(source: ImageSource.camera, maxWidth: 300, maxHeight: 300);
-                        if (image != null) {
-                          final bytes = await image.readAsBytes();
-                          ref.read(userAvatarProvider.notifier).state = base64Encode(bytes);
-                        }
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error taking photo: $e')),
-                        );
-                      }
-                    },
-                  ),
-                  if (hasPhoto)
-                    ListTile(
-                      leading: const Icon(Icons.delete_rounded, color: Colors.redAccent),
-                      title: const Text('Remove Photo', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w600)),
-                      onTap: () {
-                        Navigator.pop(context);
-                        ref.read(userAvatarProvider.notifier).state = null;
-                      },
-                    ),
-                  const SizedBox(height: 20),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   String _selectedPeriod = '7D';
   bool _showPromoBanner = true;
   bool _showAllTransactions = false;
   bool _hideBalances = false;
   bool _showSecurityBanner = true;
   bool _isBalanceHidden = false;
-  
+
   late PageController _pageController;
   int _currentSlide = 0;
   Timer? _carouselTimer;
@@ -204,7 +113,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userName = ref.watch(userNameProvider);
     final balance = ref.watch(totalBalanceNgnProvider);
     final accounts = ref.watch(accountsProvider);
     final transactions = ref.watch(transactionsProvider);
@@ -293,26 +201,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Row(
             children: [
               GestureDetector(
-                onTap: () => _showAvatarUploadDialog(context),
+                onTap: () => showAvatarSheet(context),
                 child: Container(
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: context.colors.bluePrimary.withValues(alpha: 0.3), width: 2),
                   ),
-                  child: CircleAvatar(
-                    radius: 18,
-                    backgroundColor: context.colors.blueHighlight,
-                    backgroundImage: ref.watch(userAvatarProvider) != null
-                        ? MemoryImage(base64Decode(ref.watch(userAvatarProvider)!))
-                        : null,
-                    child: ref.watch(userAvatarProvider) == null
-                        ? const Text('RM', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12))
-                        : null,
-                  ),
+                  child: const UserAvatar(radius: 18),
                 ),
               ),
               const SizedBox(width: 10),
-              Text('Hi, RAPHAEL', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: context.colors.ink, letterSpacing: -0.3)),
+              Text('Hi, ${ref.watch(userFirstNameProvider).toUpperCase()}', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: context.colors.ink, letterSpacing: -0.3)),
             ],
           ),
           
@@ -930,12 +829,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Column(
+                            Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('RAPHAEL MOMOH', style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w800)),
-                                SizedBox(height: 1),
-                                Text('08/29', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 6.5, fontWeight: FontWeight.w700)),
+                                Text(ref.watch(userCardNameProvider), style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w800)),
+                                const SizedBox(height: 1),
+                                const Text('08/29', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 6.5, fontWeight: FontWeight.w700)),
                               ],
                             ),
                             // VISA Logo Mockup
@@ -976,14 +875,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               _pauseAutoplay();
             },
             children: [
-              // Slide 1: PayNautik Global Payroll
-              _buildPayrollSlide(),
-              // Slide 2: collections — the reason to switch to Business
+              // Slide 1: collections — the reason to switch to Business
               _buildCollectionsSlide(),
-              // Slide 3: points and rewards
+              // Slide 2: points and rewards
               _buildPointsSlide(),
-              // Slide 4: gabis Promo (Pay Smarter, Live Better)
+              // Slide 3: gabis Promo (Pay Smarter, Live Better)
               _buildGabisPromoSlide(),
+              // Slide 4: PayNautik, the parent product — last, so the app's own
+              // features are what a signed-in user sees first.
+              _buildPayrollSlide(),
             ],
           ),
         ),
@@ -1023,17 +923,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // --- Slide 1: Payroll ---
+  // --- Slide 4: PayNautik, the parent product ---
   Widget _buildPayrollSlide() {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          colors: [Color(0xFF0C2C23), Color(0xFF101010)],
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.45)),
       ),
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -1044,43 +944,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF10B981), Color(0xFF059669)],
-                        ),
-                        borderRadius: BorderRadius.circular(20),
+                        color: const Color(0xFF10B981),
+                        borderRadius: BorderRadius.circular(100),
                       ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.hub_rounded, color: Colors.white, size: 10),
-                          SizedBox(width: 4),
-                          Text('GLOBAL PAYROLL', style: TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.w900)),
-                        ],
-                      ),
+                      child: const Text('GLOBAL PAYROLL',
+                          style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 1.1,
+                              color: Color(0xFF06231B))),
                     ),
                     const SizedBox(width: 8),
-                    Text('• paynautik.com', style: TextStyle(color: context.colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w700)),
+                    const Text('paynautik.com',
+                        style: TextStyle(
+                            color: Color(0xFF10B981),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900)),
                   ],
                 ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Frictionless Global Payroll',
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: Colors.white, letterSpacing: -0.3),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Automate salary disbursements across 150+ countries via smart contracts instantly.',
-                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, height: 1.3, fontWeight: FontWeight.w500),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
                 const SizedBox(height: 10),
-                ElevatedButton(
+                const Text('Payroll that lands in 150+ countries.',
+                    style: TextStyle(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 17,
+                        height: 1.15,
+                        color: Colors.white)),
+                const SizedBox(height: 5),
+                const Text(
+                  'PayNautik is the parent of gabis — smart contracts pay your whole team at once, in their own currency.',
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      color: Color(0xB3FFFFFF), fontSize: 11.5, height: 1.4),
+                ),
+                const SizedBox(height: 12),
+                ElevatedButton.icon(
                   onPressed: () async {
                     final url = Uri.parse('https://paynautik.com');
                     if (await canLaunchUrl(url)) {
@@ -1088,30 +994,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF10B981),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    minimumSize: Size.zero,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    backgroundColor: const Color(0xFFD9FF43),
+                    foregroundColor: const Color(0xFF101010),
+                    minimumSize: const Size(150, 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text('Launch PayNautik', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
-                      SizedBox(width: 4),
-                      Icon(Icons.launch_rounded, size: 12),
-                    ],
-                  ),
+                  icon: const Icon(Icons.launch_rounded, size: 13),
+                  label: const Text('Launch PayNautik',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900)),
                 ),
               ],
             ),
           ),
           const SizedBox(width: 14),
-          Expanded(
+          const Expanded(
             flex: 3,
             child: _BannerPhoto(
               asset: 'assets/images/usecase_freelancers.jpg',
-              scrim: Color(0xFF0E1A24),
+              scrim: Color(0xFF101010),
             ),
           ),
         ],
@@ -1499,11 +1401,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ],
                   ),
                   const Text('•••• 4821', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900)),
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('RAPHAEL M.', style: TextStyle(color: Colors.white, fontSize: 5.5, fontWeight: FontWeight.w800)),
-                      Text('VISA', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900, fontStyle: FontStyle.italic)),
+                      Text(ref.watch(userCardNameProvider), style: const TextStyle(color: Colors.white, fontSize: 5.5, fontWeight: FontWeight.w800)),
+                      const Text('VISA', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900, fontStyle: FontStyle.italic)),
                     ],
                   ),
                 ],
@@ -2187,21 +2089,22 @@ void _showReceiveSheet(BuildContext context) {
                   color: const Color(0xFFF1F3F7),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Column(
+                child: Column(
                   children: [
-                    _DetailRow('Bank Name', 'gabis Partner Bank'),
-                    SizedBox(height: 8),
-                    _DetailRow('Account Number', '9928371102'),
-                    SizedBox(height: 8),
-                    _DetailRow('Account Name', 'Raphael G. Momoh'),
+                    const _DetailRow('Bank Name', 'gabis Partner Bank'),
+                    const SizedBox(height: 8),
+                    const _DetailRow('Account Number', '9928371102'),
+                    const SizedBox(height: 8),
+                    _DetailRow('Account Name', ref.watch(userNameProvider)),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
                 onPressed: () {
-                  Clipboard.setData(const ClipboardData(
-                    text: 'Bank: gabis Partner Bank\nAcct: 9928371102\nName: Raphael G. Momoh',
+                  Clipboard.setData(ClipboardData(
+                    text: 'Bank: gabis Partner Bank\nAcct: 9928371102\n'
+                        'Name: ${ref.read(userNameProvider)}',
                   ));
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
