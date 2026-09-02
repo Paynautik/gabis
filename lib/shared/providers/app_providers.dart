@@ -54,6 +54,22 @@ final authStateProvider = StateProvider<bool>((ref) => false);
 /// Which tab the home shell is showing. Held here so anything on screen — a
 /// promo card, a snackbar action — can send the user to the right place.
 final homeTabProvider = StateProvider<int>((ref) => 0);
+
+/// The tabs behind that index, in the order HomeShell lists them. Named
+/// because a bare number is easy to get wrong from across the app — the
+/// copilot promo used to send people to Accounts.
+class HomeTab {
+  static const home = 0;
+  static const accounts = 1;
+  static const cards = 2;
+  static const profile = 3;
+  static const transactions = 4;
+  static const analytics = 5;
+  static const beneficiaries = 6;
+  static const settings = 7;
+  static const support = 8;
+  static const copilot = 9;
+}
 final isBusinessModeProvider = StateProvider<bool>((ref) => false);
 /// The picture on the account: null for initials, `fun:<n>` for one of the
 /// generated characters, `photo:<base64>` for an uploaded one.

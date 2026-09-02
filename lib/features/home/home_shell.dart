@@ -35,6 +35,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     }
   }
 
+  /// Order matters: it is what HomeTab's indexes name.
   static const _screens = [
     HomeScreen(),
     AccountsScreen(),

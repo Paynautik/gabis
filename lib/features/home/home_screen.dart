@@ -381,8 +381,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             Text('Accounts', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: context.colors.ink)),
             TextButton(
-              onPressed: () => showComingSoon(context, 'Accounts View'),
-              child: Text(_showAllTransactions ? 'View less' : 'View all', style: TextStyle(color: context.colors.bluePrimary, fontWeight: FontWeight.w800, fontSize: 13)),
+              // Accounts is a tab of the shell, not a coming-soon screen.
+              onPressed: () =>
+                  ref.read(homeTabProvider.notifier).state = HomeTab.accounts,
+              child: Text('View all', style: TextStyle(color: context.colors.bluePrimary, fontWeight: FontWeight.w800, fontSize: 13)),
             ),
                       ],
         ),
@@ -1264,7 +1266,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // Already inside the app — send them somewhere useful rather
                   // than inviting them to visit the site they are standing on.
                   onPressed: () =>
-                      ref.read(homeTabProvider.notifier).state = 1,
+                      ref.read(homeTabProvider.notifier).state = HomeTab.copilot,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFD9FF43),
                     foregroundColor: const Color(0xFF101010),
