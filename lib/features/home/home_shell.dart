@@ -1,4 +1,3 @@
-import 'dart:convert';
 import '../business/business_dashboard_screen.dart';
 import '../../shared/widgets/nautik_logo.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/session/session.dart';
 import '../../shared/providers/app_providers.dart';
+import '../../shared/widgets/user_avatar.dart';
 
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
@@ -220,15 +220,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                         padding: const EdgeInsets.all(12),
                         child: Row(
                           children: [
-                            CircleAvatar(
+                            UserAvatar(
                               radius: 18,
-                              backgroundColor: context.colors.bluePrimary.withValues(alpha: 0.2),
-                              backgroundImage: ref.watch(userAvatarProvider) != null
-                                  ? MemoryImage(base64Decode(ref.watch(userAvatarProvider)!))
-                                  : null,
-                              child: ref.watch(userAvatarProvider) == null
-                                  ? const Text('R', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900))
-                                  : null,
+                              onTap: () => showAvatarSheet(context),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
@@ -236,8 +230,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Raphael Momoh',
-                                    style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.white),
+                                    ref.watch(userNameProvider),
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.white),
                                   ),
                                   // Premium user removed and hidden in settings per request
                                 ],
@@ -414,7 +409,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('RAPHAEL2026', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1.5, color: Color(0xFF10B981))),
+                  Text(_referralCode(ref.read(userNameProvider)), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1.5, color: Color(0xFF10B981))),
                   GestureDetector(
                     onTap: () {
                       Navigator.pop(ctx);
@@ -505,4 +500,12 @@ class PlaceholderScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// A referral code the owner recognises as theirs: their first name, in caps,
+/// plus the year they are inviting in.
+String _referralCode(String name) {
+  final first = name.split(RegExp(r'\s+')).first.toUpperCase();
+  final clean = first.replaceAll(RegExp(r'[^A-Z0-9]'), '');
+  return '${clean.isEmpty ? 'GABIS' : clean}${DateTime.now().year}';
 }

@@ -677,6 +677,19 @@ class SettingsScreen extends ConsumerWidget {
                 ),
                 Divider(height: 1, color: context.colors.border),
                 ListTile(
+                  leading: Icon(Icons.badge_outlined, color: context.colors.ink),
+                  title: Text('Identity & limits',
+                      style: TextStyle(
+                          color: context.colors.ink, fontWeight: FontWeight.w700)),
+                  subtitle: Text(
+                      'Verify with your BVN to open a naira account and raise limits',
+                      style: TextStyle(color: context.colors.inkSoft, fontSize: 12)),
+                  trailing: Icon(Icons.chevron_right_rounded,
+                      color: context.colors.inkSoft),
+                  onTap: () => Navigator.pushNamed(context, '/verify'),
+                ),
+                Divider(height: 1, color: context.colors.border),
+                ListTile(
                   leading: Icon(Icons.security_rounded, color: context.colors.ink),
                   title: Text('Security & Privacy', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w700)),
                   subtitle: Text('Biometrics, Passcode, 2FA & Sessions', style: TextStyle(color: context.colors.inkSoft, fontSize: 12)),
@@ -971,7 +984,12 @@ class SupportScreen extends StatelessWidget {
               Expanded(
                 child: ListView(
                   children: [
-                    _chatBubble(context, 'Hi Raphael! How can I assist you with your gabis account today?', false),
+                    Consumer(
+                      builder: (context, ref, _) => _chatBubble(
+                          context,
+                          'Hi ${ref.watch(userFirstNameProvider)}! How can I assist you with your gabis account today?',
+                          false),
+                    ),
                     _chatBubble(context, 'You can ask about transfer speeds, FX rates, or card limits.', false),
                   ],
                 ),

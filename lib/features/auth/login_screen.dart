@@ -16,6 +16,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _nameController = TextEditingController();
   final _identifierController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _loading = false;
@@ -27,15 +28,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   void dispose() {
+    _nameController.dispose();
     _identifierController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
   Future<void> _login() async {
+    final name = _nameController.text.trim();
     final email = _identifierController.text.trim();
     final password = _passwordController.text;
 
+    // The name is what the app then calls them everywhere — on the card, in
+    // the greeting — so a new account cannot start without one.
+    if (_creatingAccount && name.length < 2) {
+      setState(() => _error = 'Enter the name on the account.');
+      return;
+    }
     if (!email.contains('@')) {
       setState(() => _error = 'Enter the email address on your account.');
       return;
@@ -53,7 +62,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final auth = ref.read(authServiceProvider);
       final user = _creatingAccount
-          ? await auth.signUp(email, password)
+          ? await auth.signUp(email, password, name: name)
           : await auth.signIn(email, password);
 
       if (!mounted) return;
@@ -156,6 +165,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           style: TextStyle(color: context.colors.inkSoft, fontSize: 14.5),
         ),
         const SizedBox(height: 26),
+        if (_creatingAccount) ...[
+          const Text('Full name',
+              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+          const SizedBox(height: 7),
+          TextField(
+            controller: _nameController,
+            textCapitalization: TextCapitalization.words,
+            keyboardType: TextInputType.name,
+            decoration: const InputDecoration(hintText: 'Ada Okonkwo'),
+          ),
+          const SizedBox(height: 16),
+        ],
         const Text('Email',
             style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
         const SizedBox(height: 7),
@@ -173,17 +194,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           obscureText: true,
           decoration: const InputDecoration(hintText: '••••••••'),
         ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: TextButton(
-            onPressed: _resetPassword,
-            child: Text('Forgot password?',
-                style: TextStyle(
-                    color: context.colors.bluePrimary,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 13.5)),
+        if (!_creatingAccount)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: _resetPassword,
+              child: Text('Forgot password?',
+                  style: TextStyle(
+                      color: context.colors.bluePrimary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13.5)),
+            ),
           ),
-        ),
+        if (_creatingAccount) const SizedBox(height: 18),
         if (_error != null) ...[
           Container(
             width: double.infinity,

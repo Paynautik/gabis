@@ -1,9 +1,13 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/account.dart';
 import '../models/money.dart';
 import '../models/payment_card.dart';
 import '../models/transaction.dart';
+import '../../core/firebase/auth_service.dart';
 import '../../core/firebase/user_sync.dart';
 import '../../features/business/business_persistence_stub.dart'
     if (dart.library.js_interop) '../../features/business/business_persistence_web.dart';
@@ -51,8 +55,144 @@ final authStateProvider = StateProvider<bool>((ref) => false);
 /// promo card, a snackbar action — can send the user to the right place.
 final homeTabProvider = StateProvider<int>((ref) => 0);
 final isBusinessModeProvider = StateProvider<bool>((ref) => false);
-final userAvatarProvider = StateProvider<String?>((ref) => null);
-final userNameProvider = Provider<String>((ref) => 'Raphael');
+/// The picture on the account: null for initials, `fun:<n>` for one of the
+/// generated characters, `photo:<base64>` for an uploaded one.
+///
+/// Stored the same way as the name — locally so the first frame is right, and
+/// in Firestore so the picture follows the account to another device.
+class UserAvatarNotifier extends StateNotifier<String?> {
+  UserAvatarNotifier() : super(readRaw(_key)) {
+    _pullRemote();
+  }
+
+  static const _key = 'gabis.profile.avatar';
+
+  /// A picture is stored inline with the account document, which Firestore
+  /// caps at 1MB. Anything bigger stays on this device rather than failing the
+  /// write and losing it everywhere.
+  static const _maxRemoteChars = 600 * 1024;
+
+  final _sync = UserSync();
+
+  Future<void> _pullRemote() async {
+    final profile = await _sync.get('profile');
+    final remote = profile?['avatar'];
+    if (remote is! String || remote.isEmpty || remote == state) return;
+    state = remote;
+    writeRaw(_key, remote);
+  }
+
+  Future<void> setPhoto(Uint8List bytes) =>
+      _write('photo:${base64Encode(bytes)}');
+
+  Future<void> setFun(int index) => _write('fun:$index');
+
+  /// Back to initials, which is the absence of a picture rather than a
+  /// third kind of one.
+  Future<void> clear() async {
+    state = null;
+    removeRaw(_key);
+    await _sync.put('profile', {'avatar': null});
+  }
+
+  Future<void> _write(String value) async {
+    state = value;
+    writeRaw(_key, value);
+    if (value.length > _maxRemoteChars) return;
+    await _sync.put('profile', {'avatar': value});
+  }
+}
+
+final userAvatarProvider = StateNotifierProvider<UserAvatarNotifier, String?>(
+    (ref) => UserAvatarNotifier());
+/// The name the account holder chose, held locally so the first frame is right
+/// and synced to Firestore so it follows them to another device.
+///
+/// Accounts created before sign-up asked for a name have no displayName; this
+/// is how they set one without registering again.
+class ProfileNameNotifier extends StateNotifier<String?> {
+  ProfileNameNotifier(this._ref) : super(readRaw(_key)) {
+    _pullRemote();
+  }
+
+  static const _key = 'gabis.profile.name';
+
+  final Ref _ref;
+  final _sync = UserSync();
+
+  Future<void> _pullRemote() async {
+    final profile = await _sync.get('profile');
+    final remote = profile?['name'];
+    if (remote is! String || remote.trim().isEmpty || remote == state) return;
+    state = remote;
+    writeRaw(_key, remote);
+  }
+
+  /// Writes all three copies: memory, this browser, and the account.
+  Future<void> set(String name) async {
+    final clean = name.trim();
+    if (clean.isEmpty) return;
+
+    state = clean;
+    writeRaw(_key, clean);
+    await _sync.put('profile', {'name': clean});
+    await _ref.read(authServiceProvider).updateName(clean);
+  }
+}
+
+final profileNameProvider =
+    StateNotifierProvider<ProfileNameNotifier, String?>(
+        (ref) => ProfileNameNotifier(ref));
+
+/// The account holder's name, as given when they registered.
+///
+/// Firebase's displayName is the source; an account created before the sign-up
+/// form asked for a name falls back to the email local part, so a card or a
+/// greeting never shows somebody else's name.
+final userNameProvider = Provider<String>((ref) {
+  // A name set in the profile wins: it is the most recent thing the person
+  // told us, and it is there before Firebase's cached profile catches up.
+  final chosen = ref.watch(profileNameProvider)?.trim();
+  if (chosen != null && chosen.isNotEmpty) return chosen;
+
+  final user = ref.watch(authUserProvider).value;
+
+  final name = user?.displayName?.trim();
+  if (name != null && name.isNotEmpty) return name;
+
+  final email = user?.email;
+  if (email != null && email.contains('@')) {
+    final local = email.split('@').first.replaceAll(RegExp(r'[._+-]+'), ' ').trim();
+    if (local.isNotEmpty) {
+      return local
+          .split(RegExp(r'\s+'))
+          .map((w) => w[0].toUpperCase() + w.substring(1))
+          .join(' ');
+    }
+  }
+
+  return 'there';
+});
+
+/// Just the first name, for greetings.
+final userFirstNameProvider =
+    Provider<String>((ref) => ref.watch(userNameProvider).split(' ').first);
+
+/// One or two letters for the avatar, taken from the same name.
+final userInitialsProvider = Provider<String>((ref) {
+  final parts = ref
+      .watch(userNameProvider)
+      .split(RegExp(r'\s+'))
+      .where((w) => w.isNotEmpty)
+      .toList();
+  if (parts.isEmpty) return '?';
+  if (parts.length == 1) return parts.first[0].toUpperCase();
+  return (parts.first[0] + parts.last[0]).toUpperCase();
+});
+
+/// The name as it is printed on a card.
+final userCardNameProvider =
+    Provider<String>((ref) => ref.watch(userNameProvider).toUpperCase());
 
 // --- Accounts Stateful StateNotifier ---
 class AccountsNotifier extends StateNotifier<List<Account>> {
