@@ -67,6 +67,10 @@ abstract final class GabisPalette {
   static const danger = Color(0xFFD9432B);
   static const warn = Color(0xFF9A6207);
   static const lilacInk = Color(0xFF6D5BD0);
+
+  /// Lime carries the brand on dark surfaces; this is what it becomes when the
+  /// same accent has to be read as text or a mark on cream.
+  static const limeInk = Color(0xFF5B7500);
   static const warnSurface = Color(0xFFFBF1DC);
   static const limeSurface = Color(0xFFF3F8D8);
 }
@@ -1007,8 +1011,10 @@ class _ConnectedPaymentsTabState extends ConsumerState<_ConnectedPaymentsTab> {
                   label: const Text('Export debtors'),
                 ),
               OutlinedButton.icon(
+                // Lime is a colour for the dark surfaces; on cream it is all
+                // but invisible, so this reads in ink like its neighbour.
                 style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFFD9FF43),
+                    foregroundColor: GabisPalette.ink,
                     side: const BorderSide(color: GabisPalette.lineStrong),
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 16)),
@@ -1965,7 +1971,7 @@ class _StatTable extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               color: stat == best && stat.successes > 0
-                                  ? const Color(0xFFD9FF43)
+                                  ? GabisPalette.limeInk
                                   : GabisPalette.ink,
                               fontSize: 12.5,
                               fontWeight: FontWeight.w600)),
@@ -1981,7 +1987,7 @@ class _StatTable extends StatelessWidget {
                       backgroundColor: GabisPalette.line,
                       valueColor: AlwaysStoppedAnimation(
                           stat == best && stat.successes > 0
-                              ? const Color(0xFFD9FF43)
+                              ? GabisPalette.limeInk
                               : GabisPalette.electric),
                     ),
                   ),
@@ -2025,7 +2031,7 @@ class _PromiseQueue extends ConsumerWidget {
         children: [
           Text('${due.length} promise${due.length == 1 ? '' : 's'} to verify',
               style: const TextStyle(
-                  color: Color(0xFFD9FF43),
+                  color: GabisPalette.limeInk,
                   fontSize: 14,
                   fontWeight: FontWeight.w800)),
           const SizedBox(height: 4),
