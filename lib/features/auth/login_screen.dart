@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/firebase/auth_service.dart';
+import '../../core/session/session.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/coming_soon.dart';
 
@@ -51,15 +52,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       final auth = ref.read(authServiceProvider);
-      if (_creatingAccount) {
-        await auth.signUp(email, password);
-      } else {
-        await auth.signIn(email, password);
-      }
+      final user = _creatingAccount
+          ? await auth.signUp(email, password)
+          : await auth.signIn(email, password);
+
       if (!mounted) return;
       ref.read(authStateProvider.notifier).state = true;
-      // The account's own preferences, not whatever this browser had.
-      ref.invalidate(demoDataProvider);
+      // If this browser's local copy belongs to somebody else, it goes before
+      // anything reads it. The account's own preferences arrive from Firestore.
+      ref.read(sessionProvider).adoptUser(user.uid);
       Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
     } catch (error) {
       if (!mounted) return;

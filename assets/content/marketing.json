@@ -1,0 +1,955 @@
+{
+  "pages": [
+    {
+      "route": "/wallet",
+      "eyebrow": "Multi-currency wallet",
+      "title": "Five currencies.\nOne account.",
+      "lede": "Hold naira, dollars, pounds, Canadian dollars and yen side by side. Money stays in the currency it arrived in until you decide otherwise, so nobody converts on your behalf at a rate you never saw.",
+      "highlights": [
+        "NGN · USD · GBP · CAD · JPY",
+        "No forced conversion",
+        "One login, one balance sheet"
+      ],
+      "features": [
+        {
+          "icon": "account_balance_wallet_outlined",
+          "title": "Balances that stay put",
+          "body": "Get paid in dollars, keep dollars. Convert when the rate suits you, not when a settlement job runs."
+        },
+        {
+          "icon": "swap_horiz_rounded",
+          "title": "Mid-market swaps",
+          "body": "Move between your own balances at a rate you can check against the market, with the fee stated before you confirm."
+        },
+        {
+          "icon": "receipt_long_rounded",
+          "title": "Statements per currency",
+          "body": "Every wallet has its own history you can export for your accountant or your own records."
+        },
+        {
+          "icon": "insights_rounded",
+          "title": "One total that means something",
+          "body": "Your combined value in your home currency, recalculated as rates move."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Which currencies can I hold?",
+          "answer": "NGN, USD, GBP, CAD and JPY today. New currencies are added when the local rails behind them are reliable, not before."
+        },
+        {
+          "question": "Do you convert my money automatically?",
+          "answer": "No. Funds stay in the currency they arrived in. Conversion only happens when you ask for it."
+        },
+        {
+          "question": "What rate do you use?",
+          "answer": "The mid-market rate at the moment you confirm, with the fee shown separately rather than buried in a marked-up rate."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/usd-account",
+      "eyebrow": "Global USD account",
+      "title": "Get paid like\na local.",
+      "lede": "Your own US account number and routing number, plus GBP details. Clients, platforms and marketplaces pay you the way they pay anyone in their own country, and the money lands in your balance.",
+      "highlights": [
+        "US account + routing number",
+        "ACH and wire",
+        "GBP details included"
+      ],
+      "features": [
+        {
+          "icon": "south_west_rounded",
+          "title": "ACH and wire receipts",
+          "body": "Payroll, invoices and platform payouts arrive by the same route your client already uses."
+        },
+        {
+          "icon": "public_rounded",
+          "title": "Works with global platforms",
+          "body": "Upwork, Deel, Stripe, YouTube and the rest — the details look like any other US account."
+        },
+        {
+          "icon": "lock_clock_rounded",
+          "title": "Lands in the currency sent",
+          "body": "Dollars stay dollars until you convert. Nothing is swept into naira on arrival."
+        },
+        {
+          "icon": "description_outlined",
+          "title": "Proof for your records",
+          "body": "Every inbound payment carries the sender reference, so reconciliation is not detective work."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Is this a real US bank account?",
+          "answer": "You get US account and routing details issued through licensed partner institutions. gabis is a financial technology company, not a bank."
+        },
+        {
+          "question": "Can I receive from anywhere?",
+          "answer": "Anywhere that can send ACH or a wire to a US account, plus local GBP transfers to your pound details."
+        },
+        {
+          "question": "How long do funds take?",
+          "answer": "ACH typically settles in one to three business days; wires are usually same day once sent."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/virtual-cards",
+      "eyebrow": "Virtual cards",
+      "title": "A card that\nworks abroad.",
+      "lede": "Create a card in seconds and spend from whichever balance makes sense. Subscriptions, ads, flights and shopping — without the decline that means nothing and the call to a bank that cannot help.",
+      "highlights": [
+        "Visa and Mastercard",
+        "Spend from any balance",
+        "Freeze and unfreeze instantly"
+      ],
+      "features": [
+        {
+          "icon": "credit_card_rounded",
+          "title": "Issued instantly",
+          "body": "A virtual card is ready before you have finished reading this. Physical cards on request."
+        },
+        {
+          "icon": "ac_unit_rounded",
+          "title": "Freeze in one tap",
+          "body": "Lock the card the moment something looks wrong, unfreeze it when it does not. No support ticket."
+        },
+        {
+          "icon": "tune_rounded",
+          "title": "Per-card limits",
+          "body": "Give one card to a subscription, another to your ads account, and cap each on its own."
+        },
+        {
+          "icon": "autorenew_rounded",
+          "title": "Rotate the details",
+          "body": "New number, same card, same limits — useful when a merchant has been careless with yours."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Which networks do you issue?",
+          "answer": "Visa and Mastercard, depending on the card and the region you are spending in."
+        },
+        {
+          "question": "Can I use it for subscriptions and ads?",
+          "answer": "Yes — streaming, software, hosting, Meta and Google Ads are the most common uses."
+        },
+        {
+          "question": "What happens if a payment is declined?",
+          "answer": "You see the reason in the app: insufficient balance, a limit you set, or a merchant category block. Not a generic error."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/invoicing",
+      "eyebrow": "Smart invoicing",
+      "title": "Send it. Get paid.\nStop chasing.",
+      "lede": "Raise an invoice, send it on WhatsApp or email, and let it mark itself paid when the money arrives. Your outstanding figure is the real one, not a spreadsheet you meant to update.",
+      "highlights": [
+        "WhatsApp, email or link",
+        "Instalment schedules",
+        "Reminders before and after due date"
+      ],
+      "features": [
+        {
+          "icon": "receipt_long_rounded",
+          "title": "Invoices in seconds",
+          "body": "Client, amount, description, due date. Sent through the channel your customer actually reads."
+        },
+        {
+          "icon": "event_repeat_rounded",
+          "title": "Instalments that hold",
+          "body": "Split a bill into a schedule both sides can see, with reminders ten days ahead of each date."
+        },
+        {
+          "icon": "done_all_rounded",
+          "title": "Paid means paid",
+          "body": "Payment clears the invoice and moves your totals in the same moment. No manual ticking off."
+        },
+        {
+          "icon": "insights_rounded",
+          "title": "A collection rate you can trust",
+          "body": "Billed, collected and outstanding always agree, because they are computed from the same ledger."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Can customers pay in instalments?",
+          "answer": "Yes. Set the number of instalments and the dates; everyone sees the same schedule and part payments track against it."
+        },
+        {
+          "question": "How are reminders sent?",
+          "answer": "WhatsApp, SMS or email — ten days before the due date, on the day, and after it passes."
+        },
+        {
+          "question": "Does this work for schools and tuition?",
+          "answer": "It is one of the most common uses. See tuition invoicing for how termly fees and parent reminders are handled."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/fx",
+      "eyebrow": "Instant FX swaps",
+      "title": "The rate you\ncan check.",
+      "lede": "Convert between your own balances at the mid-market rate, with the fee shown before you confirm and the rate held while you decide.",
+      "highlights": [
+        "Mid-market rate",
+        "Fee shown up front",
+        "Settles against your balance"
+      ],
+      "features": [
+        {
+          "icon": "swap_horiz_rounded",
+          "title": "Any pair you hold",
+          "body": "Naira to dollars, pounds to naira, yen to anything — in either direction."
+        },
+        {
+          "icon": "timer_outlined",
+          "title": "Rate locked while you confirm",
+          "body": "What you saw is what settles. No slippage between tapping and clearing."
+        },
+        {
+          "icon": "percent_rounded",
+          "title": "No hidden spread",
+          "body": "The fee is a line item. It is not folded into a rounded rate that hides it."
+        },
+        {
+          "icon": "bolt_rounded",
+          "title": "Instant settlement",
+          "body": "The swap clears against your balances immediately — no pending state to babysit."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Where does your rate come from?",
+          "answer": "The mid-market rate, which you can verify against any public source at the time of the swap."
+        },
+        {
+          "question": "Are there limits?",
+          "answer": "Limits depend on your verification level and are shown in the app before you convert."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/bills",
+      "eyebrow": "Bills & airtime",
+      "title": "The small things,\nhandled.",
+      "lede": "Airtime, data, electricity tokens and subscriptions from the same balance — with a receipt that arrives when the payment clears, not when it was submitted.",
+      "highlights": [
+        "Airtime and data",
+        "Electricity tokens",
+        "Recurring subscriptions"
+      ],
+      "features": [
+        {
+          "icon": "bolt_rounded",
+          "title": "Tokens that arrive",
+          "body": "Electricity tokens are delivered and stored, so you are not screenshotting SMS to find them later."
+        },
+        {
+          "icon": "repeat_rounded",
+          "title": "Set and forget",
+          "body": "Recurring bills run on a schedule you control, and tell you before they go out."
+        },
+        {
+          "icon": "bookmark_border_rounded",
+          "title": "Saved billers",
+          "body": "The ones you repeat are one tap away, with the last amount remembered."
+        },
+        {
+          "icon": "verified_outlined",
+          "title": "Receipt on clearing",
+          "body": "Proof of payment when it is actually done, which is the only time it means anything."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Which billers are supported?",
+          "answer": "The major Nigerian networks and discos, with more added as the integrations prove reliable."
+        },
+        {
+          "question": "What if a token does not arrive?",
+          "answer": "The payment is reversed to your balance automatically if the biller does not confirm delivery."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/business",
+      "eyebrow": "gabis Business",
+      "title": "Get paid.\nChase what is owed.",
+      "lede": "The same account, with the tools a small business actually needs: invoices that clear themselves, a collections agent that makes the call, and tax built from money that landed.",
+      "highlights": [
+        "Invoices and instalments",
+        "AI debt recovery",
+        "Multi-currency tax"
+      ],
+      "features": [
+        {
+          "icon": "business_center_rounded",
+          "title": "One account, two modes",
+          "body": "Switch between personal and business without a second login or a separate app."
+        },
+        {
+          "icon": "record_voice_over_rounded",
+          "title": "Collections that run themselves",
+          "body": "Reminders, then a conversational call in your customer’s own language, then a payment link."
+        },
+        {
+          "icon": "groups_rounded",
+          "title": "Customers in one place",
+          "body": "Every payer, what they owe, what they have paid and when they next fall due."
+        },
+        {
+          "icon": "account_balance_rounded",
+          "title": "Filing without the week of work",
+          "body": "Tax computed from cleared payments, exportable for your accountant."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Do I need a registered company?",
+          "answer": "No. Sole traders, freelancers and informal businesses use it exactly as registered companies do."
+        },
+        {
+          "question": "Can I import my existing debtors?",
+          "answer": "Yes — name, phone, amount and due date is enough to start collections on day one."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/tuition-invoicing",
+      "eyebrow": "Tuition invoicing",
+      "title": "Termly fees,\nwithout the chasing.",
+      "lede": "Built for schools and training providers: issue fees to every parent at once, let them pay in instalments, and see who is short before the term starts rather than after it ends.",
+      "highlights": [
+        "Bulk fee runs",
+        "Parent instalment plans",
+        "Per-class collection view"
+      ],
+      "features": [
+        {
+          "icon": "school_rounded",
+          "title": "Issue a whole term at once",
+          "body": "One fee run reaches every parent on the roll, each with their own balance and schedule."
+        },
+        {
+          "icon": "event_repeat_rounded",
+          "title": "Plans parents can meet",
+          "body": "Split fees across the term with reminders that arrive ten days before each date."
+        },
+        {
+          "icon": "fact_check_outlined",
+          "title": "Know where you stand",
+          "body": "Collected, outstanding and overdue by class, so the bursar is not reconciling by hand."
+        },
+        {
+          "icon": "phone_in_talk_rounded",
+          "title": "Polite follow-up",
+          "body": "Overdue balances get a call in the parent’s own language, on the school’s behalf."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Can parents pay in parts?",
+          "answer": "Yes. Instalment plans are the default for tuition, and part payments track against the plan."
+        },
+        {
+          "question": "Do parents need the app?",
+          "answer": "No. They receive a link on WhatsApp or email and can pay without installing anything."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/debt-recovery",
+      "eyebrow": "AI debt recovery",
+      "title": "The chasing\nhappens without you.",
+      "lede": "Load whoever owes you once. Reminders go out on time, a conversational agent makes the call in the customer’s own language, and a one-tap payment link clears the invoice when it lands.",
+      "highlights": [
+        "English, Pidgin, Yoruba, Hausa, Igbo",
+        "Transcript for every call",
+        "Stops the moment it is paid"
+      ],
+      "features": [
+        {
+          "icon": "group_add_rounded",
+          "title": "Add whoever owes you",
+          "body": "Name, number, amount, due date. That is enough for collections to start working."
+        },
+        {
+          "icon": "schedule_rounded",
+          "title": "Reminders on time, every time",
+          "body": "Ten days before, on the day, and after. You never have to remember a date again."
+        },
+        {
+          "icon": "record_voice_over_rounded",
+          "title": "A real conversation",
+          "body": "The agent explains the balance, answers the obvious questions and stays polite on your behalf."
+        },
+        {
+          "icon": "task_alt_rounded",
+          "title": "Payment closes the loop",
+          "body": "A WhatsApp link, and when it clears the invoice and your totals update themselves."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "What languages can the agent speak?",
+          "answer": "English, Nigerian Pidgin, Yoruba, Hausa and Igbo, chosen per customer."
+        },
+        {
+          "question": "Will it keep calling someone who has paid?",
+          "answer": "No. A cleared payment stops the sequence immediately."
+        },
+        {
+          "question": "Do I see what was said?",
+          "answer": "Every call has a transcript, an outcome and, where given, a promise-to-pay date."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/connected-payments",
+      "eyebrow": "Connected payments",
+      "title": "Collect across\nthree markets.",
+      "lede": "Take payments in Nigeria, Kenya and Ghana and settle into one account, with webhooks pushing every event into your own systems so your ledger is never a guess.",
+      "highlights": [
+        "NGN, KES, GHS",
+        "Single settlement account",
+        "Webhooks on every event"
+      ],
+      "features": [
+        {
+          "icon": "public_rounded",
+          "title": "Local rails, one balance",
+          "body": "Bank transfer and mobile money in each market, settling into the account you already use."
+        },
+        {
+          "icon": "webhook_rounded",
+          "title": "Events you can build on",
+          "body": "Created, paid, failed, reversed — delivered to your endpoint with retries and a full log."
+        },
+        {
+          "icon": "link_rounded",
+          "title": "Links and checkouts",
+          "body": "Share a link or embed a checkout; both post the same events to the same place."
+        },
+        {
+          "icon": "rule_folder_rounded",
+          "title": "Reconciliation that holds",
+          "body": "Every payment carries its reference from collection through to settlement."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "Which countries are live?",
+          "answer": "Nigeria, Kenya and Ghana, with mobile money and bank rails in each."
+        },
+        {
+          "question": "Is there an API?",
+          "answer": "Yes — collections, payouts and webhooks. Talk to us and we will get you keys."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/bulk-payouts",
+      "eyebrow": "Bulk payouts",
+      "title": "Pay everyone\nat once.",
+      "lede": "Salaries, contractor payments and supplier runs from one upload, with per-recipient status instead of one number that either worked or did not.",
+      "highlights": [
+        "Upload once",
+        "Per-recipient status",
+        "Retry only what failed"
+      ],
+      "features": [
+        {
+          "icon": "upload_file_rounded",
+          "title": "One file, one run",
+          "body": "Upload the list, review the total, approve once. No pasting account numbers."
+        },
+        {
+          "icon": "checklist_rounded",
+          "title": "Status per person",
+          "body": "You see exactly who was paid, who bounced and why — not a batch that silently half-failed."
+        },
+        {
+          "icon": "replay_rounded",
+          "title": "Retry the failures only",
+          "body": "Fix a wrong account and resend that one payment, without touching the rest."
+        },
+        {
+          "icon": "shield_outlined",
+          "title": "Approval before money moves",
+          "body": "Nothing leaves until somebody with the authority confirms the run."
+        }
+      ],
+      "faqs": [
+        {
+          "question": "How many recipients per run?",
+          "answer": "Runs of several thousand are routine; larger ones are split automatically."
+        },
+        {
+          "question": "Can two people approve?",
+          "answer": "Yes. Maker-checker approval is available for teams that need it."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/about",
+      "eyebrow": "About gabis",
+      "title": "Built for how Africa\nactually moves money.",
+      "lede": "A decade of work made money move across the continent. What sits on top of those rails is still a ledger with a search box. gabis is the layer that reads them and acts.",
+      "highlights": [],
+      "features": [],
+      "faqs": [],
+      "sections": [
+        {
+          "heading": "Why we exist",
+          "body": "A Lagos merchant’s money moves across a bank account, mobile money, cash, informal credit and two currencies. Every transaction is recorded somewhere. Almost none of it is ever turned into a decision. We are building the software that closes that gap — not another app that waits to be told what to do."
+        },
+        {
+          "heading": "What we have shipped",
+          "body": "A working multi-currency product: accounts, cards, transfers, FX, invoicing with instalment schedules, bill payments, an AI copilot that reasons over your own transactions, and a collections agent that places real calls. Founder-built, running code, not mockups."
+        },
+        {
+          "heading": "How we think about your money",
+          "body": "The deterministic core computes your financial state on device — categorisation, commitments, burn rate, what is genuinely spare. Numbers that cannot hallucinate. A model only ever phrases and explains them, and nothing moves without your explicit approval."
+        },
+        {
+          "heading": "Where we are going",
+          "body": "Every African business will have a financial brain. gabis starts as the copilot that reads your money and the agent that collects it, and ends as the intelligence layer merchants, freelancers and institutions run their financial lives on."
+        }
+      ],
+      "ctaTitle": "Open your account",
+      "ctaBody": "It takes a few minutes. Hold the currencies you actually use and move your first payment the same day."
+    },
+    {
+      "route": "/careers",
+      "eyebrow": "Careers",
+      "title": "Small team.\nReal problems.",
+      "lede": "We are early. That means fewer people, wider scope and work that ships to real users in days rather than quarters. If that is the trade you want, we would like to hear from you.",
+      "highlights": [],
+      "features": [
+        {
+          "icon": "code_rounded",
+          "title": "Engineering",
+          "body": "Flutter, Dart and Firebase across mobile, web and functions. You will own features end to end."
+        },
+        {
+          "icon": "psychology_rounded",
+          "title": "Applied AI",
+          "body": "Financial reasoning over messy real-world records, voice agents in African languages, and evaluating reliability where a wrong answer costs someone money."
+        },
+        {
+          "icon": "support_agent_rounded",
+          "title": "Operations & support",
+          "body": "The people who make sure a stuck payment is somebody’s problem within minutes."
+        },
+        {
+          "icon": "handshake_rounded",
+          "title": "Partnerships",
+          "body": "Working with the licensed institutions and rails that make everything else possible."
+        }
+      ],
+      "faqs": [],
+      "sections": [
+        {
+          "heading": "How to apply",
+          "body": "There is no formal listing pipeline yet. Write to careers@gabis.app with what you have built and what you want to work on. Links to real work beat a CV every time. We reply to everyone."
+        }
+      ],
+      "ctaTitle": "Work with us",
+      "ctaBody": "Send what you have built to careers@gabis.app. We read everything."
+    },
+    {
+      "route": "/press",
+      "eyebrow": "Press & news",
+      "title": "What we have\nsaid publicly.",
+      "lede": "Company news, product milestones and anything we have put on the record. For interviews or comment, write to press@gabis.app.",
+      "highlights": [],
+      "features": [],
+      "faqs": [],
+      "sections": [
+        {
+          "heading": "Company deck",
+          "body": "Our current company deck covers the problem, the product, the architecture and where we are going. It is linked from the footer and free to quote with attribution."
+        },
+        {
+          "heading": "Product milestones",
+          "body": "Multi-currency accounts, virtual cards, invoicing with instalments, the AI copilot over real transaction history, and the autonomous voice collections agent are all live. Multimodal ingestion of receipts and statements is in build."
+        },
+        {
+          "heading": "Media enquiries",
+          "body": "press@gabis.app for interviews, comment and fact-checking. We will tell you plainly what is shipped and what is not."
+        }
+      ],
+      "ctaTitle": "Get in touch",
+      "ctaBody": "press@gabis.app for interviews and comment."
+    },
+    {
+      "route": "/brand",
+      "eyebrow": "Brand assets",
+      "title": "Use the mark\nproperly.",
+      "lede": "The gabis wordmark, our colours and the rules that keep them recognisable. If you are writing about us or building an integration, this is what you need.",
+      "highlights": [],
+      "features": [
+        {
+          "icon": "abc_rounded",
+          "title": "The wordmark",
+          "body": "Always lowercase: gabis. Never Gabis, never GABIS, never with the dot doubled or the mark redrawn."
+        },
+        {
+          "icon": "palette_outlined",
+          "title": "Core colours",
+          "body": "Ink #101010, cream #F4F0E8, electric #4C45FF, lime #D9FF43, coral #FF7657, lilac #D9D0FF."
+        },
+        {
+          "icon": "space_bar_rounded",
+          "title": "Clear space",
+          "body": "Leave at least the height of the g around the mark. Do not crowd it with other logos."
+        },
+        {
+          "icon": "block_rounded",
+          "title": "What not to do",
+          "body": "No stretching, recolouring, outlining, drop shadows, or placing the navy mark on a dark background."
+        }
+      ],
+      "faqs": [],
+      "sections": [
+        {
+          "heading": "Requesting files",
+          "body": "Write to brand@gabis.app for SVG and PNG versions of the wordmark in navy and white. Please do not extract the mark from screenshots."
+        }
+      ],
+      "ctaTitle": "Need the files?",
+      "ctaBody": "brand@gabis.app and we will send the full set."
+    },
+    {
+      "route": "/terms",
+      "eyebrow": "Legal",
+      "title": "Terms of service.",
+      "lede": "The agreement between you and gabis when you use our apps and services. Written to be read, not to be survived.",
+      "highlights": [],
+      "features": [],
+      "faqs": [],
+      "sections": [
+        {
+          "heading": "Who we are",
+          "body": "gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners. Where those partners impose their own terms on an account or card, those terms apply alongside these."
+        },
+        {
+          "heading": "Your account",
+          "body": "You must give accurate information when you open an account and keep it current. You are responsible for your credentials and for activity carried out with them. We may ask you to verify your identity before raising limits, and we may limit or suspend an account where we are required to, or where we reasonably suspect fraud."
+        },
+        {
+          "heading": "Using the services",
+          "body": "You agree not to use gabis for anything unlawful, for payments you are not entitled to make, or in a way that puts our partners or other users at risk. We may refuse or reverse a transaction where we are legally required to do so, or where completing it would breach these terms."
+        },
+        {
+          "heading": "Fees and rates",
+          "body": "Fees are shown before you confirm a transaction. Conversion uses the mid-market rate at the moment you confirm, with the fee stated as a separate line rather than folded into the rate. We will tell you before any fee changes take effect."
+        },
+        {
+          "heading": "Automation and approvals",
+          "body": "Features that act on your behalf — payment reminders, collections calls, payday sweeps — only run within limits you set and only after you approve them. Nothing moves money without an explicit confirmation from you."
+        },
+        {
+          "heading": "Liability",
+          "body": "We take responsibility for our own failures and for money we hold incorrectly. We are not liable for losses caused by inaccurate details you supply, by your own device or credentials being compromised, or by events outside our reasonable control."
+        },
+        {
+          "heading": "Closing your account",
+          "body": "You can close your account at any time once your balance is settled. We will give you notice before closing an account ourselves, except where the law requires otherwise."
+        },
+        {
+          "heading": "Changes and contact",
+          "body": "We may update these terms; material changes are notified in the app before they take effect. Questions go to legal@gabis.app."
+        }
+      ],
+      "ctaTitle": "Questions about these terms?",
+      "ctaBody": "legal@gabis.app — a person reads it."
+    },
+    {
+      "route": "/privacy",
+      "eyebrow": "Legal",
+      "title": "Privacy policy.",
+      "lede": "What we collect, why we hold it, and what we will never do with it. Your transaction history is the most personal thing you will give us and we treat it that way.",
+      "highlights": [],
+      "features": [],
+      "faqs": [],
+      "sections": [
+        {
+          "heading": "What we collect",
+          "body": "Identity and contact details you give us when opening an account; verification documents where regulation requires them; transaction records created by your use of the service; and device and usage data needed to keep accounts secure."
+        },
+        {
+          "heading": "Why we hold it",
+          "body": "To operate your account, to meet anti-money-laundering and know-your-customer obligations, to prevent fraud, and to provide the features you asked for. We do not sell your data, and we do not share it with advertisers."
+        },
+        {
+          "heading": "On-device reasoning",
+          "body": "The copilot computes your financial state on your device wherever it can — categorisation, recurring commitments, burn rate, affordability. That analysis does not require sending your full transaction history anywhere. Where a request needs a model, only the specific context for that question is sent, and never for advertising."
+        },
+        {
+          "heading": "Who we share with",
+          "body": "Our licensed financial institution partners, so payments can actually settle; identity verification providers; and authorities where we are legally compelled. Each receives the minimum needed to do their part."
+        },
+        {
+          "heading": "How long we keep it",
+          "body": "For as long as your account is open, and afterwards for the period financial regulation requires us to retain records. After that it is deleted."
+        },
+        {
+          "heading": "Your rights",
+          "body": "You can ask for a copy of your data, ask us to correct it, or ask for deletion where no legal retention duty applies. Write to privacy@gabis.app and we will respond within 30 days."
+        }
+      ],
+      "ctaTitle": "Exercise your rights",
+      "ctaBody": "privacy@gabis.app — access, correction or deletion requests."
+    },
+    {
+      "route": "/security",
+      "eyebrow": "Legal",
+      "title": "Security.",
+      "lede": "How your money and your data are protected, and what we ask of you. Written plainly, because security advice nobody reads protects nobody.",
+      "highlights": [],
+      "features": [
+        {
+          "icon": "lock_rounded",
+          "title": "Encryption everywhere",
+          "body": "Data is encrypted in transit and at rest. Credentials are never stored in plain text."
+        },
+        {
+          "icon": "fingerprint_rounded",
+          "title": "Device-level access",
+          "body": "Biometric unlock and device binding, so a stolen password alone is not enough."
+        },
+        {
+          "icon": "gpp_maybe_outlined",
+          "title": "Approval before money moves",
+          "body": "Every money-moving action is confirmed by you. No automation bypasses that."
+        },
+        {
+          "icon": "visibility_outlined",
+          "title": "Fraud monitoring",
+          "body": "Unusual activity is flagged and, where necessary, held until you confirm it was you."
+        }
+      ],
+      "faqs": [],
+      "sections": [
+        {
+          "heading": "What we will never ask for",
+          "body": "We will never ask for your PIN, your password, or a one-time code — not by phone, not on WhatsApp, not by email. Anyone who does is not us. Report it to security@gabis.app."
+        },
+        {
+          "heading": "Reporting a vulnerability",
+          "body": "If you have found a security issue, write to security@gabis.app with enough detail to reproduce it. We will acknowledge within two business days, keep you updated, and credit you if you would like us to. Please do not test against other people’s accounts."
+        },
+        {
+          "heading": "If something goes wrong",
+          "body": "Freeze your cards from the app immediately, then contact support. A frozen card cannot be charged, and freezing costs nothing if it turns out to be a false alarm."
+        }
+      ],
+      "ctaTitle": "Report a security issue",
+      "ctaBody": "security@gabis.app — acknowledged within two business days."
+    },
+    {
+      "route": "/tax-compliance",
+      "eyebrow": "Legal",
+      "title": "Tax compliance.",
+      "lede": "Filing built from money that actually cleared, not from invoices you hoped would land — and a clear line about what we do and do not do for you.",
+      "highlights": [],
+      "features": [
+        {
+          "icon": "account_balance_rounded",
+          "title": "Computed from cleared payments",
+          "body": "VAT and income summaries are built from payments that settled, so nothing is counted before it exists."
+        },
+        {
+          "icon": "calendar_month_rounded",
+          "title": "Period by period",
+          "body": "Breakdowns by month, quarter and year, in every currency you were paid in."
+        },
+        {
+          "icon": "download_rounded",
+          "title": "Export for your accountant",
+          "body": "A file your accountant can actually work from, rather than screenshots of a dashboard."
+        },
+        {
+          "icon": "rule_rounded",
+          "title": "Nothing counted twice",
+          "body": "Instalments, refunds and reversals are netted off before a figure is presented."
+        }
+      ],
+      "faqs": [],
+      "sections": [
+        {
+          "heading": "What this is not",
+          "body": "gabis is not a tax adviser and these figures are not tax advice. We show you what you collected and what that implies under the rates you select. Filing, and responsibility for what you file, remains yours and your accountant’s."
+        },
+        {
+          "heading": "Multi-currency income",
+          "body": "Income received in foreign currency is reported in that currency and converted at the rate on the date it cleared, so the figures match your bank records rather than today’s rate."
+        }
+      ],
+      "ctaTitle": "Talk to us about filing",
+      "ctaBody": "support@gabis.app if your situation is unusual — most are."
+    },
+    {
+      "route": "/help",
+      "eyebrow": "Support",
+      "title": "Help centre.",
+      "lede": "The questions people actually ask, answered without a maze of articles. If your answer is not here, a person is one message away.",
+      "highlights": [],
+      "features": [],
+      "faqs": [
+        {
+          "question": "How do I open an account?",
+          "answer": "Download the app or open your account on the web, give your details, and verify your identity. Most people are done in under ten minutes."
+        },
+        {
+          "question": "What do I need to verify my identity?",
+          "answer": "A government-issued ID and a selfie. Business accounts also need proof the business exists — a registration document or equivalent."
+        },
+        {
+          "question": "How long do transfers take?",
+          "answer": "Local Nigerian transfers are usually instant. ACH into your USD account settles in one to three business days; wires are typically same day."
+        },
+        {
+          "question": "Why was my card declined?",
+          "answer": "The app shows the actual reason — balance, a limit you set, or a merchant category. If it says none of those, contact support and we will trace it."
+        },
+        {
+          "question": "How do I freeze a card?",
+          "answer": "Open the card and tap freeze. It takes effect immediately and you can unfreeze it just as fast."
+        },
+        {
+          "question": "Can I use gabis outside Nigeria?",
+          "answer": "Yes. The account is built for people who earn in one place and spend in another."
+        },
+        {
+          "question": "How do I get my money out?",
+          "answer": "Withdraw to any bank account you control, in any currency you hold, from the app."
+        },
+        {
+          "question": "Something went wrong with a payment — what now?",
+          "answer": "Contact support with the reference. Failed payments are returned to your balance automatically; we will tell you when and why."
+        }
+      ],
+      "sections": [],
+      "ctaTitle": "Still stuck?",
+      "ctaBody": "support@gabis.app, or WhatsApp +234 701 888 8303 — both reach a person."
+    },
+    {
+      "route": "/contact",
+      "eyebrow": "Support",
+      "title": "Contact support.",
+      "lede": "Real people, sensible hours, and no phone tree. WhatsApp +234 701 888 8303, or write to support@gabis.app — tell us what happened and include a reference if you have one.",
+      "highlights": [],
+      "features": [
+        {
+          "icon": "chat_rounded",
+          "title": "WhatsApp live chat",
+          "body": "+234 701 888 8303 — the fastest route for anything urgent, like a stuck payment or a card you need frozen."
+        },
+        {
+          "icon": "mail_outline_rounded",
+          "title": "Email support",
+          "body": "support@gabis.app for anything that needs a paper trail or a document attached."
+        },
+        {
+          "icon": "business_center_rounded",
+          "title": "Business enquiries",
+          "body": "business@gabis.app for collections, payouts, API access and partnerships."
+        },
+        {
+          "icon": "gpp_good_outlined",
+          "title": "Security reports",
+          "body": "security@gabis.app, acknowledged within two business days."
+        }
+      ],
+      "faqs": [],
+      "sections": [
+        {
+          "heading": "What to include",
+          "body": "The transaction reference, the amount, the date, and what you expected to happen. That is usually enough for us to find it on the first reply instead of the third."
+        }
+      ],
+      "ctaTitle": "Message us",
+      "ctaBody": "support@gabis.app, or WhatsApp +234 701 888 8303."
+    },
+    {
+      "route": "/status",
+      "eyebrow": "Support",
+      "title": "System status.",
+      "lede": "Whether the things that matter are working right now, and what we do when they are not.",
+      "highlights": [],
+      "features": [
+        {
+          "icon": "check_circle_outline_rounded",
+          "title": "Payments and transfers",
+          "body": "Local transfers, USD receipts and FX swaps. Operational."
+        },
+        {
+          "icon": "credit_card_rounded",
+          "title": "Card issuing and spend",
+          "body": "Virtual card creation and authorisations. Operational."
+        },
+        {
+          "icon": "receipt_long_rounded",
+          "title": "Invoicing and collections",
+          "body": "Invoice delivery, reminders and collections calls. Operational."
+        },
+        {
+          "icon": "phone_iphone_rounded",
+          "title": "Apps and web",
+          "body": "iOS, Android and the web app. Operational."
+        }
+      ],
+      "faqs": [],
+      "sections": [
+        {
+          "heading": "How we handle incidents",
+          "body": "When something breaks we say so in the app rather than waiting for you to notice. You will get what is affected, what is not, and what we are doing — updated as it changes, not once at the end."
+        },
+        {
+          "heading": "Planned maintenance",
+          "body": "Anything that could interrupt payments is announced at least 48 hours ahead and scheduled outside Nigerian business hours."
+        }
+      ],
+      "ctaTitle": "Seeing something we are not?",
+      "ctaBody": "support@gabis.app — tell us and we will check immediately."
+    }
+  ]
+}

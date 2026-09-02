@@ -11,6 +11,8 @@ import 'sidebar_screens.dart';
 import '../copilot/copilot_screen.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../core/session/session.dart';
 import '../../shared/providers/app_providers.dart';
 
 class HomeShell extends ConsumerStatefulWidget {
@@ -168,8 +170,11 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                         if (value == 'settings') {
                           _showSettingsDialog(context);
                         } else if (value == 'logout') {
-                          ref.read(authStateProvider.notifier).state = false;
-                          Navigator.of(context).pushReplacementNamed('/landing');
+                          // Clears the local copy before leaving, so the next
+                          // person on this browser starts with nothing.
+                          ref.read(sessionProvider).signOut();
+                          Navigator.of(context).pushNamedAndRemoveUntil(
+                              '/landing', (route) => false);
                         } else if (value == 'business') {
                           ref.read(isBusinessModeProvider.notifier).state = true;
                         }
