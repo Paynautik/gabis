@@ -2,6 +2,7 @@
 // swap this import back to revert.
 import '../features/landing/gabis_landing_v3.dart';
 import '../features/marketing/marketing_content.dart';
+import '../core/session/auth_gate.dart';
 import '../features/points/points_screen.dart';
 import '../features/business/business_dashboard_screen.dart';
 import '../features/marketing/marketing_screen.dart';
@@ -37,15 +38,15 @@ class GabisApp extends ConsumerWidget {
         '/splash': (_) => const SplashScreen(),
         '/landing': (_) => const LandingScreen(),
         '/login': (_) => const LoginScreen(),
-        '/home': (_) => const HomeShell(),
-        '/send': (_) => const SendMoneyScreen(),
-        '/cards': (_) => const CardsScreen(),
-        '/fx': (_) => const FxScreen(),
-        '/bills': (_) => const BillsScreen(),
-        '/points': (_) => const PointsScreen(),
-        // Direct link to the business dashboard — deep-linkable, and the only
-        // way to reach it without walking the whole personal shell.
-        '/business-dashboard': (_) => const BusinessDashboardScreen(),
+        // Anything holding money or customer data sits behind the gate.
+        '/home': (_) => const AuthGate(child: HomeShell()),
+        '/send': (_) => const AuthGate(child: SendMoneyScreen()),
+        '/cards': (_) => const AuthGate(child: CardsScreen()),
+        '/fx': (_) => const AuthGate(child: FxScreen()),
+        '/bills': (_) => const AuthGate(child: BillsScreen()),
+        '/points': (_) => const AuthGate(child: PointsScreen()),
+        '/business-dashboard': (_) =>
+            const AuthGate(child: BusinessDashboardScreen()),
       },
       // Every footer destination is a real route with its own page.
       onGenerateRoute: (settings) {

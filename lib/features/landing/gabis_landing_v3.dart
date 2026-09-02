@@ -1607,14 +1607,27 @@ class _MoveCardState extends State<_MoveCard> {
   }
 
   Widget _cardBody(_Move move, double width) {
+    // Thirteen saturated fills drifting past reads as a quilt: the colour
+    // competes with itself and none of it means anything. One white surface,
+    // with colour carrying the icon and the rule, keeps the palette and lets
+    // the words do the work.
     return Container(
       width: width,
       height: 172,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: move.color,
+        color: Colors.white,
         border: Border.all(color: GabisV3.ink, width: 1.3),
         borderRadius: BorderRadius.circular(10),
+        boxShadow: _hover
+            ? [
+                BoxShadow(
+                  color: GabisV3.ink.withValues(alpha: .10),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                ),
+              ]
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1622,9 +1635,22 @@ class _MoveCardState extends State<_MoveCard> {
           Row(
             children: [
               Text(move.index,
-                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 12,
+                      color: GabisV3.ink.withValues(alpha: .45))),
               const Spacer(),
-              Icon(move.icon, size: 18),
+              // The card's colour, concentrated into one mark.
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: move.color,
+                  border: Border.all(color: GabisV3.ink, width: 1.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(move.icon, size: 16),
+              ),
             ],
           ),
           const Spacer(),

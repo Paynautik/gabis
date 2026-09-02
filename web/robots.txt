@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://gabis.pages.dev/sitemap.xml
