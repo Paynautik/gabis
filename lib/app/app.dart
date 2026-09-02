@@ -3,6 +3,7 @@
 import '../features/landing/gabis_landing_v3.dart';
 import '../features/marketing/marketing_content.dart';
 import '../core/session/auth_gate.dart';
+import '../features/kyc/kyc_screen.dart';
 import '../features/points/points_screen.dart';
 import '../features/business/business_dashboard_screen.dart';
 import '../features/marketing/marketing_screen.dart';
@@ -45,6 +46,7 @@ class GabisApp extends ConsumerWidget {
         '/fx': (_) => const AuthGate(child: FxScreen()),
         '/bills': (_) => const AuthGate(child: BillsScreen()),
         '/points': (_) => const AuthGate(child: PointsScreen()),
+        '/verify': (_) => const AuthGate(child: KycScreen()),
         '/business-dashboard': (_) =>
             const AuthGate(child: BusinessDashboardScreen()),
       },
