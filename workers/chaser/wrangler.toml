@@ -3,6 +3,10 @@ main = "src/index.ts"
 compatibility_date = "2026-09-01"
 compatibility_flags = ["nodejs_compat"]
 
+# The /queue and /inbound routes need a hostname; the cron would fire without
+# one, but then there would be no way to read what it is about to do.
+workers_dev = true
+
 # Mid-morning in Lagos (08:00 UTC). The hours rule in policy.ts is what keeps a
 # reminder out of somebody's night; this is only when the pass happens.
 [triggers]
