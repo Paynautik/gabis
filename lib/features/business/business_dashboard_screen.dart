@@ -309,6 +309,9 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
   /// What the sentence did not say, shown against the fields it left empty.
   List<String> _missing = const [];
 
+  /// Pulled out of the same sentence, so sending does not ask for it again.
+  String? _draftedPhone;
+
   /// Describe the invoice in a sentence and let the model fill the form. The
   /// draft is never sent — it lands in the fields for the owner to check.
   Future<void> _draftFromText() async {
@@ -325,6 +328,7 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
           draft.amount == 0 ? '' : draft.amount.toStringAsFixed(0);
       _descCtrl.text = draft.description;
       _dueInDays = draft.dueInDays;
+      _draftedPhone = draft.phone;
       _missing = draft.missing;
       _isDrafting = false;
     });
@@ -355,14 +359,69 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
         description: desc.isEmpty ? 'General services' : desc,
         issued: now,
         due: now.add(Duration(days: _dueInDays)),
+        clientPhone: _draftedPhone,
       ));
       _isGenerating = false;
       _dueInDays = 30;
+      _draftedPhone = null;
       _missing = const [];
       _clientCtrl.clear(); _amountCtrl.clear(); _descCtrl.clear();
       _promptCtrl.clear();
     });
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invoice for $client created.'), backgroundColor: GabisPalette.success));
+  }
+
+  /// Marking an invoice paid is the moment the customer is owed proof. The
+  /// receipt is offered there rather than left as a job for later, because
+  /// later is when it stops happening.
+  Future<void> _markPaidAndOfferReceipt(Invoice inv) async {
+    ref.read(businessProvider.notifier).markInvoicePaid(inv.id);
+    if (!mounted) return;
+
+    final send = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: GabisPalette.surface,
+        title: const Text('Send a receipt?',
+            style: TextStyle(color: GabisPalette.ink, fontSize: 16)),
+        content: Text(
+            '${inv.client} paid ${formatFull(inv.amount)}. Send them proof on '
+            'WhatsApp — it takes one tap and it is the thing customers ask for '
+            'a week later.',
+            style: const TextStyle(color: GabisPalette.inkSoft, fontSize: 13)),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Not now',
+                  style: TextStyle(color: GabisPalette.inkSoft))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: GabisPalette.ink,
+                foregroundColor: GabisPalette.cream),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Send receipt'),
+          ),
+        ],
+      ),
+    );
+    if (send != true || !mounted) return;
+
+    final phone = inv.clientPhone ?? await _askPhone(context, inv.client);
+    if (phone == null || !mounted) return;
+
+    final company = ref.read(businessProvider).companies.isEmpty
+        ? 'gabis'
+        : ref.read(businessProvider).companies.first.name;
+
+    final opened = await Outreach.whatsapp(
+        phone, Outreach.receiptMessage(invoice: inv, company: company));
+    if (!mounted) return;
+    Outreach.toast(
+        context,
+        opened
+            ? 'Receipt ready to send to ${inv.client}.'
+            : 'Could not open WhatsApp on this device.',
+        ok: opened);
   }
 
   @override
@@ -482,7 +541,10 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
                   tooltip: 'Send on WhatsApp',
                   icon: const Icon(Icons.chat_rounded, size: 18, color: Color(0xFF25D366)),
                   onPressed: () async {
-                    final phone = await _askPhone(context, inv.client);
+                    // Already captured when the invoice was drafted; only ask
+                    // when the note did not carry one.
+                    final phone = inv.clientPhone ??
+                        await _askPhone(context, inv.client);
                     if (phone == null || !context.mounted) return;
                     final sent = await Outreach.whatsapp(
                         phone, Outreach.invoiceMessage(inv));
@@ -517,7 +579,7 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
                   },
                 ),
                 TextButton(
-                  onPressed: () => ref.read(businessProvider.notifier).markInvoicePaid(inv.id),
+                  onPressed: () => _markPaidAndOfferReceipt(inv),
                   child: const Text('Mark paid', style: TextStyle(fontSize: 12)),
                 ),
               ],
