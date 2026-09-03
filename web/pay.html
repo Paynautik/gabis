@@ -35,21 +35,10 @@
     .wrap { max-width: 480px; margin: 0 auto; padding: 28px 20px 48px; }
 
     .brand {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      font-size: 19px;
+      display: block;
+      width: 88px;
+      height: auto;
       margin-bottom: 26px;
-    }
-
-    .brand .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--lime-ink);
-      margin-top: 7px;
     }
 
     .who { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 4px; }
@@ -136,6 +125,9 @@
       font-size: 14px;
     }
 
+    .steps li > span { flex: 1; }
+    .steps b { white-space: nowrap; }
+
     .steps li::before {
       content: counter(step);
       flex: none;
@@ -182,7 +174,7 @@
 </head>
 <body>
   <div class="wrap">
-    <div class="brand">gabis<span class="dot"></span></div>
+    <img class="brand" src="gabis-wordmark.png" alt="gabis" width="720" height="321">
     <div id="content">
       <div class="error">
         <h1>This payment link is incomplete</h1>
@@ -247,10 +239,10 @@
           '<button id="copy" type="button">Copy account number</button>' +
         '</div>' +
         '<ol class="steps">' +
-          '<li>Copy the account number above.</li>' +
-          '<li>Open your bank app and send ' + esc(amount) + ' to it.</li>' +
-          (data.id ? '<li>Put <b>' + esc(data.id) + '</b> in the narration so it is matched to you.</li>' : '') +
-          '<li>Come back and tell ' + esc(dest.name) + ' it is done.</li>' +
+          '<li><span>Copy the account number above.</span></li>' +
+          '<li><span>Open your bank app and send ' + esc(amount) + ' to it.</span></li>' +
+          (data.id ? '<li><span>Put <b>' + esc(data.id) + '</b> in the narration so it is matched to you.</span></li>' : '') +
+          '<li><span>Come back and tell ' + esc(dest.name) + ' it is done.</span></li>' +
         '</ol>' +
         '<p class="foot">gabis is a financial technology company, not a bank. This page shows details supplied by ' +
           esc(dest.name) + '; the transfer happens in your own bank app, and no payment is taken here.</p>';
