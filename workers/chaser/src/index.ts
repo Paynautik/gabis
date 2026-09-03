@@ -42,6 +42,12 @@ interface Queue {
   debtors?: Debtor[];
 }
 
+/** The site is the only thing that asks, and only for /status. */
+const cors = {
+  'access-control-allow-origin': 'https://gabis.pages.dev',
+  'access-control-allow-methods': 'GET, OPTIONS',
+};
+
 /** Says which secret is missing rather than throwing an opaque 1101. */
 function missingSecret(env: Env): string | null {
   if (!env.GOOGLE_SA_EMAIL) return 'GOOGLE_SA_EMAIL';
@@ -199,6 +205,25 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 204, headers: cors });
+    }
+
+    // The app asks this before it offers to turn reminders on, so a switch is
+    // never presented as armed when the rail behind it cannot send anything.
+    // Readable by the site, and it says nothing a stranger could use.
+    if (url.pathname === '/status') {
+      return Response.json(
+        {
+          ok: true,
+          configured: missingSecret(env) === null,
+          sends: Boolean(env.WHATSAPP_TOKEN && env.WHATSAPP_PHONE_ID),
+          schedule: '08:00 UTC daily',
+        },
+        { headers: cors },
+      );
+    }
+
     const missing = missingSecret(env);
     if (missing) {
       return Response.json(
@@ -206,7 +231,7 @@ export default {
           error: 'not_configured',
           detail: `${missing} is not set. See workers/chaser/README.md — without it the schedule runs and does nothing.`,
         },
-        { status: 503 },
+        { status: 503, headers: cors },
       );
     }
 
@@ -265,7 +290,7 @@ export default {
         }
       }
 
-      return Response.json({ now: now.toISOString(), items: out });
+      return Response.json({ now: now.toISOString(), items: out }, { headers: cors });
     }
 
     return Response.json({ error: 'not_found' }, { status: 404 });
