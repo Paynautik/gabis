@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Pay this invoice · gabis</title>
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png">
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+  <style>
+    /* A page opened on mobile data, one-handed, halfway through a chat. It
+       loads in a single request: no fonts, no framework, no bundle. */
+    :root {
+      --cream: #F4F0E8;
+      --surface: #FFFFFF;
+      --ink: #1E0C62;
+      --ink-soft: #5B5372;
+      --ink-faint: #8B8399;
+      --line: #E2DCD1;
+      --lime: #D9FF43;
+      --lime-ink: #5B7500;
+      --green: #1F7A52;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap { max-width: 480px; margin: 0 auto; padding: 28px 20px 48px; }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      font-size: 19px;
+      margin-bottom: 26px;
+    }
+
+    .brand .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--lime-ink);
+      margin-top: 7px;
+    }
+
+    .who { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 4px; }
+
+    .amount {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      margin: 0 0 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .what { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 24px; }
+    .what b { color: var(--ink); font-weight: 600; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .label {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin: 0 0 6px;
+    }
+
+    .acct {
+      font-size: 34px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      font-variant-numeric: tabular-nums;
+      margin: 0 0 14px;
+      word-break: break-all;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+      font-size: 14.5px;
+    }
+
+    .row span:first-child { color: var(--ink-soft); }
+    .row span:last-child { text-align: right; font-weight: 600; }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 17px;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      background: var(--ink);
+      color: var(--cream);
+      margin-top: 18px;
+    }
+
+    button:active { transform: translateY(1px); }
+    button:focus-visible { outline: 3px solid var(--lime-ink); outline-offset: 2px; }
+    button.copied { background: var(--green); }
+
+    .steps {
+      margin: 26px 0 0;
+      padding: 0;
+      list-style: none;
+      counter-reset: step;
+    }
+
+    .steps li {
+      counter-increment: step;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 7px 0;
+      color: var(--ink-soft);
+      font-size: 14px;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      flex: none;
+      width: 21px;
+      height: 21px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      color: var(--ink-faint);
+      font-size: 11.5px;
+      font-weight: 700;
+      display: grid;
+      place-items: center;
+      margin-top: 1px;
+    }
+
+    .foot {
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      color: var(--ink-faint);
+      font-size: 12px;
+    }
+
+    .error { padding: 40px 0; }
+    .error h1 { font-size: 21px; margin: 0 0 8px; }
+    .error p { color: var(--ink-soft); font-size: 14.5px; margin: 0; }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --cream: #12101B;
+        --surface: #191527;
+        --ink: #EFEBF7;
+        --ink-soft: #A79FBE;
+        --ink-faint: #7B7392;
+        --line: #2E2743;
+        --lime-ink: #C6EE3A;
+        --green: #4FC08A;
+      }
+      button { background: var(--lime); color: #101010; }
+      button.copied { background: var(--green); color: #06231B; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">gabis<span class="dot"></span></div>
+    <div id="content">
+      <div class="error">
+        <h1>This payment link is incomplete</h1>
+        <p>Ask whoever sent it to share the link again — the part after the # is missing, which is where the invoice details live.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // Everything the page needs is in the fragment, which browsers never
+      // send to the server — the invoice details stay between the two people
+      // in the chat.
+      var raw = location.hash.slice(1);
+      if (!raw) return;
+
+      var data;
+      try {
+        var json = decodeURIComponent(escape(atob(raw.replace(/-/g, '+').replace(/_/g, '/'))));
+        data = JSON.parse(json);
+      } catch (e) {
+        return;
+      }
+
+      var dest = data.dest || {};
+      if (!dest.acct) return;
+
+      var symbols = { NGN: '₦', USD: '$', GBP: '£', KES: 'KSh ', GHS: 'GH₵ ' };
+      var symbol = symbols[data.cur] || (data.cur ? data.cur + ' ' : '');
+      var amount = symbol + Number(data.amt || 0).toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      var due = '';
+      if (data.due) {
+        var d = new Date(data.due + 'T00:00:00');
+        if (!isNaN(d)) {
+          due = d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+      }
+
+      document.title = 'Pay ' + amount + ' · gabis';
+
+      document.getElementById('content').innerHTML =
+        '<p class="who">' + esc(dest.name) + ' is requesting</p>' +
+        '<p class="amount">' + esc(amount) + '</p>' +
+        '<p class="what">for <b>' + esc(data['for'] || 'services') + '</b>' +
+          (due ? ' · due ' + esc(due) : '') + '</p>' +
+        '<div class="card">' +
+          '<p class="label">Account number</p>' +
+          '<p class="acct" id="acct">' + esc(dest.acct) + '</p>' +
+          '<div class="row"><span>Bank</span><span>' + esc(dest.bank) + '</span></div>' +
+          '<div class="row"><span>Account name</span><span>' + esc(dest.name) + '</span></div>' +
+          (data.id ? '<div class="row"><span>Use as reference</span><span>' + esc(data.id) + '</span></div>' : '') +
+          '<button id="copy" type="button">Copy account number</button>' +
+        '</div>' +
+        '<ol class="steps">' +
+          '<li>Copy the account number above.</li>' +
+          '<li>Open your bank app and send ' + esc(amount) + ' to it.</li>' +
+          (data.id ? '<li>Put <b>' + esc(data.id) + '</b> in the narration so it is matched to you.</li>' : '') +
+          '<li>Come back and tell ' + esc(dest.name) + ' it is done.</li>' +
+        '</ol>' +
+        '<p class="foot">gabis is a financial technology company, not a bank. This page shows details supplied by ' +
+          esc(dest.name) + '; the transfer happens in your own bank app, and no payment is taken here.</p>';
+
+      var button = document.getElementById('copy');
+      button.addEventListener('click', function () {
+        var number = dest.acct;
+
+        function done() {
+          button.textContent = 'Copied';
+          button.classList.add('copied');
+          setTimeout(function () {
+            button.textContent = 'Copy account number';
+            button.classList.remove('copied');
+          }, 2200);
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(number).then(done, fallback);
+        } else {
+          fallback();
+        }
+
+        // Older mobile browsers, and any context where the clipboard API is
+        // blocked: select the number so a long-press copy still works.
+        function fallback() {
+          var range = document.createRange();
+          range.selectNodeContents(document.getElementById('acct'));
+          var selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+          try {
+            document.execCommand('copy');
+            done();
+          } catch (e) {
+            button.textContent = 'Press and hold the number to copy';
+          }
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
