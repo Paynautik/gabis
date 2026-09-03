@@ -1460,11 +1460,12 @@ const _moves = <_Move>[
       ]),
 ];
 
-/// Two rows drifting in opposite directions, looping seamlessly.
+/// One row drifting past, looping seamlessly.
 ///
 /// Thirteen capabilities as a static grid is a wall the eye has to work
-/// through. Drifting past, it reads at a glance and takes a third of the
-/// height. Motion pauses on hover so anything can actually be read.
+/// through. Drifting past in a single line, it reads as one list rather than
+/// two competing ones, and takes half the height again. Motion pauses on
+/// hover so anything can actually be read.
 class _MoveMarquee extends StatefulWidget {
   const _MoveMarquee();
 
@@ -1480,7 +1481,10 @@ class _MoveMarqueeState extends State<_MoveMarquee>
   @override
   void initState() {
     super.initState();
-    _c = AnimationController(vsync: this, duration: const Duration(seconds: 46))
+    // One row carries every card, so the loop is nearly twice as long as the
+    // old two-row split — the duration follows, keeping the drift speed the
+    // same rather than doubling it.
+    _c = AnimationController(vsync: this, duration: const Duration(seconds: 86))
       ..repeat();
   }
 
@@ -1492,24 +1496,17 @@ class _MoveMarqueeState extends State<_MoveMarquee>
 
   @override
   Widget build(BuildContext context) {
-    final top = _moves.take(7).toList();
-    final bottom = _moves.skip(7).toList();
-
     return MouseRegion(
       onEnter: (_) => setState(() => _paused = true),
       onExit: (_) => setState(() => _paused = false),
       child: AnimatedBuilder(
         animation: _c,
-        builder: (context, _) {
-          final t = _c.value;
-          return Column(
-            children: [
-              _MarqueeRow(items: top, progress: t, reverse: false, paused: _paused),
-              const SizedBox(height: 16),
-              _MarqueeRow(items: bottom, progress: t, reverse: true, paused: _paused),
-            ],
-          );
-        },
+        builder: (context, _) => _MarqueeRow(
+          items: _moves,
+          progress: _c.value,
+          reverse: false,
+          paused: _paused,
+        ),
       ),
     );
   }
