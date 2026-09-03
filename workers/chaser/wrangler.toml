@@ -1,0 +1,19 @@
+name = "gabis-chaser"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Mid-morning in Lagos (08:00 UTC). The hours rule in policy.ts is what keeps a
+# reminder out of somebody's night; this is only when the pass happens.
+[triggers]
+crons = ["0 8 * * *"]
+
+[vars]
+FIREBASE_PROJECT = "paynautic"
+FIRESTORE_DB = "(default)"
+
+# Secrets, set with `npx wrangler secret put <name>`:
+#   GOOGLE_SA_EMAIL        the service account that may read and write Firestore
+#   GOOGLE_SA_PRIVATE_KEY  its private key, PEM, newlines as \n
+#   WHATSAPP_TOKEN         optional; without it the sender rehearses
+#   WHATSAPP_PHONE_ID      optional; same
