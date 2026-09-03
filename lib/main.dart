@@ -21,9 +21,10 @@ Future<void> main() async {
   // back to local storage, so a bad network is a degraded session, not a dead
   // one.
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    final options = DefaultFirebaseOptions.currentPlatform;
+    await (options == null
+        ? Firebase.initializeApp()
+        : Firebase.initializeApp(options: options));
   } catch (error, stack) {
     firebaseInitError = '$error';
     debugPrint('Firebase unavailable, running locally: $error\n$stack');

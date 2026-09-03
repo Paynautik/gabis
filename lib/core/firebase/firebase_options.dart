@@ -3,6 +3,7 @@
 // Lives in the existing `paynautic` project because the account is at its
 // Google Cloud project quota; gabis keeps its own Firestore collections under
 // users/{uid}, so nothing here touches the other app's data.
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:firebase_core/firebase_core.dart';
 
 class DefaultFirebaseOptions {
@@ -16,7 +17,12 @@ class DefaultFirebaseOptions {
     measurementId: 'G-EC1XJXM07Z',
   );
 
-  /// Web is the shipping target today; mobile builds fall back to the same
-  /// project once their app records exist.
-  static FirebaseOptions get currentPlatform => web;
+  /// Android reads android/app/google-services.json through the Gradle plugin
+  /// rather than values compiled in here, so passing it web's options would
+  /// point the phone at the wrong app record. Null lets the native SDK use the
+  /// file it already has.
+  static FirebaseOptions? get currentPlatform {
+    if (kIsWeb) return web;
+    return defaultTargetPlatform == TargetPlatform.android ? null : web;
+  }
 }
