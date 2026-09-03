@@ -119,6 +119,15 @@ class Invoice {
   /// number the person already pasted.
   final String? clientPhone;
 
+  /// Set on every invoice cut from one agreement, so the parts of a job stay
+  /// recognisable as one job rather than four unrelated bills.
+  final String? agreement;
+
+  /// Which part of that agreement this is, and how many there are: 2 of 4.
+  /// Null on an ordinary one-off invoice.
+  final int? milestone;
+  final int? milestones;
+
   Invoice({
     required this.id,
     required this.client,
@@ -130,9 +139,19 @@ class Invoice {
     this.status = 'sent',
     this.companyDomain,
     this.clientPhone,
+    this.agreement,
+    this.milestone,
+    this.milestones,
   });
 
   bool get isOverdue => status != 'paid' && due.isBefore(DateTime.now());
+
+  bool get isMilestone => milestone != null && milestones != null;
+
+  /// What the client is told this bill is for: the description, said as the
+  /// stage of the job it actually is.
+  String get milestoneLabel =>
+      isMilestone ? 'Milestone $milestone of $milestones' : '';
 }
 
 /// A collections call the voice agent placed.
@@ -615,6 +634,72 @@ class BusinessNotifier extends StateNotifier<BusinessState> {
   }
 
   // ── mutations ──────────────────────────────────────────────────────────
+
+  /// Cuts one agreement into a sequence of invoices.
+  ///
+  /// Only the first is sent. The rest are drafts that become due as the work
+  /// reaches them, which is what makes this safe: gabis never holds the
+  /// client's money against a stage that has not happened, and the business
+  /// never has to remember to raise the next bill. Releasing a milestone is a
+  /// decision the business makes, not a timer.
+  ///
+  /// The last part carries any rounding remainder, so the parts always add up
+  /// to the total that was agreed.
+  List<Invoice> addMilestoneInvoices({
+    required String client,
+    required double total,
+    required String description,
+    required int parts,
+    required int daysApart,
+    String currency = 'NGN',
+    String? clientPhone,
+    String? companyDomain,
+    DateTime? from,
+  }) {
+    final count = parts.clamp(2, 12);
+    final now = from ?? DateTime.now();
+    final seq = state.invoices.length + 2482;
+    final agreement = 'AGR-$seq';
+
+    final each = (total / count * 100).floorToDouble() / 100;
+    final created = <Invoice>[];
+
+    for (var i = 1; i <= count; i++) {
+      final last = i == count;
+      created.add(Invoice(
+        id: '$agreement-M$i',
+        client: client,
+        amount: last ? total - each * (count - 1) : each,
+        currency: currency,
+        description: description,
+        issued: now,
+        due: now.add(Duration(days: daysApart * i)),
+        status: i == 1 ? 'sent' : 'draft',
+        clientPhone: clientPhone,
+        companyDomain: companyDomain,
+        agreement: agreement,
+        milestone: i,
+        milestones: count,
+      ));
+    }
+
+    state = state.copyWith(invoices: [...created, ...state.invoices]);
+    return created;
+  }
+
+  /// Moves the next unsent part of an agreement from draft to sent, which is
+  /// how a stage of work is billed once it is done.
+  Invoice? releaseNextMilestone(String agreement) {
+    final pending = state.invoices
+        .where((i) => i.agreement == agreement && i.status == 'draft')
+        .toList()
+      ..sort((a, b) => (a.milestone ?? 0).compareTo(b.milestone ?? 0));
+    if (pending.isEmpty) return null;
+
+    pending.first.status = 'sent';
+    state = state.copyWith(invoices: [...state.invoices]);
+    return pending.first;
+  }
 
   void addInvoice(Invoice invoice) {
     state = state.copyWith(invoices: [invoice, ...state.invoices]);

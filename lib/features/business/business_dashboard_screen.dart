@@ -314,6 +314,10 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
   /// Pulled out of the same sentence, so sending does not ask for it again.
   String? _draftedPhone;
 
+  /// 1 means one bill for the whole job. Above that, the job is billed in
+  /// stages: one invoice per stage, only the first of them sent.
+  int _parts = 1;
+
   /// Describe the invoice in a sentence and let the model fill the form. The
   /// draft is never sent — it lands in the fields for the owner to check.
   Future<void> _draftFromText() async {
@@ -351,26 +355,45 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
     setState(() => _isGenerating = true);
     await Future.delayed(const Duration(seconds: 1));
     if (!mounted) return;
+    final total = double.tryParse(amount.replaceAll(',', '')) ?? 0;
+    final parts = _parts;
     setState(() {
       final now = DateTime.now();
       final seq = ref.read(businessProvider).invoices.length + 2482;
-      ref.read(businessProvider.notifier).addInvoice(Invoice(
-        id: 'INV-$seq',
-        client: client,
-        amount: double.tryParse(amount.replaceAll(',', '')) ?? 0,
-        description: desc.isEmpty ? 'General services' : desc,
-        issued: now,
-        due: now.add(Duration(days: _dueInDays)),
-        clientPhone: _draftedPhone,
-      ));
+      if (parts > 1) {
+        ref.read(businessProvider.notifier).addMilestoneInvoices(
+              client: client,
+              total: total,
+              description: desc.isEmpty ? 'General services' : desc,
+              parts: parts,
+              daysApart: _dueInDays,
+              clientPhone: _draftedPhone,
+              from: now,
+            );
+      } else {
+        ref.read(businessProvider.notifier).addInvoice(Invoice(
+          id: 'INV-$seq',
+          client: client,
+          amount: total,
+          description: desc.isEmpty ? 'General services' : desc,
+          issued: now,
+          due: now.add(Duration(days: _dueInDays)),
+          clientPhone: _draftedPhone,
+        ));
+      }
       _isGenerating = false;
       _dueInDays = 30;
+      _parts = 1;
       _draftedPhone = null;
       _missing = const [];
       _clientCtrl.clear(); _amountCtrl.clear(); _descCtrl.clear();
       _promptCtrl.clear();
     });
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invoice for $client created.'), backgroundColor: GabisPalette.success));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(parts > 1
+            ? '$parts invoices for $client created. The first is sent; the rest stay drafts until you release them.'
+            : 'Invoice for $client created.'),
+        backgroundColor: GabisPalette.success));
   }
 
   /// Where money for this invoice should land: the NUBAN a partner issued
@@ -504,14 +527,52 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
             _buildField('Amount (NGN)', 'e.g. 500000', _amountCtrl, isNumber: true),
             const SizedBox(height: 16),
             _buildField('Description', 'e.g. Web Development', _descCtrl),
+            const SizedBox(height: 16),
+            // Most jobs of any size are paid in stages anyway, in a
+            // conversation nobody writes down. Saying it here turns that into
+            // invoices with dates on them.
+            const Text('Bill it in',
+                style: TextStyle(
+                    color: GabisPalette.inkSoft,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
-            Text('Payment terms: net $_dueInDays days',
+            Wrap(
+              spacing: 8,
+              children: [
+                for (final n in const [1, 2, 3, 4])
+                  ChoiceChip(
+                    label: Text(n == 1 ? 'One invoice' : '$n milestones',
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: _parts == n
+                                ? Colors.white
+                                : GabisPalette.inkSoft)),
+                    selected: _parts == n,
+                    showCheckmark: false,
+                    backgroundColor: GabisPalette.surface,
+                    selectedColor: GabisPalette.electric,
+                    side: const BorderSide(color: GabisPalette.line),
+                    onSelected: (_) => setState(() => _parts = n),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+                _parts == 1
+                    ? 'Payment terms: net $_dueInDays days'
+                    : 'Payment terms: $_parts invoices, $_dueInDays days apart. '
+                        'Only the first is sent — release the rest as the work reaches them.',
                 style: const TextStyle(color: GabisPalette.inkSoft, fontSize: 12)),
             const SizedBox(height: 24),
             SizedBox(width: double.infinity, height: 48, child: ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: GabisPalette.electric, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
               onPressed: _isGenerating ? null : _generate,
-              child: _isGenerating ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: GabisPalette.ink)) : const Text('Generate Invoice', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: _isGenerating
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: GabisPalette.ink))
+                  : Text(_parts == 1 ? 'Generate Invoice' : 'Generate $_parts Invoices',
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
             )),
           ]),
         ),
@@ -533,6 +594,19 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
                 ]),
                 const SizedBox(height: 4),
                 Text(inv.description, style: const TextStyle(color: GabisPalette.inkSoft, fontSize: 12)),
+                // A part of a job reads as a part of a job, so four bills to
+                // one client are not mistaken for four jobs.
+                if (inv.isMilestone) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                      inv.status == 'draft'
+                          ? '${inv.milestoneLabel} · not sent yet'
+                          : inv.milestoneLabel,
+                      style: const TextStyle(
+                          color: GabisPalette.inkFaint,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600)),
+                ],
               ])),
               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 Text(formatFull(inv.amount), style: const TextStyle(color: GabisPalette.ink, fontWeight: FontWeight.w600, fontSize: 15)),
@@ -553,6 +627,26 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
                 ),
               ]),
               const SizedBox(width: 12),
+              // Releasing the next stage is the business saying the work got
+              // there. It is deliberately a button somebody presses rather
+              // than a timer, because a date passing is not the same as a
+              // stage being done.
+              if (inv.isMilestone && inv.status == 'draft')
+                TextButton(
+                  onPressed: () {
+                    final released = ref
+                        .read(businessProvider.notifier)
+                        .releaseNextMilestone(inv.agreement!);
+                    if (released == null || !context.mounted) return;
+                    Outreach.toast(context,
+                        '${released.id} released — send it when you are ready.');
+                  },
+                  child: const Text('Release',
+                      style: TextStyle(
+                          color: GabisPalette.electric,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700)),
+                ),
               if (!isPaid) ...[
                 IconButton(
                   tooltip: 'Send on WhatsApp',
@@ -1887,19 +1981,32 @@ class _ReachOutPanelState extends ConsumerState<_ReachOutPanel> {
     final store = ref.read(businessProvider);
     final company = store.companyOf(d)?.name ?? 'gabis';
     final overdueDays = -d.daysUntilDue;
+
+    // Checked before the buttons are drawn, so a blocked chase reads as a
+    // stated rule rather than a button that quietly does nothing. The decision
+    // also carries which approach this is, so the wording escalates from the
+    // same count the limits are enforced on.
+    final gate = ContactPolicy.check(payer: d, priorCalls: store.calls);
+    final priorAttempts = gate.attempt - 1;
+
+    // A reminder that says what is owed and then leaves the person to hunt
+    // for the account number is half a reminder. The portal link carries every
+    // invoice in their name plus where to pay, in the fragment, so nothing is
+    // sent to a server to render it.
+    final payTo = PaymentDestination.fromNairaAccount(
+            ref.read(kycProvider).account) ??
+        PaymentDestination.fromCompany(store.companyOf(d));
+    final portal =
+        PortalLink.forClient(d.name, store.invoices, payTo);
+
     final message = '${Outreach.chaseMessage(
       name: d.name,
       company: company,
       outstanding: d.outstanding,
       daysOverdue: overdueDays,
+      attempt: gate.attempt,
+      payLink: portal,
     )}\n\n${ContactPolicy.optOutLine(company)}';
-
-    // Checked before the buttons are drawn, so a blocked chase reads as a
-    // stated rule rather than a button that quietly does nothing.
-    final gate = ContactPolicy.check(payer: d, priorCalls: store.calls);
-
-    final priorAttempts =
-        store.calls.where((c) => c.payerName == d.name).length;
 
     void log(
       String outcome,

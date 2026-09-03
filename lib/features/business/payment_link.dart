@@ -71,9 +71,62 @@ class PaymentLink {
       'to': invoice.client,
       'amt': invoice.amount,
       'cur': invoice.currency,
-      'for': invoice.description,
+      'for': invoice.isMilestone
+          ? '${invoice.description} (part ${invoice.milestone} of ${invoice.milestones})'
+          : invoice.description,
       'due': invoice.due.toIso8601String().split('T').first,
       'dest': destination.toJson(),
+    };
+
+    final encoded = base64Url.encode(utf8.encode(jsonEncode(payload)));
+    return '$base#$encoded';
+  }
+}
+
+/// The link a client opens to see everything they owe one business.
+///
+/// The same trick as [PaymentLink]: the whole statement rides in the fragment,
+/// so a client sees their invoices without gabis issuing them a login, holding
+/// a password, or writing their balance into a server log. It also means the
+/// page is static and the link keeps working with no session to expire — the
+/// cost being that a link shared onward shows what it shows, which is why it
+/// carries no phone number, email or address.
+class PortalLink {
+  static const base = 'https://gabis.pages.dev/portal';
+
+  /// Null when there is nothing to show, rather than a link to an empty page.
+  static String? forClient(
+    String client,
+    List<Invoice> invoices,
+    PaymentDestination? destination,
+  ) {
+    // Drafts are stages of work that have not been billed yet — a client
+    // seeing one would be asked for money nobody has asked them for. They
+    // appear here only once the business releases them.
+    final mine = invoices
+        .where((i) => i.client == client && i.status != 'draft')
+        .toList()
+      ..sort((a, b) => a.due.compareTo(b.due));
+    if (mine.isEmpty) return null;
+
+    final payload = {
+      'v': 1,
+      'to': client,
+      'cur': mine.first.currency,
+      'inv': [
+        for (final i in mine)
+          {
+            'id': i.id,
+            'amt': i.amount,
+            'cur': i.currency,
+            'for': i.description,
+            'due': i.due.toIso8601String().split('T').first,
+            'st': i.status,
+            if (i.milestone != null) 'm': i.milestone,
+            if (i.milestones != null) 'mn': i.milestones,
+          }
+      ],
+      if (destination != null) 'dest': destination.toJson(),
     };
 
     final encoded = base64Url.encode(utf8.encode(jsonEncode(payload)));

@@ -7,8 +7,15 @@ class ContactDecision {
   /// Written for the person about to press the button, not for a log file.
   final String? reason;
 
-  const ContactDecision.allow() : allowed = true, reason = null;
-  const ContactDecision.deny(this.reason) : allowed = false;
+  /// Which approach this would be: 1 for the first, 2 for the second. The
+  /// message is written from this, so the count and the wording cannot drift
+  /// apart.
+  final int attempt;
+
+  const ContactDecision.allow({this.attempt = 1})
+      : allowed = true,
+        reason = null;
+  const ContactDecision.deny(this.reason, {this.attempt = 1}) : allowed = false;
 }
 
 /// The rules that decide whether a chase may go out.
@@ -52,7 +59,20 @@ class ContactPolicy {
           '${dayEndHour.toString().padLeft(2, '0')}:00.');
     }
 
-    final mine = priorCalls.where((c) => c.payerName == payer.name);
+    final mine = priorCalls.where((c) => c.payerName == payer.name).toList()
+      ..sort((a, b) => a.placedAt.compareTo(b.placedAt));
+    final attempt = mine.length + 1;
+
+    // Someone who has said no is not a lead to be worked. A refusal ends the
+    // automated reminders; what follows is a conversation between two people,
+    // or a matter for the courts, and neither belongs on this button.
+    if (mine.isNotEmpty && mine.last.outcome == 'refused') {
+      return ContactDecision.deny(
+          '${payer.name.split(' ').first} refused the last approach. '
+          'Automated reminders stop there — speak to them directly, or agree '
+          'a new date on their record first.',
+          attempt: attempt);
+    }
 
     final today = mine
         .where((c) =>
@@ -61,20 +81,22 @@ class ContactPolicy {
             c.placedAt.day == at.day)
         .length;
     if (today >= maxPerDay) {
-      return const ContactDecision.deny(
-          'Already contacted today. One approach a day keeps this a reminder rather than a chase.');
+      return ContactDecision.deny(
+          'Already contacted today. One approach a day keeps this a reminder rather than a chase.',
+          attempt: attempt);
     }
 
     final week = mine
         .where((c) => at.difference(c.placedAt).inDays < 7)
         .length;
     if (week >= maxPerWeek) {
-      return const ContactDecision.deny(
+      return ContactDecision.deny(
           'Three approaches already this week. The next one can go out '
-          'once seven days have passed since the first.');
+          'once seven days have passed since the first.',
+          attempt: attempt);
     }
 
-    return const ContactDecision.allow();
+    return ContactDecision.allow(attempt: attempt);
   }
 
   /// The line that has to travel with every automated reminder: who is asking,

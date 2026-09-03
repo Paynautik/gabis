@@ -20,20 +20,53 @@ class Outreach {
     return p;
   }
 
+  /// The reminder, written for the attempt it actually is.
+  ///
+  /// A third reminder that reads exactly like the first is how a business
+  /// teaches someone that reminders can be ignored; one that escalates into a
+  /// threat is how it loses the customer and, under the NDPR, invites a
+  /// complaint. So the tone firms up and the ask gets more specific, the last
+  /// one says plainly that the automated reminders stop and a person takes
+  /// over, and none of them threaten anything the business has not decided to
+  /// do.
   static String chaseMessage({
     required String name,
     required String company,
     required double outstanding,
     required int daysOverdue,
     String? invoiceId,
+    int attempt = 1,
+    String? payLink,
   }) {
+    final first = name.split(' ').first;
     final ref = invoiceId == null ? '' : ' ($invoiceId)';
-    final timing = daysOverdue > 0
-        ? 'was due $daysOverdue ${daysOverdue == 1 ? 'day' : 'days'} ago'
-        : 'is due shortly';
-    return 'Hello ${name.split(' ').first}, this is $company. '
-        'Your balance of ${formatFull(outstanding)}$ref $timing. '
-        'You can pay from your gabis app, or reply here if you need a new date. Thank you.';
+    final owed = formatFull(outstanding);
+    final late = daysOverdue == 1 ? '1 day' : '$daysOverdue days';
+    final pay = payLink == null ? '' : '\n\nPay here: $payLink';
+
+    if (attempt <= 1) {
+      final timing = daysOverdue > 0
+          ? 'was due $late ago'
+          : 'is due shortly';
+      return 'Hello $first, this is $company. '
+          'Your balance of $owed$ref $timing. '
+          'You can pay from your gabis app, or reply here if you need a new date. '
+          'Thank you.$pay';
+    }
+
+    if (attempt == 2) {
+      return 'Hello $first, $company again about $owed$ref, '
+          '${daysOverdue > 0 ? 'now $late overdue' : 'due shortly'}. '
+          'We have not heard back on the first reminder. '
+          'Can you pay today, or reply with the date you will pay so we can hold it? '
+          'Thank you.$pay';
+    }
+
+    return 'Hello $first. This is the last automated reminder from $company '
+        'about $owed$ref, ${daysOverdue > 0 ? '$late overdue' : 'now due'}. '
+        'After this someone from $company will contact you directly to agree how '
+        'it will be settled. If you have already paid, reply with the date and '
+        'we will match it. Thank you.$pay';
   }
 
   /// The proof of payment a vendor currently types by hand, or does not send
