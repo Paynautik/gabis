@@ -2513,6 +2513,92 @@ class _CollectionsIntelligence extends ConsumerWidget {
             'Which language, which channel and which hour actually gets people to pay. Every attempt adds a row.',
             style: TextStyle(color: GabisPalette.inkSoft, fontSize: 12.5, height: 1.5),
           ),
+
+          // The conclusion goes above the tables. Averages are interesting;
+          // what a business can act on is what to do differently next time.
+          ...(() {
+            final insights = store.whatWorks;
+            if (insights.isEmpty) {
+              final left = store.attemptsUntilInsight;
+              return [
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: GabisPalette.cream,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: GabisPalette.line),
+                  ),
+                  child: Text(
+                    left > 0
+                        ? 'Too early to say what works. $left more '
+                            '${left == 1 ? 'attempt' : 'attempts'} and this will '
+                            'start naming the language, channel and hour that get paid.'
+                        : 'Nothing stands out yet: no approach is beating your '
+                            'average by enough to be worth changing anything for.',
+                    style: const TextStyle(
+                        color: GabisPalette.inkSoft, fontSize: 12, height: 1.5),
+                  ),
+                ),
+              ];
+            }
+
+            return [
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: GabisPalette.cream,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: GabisPalette.lineStrong),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('WHAT WORKS FOR YOU',
+                        style: TextStyle(
+                            fontSize: 9.5,
+                            letterSpacing: 1,
+                            fontWeight: FontWeight.w900,
+                            color: GabisPalette.inkFaint)),
+                    const SizedBox(height: 10),
+                    for (final insight in insights.take(3)) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('→ ',
+                                style: TextStyle(
+                                    color: GabisPalette.electric,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 13)),
+                            Expanded(
+                              child: Text(insight.sentence,
+                                  style: const TextStyle(
+                                      color: GabisPalette.ink,
+                                      fontSize: 12.5,
+                                      height: 1.45,
+                                      fontWeight: FontWeight.w600)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    Text(
+                      'Measured on your own attempts, not on anybody else\'s. '
+                      'It says nothing until the numbers behind it are worth acting on.',
+                      style: TextStyle(
+                          color: GabisPalette.inkFaint,
+                          fontSize: 11,
+                          height: 1.4),
+                    ),
+                  ],
+                ),
+              ),
+            ];
+          })(),
           if (store.sampleAttempts) ...[
             const SizedBox(height: 14),
             Container(
