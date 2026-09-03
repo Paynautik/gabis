@@ -1,34 +1,58 @@
 rules_version = '2';
 
-// gabis stores everything user-scoped under users/{uid}. Nobody reads or
-// writes another person's financial data, and there is no public collection.
+// One database, two products.
+//
+// gabis and paynautic.com share the paynautic project because the account is
+// at its Google Cloud project quota, and Firestore rules are per database
+// rather than per app — so this file governs both, and a deploy from either
+// side replaces it whole. That is the clash worth avoiding, and it is avoided
+// by making the two products' paths disjoint rather than by hoping.
+//
+//   gabis            users/{uid}/gabis/**        plus payment_accounts
+//   paynautic.com    users/{uid}/**              everything else it keeps
+//
+// The shared rule below is what was already deployed and what paynautic.com
+// runs on: a user reaches their own documents and nobody else's. gabis's own
+// rules are additions under paths only gabis writes, so this file is a strict
+// superset of what was here before and cannot take away access paynautic.com
+// already had.
+//
+// The clean separation is a second Firestore database for gabis, which needs
+// the project on the Blaze plan. firebase/README.md has the steps for the day
+// that happens; until then, disjoint paths and one shared file.
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Shared by both products: your own documents, nobody else's, and no
+    // public collection anywhere.
     match /users/{uid}/{document=**} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
-    // The reminder log the scheduled chaser writes is the record the
-    // frequency limits are counted from, and a dispute is settled by it. The
-    // owner may read their own; nobody may edit one after the fact. The
-    // chaser itself writes with a service account, which these rules do not
-    // apply to.
+    // gabis only, and narrower than the rule above on purpose.
+    //
+    // The reminder log the chaser writes is the record its frequency limits
+    // are counted from, and what settles a dispute with a customer later. The
+    // owner may read their own; nobody may edit one after the fact, including
+    // the owner. The chaser writes with a service account, which these rules
+    // do not apply to.
     match /users/{uid}/gabis/collections/attempts/{attempt} {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if false;
     }
 
-    // The map from a per-invoice account number to the invoice it belongs to.
-    // The worker writes and reads these with a service account; a business may
-    // read its own rows and nothing else, and nobody may edit one, because an
-    // edited row would send somebody else's money to the wrong ledger.
+    // gabis only: the map from a per-invoice account number to the invoice it
+    // belongs to. The payment webhook writes and reads these with a service
+    // account. A business may read its own rows; nobody may edit one, because
+    // an edited row would route somebody else's money to the wrong ledger.
     match /payment_accounts/{account} {
       allow read: if request.auth != null && resource.data.uid == request.auth.uid;
       allow write: if false;
     }
 
-    // Payments that arrived and could not be placed. Only the worker writes
-    // them; nobody reads them from the app yet, and a stranger must not.
+    // gabis only: payments that arrived and could not be placed. The worker
+    // writes them; nothing reads them from either app yet, and a stranger
+    // must not.
     match /unmatched_payments/{payment} {
       allow read, write: if false;
     }

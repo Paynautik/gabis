@@ -1,17 +1,6 @@
 {
   "indexes": [
     {
-      "//": "The chaser finds the businesses that turned reminders on with a collection-group query. Collection-group queries are not served by the automatic single-field indexes, so without this the scheduled pass fails outright.",
-      "collectionGroup": "gabis",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
-        {
-          "fieldPath": "autonomous",
-          "order": "ASCENDING"
-        }
-      ]
-    },
-    {
       "//": "Prior attempts for one debtor, oldest first: an equality on one field ordered by another needs a composite index, and this is what the escalation counts.",
       "collectionGroup": "attempts",
       "queryScope": "COLLECTION",
@@ -25,29 +14,41 @@
           "order": "ASCENDING"
         }
       ]
-    },
+    }
+  ],
+  "fieldOverrides": [
     {
-      "//": "The webhook finds the invoice a payment belongs to by the account it landed in, and falls back to the reference typed into the narration. Both are collection-group lookups.",
-      "collectionGroup": "payment_accounts",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
+      "//": "The chaser finds the accounts that turned reminders on with a collection-group query, which the automatic indexes do not serve.",
+      "collectionGroup": "gabis",
+      "fieldPath": "autonomous",
+      "indexes": [
         {
-          "fieldPath": "account",
-          "order": "ASCENDING"
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
         }
       ]
     },
     {
-      "//": "The narration fallback, matched on the invoice id.",
+      "//": "The webhook finds the invoice a payment belongs to by the account it landed in.",
       "collectionGroup": "payment_accounts",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
+      "fieldPath": "account",
+      "indexes": [
         {
-          "fieldPath": "invoice",
-          "order": "ASCENDING"
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
+        }
+      ]
+    },
+    {
+      "//": "And by the reference typed into the narration, when the account is not one of ours.",
+      "collectionGroup": "payment_accounts",
+      "fieldPath": "invoice",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION_GROUP"
         }
       ]
     }
-  ],
-  "fieldOverrides": []
+  ]
 }
