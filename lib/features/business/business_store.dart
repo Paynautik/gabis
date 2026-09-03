@@ -106,6 +106,10 @@ class Invoice {
   String status; // draft | sent | paid | overdue
   final String? companyDomain;
 
+  /// Captured when the invoice was drafted, so sending it does not ask for a
+  /// number the person already pasted.
+  final String? clientPhone;
+
   Invoice({
     required this.id,
     required this.client,
@@ -116,6 +120,7 @@ class Invoice {
     this.currency = 'NGN',
     this.status = 'sent',
     this.companyDomain,
+    this.clientPhone,
   });
 
   bool get isOverdue => status != 'paid' && due.isBefore(DateTime.now());

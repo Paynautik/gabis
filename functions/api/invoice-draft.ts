@@ -24,6 +24,11 @@ const InvoiceDraft = z.object({
     .string()
     .describe("ISO code. NGN unless the text clearly says otherwise"),
   description: z.string().describe("What the invoice is for, one short line"),
+  phone: z
+    .string()
+    .describe(
+      "The client's phone number exactly as written, or an empty string when the text has none",
+    ),
   due_in_days: z
     .number()
     .describe("Payment terms in days. 30 when the text does not say"),
@@ -41,6 +46,8 @@ Rules:
 - Never invent a client name or an amount that is not in the text. If one is
   absent, put a sensible placeholder in the field and name it in "missing".
 - description is what the work was, not a sentence about invoicing.
+- phone is copied verbatim when present, and left empty otherwise. Never invent
+  a number, and never treat an amount as one.
 - The draft is reviewed by a person before it is sent, so prefer leaving a
   field in "missing" over guessing.`;
 

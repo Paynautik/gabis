@@ -62,6 +62,7 @@ class BusinessPersistence {
       };
 
   static Map<String, dynamic> _invoice(Invoice i) => {
+        'clientPhone': i.clientPhone,
         'id': i.id,
         'client': i.client,
         'amount': i.amount,
@@ -154,6 +155,7 @@ class BusinessPersistence {
           due: DateTime.parse(m['due'] as String),
           status: m['status'] as String,
           companyDomain: m['companyDomain'] as String?,
+          clientPhone: m['clientPhone'] as String?,
         );
       }).toList();
 

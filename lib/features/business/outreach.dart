@@ -35,6 +35,27 @@ class Outreach {
         'You can pay from your gabis app, or reply here if you need a new date. Thank you.';
   }
 
+  /// The proof of payment a vendor currently types by hand, or does not send
+  /// at all. WhatsApp renders *asterisks* as bold, which is why it is written
+  /// this way rather than as prose.
+  static String receiptMessage({
+    required Invoice invoice,
+    required String company,
+    DateTime? paidAt,
+  }) {
+    final at = paidAt ?? DateTime.now();
+    return '*PAYMENT RECEIVED*\n'
+        '\n'
+        '*From:* ${invoice.client}\n'
+        '*Invoice:* ${invoice.id}\n'
+        '*Amount:* ${formatFull(invoice.amount)}\n'
+        '*For:* ${invoice.description}\n'
+        '*Date:* ${_date(at)}\n'
+        '\n'
+        'Received in full, nothing further is owed on this invoice. '
+        'Thank you — $company.';
+  }
+
   static String invoiceMessage(Invoice invoice) =>
       'Hello ${invoice.client}, please find invoice ${invoice.id} for '
       '${formatFull(invoice.amount)} — ${invoice.description}. '
