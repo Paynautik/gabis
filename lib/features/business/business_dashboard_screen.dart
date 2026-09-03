@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'business_store.dart';
+import 'invoice_ai.dart';
 import 'outreach.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/providers/app_providers.dart';
@@ -293,7 +294,45 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
   final _clientCtrl = TextEditingController();
   final _amountCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
+  final _promptCtrl = TextEditingController();
   bool _isGenerating = false;
+
+  /// Set while the model is turning a sentence into fields.
+  bool _isDrafting = false;
+
+  /// Days the drafted terms asked for, so the due date follows what was said
+  /// rather than always being thirty days.
+  int _dueInDays = 30;
+
+  /// What the sentence did not say, shown against the fields it left empty.
+  List<String> _missing = const [];
+
+  /// Describe the invoice in a sentence and let the model fill the form. The
+  /// draft is never sent — it lands in the fields for the owner to check.
+  Future<void> _draftFromText() async {
+    final prompt = _promptCtrl.text.trim();
+    if (prompt.length < 3 || _isDrafting) return;
+
+    setState(() => _isDrafting = true);
+    final draft = await ref.read(invoiceDrafterProvider).draft(prompt);
+    if (!mounted) return;
+
+    setState(() {
+      _clientCtrl.text = draft.client;
+      _amountCtrl.text =
+          draft.amount == 0 ? '' : draft.amount.toStringAsFixed(0);
+      _descCtrl.text = draft.description;
+      _dueInDays = draft.dueInDays;
+      _missing = draft.missing;
+      _isDrafting = false;
+    });
+
+    if (draft.missing.isNotEmpty) {
+      Outreach.toast(
+          context, 'Drafted. Check ${draft.missing.join(' and ')} before sending.',
+          ok: false);
+    }
+  }
 
 
   void _generate() async {
@@ -313,16 +352,19 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
         amount: double.tryParse(amount.replaceAll(',', '')) ?? 0,
         description: desc.isEmpty ? 'General services' : desc,
         issued: now,
-        due: now.add(const Duration(days: 30)),
+        due: now.add(Duration(days: _dueInDays)),
       ));
       _isGenerating = false;
+      _dueInDays = 30;
+      _missing = const [];
       _clientCtrl.clear(); _amountCtrl.clear(); _descCtrl.clear();
+      _promptCtrl.clear();
     });
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invoice for $client created.'), backgroundColor: GabisPalette.success));
   }
 
   @override
-  void dispose() { _clientCtrl.dispose(); _amountCtrl.dispose(); _descCtrl.dispose(); super.dispose(); }
+  void dispose() { _clientCtrl.dispose(); _amountCtrl.dispose(); _descCtrl.dispose(); _promptCtrl.dispose(); super.dispose(); }
 
   @override
   Widget build(BuildContext context) {
@@ -339,11 +381,52 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text('New Invoice', style: TextStyle(color: GabisPalette.ink, fontSize: 16, fontWeight: FontWeight.w600)),
             const SizedBox(height: 20),
+            // Say it once in plain words; the fields below fill themselves in.
+            Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Expanded(
+                child: _buildField(
+                  'Describe it',
+                  'e.g. bill Sarah 150k for brand design, net 14',
+                  _promptCtrl,
+                ),
+              ),
+              const SizedBox(width: 12),
+              SizedBox(
+                height: 48,
+                child: OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                      foregroundColor: GabisPalette.ink,
+                      side: const BorderSide(color: GabisPalette.lineStrong),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8))),
+                  onPressed: _isDrafting ? null : _draftFromText,
+                  icon: _isDrafting
+                      ? const SizedBox(
+                          height: 14,
+                          width: 14,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: GabisPalette.ink))
+                      : const Icon(Icons.auto_awesome_rounded, size: 15),
+                  label: const Text('Draft it',
+                      style: TextStyle(fontWeight: FontWeight.w800)),
+                ),
+              ),
+            ]),
+            if (_missing.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text('Add the ${_missing.join(' and ')} before sending.',
+                  style: const TextStyle(
+                      color: GabisPalette.warn, fontSize: 12, fontWeight: FontWeight.w600)),
+            ],
+            const SizedBox(height: 16),
             _buildField('Client Name', 'e.g. Acme Corp', _clientCtrl),
             const SizedBox(height: 16),
             _buildField('Amount (NGN)', 'e.g. 500000', _amountCtrl, isNumber: true),
             const SizedBox(height: 16),
             _buildField('Description', 'e.g. Web Development', _descCtrl),
+            const SizedBox(height: 8),
+            Text('Payment terms: net $_dueInDays days',
+                style: const TextStyle(color: GabisPalette.inkSoft, fontSize: 12)),
             const SizedBox(height: 24),
             SizedBox(width: double.infinity, height: 48, child: ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: GabisPalette.electric, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
