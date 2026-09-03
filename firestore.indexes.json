@@ -1,0 +1,22 @@
+{
+  "indexes": [
+    {
+      "//": "The chaser finds the businesses that turned reminders on with a collection-group query. Collection-group queries are not served by the automatic single-field indexes, so without this the scheduled pass fails outright.",
+      "collectionGroup": "gabis",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        { "fieldPath": "autonomous", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "//": "Prior attempts for one debtor, oldest first: an equality on one field ordered by another needs a composite index, and this is what the escalation counts.",
+      "collectionGroup": "attempts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "debtor_name", "order": "ASCENDING" },
+        { "fieldPath": "placed_at", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

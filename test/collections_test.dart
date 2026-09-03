@@ -127,6 +127,41 @@ void main() {
       expect(parts.last.due.difference(parts.first.due).inDays, 28);
     });
 
+    test('two agreements on one day do not share an id', () {
+      final notifier = BusinessNotifier()..startEmpty();
+      final at = DateTime(2026, 9, 3, 14, 30);
+
+      final first = notifier.addMilestoneInvoices(
+        client: 'Adaeze Okafor',
+        total: 90000,
+        description: 'Brand photography',
+        parts: 3,
+        daysApart: 7,
+        from: at,
+      );
+
+      // Deleting one puts the counter back where it was, which is how the
+      // second agreement used to land on the first one's id.
+      notifier.deleteInvoice(first.last.id);
+
+      final second = notifier.addMilestoneInvoices(
+        client: 'Chidi Nwosu',
+        total: 60000,
+        description: 'Studio hire',
+        parts: 2,
+        daysApart: 7,
+        from: at,
+      );
+
+      expect(second.first.agreement, isNot(first.first.agreement));
+      expect(
+          notifier.state.invoices
+              .where((i) => i.agreement == first.first.agreement)
+              .map((i) => i.client)
+              .toSet(),
+          {'Adaeze Okafor'});
+    });
+
     test('releasing moves only the next one', () {
       final notifier = BusinessNotifier()..startEmpty();
       final parts = notifier.addMilestoneInvoices(
