@@ -50,8 +50,140 @@
    "areaServed":["NG","KE","GH"],
    "contactPoint":{"@type":"ContactPoint","contactType":"customer support","telephone":"+234-701-888-8303","email":"support@gabis.app"}}
   </script>
+  <style>
+    /* The bundle is a few megabytes over a Lagos connection, and a canvas app
+       paints nothing until it boots. Without this the page is blank the whole
+       time, which reads as broken rather than loading. */
+    :root { color-scheme: light dark; }
+
+    #gabis-splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 26px;
+      background: #F4F0E8;
+      color: #101010;
+      font-family: Helvetica, Arial, sans-serif;
+      transition: opacity 380ms ease;
+    }
+
+    #gabis-splash.is-done { opacity: 0; pointer-events: none; }
+
+    .gabis-splash__mark {
+      font-size: clamp(38px, 9vw, 58px);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+    }
+
+    /* The dot in the wordmark, in the brand lime. */
+    .gabis-splash__mark b { color: #7CB800; font-weight: 800; }
+
+    .gabis-splash__bar {
+      position: relative;
+      width: min(280px, 62vw);
+      height: 3px;
+      border-radius: 99px;
+      background: rgba(16, 16, 16, 0.12);
+      overflow: hidden;
+    }
+
+    .gabis-splash__bar::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: 40%;
+      border-radius: 99px;
+      background: #101010;
+      animation: gabis-slide 1.15s ease-in-out infinite;
+    }
+
+    @keyframes gabis-slide {
+      0%   { transform: translateX(-105%); }
+      100% { transform: translateX(255%); }
+    }
+
+    .gabis-splash__line {
+      font-size: 15px;
+      color: #6B6660;
+      text-align: center;
+      padding: 0 24px;
+    }
+
+    /* Shown only if the bundle is taking unusually long, so a stalled load
+       says so instead of spinning forever. */
+    .gabis-splash__slow {
+      font-size: 12.5px;
+      color: #8A857D;
+      opacity: 0;
+      transition: opacity 300ms ease;
+    }
+
+    #gabis-splash.is-slow .gabis-splash__slow { opacity: 1; }
+
+    @media (prefers-color-scheme: dark) {
+      #gabis-splash { background: #101010; color: #F4F0E8; }
+      .gabis-splash__bar { background: rgba(244, 240, 232, 0.16); }
+      .gabis-splash__bar::after { background: #D9FF43; }
+      .gabis-splash__mark b { color: #D9FF43; }
+      .gabis-splash__line { color: #A8A29A; }
+    }
+
+    /* A moving bar is the whole point, but not for someone who asked for less
+       motion — they get a static one. */
+    @media (prefers-reduced-motion: reduce) {
+      .gabis-splash__bar::after { animation: none; width: 100%; opacity: 0.35; }
+      #gabis-splash { transition: none; }
+    }
+  </style>
 </head>
 <body>
+  <div id="gabis-splash" role="status" aria-live="polite">
+    <div class="gabis-splash__mark">gabis<b>.</b></div>
+    <div class="gabis-splash__bar"></div>
+    <div class="gabis-splash__line">Loading the agent that gets you paid.</div>
+    <div class="gabis-splash__slow">Still loading — a slow connection can take a moment.</div>
+  </div>
+
+  <script>
+    (function () {
+      var splash = document.getElementById('gabis-splash');
+      if (!splash) return;
+
+      var done = false;
+      function dismiss() {
+        if (done) return;
+        done = true;
+        splash.classList.add('is-done');
+        // Removed rather than left transparent, so it never eats a tap.
+        setTimeout(function () { splash.remove(); }, 400);
+      }
+
+      // The event Flutter fires once it has painted something.
+      window.addEventListener('flutter-first-frame', dismiss);
+
+      // Older engines do not fire it, so also watch for the view itself.
+      var observer = new MutationObserver(function () {
+        if (document.querySelector('flt-glass-pane, flutter-view, flt-scene-host')) {
+          observer.disconnect();
+          dismiss();
+        }
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+
+      setTimeout(function () {
+        if (!done) splash.classList.add('is-slow');
+      }, 8000);
+
+      // A last resort: never leave the splash covering a working app.
+      setTimeout(dismiss, 30000);
+    })();
+  </script>
+
   <script src="flutter_bootstrap.js" async></script>
 
   <!--
