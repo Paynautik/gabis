@@ -671,6 +671,33 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
                     }
                   },
                 ),
+                // The statement is the thing a client asks for by name — "what
+                // do I still owe you?" — and until now it only travelled
+                // attached to a chase, which is the wrong tone for a question
+                // somebody asked politely.
+                IconButton(
+                  tooltip: 'Copy statement link for ${inv.client}',
+                  icon: const Icon(Icons.link_rounded,
+                      size: 18, color: GabisPalette.inkSoft),
+                  onPressed: () async {
+                    final link = PortalLink.forClient(
+                        inv.client,
+                        ref.read(businessProvider).invoices,
+                        _payTo(inv));
+                    if (!context.mounted) return;
+                    if (link == null) {
+                      Outreach.toast(
+                          context,
+                          'Nothing to show ${inv.client} yet — send an invoice first.',
+                          ok: false);
+                      return;
+                    }
+                    await Clipboard.setData(ClipboardData(text: link));
+                    if (!context.mounted) return;
+                    Outreach.toast(context,
+                        'Statement link copied. It shows every invoice in ${inv.client}\'s name.');
+                  },
+                ),
                 IconButton(
                   tooltip: 'Email invoice',
                   icon: const Icon(Icons.mail_outline_rounded,
@@ -1979,6 +2006,10 @@ class _AutonomousRemindersCardState
   bool _busy = false;
   String? _last;
 
+  /// Null while it is being asked, and again if the worker cannot be reached.
+  ChaserStatus? _status;
+  bool _asked = false;
+
   @override
   void initState() {
     super.initState();
@@ -1986,6 +2017,14 @@ class _AutonomousRemindersCardState
     // lives on the account rather than on this device.
     _rail.isOn().then((on) {
       if (mounted && on) setState(() => _on = true);
+    });
+
+    // What the rail can do decides what this card is allowed to claim.
+    _rail.status().then((status) {
+      if (mounted) setState(() {
+        _status = status;
+        _asked = true;
+      });
     });
   }
 
@@ -2033,7 +2072,7 @@ class _AutonomousRemindersCardState
                     fontSize: 15,
                     fontWeight: FontWeight.w600)),
           ),
-          if (signedIn)
+          if (signedIn && (_status?.configured ?? false))
             Switch(
               value: _on,
               activeColor: GabisPalette.electric,
@@ -2042,13 +2081,30 @@ class _AutonomousRemindersCardState
         ]),
         const SizedBox(height: 6),
         Text(
-          signedIn
-              ? 'Sends the first, second and final reminder to the $overdue '
-                  '${overdue == 1 ? 'person' : 'people'} overdue, once a day, '
-                  'between 08:00 and 20:00 — the same rules that apply when you '
-                  'press the buttons yourself. A refusal stops it permanently.'
-              : 'Sign in first. The queue lives on your account, which is also '
-                  'what tells the reminders apart from anyone else\'s.',
+          !signedIn
+              ? 'Sign in first. The queue lives on your account, which is also '
+                  'what tells the reminders apart from anyone else\'s.'
+              : !_asked
+                  ? 'Checking whether the reminder server is ready…'
+                  : _status == null
+                      ? 'The reminder server cannot be reached right now, so '
+                          'nothing can be turned on. Reminders you send yourself '
+                          'are unaffected.'
+                      : !_status!.configured
+                          ? 'The reminder server is running but has no '
+                              'credentials yet, so it cannot read your queue. '
+                              'Until it does, turning this on would claim more '
+                              'than it can do.'
+                          : _status!.sends
+                              ? 'Sends the first, second and final reminder to '
+                                  'the $overdue ${overdue == 1 ? 'person' : 'people'} '
+                                  'overdue, once a day, between 08:00 and 20:00 — '
+                                  'the same rules that apply when you press the '
+                                  'buttons yourself. A refusal stops it permanently.'
+                              : 'Ready, but with no way to send yet: it will work '
+                                  'out each reminder and write it down without '
+                                  'sending, so you can read what it would have '
+                                  'said before it says it.',
           style: const TextStyle(
               color: GabisPalette.inkSoft, fontSize: 12.5, height: 1.5),
         ),
