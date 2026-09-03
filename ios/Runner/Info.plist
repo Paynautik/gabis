@@ -45,5 +45,9 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>gabis uses the camera to scan payment QR codes and to take your profile photo.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>gabis uses your photo library so you can choose a profile picture.</string>
 </dict>
 </plist>
