@@ -31,6 +31,15 @@ class Payer {
   String status; // on_track | reminder_sent | defaulted | settled
   List<PaymentRecord> payments;
 
+  /// Honoured everywhere, permanently, once set. A refusal that has to be
+  /// remembered by whoever heard it is not a refusal.
+  bool doNotContact;
+
+  /// Why this person's phone number may lawfully be used — a contract, their
+  /// consent, or the legitimate interest of collecting a debt they owe. The
+  /// contact rules refuse to act without one.
+  String? consentBasis;
+
   Payer({
     required this.name,
     required this.email,
@@ -41,6 +50,8 @@ class Payer {
     this.currentInstallment = 0,
     required this.nextDueDate,
     this.status = 'on_track',
+    this.doNotContact = false,
+    this.consentBasis,
     List<PaymentRecord>? payments,
   }) : payments = payments ?? [];
 
@@ -624,6 +635,56 @@ class BusinessNotifier extends StateNotifier<BusinessState> {
       payer.nextDueDate = DateTime.now().add(const Duration(days: 30));
     }
     state = state.copyWith(companies: [...state.companies]);
+  }
+
+  /// A refusal, honoured from here on. Kept on the record rather than acted on
+  /// by deleting them, so nobody re-imports the same person next week.
+  void setDoNotContact(Payer payer, bool value) {
+    payer.doNotContact = value;
+    state = state.copyWith(companies: [...state.companies]);
+  }
+
+  /// Everything held about one person, for a data-subject request.
+  Map<String, dynamic> exportPayer(Payer payer) => {
+        'name': payer.name,
+        'email': payer.email,
+        'phone': payer.phone,
+        'consentBasis': payer.consentBasis,
+        'doNotContact': payer.doNotContact,
+        'totalAmount': payer.totalAmount,
+        'amountPaid': payer.amountPaid,
+        'installments': payer.installments,
+        'currentInstallment': payer.currentInstallment,
+        'nextDueDate': payer.nextDueDate.toIso8601String(),
+        'status': payer.status,
+        'payments': payer.payments
+            .map((r) => {
+                  'at': r.timestamp.toIso8601String(),
+                  'amount': r.amount,
+                  'note': r.note,
+                })
+            .toList(),
+        'contactAttempts': state.calls
+            .where((c) => c.payerName == payer.name)
+            .map((c) => {
+                  'at': c.placedAt.toIso8601String(),
+                  'channel': c.channel,
+                  'language': c.language,
+                  'outcome': c.outcome,
+                  'transcript': c.transcript,
+                })
+            .toList(),
+      };
+
+  /// Erasure: the person and every attempt made against them.
+  void erasePayer(Payer payer) {
+    for (final company in state.companies) {
+      company.payers.removeWhere((p) => identical(p, payer));
+    }
+    state = state.copyWith(
+      companies: [...state.companies],
+      calls: state.calls.where((c) => c.payerName != payer.name).toList(),
+    );
   }
 
   void markReminderSent(Payer payer) {

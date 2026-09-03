@@ -50,6 +50,8 @@ class BusinessPersistence {
         'currentInstallment': p.currentInstallment,
         'nextDueDate': p.nextDueDate.toIso8601String(),
         'status': p.status,
+        'doNotContact': p.doNotContact,
+        'consentBasis': p.consentBasis,
         'payments': p.payments
             .map((r) => {
                   'timestamp': r.timestamp.toIso8601String(),
@@ -124,6 +126,10 @@ class BusinessPersistence {
               currentInstallment: pm['currentInstallment'] as int,
               nextDueDate: DateTime.parse(pm['nextDueDate'] as String),
               status: pm['status'] as String,
+              doNotContact: (pm['doNotContact'] as bool?) ?? false,
+              // Books written before consent was recorded keep working; the
+              // contact rules ask for a basis before the next reminder.
+              consentBasis: pm['consentBasis'] as String?,
               payments: (pm['payments'] as List)
                   .map((r) => PaymentRecord(
                         timestamp: DateTime.parse(r['timestamp'] as String),

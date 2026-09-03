@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'business_store.dart';
+import 'contact_policy.dart';
 import 'invoice_ai.dart';
 import 'outreach.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../core/services/africas_talking_service.dart';
 import 'dart:async';
+import 'dart:convert';
 
 // ============================================================================
 // SHARED INPUT FIELD BUILDER
@@ -895,10 +897,109 @@ class _ConnectedPaymentsTabState extends ConsumerState<_ConnectedPaymentsTab> {
         totalAmount: amount,
         installments: instalments,
         nextDueDate: DateTime.now().subtract(Duration(days: daysOverdue)),
+        // An imported debtor is being billed under an agreement they entered;
+        // the operator can change this on the record if that is not so.
+        consentBasis: 'Contract — outstanding balance under an agreement',
       ));
     }
 
     return (payers: payers, skipped: skipped);
+  }
+
+  /// The lawful bases a Nigerian, Kenyan or Ghanaian business actually has
+  /// for holding a debtor's phone number.
+  static const _consentBases = [
+    'Contract — outstanding balance under an agreement',
+    'Consent — they agreed to reminders',
+    'Legitimate interest — recovering a debt owed to us',
+  ];
+
+  String _consentBasis = _consentBases.first;
+
+  Widget _consentField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Why you may contact them',
+            style: TextStyle(
+                color: GabisPalette.inkSoft, fontSize: 12, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 6),
+        StatefulBuilder(
+          builder: (context, setLocal) => DropdownButtonFormField<String>(
+            initialValue: _consentBasis,
+            isExpanded: true,
+            style: const TextStyle(color: GabisPalette.ink, fontSize: 13),
+            items: _consentBases
+                .map((b) => DropdownMenuItem(
+                    value: b, child: Text(b, overflow: TextOverflow.ellipsis)))
+                .toList(),
+            onChanged: (v) {
+              if (v == null) return;
+              setLocal(() => _consentBasis = v);
+              _consentBasis = v;
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// The three things a person can ask a business to do with their data, and
+  /// the refusal that has to outlive whoever took the call.
+  Future<void> _payerRecordAction(String action, Payer p) async {
+    final notifier = ref.read(businessProvider.notifier);
+
+    switch (action) {
+      case 'dnc':
+        notifier.setDoNotContact(p, !p.doNotContact);
+        if (!mounted) return;
+        Outreach.toast(
+            context,
+            p.doNotContact
+                ? '${p.name} will not be contacted again.'
+                : 'Contact allowed for ${p.name} again.');
+        break;
+
+      case 'export':
+        final data =
+            const JsonEncoder.withIndent('  ').convert(notifier.exportPayer(p));
+        await Clipboard.setData(ClipboardData(text: data));
+        if (!mounted) return;
+        Outreach.toast(context, 'Everything held about ${p.name} copied.');
+        break;
+
+      case 'erase':
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: GabisPalette.surface,
+            title: const Text('Erase this person?',
+                style: TextStyle(color: GabisPalette.ink, fontSize: 16)),
+            content: Text(
+                '${p.name}, their balance and every contact attempt will be '
+                'removed. This cannot be undone.',
+                style: const TextStyle(color: GabisPalette.inkSoft, fontSize: 13)),
+            actions: [
+              TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Cancel',
+                      style: TextStyle(color: GabisPalette.inkSoft))),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: GabisPalette.danger,
+                    foregroundColor: Colors.white),
+                onPressed: () => Navigator.pop(ctx, true),
+                child: const Text('Erase'),
+              ),
+            ],
+          ),
+        );
+        if (confirmed != true || !mounted) return;
+        notifier.erasePayer(p);
+        if (!mounted) return;
+        Outreach.toast(context, '${p.name} erased.');
+        break;
+    }
   }
 
   void _addPayer(int companyIndex) {
@@ -917,6 +1018,10 @@ class _ConnectedPaymentsTabState extends ConsumerState<_ConnectedPaymentsTab> {
           _buildField('Total Amount (NGN)', 'e.g. 500000', _payerAmountCtrl, isNumber: true),
           const SizedBox(height: 12),
           _buildField('Number of Installments', 'e.g. 4', _payerInstCtrl, isNumber: true),
+          const SizedBox(height: 12),
+          // Without a lawful basis on the record, the contact rules refuse to
+          // send anything to this person.
+          _consentField(),
         ]),
       ),
       actions: [
@@ -938,6 +1043,7 @@ class _ConnectedPaymentsTabState extends ConsumerState<_ConnectedPaymentsTab> {
                 totalAmount: amount,
                 installments: inst,
                 nextDueDate: DateTime.now().add(const Duration(days: 30)),
+                consentBasis: _consentBasis,
               ));
             });
             _payerNameCtrl.clear(); _payerEmailCtrl.clear(); _payerPhoneCtrl.clear(); _payerAmountCtrl.clear(); _payerInstCtrl.clear();
@@ -1357,6 +1463,42 @@ class _ConnectedPaymentsTabState extends ConsumerState<_ConnectedPaymentsTab> {
               Text(statusLabel, style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.w600)),
             ]),
           ),
+          if (p.doNotContact) ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                  color: GabisPalette.warnSurface,
+                  borderRadius: BorderRadius.circular(6)),
+              child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.block_rounded, color: GabisPalette.warn, size: 12),
+                SizedBox(width: 4),
+                Text('Do not contact',
+                    style: TextStyle(
+                        color: GabisPalette.warn,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600)),
+              ]),
+            ),
+          ],
+          PopupMenuButton<String>(
+            tooltip: 'Record',
+            icon: const Icon(Icons.more_horiz_rounded,
+                color: GabisPalette.inkSoft, size: 18),
+            onSelected: (value) => _payerRecordAction(value, p),
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                value: 'dnc',
+                child: Text(p.doNotContact
+                    ? 'Allow contact again'
+                    : 'They asked not to be contacted'),
+              ),
+              const PopupMenuItem(
+                  value: 'export', child: Text('Copy everything we hold')),
+              const PopupMenuItem(
+                  value: 'erase', child: Text('Erase this person')),
+            ],
+          ),
         ]),
         const SizedBox(height: 16),
 
@@ -1468,6 +1610,16 @@ class _AIDebtCollectionTabState extends ConsumerState<_AIDebtCollectionTab> {
     final debtors = _debtors;
     if (debtors.isEmpty) return;
     final debtor = debtors[_selectedDebtor.clamp(0, debtors.length - 1)];
+
+    // An automated caller is exactly the thing that must not be able to ring
+    // someone at 3am, or for the fourth time this week.
+    final gate = ContactPolicy.check(
+        payer: debtor, priorCalls: ref.read(businessProvider).calls);
+    if (!gate.allowed) {
+      Outreach.toast(context, gate.reason!, ok: false);
+      return;
+    }
+
     final company = ref.read(businessProvider).companyOf(debtor);
     final owed = debtor.outstanding;
     final overdueDays = -debtor.daysUntilDue;
@@ -1636,12 +1788,16 @@ class _ReachOutPanelState extends ConsumerState<_ReachOutPanel> {
     final store = ref.read(businessProvider);
     final company = store.companyOf(d)?.name ?? 'gabis';
     final overdueDays = -d.daysUntilDue;
-    final message = Outreach.chaseMessage(
+    final message = '${Outreach.chaseMessage(
       name: d.name,
       company: company,
       outstanding: d.outstanding,
       daysOverdue: overdueDays,
-    );
+    )}\n\n${ContactPolicy.optOutLine(company)}';
+
+    // Checked before the buttons are drawn, so a blocked chase reads as a
+    // stated rule rather than a button that quietly does nothing.
+    final gate = ContactPolicy.check(payer: d, priorCalls: store.calls);
 
     final priorAttempts =
         store.calls.where((c) => c.payerName == d.name).length;
@@ -1681,7 +1837,9 @@ class _ReachOutPanelState extends ConsumerState<_ReachOutPanel> {
         ),
         icon: Icon(icon, size: 16),
         label: Text(label, style: const TextStyle(fontSize: 12.5)),
-        onPressed: () async {
+        onPressed: !gate.allowed
+            ? null
+            : () async {
           final opened = await go();
           if (!context.mounted) return;
           if (opened) {
@@ -1737,6 +1895,26 @@ class _ReachOutPanelState extends ConsumerState<_ReachOutPanel> {
               style: const TextStyle(
                   color: GabisPalette.inkSoft, fontSize: 12.5, height: 1.5)),
           const SizedBox(height: 14),
+          if (!gate.allowed) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: GabisPalette.warnSurface,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(children: [
+                const Icon(Icons.block_rounded, size: 16, color: GabisPalette.warn),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(gate.reason!,
+                      style: const TextStyle(
+                          color: GabisPalette.warn, fontSize: 12.5, height: 1.4)),
+                ),
+              ]),
+            ),
+            const SizedBox(height: 12),
+          ],
           Wrap(spacing: 10, runSpacing: 10, children: [
             channel('WhatsApp', Icons.chat_rounded, const Color(0xFF25D366),
                 () => Outreach.whatsapp(d.phone, message), 'contacted', 'whatsapp'),
