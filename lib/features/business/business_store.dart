@@ -215,6 +215,36 @@ class CallLog {
       outcome == 'paid' || outcome == 'settled' || amountRecovered > 0;
 }
 
+/// One thing worth doing differently on the next attempt.
+class Insight {
+  /// What was varied: language, channel, time of day, tone.
+  final String dimension;
+
+  /// The value that did best — 'Pidgin', 'whatsapp', 'Morning (before 12)'.
+  final String label;
+
+  /// Its recovery rate, and how many times better than the overall rate.
+  final double rate;
+  final double lift;
+
+  final int attempts;
+  final double recovered;
+
+  const Insight({
+    required this.dimension,
+    required this.label,
+    required this.rate,
+    required this.lift,
+    required this.attempts,
+    required this.recovered,
+  });
+
+  /// Written the way somebody would say it out loud.
+  String get sentence =>
+      '$label recovers ${(rate * 100).round()}% of the time — '
+      '${lift.toStringAsFixed(1)}× your average, over $attempts attempts.';
+}
+
 /// A roll-up of attempts, sliced however the caller asks.
 class CollectionStat {
   final String label;
@@ -353,6 +383,59 @@ class BusinessState {
         if (h < 16) return 'Afternoon (12–16)';
         return 'Evening (after 16)';
       });
+
+  /// The one line the whole record exists to produce.
+  ///
+  /// Averages across every attempt are interesting; what a business can act on
+  /// is "do this next". This compares each bucket against the overall rate and
+  /// reports the best one that has enough attempts behind it to mean anything.
+  ///
+  /// It refuses more often than it answers, on purpose. A 100% recovery rate
+  /// over two attempts is noise, and a business that reorganises its week
+  /// around noise will trust nothing here later.
+  List<Insight> get whatWorks {
+    // Below this, the honest answer is that nobody knows yet.
+    const minimumAttempts = 12;
+    const minimumPerBucket = 5;
+
+    if (calls.length < minimumAttempts) return const [];
+
+    final overall = recoveryRate;
+    if (overall <= 0) return const [];
+
+    final found = <Insight>[];
+
+    void consider(String dimension, List<CollectionStat> stats) {
+      final eligible =
+          stats.where((s) => s.attempts >= minimumPerBucket).toList();
+      if (eligible.length < 2) return;
+
+      eligible.sort((a, b) => b.successRate.compareTo(a.successRate));
+      final best = eligible.first;
+      if (best.successRate <= overall) return;
+
+      found.add(Insight(
+        dimension: dimension,
+        label: best.label,
+        rate: best.successRate,
+        lift: best.successRate / overall,
+        attempts: best.attempts,
+        recovered: best.recovered,
+      ));
+    }
+
+    consider('language', statsByLanguage);
+    consider('channel', statsByChannel);
+    consider('time of day', statsByHour);
+    consider('tone', statsByTone);
+
+    // Strongest lift first: the thing most worth changing about the next one.
+    found.sort((a, b) => b.lift.compareTo(a.lift));
+    return found;
+  }
+
+  /// How many more attempts before [whatWorks] will say anything at all.
+  int get attemptsUntilInsight => (12 - calls.length).clamp(0, 12);
 
   /// Share of attempts that ended in money arriving.
   double get recoveryRate {

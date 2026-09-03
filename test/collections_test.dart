@@ -182,6 +182,70 @@ void main() {
     });
   });
 
+  group('what works', () {
+    BusinessState book(List<CallLog> calls) => BusinessState(
+          companies: const [],
+          invoices: const [],
+          calls: calls,
+          filings: const [],
+        );
+
+    CallLog attempt({
+      required String language,
+      required bool paid,
+      String name = 'Adaeze Okafor',
+    }) =>
+        CallLog(
+          payerName: name,
+          company: 'Gabis Ventures',
+          amount: 50000,
+          placedAt: DateTime(2026, 9, 3, 10),
+          tone: 'Manual outreach',
+          outcome: paid ? 'paid' : 'no_answer',
+          transcript: const [],
+          language: language,
+        );
+
+    test('says nothing at all on a handful of attempts', () {
+      final thin = book([
+        for (var i = 0; i < 6; i++)
+          attempt(language: 'Pidgin', paid: i.isEven),
+      ]);
+
+      expect(thin.whatWorks, isEmpty);
+      expect(thin.attemptsUntilInsight, 6);
+    });
+
+    test('names the approach that beats the average', () {
+      final measured = book([
+        for (var i = 0; i < 8; i++) attempt(language: 'Pidgin', paid: i < 6),
+        for (var i = 0; i < 8; i++) attempt(language: 'English', paid: i < 1),
+      ]);
+
+      final insights = measured.whatWorks;
+      expect(insights, isNotEmpty);
+
+      final language =
+          insights.firstWhere((i) => i.dimension == 'language');
+      expect(language.label, 'Pidgin');
+      expect(language.lift, greaterThan(1));
+      expect(language.sentence, contains('Pidgin'));
+      expect(measured.attemptsUntilInsight, 0);
+    });
+
+    test('a bucket too small to mean anything is not reported', () {
+      // Two perfect attempts in Yoruba against a long English record: a real
+      // rate of 100% and no evidence whatsoever.
+      final lopsided = book([
+        for (var i = 0; i < 14; i++) attempt(language: 'English', paid: i < 4),
+        for (var i = 0; i < 2; i++) attempt(language: 'Yoruba', paid: true),
+      ]);
+
+      expect(
+          lopsided.whatWorks.where((i) => i.label == 'Yoruba'), isEmpty);
+    });
+  });
+
   group('PortalLink', () {
     Invoice invoice(String id, String status) => Invoice(
           id: id,
