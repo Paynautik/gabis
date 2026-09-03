@@ -8,6 +8,7 @@ import 'payment_link.dart';
 import '../kyc/kyc_store.dart';
 import 'outreach.dart';
 import 'autonomous_reminders.dart';
+import 'reconciliation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/providers/app_providers.dart';
@@ -297,6 +298,33 @@ class _SmartInvoicesTab extends ConsumerStatefulWidget {
 }
 
 class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
+  @override
+  void initState() {
+    super.initState();
+    _applyArrivedPayments();
+  }
+
+  /// Money that arrived while nobody was looking.
+  ///
+  /// The webhook wrote it down the moment it landed; this is where it becomes
+  /// a paid invoice and an offer to send the receipt. The point of the whole
+  /// arrangement is that nobody had to tell anybody anything.
+  Future<void> _applyArrivedPayments() async {
+    final closed = await _reconciler.apply(ref.read(businessProvider.notifier));
+    if (!mounted || closed.isEmpty) return;
+
+    Outreach.toast(
+        context,
+        closed.length == 1
+            ? '${closed.first.id} was paid — marked off and the chase stopped.'
+            : '${closed.length} invoices were paid — marked off and their chases stopped.');
+
+    for (final invoice in closed) {
+      if (!mounted) return;
+      await _offerReceipt(invoice);
+    }
+  }
+
   final _clientCtrl = TextEditingController();
   final _amountCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
@@ -402,6 +430,27 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
   /// through verification when there is a live one, otherwise the account the
   /// business already gives people. Null means neither is set, and the link is
   /// left off rather than pointing nowhere.
+  /// Accounts minted for a single invoice, once each, kept for the session so
+  /// sending the same invoice twice does not mint a second one.
+  final _perInvoice = <String, PaymentDestination>{};
+  final _reconciler = Reconciliation();
+
+  /// Asks for an account belonging to this invoice alone, and falls back
+  /// quietly: an invoice with the shared account on it still gets paid, it
+  /// just has to be matched by its narration afterwards.
+  Future<PaymentDestination?> _payToFor(Invoice inv) async {
+    final held = _perInvoice[inv.id];
+    if (held != null) return held;
+
+    final minted = await _reconciler.accountFor(inv);
+    if (minted != null && minted.accountNumber.isNotEmpty) {
+      _perInvoice[inv.id] = minted;
+      return minted;
+    }
+
+    return _payTo(inv);
+  }
+
   PaymentDestination? _payTo(Invoice inv) {
     final live = PaymentDestination.fromNairaAccount(
         ref.read(kycProvider).account);
@@ -419,7 +468,10 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
   Future<void> _markPaidAndOfferReceipt(Invoice inv) async {
     ref.read(businessProvider.notifier).markInvoicePaid(inv.id);
     if (!mounted) return;
+    await _offerReceipt(inv);
+  }
 
+  Future<void> _offerReceipt(Invoice inv) async {
     final send = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -661,7 +713,8 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
                     if (phone == null || !context.mounted) return;
                     final sent = await Outreach.whatsapp(
                         phone,
-                        Outreach.invoiceMessage(inv, payTo: _payTo(inv)));
+                        Outreach.invoiceMessage(inv,
+                            payTo: await _payToFor(inv)));
                     if (!context.mounted) return;
                     if (sent) {
                       ref.read(businessProvider.notifier).markInvoiceSent(inv.id);
@@ -708,7 +761,7 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
                     final sent = await Outreach.email(
                       address,
                       'Invoice ${inv.id} — ${formatFull(inv.amount)}',
-                      Outreach.invoiceMessage(inv, payTo: _payTo(inv)),
+                      Outreach.invoiceMessage(inv, payTo: await _payToFor(inv)),
                     );
                     if (!context.mounted) return;
                     if (sent) {

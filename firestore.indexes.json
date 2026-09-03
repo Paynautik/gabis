@@ -5,7 +5,10 @@
       "collectionGroup": "gabis",
       "queryScope": "COLLECTION_GROUP",
       "fields": [
-        { "fieldPath": "autonomous", "order": "ASCENDING" }
+        {
+          "fieldPath": "autonomous",
+          "order": "ASCENDING"
+        }
       ]
     },
     {
@@ -13,8 +16,36 @@
       "collectionGroup": "attempts",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "debtor_name", "order": "ASCENDING" },
-        { "fieldPath": "placed_at", "order": "ASCENDING" }
+        {
+          "fieldPath": "debtor_name",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "placed_at",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "The webhook finds the invoice a payment belongs to by the account it landed in, and falls back to the reference typed into the narration. Both are collection-group lookups.",
+      "collectionGroup": "payment_accounts",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "account",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "//": "The narration fallback, matched on the invoice id.",
+      "collectionGroup": "payment_accounts",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "invoice",
+          "order": "ASCENDING"
+        }
       ]
     }
   ],
