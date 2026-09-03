@@ -29,9 +29,14 @@ firebase apps:sdkconfig ANDROID <the app id it prints> \
 The Gradle plugin is already wired (`android/settings.gradle.kts` and
 `android/app/build.gradle.kts`), and `google-services.json` is gitignored, so
 every machine that builds the Android app fetches its own copy with the second
-command above. **An Android build fails until that file exists** — that is the
-plugin telling the truth rather than building an app whose Firebase calls would
-all fail at runtime.
+command above.
+
+A build without that file works and says so: the plugin is applied only when
+the file is there, and skipped with a line in the log when it is not. Firebase
+is then unavailable in that build — sign-in and sync included — which is the
+right trade for a clone that only wants to run the app. gabis signs in with
+email and password and uses no Google sign-in, so there are no SHA
+fingerprints to register either.
 
 `DefaultFirebaseOptions.currentPlatform` returns null on Android on purpose:
 the native SDK reads `google-services.json`, and passing it the web app's
