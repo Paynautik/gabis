@@ -37,7 +37,8 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" sizes="64x64" href="favicon.png"/>
+  <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48"/>
 
   <title>gabis — the agent that gets you paid | AI collections for African business</title>
   <link rel="manifest" href="manifest.json">
@@ -73,15 +74,14 @@
 
     #gabis-splash.is-done { opacity: 0; pointer-events: none; }
 
+    /* The logo asset itself, so the loading screen and the app agree. */
     .gabis-splash__mark {
-      font-size: clamp(38px, 9vw, 58px);
-      font-weight: 800;
-      letter-spacing: -2px;
-      line-height: 1;
+      width: clamp(150px, 44vw, 224px);
+      height: auto;
+      display: block;
     }
 
-    /* The dot in the wordmark, in the brand lime. */
-    .gabis-splash__mark b { color: #7CB800; font-weight: 800; }
+    .gabis-splash__mark--dark { display: none; }
 
     .gabis-splash__bar {
       position: relative;
@@ -129,8 +129,9 @@
       #gabis-splash { background: #101010; color: #F4F0E8; }
       .gabis-splash__bar { background: rgba(244, 240, 232, 0.16); }
       .gabis-splash__bar::after { background: #D9FF43; }
-      .gabis-splash__mark b { color: #D9FF43; }
       .gabis-splash__line { color: #A8A29A; }
+      .gabis-splash__mark--light { display: none; }
+      .gabis-splash__mark--dark { display: block; }
     }
 
     /* A moving bar is the whole point, but not for someone who asked for less
@@ -143,7 +144,10 @@
 </head>
 <body>
   <div id="gabis-splash" role="status" aria-live="polite">
-    <div class="gabis-splash__mark">gabis<b>.</b></div>
+    <img class="gabis-splash__mark gabis-splash__mark--light"
+         src="gabis-wordmark.png" alt="gabis" width="720" height="321" fetchpriority="high">
+    <img class="gabis-splash__mark gabis-splash__mark--dark"
+         src="gabis-wordmark-white.png" alt="" aria-hidden="true" width="720" height="321">
     <div class="gabis-splash__bar"></div>
     <div class="gabis-splash__line">Loading the agent that gets you paid.</div>
     <div class="gabis-splash__slow">Still loading — a slow connection can take a moment.</div>
