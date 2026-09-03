@@ -75,6 +75,9 @@ class BusinessPersistence {
         'due': i.due.toIso8601String(),
         'status': i.status,
         'companyDomain': i.companyDomain,
+        'agreement': i.agreement,
+        'milestone': i.milestone,
+        'milestones': i.milestones,
       };
 
   static Map<String, dynamic> _call(CallLog c) => {
@@ -162,6 +165,9 @@ class BusinessPersistence {
           status: m['status'] as String,
           companyDomain: m['companyDomain'] as String?,
           clientPhone: m['clientPhone'] as String?,
+          agreement: m['agreement'] as String?,
+          milestone: (m['milestone'] as num?)?.toInt(),
+          milestones: (m['milestones'] as num?)?.toInt(),
         );
       }).toList();
 
