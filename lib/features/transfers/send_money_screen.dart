@@ -7,7 +7,14 @@ import '../../shared/widgets/in_app_notification.dart';
 import 'send_confirm_screen.dart';
 
 class SendMoneyScreen extends ConsumerStatefulWidget {
-  const SendMoneyScreen({super.key});
+  const SendMoneyScreen({super.key, this.payee, this.amountMinor});
+
+  /// Set when the screen is opened from a scanned code, so the user lands on
+  /// the amount rather than searching for someone they just pointed a camera at.
+  final AppContact? payee;
+
+  /// An amount the code carried, if it had one.
+  final int? amountMinor;
 
   @override
   ConsumerState<SendMoneyScreen> createState() => _SendMoneyScreenState();
@@ -26,6 +33,10 @@ class _SendMoneyScreenState extends ConsumerState<SendMoneyScreen> {
   @override
   void initState() {
     super.initState();
+    _selectedContact = widget.payee;
+    if (widget.amountMinor != null && widget.amountMinor! > 0) {
+      _amountController.text = (widget.amountMinor! / 100).toStringAsFixed(2);
+    }
     _searchController.addListener(() {
       setState(() {
         _searchQuery = _searchController.text.toLowerCase();

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
@@ -14,6 +15,10 @@ import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/coming_soon.dart';
 import '../../shared/widgets/transaction_tile.dart';
 import '../../shared/widgets/user_avatar.dart';
+import '../notifications/notifications_store.dart';
+import '../scan/scan_screen.dart';
+import '../transfers/send_money_screen.dart';
+import '../../shared/models/app_contact.dart';
 import '../../shared/widgets/glowing_background.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -24,9 +29,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  /// Cleared once the notifications sheet has been opened.
-  bool _notificationsRead = false;
-
   String _selectedPeriod = '7D';
   bool _showPromoBanner = true;
   bool _showAllTransactions = false;
@@ -187,6 +189,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   // --- Header ---
   Widget _buildHeader(BuildContext context) {
+    final unread = ref.watch(unreadNotificationsProvider);
     return Container(
       height: 72,
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -223,20 +226,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 icon: Icon(Icons.headset_mic_rounded, color: context.colors.ink, size: 24),
               ),
               IconButton(
-                onPressed: () => _showScannerDialog(context),
+                onPressed: () => _openScanner(context),
                 icon: Icon(Icons.qr_code_scanner_rounded, color: context.colors.ink, size: 22),
               ),
               Stack(
                 clipBehavior: Clip.none,
                 children: [
                   IconButton(
-                    onPressed: () {
-                      setState(() => _notificationsRead = true);
-                      _showNotificationsSheet(context);
-                    },
+                    onPressed: () => _showNotificationsSheet(context, ref),
                     icon: Icon(Icons.notifications_none_rounded, color: context.colors.ink, size: 26),
                   ),
-                  if (!_notificationsRead) Positioned(
+                  if (unread > 0) Positioned(
                     right: 6,
                     top: 6,
                     child: Container(
@@ -246,7 +246,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: context.colors.scaffoldBg, width: 1.5),
                       ),
-                      child: const Text('99+', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
+                      child: Text(unread > 99 ? '99+' : '$unread', style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
                     ),
                   ),
                 ],
@@ -1735,8 +1735,94 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  // --- Spending Insights Donut Chart ---
+  // --- Spending Insights ---
+
+  /// What the period chip offers, and how far back each one reaches.
+  static const _spendPeriods = ['This week', 'This month', 'Last 3 months', 'This year'];
+
+  DateTime _spendCutoff(String period) {
+    final now = DateTime.now();
+    switch (period) {
+      case 'This week':
+        return DateTime(now.year, now.month, now.day)
+            .subtract(Duration(days: now.weekday - 1));
+      case 'Last 3 months':
+        return DateTime(now.year, now.month - 2, 1);
+      case 'This year':
+        return DateTime(now.year, 1, 1);
+      case 'This month':
+      default:
+        return DateTime(now.year, now.month, 1);
+    }
+  }
+
+  /// Money out, grouped by what it was spent on. Transfers between the user's
+  /// own accounts are not spending, and neither is anything that failed.
+  List<_SpendSlice> _spendBreakdown(List<AppTransaction> transactions) {
+    final cutoff = _spendCutoff(_selectedPeriod);
+    final totals = <String, int>{};
+
+    for (final tx in transactions) {
+      if (tx.isCredit) continue;
+      if (tx.status == TransactionStatus.failed ||
+          tx.status == TransactionStatus.reversed) continue;
+      if (tx.createdAt.isBefore(cutoff)) continue;
+
+      final label = _spendCategory(tx);
+      totals[label] = (totals[label] ?? 0) + tx.amount.minorUnits;
+    }
+
+    final slices = totals.entries
+        .map((e) => _SpendSlice(e.key, e.value, _spendColor(e.key)))
+        .toList()
+      ..sort((a, b) => b.minorUnits.compareTo(a.minorUnits));
+
+    return slices;
+  }
+
+  String _spendCategory(AppTransaction tx) {
+    switch (tx.type) {
+      case TransactionType.cardPayment:
+        return 'Card spending';
+      case TransactionType.billPayment:
+        return 'Bills';
+      case TransactionType.transfer:
+        return 'Transfers';
+      case TransactionType.withdrawal:
+        return 'Withdrawals';
+      case TransactionType.fx:
+        return 'Currency swaps';
+      case TransactionType.fee:
+        return 'Fees';
+      case TransactionType.deposit:
+        return 'Deposits';
+    }
+  }
+
+  Color _spendColor(String category) {
+    switch (category) {
+      case 'Card spending':
+        return context.colors.bluePrimary;
+      case 'Bills':
+        return const Color(0xFF7C4DFF);
+      case 'Transfers':
+        return const Color(0xFF12B76A);
+      case 'Withdrawals':
+        return const Color(0xFFF79009);
+      case 'Currency swaps':
+        return const Color(0xFF06AED4);
+      default:
+        return const Color(0xFF98A2B3);
+    }
+  }
+
   Widget _buildSpendingInsightsCard() {
+    final currency = ref.watch(accountsProvider).isEmpty
+        ? 'NGN'
+        : ref.watch(accountsProvider).first.currency;
+    final slices = _spendBreakdown(ref.watch(transactionsProvider));
+    final total = slices.fold<int>(0, (sum, s) => sum + s.minorUnits);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -1751,39 +1837,108 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Spending Insights', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: context.colors.ink)),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(color: context.colors.scaffoldBg, borderRadius: BorderRadius.circular(10), border: Border.all(color: context.colors.border)),
-                child: Row(
-                  children: [
-                    Text('This Month', style: TextStyle(color: context.colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w800)),
-                    SizedBox(width: 4),
-                    Icon(Icons.keyboard_arrow_down_rounded, color: context.colors.inkSoft, size: 12),
-                  ],
+              PopupMenuButton<String>(
+                tooltip: 'Change period',
+                initialValue: _selectedPeriod,
+                onSelected: (value) => setState(() => _selectedPeriod = value),
+                itemBuilder: (_) => _spendPeriods
+                    .map((p) => PopupMenuItem(value: p, child: Text(p)))
+                    .toList(),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(color: context.colors.scaffoldBg, borderRadius: BorderRadius.circular(10), border: Border.all(color: context.colors.border)),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(_selectedPeriod, style: TextStyle(color: context.colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w800)),
+                      const SizedBox(width: 4),
+                      Icon(Icons.keyboard_arrow_down_rounded, color: context.colors.inkSoft, size: 12),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 24),
+          if (slices.isEmpty)
+            _buildSpendingEmptyState()
+          else
+            Row(
+              children: [
+                SizedBox(
+                  width: 110,
+                  height: 110,
+                  child: CustomPaint(
+                    painter: _DonutChartPainter(
+                      context: context,
+                      slices: slices,
+                      total: Money(minorUnits: total, currency: currency),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    children: [
+                      // Four categories is as much as this card can show
+                      // without the rows becoming unreadable.
+                      for (final slice in slices.take(4)) ...[
+                        _SpendItemRow(
+                          slice.label,
+                          Money(minorUnits: slice.minorUnits, currency: currency)
+                              .format(),
+                          '${((slice.minorUnits / total) * 100).round()}%',
+                          slice.color,
+                        ),
+                        if (slice != slices.take(4).last)
+                          const SizedBox(height: 8),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  /// Nothing spent in this period is a fact worth stating plainly, rather than
+  /// a chart of somebody else's numbers.
+  Widget _buildSpendingEmptyState() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Row(
             children: [
-              // Vector Painted Donut Chart
-              SizedBox(
-                width: 110,
-                height: 110,
-                child: CustomPaint(
-                  painter: _DonutChartPainter(context),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: context.colors.blueHighlight,
+                  shape: BoxShape.circle,
                 ),
+                child: Icon(Icons.pie_chart_outline_rounded,
+                    color: context.colors.bluePrimary, size: 18),
               ),
-              const SizedBox(width: 20),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _SpendItemRow('Shopping', '₦145,000', '45%', context.colors.bluePrimary),
-                    SizedBox(height: 8),
-                    _SpendItemRow('Bills', '₦86,400', '27%', Color(0xFF7C4DFF)),
-                    SizedBox(height: 8),
-                    _SpendItemRow('Food', '₦44,800', '14%', Color(0xFF12B76A)),
+                    Text('Nothing spent ${_selectedPeriod.toLowerCase()}',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13.5,
+                            color: context.colors.ink)),
+                    const SizedBox(height: 2),
+                    Text(
+                        'Your categories appear here as soon as money leaves the account.',
+                        style: TextStyle(
+                            color: context.colors.inkSoft,
+                            fontSize: 11.5,
+                            height: 1.35)),
                   ],
                 ),
               ),
@@ -2239,89 +2394,174 @@ class _MockCard extends StatelessWidget {
     );
   }
 
-  void _showScannerDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-          backgroundColor: Colors.black87,
-          child: Container(
-            height: 400,
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Scan QR Code', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
-                const SizedBox(height: 24),
-                Container(
-                  height: 200,
-                  width: 200,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFF00B876), width: 3),
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  child: const Center(
-                    child: Icon(Icons.qr_code_scanner_rounded, color: Colors.white54, size: 64),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel', style: TextStyle(color: Colors.white, fontSize: 14)),
-                ),
-              ],
-            ),
+  /// Opens the camera, and on a good code goes straight to the transfer with
+  /// the payee filled in.
+  Future<void> _openScanner(BuildContext context) async {
+    final payee = await Navigator.push<ScannedPayee>(
+      context,
+      MaterialPageRoute(builder: (_) => const ScanScreen()),
+    );
+    if (payee == null || !context.mounted) return;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SendMoneyScreen(
+          payee: AppContact(
+            id: 'scan-${payee.account}',
+            name: payee.name ?? 'Account ${payee.account}',
+            phone: payee.account,
+            hasGabis: true,
           ),
-        );
-      },
+          amountMinor: payee.amountMinor,
+        ),
+      ),
     );
   }
 
-  void _showNotificationsSheet(BuildContext context) {
+  /// Real notifications: money that moved, points that landed, and whether the
+  /// account still needs verifying. Opening the sheet is what marks them read.
+  void _showNotificationsSheet(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: context.colors.scaffoldBg,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (context) {
-        return Container(
-          height: MediaQuery.of(context).size.height * 0.7,
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (sheetContext) => Consumer(
+        builder: (sheetContext, ref, _) {
+          final items = ref.watch(notificationsProvider);
+          final seen = ref.watch(notificationsSeenProvider);
+
+          return SizedBox(
+            height: MediaQuery.of(sheetContext).size.height * 0.7,
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Notifications', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: Color(0xFF101828))),
-                  TextButton(onPressed: () => Navigator.pop(context), child: const Text('Mark all as read')),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Notifications',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                              color: sheetContext.colors.ink)),
+                      if (items.any((n) => n.at.isAfter(seen)))
+                        TextButton(
+                          onPressed: () => ref
+                              .read(notificationsSeenProvider.notifier)
+                              .markAllRead(),
+                          child: const Text('Mark all as read'),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: items.isEmpty
+                        ? _notificationsEmptyState(sheetContext)
+                        : ListView.separated(
+                            itemCount: items.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: 4),
+                            itemBuilder: (_, index) {
+                              final item = items[index];
+                              final isNew = item.at.isAfter(seen);
+
+                              return ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                      color: item.tint.withValues(alpha: 0.1),
+                                      shape: BoxShape.circle),
+                                  child: Icon(item.icon, color: item.tint, size: 20),
+                                ),
+                                title: Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(item.title,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 14,
+                                              color: sheetContext.colors.ink)),
+                                    ),
+                                    if (isNew) ...[
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        width: 6,
+                                        height: 6,
+                                        decoration: const BoxDecoration(
+                                            color: Color(0xFFEF4444),
+                                            shape: BoxShape.circle),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                subtitle: Text(item.body,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: sheetContext.colors.inkSoft)),
+                                trailing: Text(item.age,
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        color: sheetContext.colors.inkSoft)),
+                                onTap: () =>
+                                    _openNotification(sheetContext, ref, item),
+                              );
+                            },
+                          ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView(
-                  children: [
-                    ListTile(
-                      leading: Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: const Color(0xFF00B876).withValues(alpha: 0.1), shape: BoxShape.circle), child: const Icon(Icons.download_rounded, color: Color(0xFF00B876))),
-                      title: const Text('Money Received', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                      subtitle: const Text('You received ₦50,000 from John Doe.', style: TextStyle(fontSize: 12)),
-                      trailing: const Text('2m ago', style: TextStyle(fontSize: 10, color: Colors.grey)),
-                    ),
-                    ListTile(
-                      leading: Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: const Color(0xFF1858F2).withValues(alpha: 0.1), shape: BoxShape.circle), child: const Icon(Icons.security_rounded, color: Color(0xFF1858F2))),
-                      title: const Text('New Login', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
-                      subtitle: const Text('New login from Mac OS on Chrome.', style: TextStyle(fontSize: 12)),
-                      trailing: const Text('1h ago', style: TextStyle(fontSize: 10, color: Colors.grey)),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+            ),
+          );
+        },
+      ),
+    ).whenComplete(
+        () => ref.read(notificationsSeenProvider.notifier).markAllRead());
+  }
+
+  Widget _notificationsEmptyState(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.notifications_none_rounded,
+              size: 44, color: context.colors.inkSoft),
+          const SizedBox(height: 12),
+          Text('Nothing yet',
+              style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  fontSize: 15,
+                  color: context.colors.ink)),
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Text(
+              'Money in and out, points you earn and anything about your account will show up here.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 12, height: 1.4, color: context.colors.inkSoft),
+            ),
           ),
-        );
-      },
+        ],
+      ),
     );
+  }
+
+  /// A notification that leads somewhere takes the user there.
+  void _openNotification(
+      BuildContext context, WidgetRef ref, AppNotification item) {
+    Navigator.pop(context);
+    if (item.route != null) {
+      Navigator.pushNamed(context, item.route!);
+      return;
+    }
+    if (item.tab != null) {
+      ref.read(homeTabProvider.notifier).state = item.tab!;
+    }
   }
 
 class _DayLabel extends StatelessWidget {
@@ -2465,16 +2705,33 @@ class _SvgTrendLinePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+/// One category's share of what was spent.
+class _SpendSlice {
+  final String label;
+  final int minorUnits;
+  final Color color;
+
+  const _SpendSlice(this.label, this.minorUnits, this.color);
+}
+
 class _DonutChartPainter extends CustomPainter {
   final BuildContext context;
-  _DonutChartPainter(this.context);
+  final List<_SpendSlice> slices;
+  final Money total;
+
+  _DonutChartPainter({
+    required this.context,
+    required this.slices,
+    required this.total,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
+    if (total.minorUnits <= 0) return;
+
     final center = Offset(size.width / 2, size.height / 2);
     final radius = min(size.width, size.height) / 2;
-    
-    // Thick stroke paint to make arcs look like a donut ring
+
     final paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 14.0
@@ -2482,61 +2739,40 @@ class _DonutChartPainter extends CustomPainter {
 
     final rect = Rect.fromCircle(center: center, radius: radius - 7);
 
-    // Dynamic arcs angles (Shopping: 45%, Bills: 27%, Food: 14%, Others: 14%)
-    double startAngle = -pi / 2; // Start from top 12 o'clock
+    double startAngle = -pi / 2; // 12 o'clock
+    for (final slice in slices) {
+      paint.color = slice.color;
+      final sweep = 2 * pi * (slice.minorUnits / total.minorUnits);
+      canvas.drawArc(rect, startAngle, sweep, false, paint);
+      startAngle += sweep;
+    }
 
-    // Shopping (45%, blue)
-    paint.color = context.colors.bluePrimary;
-    double sweepAngle = 2 * pi * 0.45;
-    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
-    startAngle += sweepAngle;
-
-    // Bills (27%, purple)
-    paint.color = const Color(0xFF7C4DFF);
-    sweepAngle = 2 * pi * 0.27;
-    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
-    startAngle += sweepAngle;
-
-    // Food (14%, green)
-    paint.color = const Color(0xFF12B76A);
-    sweepAngle = 2 * pi * 0.14;
-    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
-    startAngle += sweepAngle;
-
-    // Others (14%, orange)
-    paint.color = const Color(0xFFF79009);
-    sweepAngle = 2 * pi * 0.14;
-    canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
-
-    // Draw inner text: "Total Spent \n ₦320,000"
-    final textPainterLabel = TextPainter(
+    final label = TextPainter(
       text: TextSpan(
-        text: 'Total Spent',
+        text: 'Total spent',
         style: TextStyle(color: context.colors.inkSoft, fontSize: 10, fontWeight: FontWeight.w600),
       ),
       textDirection: TextDirection.ltr,
     )..layout();
-    
-    final textPainterValue = TextPainter(
+
+    // The amount is rounded to whole units: the pennies do not fit, and this
+    // is a summary rather than a statement.
+    final value = TextPainter(
       text: TextSpan(
-        text: '₦320,000',
+        text: '${total.symbol}${intl.NumberFormat('#,##0').format(total.major)}',
         style: TextStyle(color: context.colors.ink, fontSize: 13, fontWeight: FontWeight.w900),
       ),
       textDirection: TextDirection.ltr,
     )..layout();
 
-    textPainterLabel.paint(
-      canvas,
-      center - Offset(textPainterLabel.width / 2, 12),
-    );
-    textPainterValue.paint(
-      canvas,
-      center - Offset(textPainterValue.width / 2, -4),
-    );
+    label.paint(canvas, center - Offset(label.width / 2, 12));
+    value.paint(canvas, center - Offset(value.width / 2, -4));
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _DonutChartPainter old) =>
+      old.total.minorUnits != total.minorUnits ||
+      old.slices.length != slices.length;
 }
 
 class _CurrencyBadge extends StatelessWidget {
