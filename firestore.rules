@@ -17,5 +17,20 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow write: if false;
     }
+
+    // The map from a per-invoice account number to the invoice it belongs to.
+    // The worker writes and reads these with a service account; a business may
+    // read its own rows and nothing else, and nobody may edit one, because an
+    // edited row would send somebody else's money to the wrong ledger.
+    match /payment_accounts/{account} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow write: if false;
+    }
+
+    // Payments that arrived and could not be placed. Only the worker writes
+    // them; nobody reads them from the app yet, and a stranger must not.
+    match /unmatched_payments/{payment} {
+      allow read, write: if false;
+    }
   }
 }

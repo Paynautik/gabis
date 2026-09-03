@@ -717,6 +717,24 @@ class BusinessNotifier extends StateNotifier<BusinessState> {
     state = state.copyWith(invoices: [invoice, ...state.invoices]);
   }
 
+  /// Attributes money to the most recent attempt on that debtor.
+  ///
+  /// A promise that was kept and an attempt that recovered something are the
+  /// two facts the collections record exists to hold, and both were left blank
+  /// while payments arrived out of band. They are filled in here, once, from
+  /// the payment itself.
+  void creditLastAttempt(String payerName, double amount) {
+    final mine = state.calls.where((c) => c.payerName == payerName).toList()
+      ..sort((a, b) => a.placedAt.compareTo(b.placedAt));
+    if (mine.isEmpty || amount <= 0) return;
+
+    final last = mine.last;
+    last.amountRecovered += amount;
+    if (last.promisedDate != null) last.promiseKept = true;
+
+    state = state.copyWith(calls: [...state.calls]);
+  }
+
   void markInvoicePaid(String id) {
     for (final i in state.invoices) {
       if (i.id == id) i.status = 'paid';

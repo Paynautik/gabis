@@ -12,6 +12,8 @@ import {
   optOutLine,
 } from '../../../firebase/functions/src/message';
 import { send } from './send';
+import { uidFromIdToken } from './auth';
+import { Paystack, claim } from './payments';
 
 /**
  * The rail that makes reminders autonomous, on a schedule that costs nothing.
@@ -34,6 +36,7 @@ export interface Env {
   FIRESTORE_DB?: string;
   WHATSAPP_TOKEN?: string;
   WHATSAPP_PHONE_ID?: string;
+  PAYSTACK_SECRET?: string;
 }
 
 interface Queue {
@@ -45,7 +48,8 @@ interface Queue {
 /** The site is the only thing that asks, and only for /status. */
 const cors = {
   'access-control-allow-origin': 'https://gabis.pages.dev',
-  'access-control-allow-methods': 'GET, OPTIONS',
+  'access-control-allow-methods': 'GET, POST, OPTIONS',
+  'access-control-allow-headers': 'authorization, content-type',
 };
 
 /** Says which secret is missing rather than throwing an opaque 1101. */
@@ -218,6 +222,7 @@ export default {
           ok: true,
           configured: missingSecret(env) === null,
           sends: Boolean(env.WHATSAPP_TOKEN && env.WHATSAPP_PHONE_ID),
+          accounts: Boolean(env.PAYSTACK_SECRET),
           schedule: '08:00 UTC daily',
         },
         { headers: cors },
@@ -268,6 +273,100 @@ export default {
       }
 
       return Response.json({ ok: true, acted });
+    }
+
+    // An account of its own for one invoice. The app asks with the user's
+    // own Firebase token, so nothing here needs a second credential, and the
+    // mapping is written under that uid and nowhere else.
+    if (url.pathname === '/accounts' && request.method === 'POST') {
+      const uid = await uidFromIdToken(
+        (request.headers.get('authorization') ?? '').replace(/^Bearer /, ''),
+        env.FIREBASE_PROJECT,
+      );
+      if (!uid) return Response.json({ error: 'unauthorised' }, { status: 401, headers: cors });
+
+      const body = (await request.json().catch(() => null)) as {
+        invoice?: string;
+        name?: string;
+        email?: string;
+        phone?: string;
+      } | null;
+      if (!body?.invoice || !body.name) {
+        return Response.json({ error: 'bad_request' }, { status: 400, headers: cors });
+      }
+
+      const provider = new Paystack(env.PAYSTACK_SECRET);
+      const account = await provider.create(body.invoice, {
+        name: body.name,
+        // Paystack wants an address for the customer record; a per-invoice
+        // alias keeps one client's accounts apart without asking for one.
+        email: body.email || `${body.invoice.toLowerCase()}@invoices.gabis.app`,
+        phone: body.phone,
+      });
+
+      if (!account) {
+        return Response.json(
+          {
+            error: 'not_configured',
+            detail:
+              'No payment provider is configured, so the invoice keeps the account the business already gives people.',
+          },
+          { status: 503, headers: cors },
+        );
+      }
+
+      const db = await connect(env);
+      await db.createDocument('payment_accounts', {
+        uid,
+        invoice: body.invoice,
+        account: account.account,
+        bank: account.bank,
+        name: account.name,
+        created_at: new Date().toISOString(),
+      });
+
+      return Response.json({ ok: true, ...account }, { headers: cors });
+    }
+
+    // Money arriving. Signed by the provider, so this is the one route that
+    // may write to somebody's ledger without a user token behind it.
+    if (url.pathname === '/payments/paystack' && request.method === 'POST') {
+      const raw = await request.text();
+      const provider = new Paystack(env.PAYSTACK_SECRET);
+
+      if (!(await provider.verify(raw, request.headers.get('x-paystack-signature') ?? ''))) {
+        return Response.json({ error: 'bad_signature' }, { status: 401 });
+      }
+
+      const payment = provider.read(JSON.parse(raw));
+      if (!payment) return Response.json({ ok: true, acted: false });
+
+      const db = await connect(env);
+      const matched = await claim(db, payment);
+      if (!matched) {
+        // Recorded rather than dropped: a payment nobody can place is still a
+        // payment, and the business needs to see it to place it by hand.
+        await db.createDocument('unmatched_payments', {
+          account: payment.account,
+          amount: payment.amount,
+          reference: payment.reference,
+          narration: payment.narration,
+          paid_at: payment.paidAt,
+        });
+        return Response.json({ ok: true, acted: false, reason: 'unmatched' });
+      }
+
+      await db.createDocument(`users/${matched.uid}/gabis/collections/payments`, {
+        invoice: matched.invoice,
+        amount: payment.amount,
+        currency: payment.currency,
+        reference: payment.reference,
+        paid_at: payment.paidAt,
+        matched_by: matched.how,
+        narration: payment.narration,
+      });
+
+      return Response.json({ ok: true, acted: true, invoice: matched.invoice });
     }
 
     // The pass the schedule makes, on demand, for seeing what it would do.

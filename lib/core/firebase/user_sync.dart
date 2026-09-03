@@ -83,6 +83,42 @@ class UserSync {
     }
   }
 
+  /// Documents in a subcollection of one of this account's documents — the
+  /// payments the chaser records, and the attempts it writes down.
+  Future<List<Map<String, dynamic>>> list(String name, String sub) async {
+    final doc = _doc(name);
+    if (doc == null) return const [];
+    try {
+      final snap = await doc.collection(sub).get();
+      return snap.docs.map((d) => {'id': d.id, ...d.data()}).toList();
+    } catch (_) {
+      return const [];
+    }
+  }
+
+  /// Deletes one document from such a subcollection, used to tick a payment
+  /// off once it has been written into the local ledger.
+  Future<void> remove(String name, String sub, String id) async {
+    final doc = _doc(name);
+    if (doc == null) return;
+    try {
+      await doc.collection(sub).doc(id).delete();
+    } catch (_) {
+      // It will come round again on the next pass; a payment applied twice is
+      // prevented by the ledger, not by this delete.
+    }
+  }
+
+  /// The signed-in user's ID token, for the few calls that go to gabis's own
+  /// worker rather than to Firestore.
+  static Future<String?> idToken() async {
+    try {
+      return await FirebaseAuth.instance.currentUser?.getIdToken();
+    } catch (_) {
+      return null;
+    }
+  }
+
   Stream<Map<String, dynamic>?> watch(String name) {
     final doc = _doc(name);
     if (doc == null) return Stream.value(null);
