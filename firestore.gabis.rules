@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// Rules for the `gabis` database only.
+//
+// gabis shares the paynautic project with trustos because the account is at
+// its Google Cloud project quota. Rules are per database rather than per app,
+// so while both ran on (default) either side's deploy replaced the other's.
+// This file governs a database trustos does not use, which is what makes
+// `firebase deploy --only firestore:gabis` safe to run from this repository.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Everything gabis stores is user-scoped. Nobody reads or writes another
+    // person's financial data, and there is no public collection.
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // The reminder log the scheduled chaser writes is the record the frequency
+    // limits are counted from, and what settles a dispute later. The owner may
+    // read their own; nobody may edit one after the fact. The function itself
+    // goes through the Admin SDK, which these rules do not apply to.
+    match /users/{uid}/gabis/collections/attempts/{attempt} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}

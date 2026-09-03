@@ -23,7 +23,17 @@ import { send } from './send';
  */
 
 initializeApp();
-const db = getFirestore();
+
+/**
+ * The database gabis owns.
+ *
+ * gabis shares the paynautic project with trustos, and Firestore rules are per
+ * database rather than per app, so a database of its own is what stops a rules
+ * deploy on either side overwriting the other's. Creating it needs the project
+ * on Blaze, so this follows the app: (default) until FIRESTORE_DB says
+ * otherwise, and both must be switched together.
+ */
+const db = getFirestore(process.env.FIRESTORE_DB ?? '(default)');
 
 /** users/{uid}/gabis/collections — written by the app, read by this. */
 interface Queue {

@@ -39,44 +39,49 @@ options would point the phone at the wrong app record.
 
 ## Separating the rules from trustos
 
-Firestore rules are per **database**, not per app, and the project has one
-database (`(default)`) today. So `firebase deploy --only firestore:rules`
-replaces the rules both apps run on, which is why gabis does not deploy them.
+Firestore rules are per **database**, not per app, so while both apps ran on
+`(default)` a rules deploy from either side replaced the other's. gabis now has
+a database of its own — `gabis` — with `firestore.gabis.rules`, its own indexes,
+and a deploy target that cannot reach the database trustos runs on.
 
-Two ways out, in order of preference:
-
-### A second database, named `gabis`
-
-Firestore allows more than one database per project, each with its own rules
-file and its own deploy target. gabis would deploy `firestore.gabis.rules` to
-the `gabis` database and could not touch trustos if it tried.
+The code is written for it and still points at `(default)`, because creating
+the second database needs the project on Blaze and a build aimed at a database
+nobody had created yet would quietly stop syncing for everyone already signed
+in. Three steps, in this order:
 
 ```bash
+# 1. Make the database (needs Blaze)
 firebase firestore:databases:create gabis --location nam5 --project paynautic
+
+# 2. Copy what gabis already wrote. Reports first; --commit does it.
+GOOGLE_APPLICATION_CREDENTIALS=<service-account.json> \
+  npm --prefix firebase/functions run migrate
+GOOGLE_APPLICATION_CREDENTIALS=<service-account.json> \
+  npm --prefix firebase/functions run migrate -- --commit
+
+# 3. Point both halves at it, together
+flutter build web --release --dart-define=FIRESTORE_DB=gabis
+firebase functions:config:set  # or set FIRESTORE_DB=gabis on the function
+firebase deploy --only functions,firestore --project paynautic
 ```
 
-Then in `firebase.json`:
+The migration copies rather than moves: nothing is deleted from `(default)`, so
+if the new database turns out wrong the old copy is still there. Clearing it out
+afterwards is a console operation, once you are satisfied.
 
-```json
-"firestore": [
-  { "database": "gabis", "rules": "firestore.gabis.rules" }
-]
-```
+`firestore.rules` is still in this repository and describes gabis alone on
+`(default)`. It is not referenced by `firebase.json` any more, and it must not
+be deployed: doing so would replace the rules trustos runs on.
 
-and in the app, `FirebaseFirestore.instanceFor(app: Firebase.app(), databaseId: 'gabis')`
-inside `UserSync`, plus `getFirestore(getApp(), 'gabis')` in the chaser.
+## Indexes
 
-The cost is a migration: whatever gabis has already written under
-`users/{uid}/gabis/` in the default database stays there. Worth checking how
-much that is before moving — on a project this young it may be nothing.
+`firestore.indexes.json` carries two the chaser cannot run without:
 
-### One file that holds both apps' rules
+- a **collection-group** index on `gabis.autonomous`, because collection-group
+  queries are not served by Firestore's automatic single-field indexes, and the
+  scheduled pass finds the businesses that opted in with exactly that query;
+- a composite on `attempts (debtor_name, placed_at)`, because an equality on
+  one field ordered by another needs one — and that query is what the
+  escalation counts.
 
-Keep the single database and make `firestore.rules` the truth for both apps —
-gabis's `users/{uid}/**` block plus whatever trustos needs. This works, but
-every deploy from either side overwrites the other's, and the file has to be
-kept in step across two repositories by hand. Only take this route if the
-second database is not worth the migration.
-
-Either way, do not run `firebase deploy --only firestore:rules` from this
-repository while `firestore.rules` describes gabis alone.
+Both deploy with `firebase deploy --only firestore`.

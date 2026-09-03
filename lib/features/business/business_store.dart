@@ -658,8 +658,20 @@ class BusinessNotifier extends StateNotifier<BusinessState> {
   }) {
     final count = parts.clamp(2, 12);
     final now = from ?? DateTime.now();
-    final seq = state.invoices.length + 2482;
-    final agreement = 'AGR-$seq';
+
+    // Counting the book gives the same number again once an invoice has been
+    // deleted, and two agreements sharing an id would put one client's
+    // milestones in another's statement. The day and minute make it unique in
+    // practice while staying short enough to read out over the phone.
+    final stamp = '${now.month.toString().padLeft(2, '0')}'
+        '${now.day.toString().padLeft(2, '0')}'
+        '${now.hour.toString().padLeft(2, '0')}'
+        '${now.minute.toString().padLeft(2, '0')}';
+    var seq = state.invoices.length + 2482;
+    while (state.invoices.any((i) => i.agreement == 'AGR-$seq-$stamp')) {
+      seq++;
+    }
+    final agreement = 'AGR-$seq-$stamp';
 
     final each = (total / count * 100).floorToDouble() / 100;
     final created = <Invoice>[];

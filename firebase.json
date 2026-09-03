@@ -1,7 +1,11 @@
 {
-  "firestore": {
-    "rules": "firestore.rules"
-  },
+  "firestore": [
+    {
+      "database": "gabis",
+      "rules": "firestore.gabis.rules",
+      "indexes": "firestore.indexes.json"
+    }
+  ],
   "functions": [
     {
       "source": "firebase/functions",
