@@ -21,6 +21,10 @@ plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
     id("com.android.application") version "8.11.1" apply false
     id("org.jetbrains.kotlin.android") version "2.2.20" apply false
+    // Reads android/app/google-services.json and generates the Firebase
+    // config the SDK reads at runtime. That file is gitignored, so an Android
+    // build needs it fetched first — see firebase/README.md.
+    id("com.google.gms.google-services") version "4.4.2" apply false
 }
 
 include(":app")
