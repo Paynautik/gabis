@@ -3,7 +3,22 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services")
+}
+
+// Firebase is applied only when its config is actually here.
+//
+// google-services.json is gitignored — each machine fetches its own — and the
+// plugin fails the build outright when the file is missing. That is the right
+// behaviour for a build that needs Firebase and the wrong one for a clone that
+// just wants to run the app, so the plugin is applied when the file exists and
+// skipped when it does not. See firebase/README.md for fetching it.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+} else {
+    logger.lifecycle(
+        "google-services.json not found: building without Firebase. " +
+            "Sign-in and sync will be unavailable in this build."
+    )
 }
 
 android {
