@@ -1,8 +1,12 @@
-# Marketing routes are real files (wallet.html, terms.html …).
-# The payment page is one of them: a customer opening a link on mobile data
-# should not download the whole app to read an account number.
-/pay      /pay.html      200
-/pay/*    /pay.html      200
+# Marketing routes are real files (wallet.html, terms.html …), and Pages
+# serves those at their extensionless path on its own — /portal reaches
+# portal.html with no rule here. The payment page is one of them: a customer
+# opening a link on mobile data should not download the whole app to read an
+# account number.
+#
+# There is deliberately no /pay rule. Pages answers /pay.html with a 308 to
+# /pay, so rewriting /pay to /pay.html made the two redirect at each other and
+# the payment page never loaded at all.
 
 # Anything else belongs to the Flutter app.
 /*    /index.html    200
