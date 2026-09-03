@@ -42,6 +42,13 @@ interface Queue {
   debtors?: Debtor[];
 }
 
+/** Says which secret is missing rather than throwing an opaque 1101. */
+function missingSecret(env: Env): string | null {
+  if (!env.GOOGLE_SA_EMAIL) return 'GOOGLE_SA_EMAIL';
+  if (!env.GOOGLE_SA_PRIVATE_KEY) return 'GOOGLE_SA_PRIVATE_KEY';
+  return null;
+}
+
 async function connect(env: Env): Promise<Firestore> {
   const token = await accessToken({
     email: env.GOOGLE_SA_EMAIL,
@@ -179,12 +186,29 @@ async function runOnce(env: Env, now: Date) {
 export default {
   /** Mid-morning in Lagos. The hours rule in policy.ts holds the line anyway. */
   async scheduled(_event: ScheduledController, env: Env): Promise<void> {
+    const missing = missingSecret(env);
+    if (missing) {
+      console.error(`chaser not configured: ${missing} is not set; nothing sent`);
+      return;
+    }
+
     const result = await runOnce(env, new Date());
     console.log('chaser pass complete', result);
   },
 
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    const missing = missingSecret(env);
+    if (missing) {
+      return Response.json(
+        {
+          error: 'not_configured',
+          detail: `${missing} is not set. See workers/chaser/README.md — without it the schedule runs and does nothing.`,
+        },
+        { status: 503 },
+      );
+    }
 
     // A reply of STOP is a refusal, honoured permanently. Unauthenticated on
     // purpose: it is the provider's webhook, and the worst a forged call can
