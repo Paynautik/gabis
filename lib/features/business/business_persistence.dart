@@ -37,6 +37,9 @@ class BusinessPersistence {
         'contactPhone': c.contactPhone,
         'contactEmail': c.contactEmail,
         'termsDays': c.termsDays,
+        'payoutBank': c.payoutBank,
+        'payoutAccountNumber': c.payoutAccountNumber,
+        'payoutAccountName': c.payoutAccountName,
         'payers': c.payers.map(_payer).toList(),
       };
 
@@ -115,6 +118,9 @@ class BusinessPersistence {
           contactPhone: (m['contactPhone'] as String?) ?? '',
           contactEmail: (m['contactEmail'] as String?) ?? '',
           termsDays: (m['termsDays'] as int?) ?? 30,
+          payoutBank: (m['payoutBank'] as String?) ?? '',
+          payoutAccountNumber: (m['payoutAccountNumber'] as String?) ?? '',
+          payoutAccountName: (m['payoutAccountName'] as String?) ?? '',
           payers: (m['payers'] as List).map((p) {
             final pm = p as Map<String, dynamic>;
             return Payer(

@@ -1,3 +1,8 @@
 # Marketing routes are real files (wallet.html, terms.html …).
+# The payment page is one of them: a customer opening a link on mobile data
+# should not download the whole app to read an account number.
+/pay      /pay.html      200
+/pay/*    /pay.html      200
+
 # Anything else belongs to the Flutter app.
 /*    /index.html    200

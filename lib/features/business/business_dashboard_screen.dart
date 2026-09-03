@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'business_store.dart';
 import 'contact_policy.dart';
 import 'invoice_ai.dart';
+import 'payment_link.dart';
+import '../kyc/kyc_store.dart';
 import 'outreach.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/providers/app_providers.dart';
@@ -371,6 +373,21 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Invoice for $client created.'), backgroundColor: GabisPalette.success));
   }
 
+  /// Where money for this invoice should land: the NUBAN a partner issued
+  /// through verification when there is a live one, otherwise the account the
+  /// business already gives people. Null means neither is set, and the link is
+  /// left off rather than pointing nowhere.
+  PaymentDestination? _payTo(Invoice inv) {
+    final live = PaymentDestination.fromNairaAccount(
+        ref.read(kycProvider).account);
+    if (live != null) return live;
+
+    final store = ref.read(businessProvider);
+    final company = store.companies.where((c) => c.domain == inv.companyDomain);
+    return PaymentDestination.fromCompany(
+        company.isNotEmpty ? company.first : (store.companies.isEmpty ? null : store.companies.first));
+  }
+
   /// Marking an invoice paid is the moment the customer is owed proof. The
   /// receipt is offered there rather than left as a job for later, because
   /// later is when it stops happening.
@@ -547,7 +564,8 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
                         await _askPhone(context, inv.client);
                     if (phone == null || !context.mounted) return;
                     final sent = await Outreach.whatsapp(
-                        phone, Outreach.invoiceMessage(inv));
+                        phone,
+                        Outreach.invoiceMessage(inv, payTo: _payTo(inv)));
                     if (!context.mounted) return;
                     if (sent) {
                       ref.read(businessProvider.notifier).markInvoiceSent(inv.id);
@@ -567,7 +585,7 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
                     final sent = await Outreach.email(
                       address,
                       'Invoice ${inv.id} — ${formatFull(inv.amount)}',
-                      Outreach.invoiceMessage(inv),
+                      Outreach.invoiceMessage(inv, payTo: _payTo(inv)),
                     );
                     if (!context.mounted) return;
                     if (sent) {
@@ -629,6 +647,10 @@ class _ConnectedPaymentsTabState extends ConsumerState<_ConnectedPaymentsTab> {
   List<String> _callTranscript = [];
 
 
+  final _payoutBankCtrl = TextEditingController();
+  final _payoutAcctCtrl = TextEditingController();
+  final _payoutNameCtrl = TextEditingController();
+
   void _addCompany() {
     showDialog(context: context, builder: (ctx) => AlertDialog(
       backgroundColor: GabisPalette.surface,
@@ -651,6 +673,15 @@ class _ConnectedPaymentsTabState extends ConsumerState<_ConnectedPaymentsTab> {
             _buildField('Contact Email', 'e.g. accounts@company.com', _companyEmailCtrl),
             const SizedBox(height: 12),
             _buildField('Payment Terms (days)', 'e.g. 30', _termsCtrl, isNumber: true),
+            const SizedBox(height: 12),
+            // Where money for this company should land. It is what the
+            // payment link prints, so a customer can pay from their bank app
+            // without asking for details again.
+            _buildField('Bank', 'e.g. GTBank, Kuda, Zenith', _payoutBankCtrl),
+            const SizedBox(height: 12),
+            _buildField('Account Number', 'e.g. 0123456789', _payoutAcctCtrl, isNumber: true),
+            const SizedBox(height: 12),
+            _buildField('Account Name', 'As it appears on the account', _payoutNameCtrl),
             const SizedBox(height: 14),
             Container(
               padding: const EdgeInsets.all(12),
@@ -696,11 +727,15 @@ class _ConnectedPaymentsTabState extends ConsumerState<_ConnectedPaymentsTab> {
                   contactPhone: _companyPhoneCtrl.text.trim(),
                   contactEmail: _companyEmailCtrl.text.trim(),
                   termsDays: terms,
+                  payoutBank: _payoutBankCtrl.text.trim(),
+                  payoutAccountNumber: _payoutAcctCtrl.text.trim(),
+                  payoutAccountName: _payoutNameCtrl.text.trim(),
                 ));
             final name = _nameCtrl.text.trim();
             _nameCtrl.clear(); _domainCtrl.clear(); _typeCtrl.clear();
             _contactCtrl.clear(); _companyPhoneCtrl.clear();
             _companyEmailCtrl.clear(); _termsCtrl.clear();
+            _payoutBankCtrl.clear(); _payoutAcctCtrl.clear(); _payoutNameCtrl.clear();
             Navigator.pop(ctx);
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text('$name connected. Add the customers who owe them next.'),

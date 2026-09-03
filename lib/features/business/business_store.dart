@@ -75,6 +75,12 @@ class ConnectedCompany {
   String contactEmail;
   int termsDays;
 
+  /// Where money for this company should be sent — the account its customers
+  /// are already being given over WhatsApp.
+  String payoutBank;
+  String payoutAccountNumber;
+  String payoutAccountName;
+
   List<Payer> payers;
 
   ConnectedCompany({
@@ -85,6 +91,9 @@ class ConnectedCompany {
     this.contactPhone = '',
     this.contactEmail = '',
     this.termsDays = 30,
+    this.payoutBank = '',
+    this.payoutAccountNumber = '',
+    this.payoutAccountName = '',
     List<Payer>? payers,
   }) : payers = payers ?? [];
 

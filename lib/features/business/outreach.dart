@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'business_store.dart';
+import 'payment_link.dart';
 
 /// Real ways to reach someone who owes you money.
 ///
@@ -56,10 +57,14 @@ class Outreach {
         'Thank you — $company.';
   }
 
-  static String invoiceMessage(Invoice invoice) =>
-      'Hello ${invoice.client}, please find invoice ${invoice.id} for '
-      '${formatFull(invoice.amount)} — ${invoice.description}. '
-      'Due ${_date(invoice.due)}. Thank you.';
+  static String invoiceMessage(Invoice invoice, {PaymentDestination? payTo}) {
+    final link = PaymentLink.forInvoice(invoice, payTo);
+    return 'Hello ${invoice.client}, please find invoice ${invoice.id} for '
+        '${formatFull(invoice.amount)} — ${invoice.description}. '
+        'Due ${_date(invoice.due)}.'
+        '${link == null ? '' : '\n\nPay here: $link'}'
+        '\n\nThank you.';
+  }
 
   static String _date(DateTime d) =>
       '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
