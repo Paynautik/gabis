@@ -1,102 +1,72 @@
-import 'dart:convert';
-
-import 'package:http/http.dart' as http;
-
 import 'business_store.dart';
 import 'payment_link.dart';
+import '../../core/firebase/user_sync.dart';
 
-/// The app's end of the chaser rail in workers/chaser.
+/// The app's end of the chaser in firebase/functions.
 ///
 /// Everything up to now needed somebody to be holding the phone. Handing the
-/// queue to a cron job is what makes reminders autonomous, and it is also the
-/// first time this app sends a customer's details anywhere, so it is opt-in,
-/// it goes only when a business turns it on, and it sends the least that a
-/// reminder needs: a name, a number, what is owed, when it was due, and the
-/// lawful basis for having the number at all.
+/// queue to a scheduled function is what makes reminders autonomous, and it
+/// rides on the Firestore document this account already syncs — so there is no
+/// second store to run, no service token to hand out, and no separate notion
+/// of who a business is. Firebase Auth already answered that.
+///
+/// It is still the first time a customer's details leave the device, so it is
+/// opt-in and it carries the least a reminder needs: a name, a number, what is
+/// owed, when it was due, and the lawful basis for holding the number.
 ///
 /// Not sent: invoice descriptions, emails, addresses. The statement link is
 /// built here and travels as an opaque string — its contents live in the URL
-/// fragment, which never reaches the worker or any server.
+/// fragment, which never reaches Firestore or any server.
 class AutonomousReminders {
-  static const _base =
-      String.fromEnvironment('CHASER_URL', defaultValue: '');
-  static const _businessId =
-      String.fromEnvironment('CHASER_BUSINESS_ID', defaultValue: '');
-  static const _token =
-      String.fromEnvironment('CHASER_TOKEN', defaultValue: '');
+  static const _doc = 'collections';
 
-  /// False until the rail is wired, so the dashboard says so plainly rather
-  /// than offering a switch that does nothing.
-  static bool get configured =>
-      _base.isNotEmpty && _businessId.isNotEmpty && _token.isNotEmpty;
+  final UserSync _sync;
+  AutonomousReminders([UserSync? sync]) : _sync = sync ?? UserSync();
 
-  final http.Client _client;
-  AutonomousReminders({http.Client? client}) : _client = client ?? http.Client();
-
-  Map<String, String> get _headers => {
-        'authorization': 'Bearer $_token',
-        'x-business-id': _businessId,
-        'content-type': 'application/json',
-      };
-
-  /// What the worker would be given: one row per overdue payer.
+  /// One row per overdue payer: what the chaser needs to decide and to write.
   static List<Map<String, dynamic>> payload(
     BusinessState state, {
     PaymentDestination? payTo,
-  }) {
-    final rows = <Map<String, dynamic>>[];
-    for (final payer in state.defaulters) {
-      rows.add({
-        'name': payer.name,
-        'phone': payer.phone,
-        'outstanding': payer.outstanding,
-        'currency': 'NGN',
-        'due_on': payer.nextDueDate.toIso8601String().split('T').first,
-        'consent_basis': payer.consentBasis,
-        'do_not_contact': payer.doNotContact ? 1 : 0,
-        'portal_link':
-            PortalLink.forClient(payer.name, state.invoices, payTo),
-      });
-    }
-    return rows;
-  }
+  }) =>
+      [
+        for (final payer in state.defaulters)
+          {
+            'name': payer.name,
+            'phone': payer.phone,
+            'outstanding': payer.outstanding,
+            'currency': 'NGN',
+            'due_on': payer.nextDueDate.toIso8601String().split('T').first,
+            'consent_basis': payer.consentBasis,
+            'do_not_contact': payer.doNotContact ? 1 : 0,
+            'portal_link':
+                PortalLink.forClient(payer.name, state.invoices, payTo),
+          }
+      ];
 
-  /// Pushes the queue and says whether the rail may act on it. Returns the
-  /// number of rows the worker accepted, or null when it refused.
+  /// Pushes the queue and says whether the chaser may act on it. Returns how
+  /// many people were queued, or null when the write did not land.
   Future<int?> sync(
     BusinessState state, {
     required bool autonomous,
     PaymentDestination? payTo,
   }) async {
-    if (!configured) return null;
+    final debtors = payload(state, payTo: payTo);
 
-    try {
-      final response = await _client.post(
-        Uri.parse('$_base/sync'),
-        headers: _headers,
-        body: jsonEncode({
-          'autonomous': autonomous,
-          'debtors': payload(state, payTo: payTo),
-        }),
-      );
-      if (response.statusCode != 200) return null;
-      return (jsonDecode(response.body)['debtors'] as num?)?.toInt();
-    } catch (_) {
-      return null;
-    }
+    // Replaced wholesale rather than merged: somebody paid off or deleted in
+    // the app must stop being chased, and a partial update is a way to get
+    // that wrong.
+    final ok = await _sync.put(_doc, {
+      'autonomous': autonomous,
+      'business': state.companies.isEmpty ? 'gabis' : state.companies.first.name,
+      'debtors': debtors,
+    });
+
+    return ok ? debtors.length : null;
   }
 
-  /// What would go out on the next pass, so it can be read before it does.
-  Future<List<Map<String, dynamic>>> queue() async {
-    if (!configured) return const [];
-    try {
-      final response =
-          await _client.get(Uri.parse('$_base/queue'), headers: _headers);
-      if (response.statusCode != 200) return const [];
-      return ((jsonDecode(response.body)['items'] as List?) ?? [])
-          .cast<Map<String, dynamic>>();
-    } catch (_) {
-      return const [];
-    }
+  /// Whether the chaser is currently allowed to act for this account.
+  Future<bool> isOn() async {
+    final doc = await _sync.get(_doc);
+    return doc?['autonomous'] == true;
   }
 }

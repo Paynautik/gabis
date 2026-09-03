@@ -21,17 +21,21 @@ class UserSync {
   }
 
   /// Writes are fire-and-forget: a sync failure must never block the UI or
-  /// lose the local copy.
-  Future<void> put(String name, Map<String, dynamic> data) async {
+  /// lose the local copy. The result is there for the few callers that have
+  /// to tell the user whether it landed — turning on something that acts on
+  /// this document without them, say — and is ignored everywhere else.
+  Future<bool> put(String name, Map<String, dynamic> data) async {
     final doc = _doc(name);
-    if (doc == null) return;
+    if (doc == null) return false;
     try {
       await doc.set({
         ...data,
         'updatedAt': FieldValue.serverTimestamp(),
       });
+      return true;
     } catch (_) {
       // Local storage already holds it; the next write will try again.
+      return false;
     }
   }
 

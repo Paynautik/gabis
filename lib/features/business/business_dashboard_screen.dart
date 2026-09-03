@@ -8,6 +8,7 @@ import 'payment_link.dart';
 import '../kyc/kyc_store.dart';
 import 'outreach.dart';
 import 'autonomous_reminders.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../core/services/africas_talking_service.dart';
@@ -1978,6 +1979,16 @@ class _AutonomousRemindersCardState
   bool _busy = false;
   String? _last;
 
+  @override
+  void initState() {
+    super.initState();
+    // The switch reflects what the chaser is actually allowed to do, which
+    // lives on the account rather than on this device.
+    _rail.isOn().then((on) {
+      if (mounted && on) setState(() => _on = true);
+    });
+  }
+
   Future<void> _sync(bool on) async {
     setState(() => _busy = true);
     final store = ref.read(businessProvider);
@@ -2004,6 +2015,7 @@ class _AutonomousRemindersCardState
   @override
   Widget build(BuildContext context) {
     final overdue = ref.watch(businessProvider).defaulters.length;
+    final signedIn = FirebaseAuth.instance.currentUser != null;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 24),
@@ -2021,7 +2033,7 @@ class _AutonomousRemindersCardState
                     fontSize: 15,
                     fontWeight: FontWeight.w600)),
           ),
-          if (AutonomousReminders.configured)
+          if (signedIn)
             Switch(
               value: _on,
               activeColor: GabisPalette.electric,
@@ -2030,14 +2042,13 @@ class _AutonomousRemindersCardState
         ]),
         const SizedBox(height: 6),
         Text(
-          AutonomousReminders.configured
+          signedIn
               ? 'Sends the first, second and final reminder to the $overdue '
                   '${overdue == 1 ? 'person' : 'people'} overdue, once a day, '
                   'between 08:00 and 20:00 — the same rules that apply when you '
                   'press the buttons yourself. A refusal stops it permanently.'
-              : 'Not configured on this build. The reminder server needs '
-                  'CHASER_URL, CHASER_BUSINESS_ID and CHASER_TOKEN before '
-                  'anything can go out without you.',
+              : 'Sign in first. The queue lives on your account, which is also '
+                  'what tells the reminders apart from anyone else\'s.',
           style: const TextStyle(
               color: GabisPalette.inkSoft, fontSize: 12.5, height: 1.5),
         ),
