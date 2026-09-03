@@ -383,22 +383,24 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const Text('New Invoice', style: TextStyle(color: GabisPalette.ink, fontSize: 16, fontWeight: FontWeight.w600)),
             const SizedBox(height: 20),
-            // Say it once in plain words; the fields below fill themselves in.
-            Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Expanded(
-                child: _buildField(
-                  'Describe it',
-                  'e.g. bill Sarah 150k for brand design, net 14',
-                  _promptCtrl,
-                ),
-              ),
-              const SizedBox(width: 12),
-              SizedBox(
-                height: 48,
+            // Say it once in plain words; the fields below fill themselves
+            // in. Stacked rather than sharing a row with the button, which
+            // squeezed the field to a single character on a wide card.
+            _buildField(
+              'Describe it',
+              'e.g. bill Sarah 150k for brand design, net 14',
+              _promptCtrl,
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: SizedBox(
+                height: 44,
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                       foregroundColor: GabisPalette.ink,
                       side: const BorderSide(color: GabisPalette.lineStrong),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8))),
                   onPressed: _isDrafting ? null : _draftFromText,
@@ -413,7 +415,7 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
                       style: TextStyle(fontWeight: FontWeight.w800)),
                 ),
               ),
-            ]),
+            ),
             if (_missing.isNotEmpty) ...[
               const SizedBox(height: 8),
               Text('Add the ${_missing.join(' and ')} before sending.',
