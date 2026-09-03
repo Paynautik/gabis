@@ -1,5 +1,14 @@
 {
   "firestore": {
     "rules": "firestore.rules"
-  }
+  },
+  "functions": [
+    {
+      "source": "firebase/functions",
+      "codebase": "chaser",
+      "predeploy": [
+        "npm --prefix firebase/functions run build"
+      ]
+    }
+  ]
 }

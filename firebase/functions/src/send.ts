@@ -7,12 +7,6 @@
  * worse than one that says it did nothing.
  */
 
-export interface Env {
-  DB: D1Database;
-  WHATSAPP_TOKEN?: string;
-  WHATSAPP_PHONE_ID?: string;
-}
-
 export type SendOutcome = 'sent' | 'rehearsed' | 'failed';
 
 /** Africa's Talking and WhatsApp both want digits, country code, no punctuation. */
@@ -24,19 +18,21 @@ export function normalise(phone: string): string {
 }
 
 export async function send(
-  env: Env,
   phone: string,
   message: string,
+  config: { token?: string; phoneId?: string } = {},
 ): Promise<SendOutcome> {
-  if (!env.WHATSAPP_TOKEN || !env.WHATSAPP_PHONE_ID) return 'rehearsed';
+  const token = config.token ?? process.env.WHATSAPP_TOKEN;
+  const phoneId = config.phoneId ?? process.env.WHATSAPP_PHONE_ID;
+  if (!token || !phoneId) return 'rehearsed';
 
   try {
     const response = await fetch(
-      `https://graph.facebook.com/v21.0/${env.WHATSAPP_PHONE_ID}/messages`,
+      `https://graph.facebook.com/v21.0/${phoneId}/messages`,
       {
         method: 'POST',
         headers: {
-          authorization: `Bearer ${env.WHATSAPP_TOKEN}`,
+          authorization: `Bearer ${token}`,
           'content-type': 'application/json',
         },
         body: JSON.stringify({

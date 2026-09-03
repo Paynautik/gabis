@@ -7,5 +7,15 @@ service cloud.firestore {
     match /users/{uid}/{document=**} {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
+
+    // The reminder log the scheduled chaser writes is the record the
+    // frequency limits are counted from, and a dispute is settled by it. The
+    // owner may read their own; nobody may edit one after the fact. The
+    // function itself goes through the Admin SDK, which these rules do not
+    // apply to.
+    match /users/{uid}/gabis/collections/attempts/{attempt} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
   }
 }
