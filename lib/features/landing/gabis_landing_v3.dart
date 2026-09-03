@@ -764,7 +764,12 @@ class _Phone extends StatelessWidget {
                       top: Radius.circular(30),
                     ),
                   ),
-                  child: const Column(
+                  // On a short viewport the phone mock-up is not tall enough
+                  // for five currencies, and a Column simply overflows. The
+                  // list scrolls inside the panel instead, which clips rather
+                  // than paints a striped error over the marketing page.
+                  child: const SingleChildScrollView(
+                    child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -784,7 +789,9 @@ class _Phone extends StatelessWidget {
                       _WalletRow(symbol: r'C$', code: 'CAD', amount: '100.00'),
                       SizedBox(height: 15),
                       _WalletRow(symbol: '¥', code: 'JPY', amount: '10,000'),
+                      SizedBox(height: 8),
                     ],
+                    ),
                   ),
                 ),
               ),
@@ -2772,16 +2779,22 @@ class _Card extends StatelessWidget {
 
           const Spacer(),
 
-          Row(
-            children: [
-              _digits('••••', fg, scale),
-              SizedBox(width: 11 * scale),
-              _digits('••••', fg, scale),
-              SizedBox(width: 11 * scale),
-              _digits('••••', fg, scale),
-              SizedBox(width: 11 * scale),
-              _digits(last4, fg, scale),
-            ],
+          // A card number is one thing: at a narrow width it should get
+          // smaller, not wrap or spill over the edge of the card.
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: [
+                _digits('••••', fg, scale),
+                SizedBox(width: 11 * scale),
+                _digits('••••', fg, scale),
+                SizedBox(width: 11 * scale),
+                _digits('••••', fg, scale),
+                SizedBox(width: 11 * scale),
+                _digits(last4, fg, scale),
+              ],
+            ),
           ),
 
           SizedBox(height: 14 * scale),
@@ -2789,24 +2802,30 @@ class _Card extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('CARDHOLDER',
-                      style: TextStyle(
-                          color: fg.withValues(alpha: .55),
-                          fontSize: 7 * scale,
-                          letterSpacing: 1.2,
-                          fontWeight: FontWeight.w700)),
-                  SizedBox(height: 3 * scale),
-                  Text(holder,
-                      style: TextStyle(
-                          color: fg,
-                          fontSize: 11.5 * scale,
-                          letterSpacing: .8,
-                          fontWeight: FontWeight.w700)),
-                ],
+              // A long name is the variable thing on a card of fixed width, so
+              // it is the thing that gives.
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('CARDHOLDER',
+                        style: TextStyle(
+                            color: fg.withValues(alpha: .55),
+                            fontSize: 7 * scale,
+                            letterSpacing: 1.2,
+                            fontWeight: FontWeight.w700)),
+                    SizedBox(height: 3 * scale),
+                    Text(holder,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: fg,
+                            fontSize: 11.5 * scale,
+                            letterSpacing: .8,
+                            fontWeight: FontWeight.w700)),
+                  ],
+                ),
               ),
               SizedBox(width: 18 * scale),
               Column(

@@ -4,7 +4,9 @@ import 'package:nautik_money/shared/providers/app_providers.dart';
 
 void main() {
   test('copilot reasons over the seeded history', () {
-    final txs = TransactionsNotifier().state;
+    // The seeded history is opt-in now — a real user starts with an empty book,
+    // so the engine has to be handed the demo data explicitly.
+    final txs = TransactionsNotifier(demo: true).state;
     final engine = CopilotEngine(transactions: txs, balanceNaira: 1250000);
 
     print('transactions: ${txs.length}');

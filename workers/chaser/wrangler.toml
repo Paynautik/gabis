@@ -1,0 +1,13 @@
+name = "gabis-chaser"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+# Mid-morning in Lagos. The hours rule in policy.ts is what actually keeps a
+# reminder out of somebody's night; this is just when the pass happens.
+[triggers]
+crons = ["0 9 * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "gabis-chaser"
+database_id = "set-with-wrangler-d1-create"
