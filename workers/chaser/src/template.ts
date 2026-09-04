@@ -12,6 +12,12 @@
  *
  * WHATSAPP_TEMPLATES.md is generated from BODIES below. If you change the
  * words here, the template in Meta has to be resubmitted and re-approved.
+ *
+ * Two of Meta's rules shape how these read, and breaking either is rejected
+ * with nothing more useful than "Invalid parameter": two placeholders may not
+ * sit next to each other with only a space between them, and a body may not end
+ * on a placeholder. Hence "{{3}}, and it {{4}}" rather than "{{3}} {{4}}", and
+ * the closing thank-you after the payment link.
  */
 
 import { money } from '../../../firebase/functions/src/message.ts';
@@ -32,21 +38,22 @@ export type TemplateName =
  */
 export const BODIES: Record<TemplateName, string> = {
   gabis_reminder_first:
-    'Hello {{1}}, this is {{2}}. Your balance of {{3}} {{4}}. ' +
-    'You can pay from your gabis app, or reply here if you need a new date. ' +
-    'Thank you.\n\nPay here: {{5}}',
+    'Hello {{1}}, this is {{2}}. Your balance is {{3}}, and it {{4}}. ' +
+    'You can pay from your gabis app, or reply here if you need a new date.\n\n' +
+    'Pay here: {{5}}\n\nThank you.',
 
   gabis_reminder_second:
-    'Hello {{1}}, {{2}} again about {{3}}, {{4}}. ' +
+    'Hello {{1}}, {{2}} again about your balance of {{3}}, which is {{4}}. ' +
     'We have not heard back on the first reminder. ' +
-    'Can you pay today, or reply with the date you will pay so we can hold it? ' +
-    'Thank you.\n\nPay here: {{5}}',
+    'Can you pay today, or reply with the date you will pay so we can hold it?\n\n' +
+    'Pay here: {{5}}\n\nThank you.',
 
   gabis_reminder_final:
-    'Hello {{1}}. This is the last automated reminder from {{2}} about {{3}}, {{4}}. ' +
-    'After this someone from our team will contact you directly to agree how it ' +
-    'will be settled. If you have already paid, reply with the date and we will ' +
-    'match it. Thank you.\n\nPay here: {{5}}',
+    'Hello {{1}}. This is the last automated reminder from {{2}} about your ' +
+    'balance of {{3}}, which is {{4}}. After this someone from our team will ' +
+    'contact you directly to agree how it will be settled. If you have already ' +
+    'paid, reply with the date and we will match it.\n\n' +
+    'Pay here: {{5}}\n\nThank you.',
 };
 
 /**
