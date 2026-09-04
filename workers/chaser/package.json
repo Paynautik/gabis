@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test test/firestore.test.ts test/payments.test.ts ../../firebase/functions/test/policy.test.ts",
+    "test": "node --experimental-strip-types --test test/firestore.test.ts test/template.test.ts test/payments.test.ts ../../firebase/functions/test/policy.test.ts",
     "deploy": "wrangler deploy",
     "queue": "wrangler dev"
   },
