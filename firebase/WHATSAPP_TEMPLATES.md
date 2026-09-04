@@ -41,8 +41,10 @@ For each of the three below:
 - **Sample values:** Meta asks for an example of each placeholder before it will
   submit. The samples below are what the worker actually produces.
 
-Approval usually takes a few hours. A rejection is nearly always the category or
-a placeholder Meta could not match to a sample.
+Approval usually takes a few hours. Two of Meta's rules are worth knowing before
+editing any of this, because breaking either is rejected with nothing more
+useful than "Invalid parameter": two placeholders may not sit next to each other
+with only a space between them, and a body may not end on a placeholder.
 
 ## First reminder
 
@@ -52,9 +54,11 @@ a placeholder Meta could not match to a sample.
 **Body:**
 
 ```
-Hello {{1}}, this is {{2}}. Your balance of {{3}} {{4}}. You can pay from your gabis app, or reply here if you need a new date. Thank you.
+Hello {{1}}, this is {{2}}. Your balance is {{3}}, and it {{4}}. You can pay from your gabis app, or reply here if you need a new date.
 
 Pay here: {{5}}
+
+Thank you.
 ```
 
 **Footer:**
@@ -73,9 +77,11 @@ Sent through gabis. Reply STOP to opt out of reminders.
 **Body:**
 
 ```
-Hello {{1}}, {{2}} again about {{3}}, {{4}}. We have not heard back on the first reminder. Can you pay today, or reply with the date you will pay so we can hold it? Thank you.
+Hello {{1}}, {{2}} again about your balance of {{3}}, which is {{4}}. We have not heard back on the first reminder. Can you pay today, or reply with the date you will pay so we can hold it?
 
 Pay here: {{5}}
+
+Thank you.
 ```
 
 **Footer:**
@@ -94,9 +100,11 @@ Sent through gabis. Reply STOP to opt out of reminders.
 **Body:**
 
 ```
-Hello {{1}}. This is the last automated reminder from {{2}} about {{3}}, {{4}}. After this someone from our team will contact you directly to agree how it will be settled. If you have already paid, reply with the date and we will match it. Thank you.
+Hello {{1}}. This is the last automated reminder from {{2}} about your balance of {{3}}, which is {{4}}. After this someone from our team will contact you directly to agree how it will be settled. If you have already paid, reply with the date and we will match it.
 
 Pay here: {{5}}
+
+Thank you.
 ```
 
 **Footer:**

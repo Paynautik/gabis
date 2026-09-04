@@ -82,7 +82,12 @@ for (const name of Object.keys(BODIES) as TemplateName[]) {
   const body = (await response.json()) as {
     id?: string;
     status?: string;
-    error?: { message?: string; error_subcode?: number };
+    error?: {
+      message?: string;
+      error_subcode?: number;
+      error_user_title?: string;
+      error_user_msg?: string;
+    };
   };
 
   if (response.ok) {
@@ -90,7 +95,13 @@ for (const name of Object.keys(BODIES) as TemplateName[]) {
   } else if (body.error?.error_subcode === 2388024) {
     console.log(`${name}: already exists, left alone`);
   } else {
-    console.error(`${name}: ${body.error?.message ?? response.status}`);
+    // error_user_msg is the sentence that actually says what is wrong; message
+    // on its own is usually "Invalid parameter", which explains nothing.
+    const error = body.error;
+    console.error(
+      `${name}: ${error?.error_user_msg ?? error?.message ?? response.status}` +
+        (error?.error_user_title ? ` (${error.error_user_title})` : ''),
+    );
   }
 }
 
