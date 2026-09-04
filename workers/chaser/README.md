@@ -3,6 +3,22 @@
 The reminder schedule, on Cloudflare, reading the Firestore the app already
 writes to.
 
+## Checking the credentials really work
+
+`/status` says whether the secrets exist. It cannot say whether they work: an
+expired token, a revoked one, one pasted in twice and one scoped to somebody
+else's number all look the same from inside the worker, and the difference only
+shows up later as reminders that never arrived.
+
+```
+curl -s https://gabis-chaser.gabis-chaser.workers.dev/check
+```
+
+Asks WhatsApp about the sending number and reports what it said. Sends no
+message and needs no debtor. A failure carries Meta's own sentence and its code:
+190 is a token expired, revoked or malformed; 100 is usually a token with no
+rights over that number.
+
 ## Why here and not Firebase
 
 Scheduled Cloud Functions need the project on the Blaze plan. Firestore does

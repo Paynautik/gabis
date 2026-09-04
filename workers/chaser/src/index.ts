@@ -230,6 +230,66 @@ export default {
       );
     }
 
+    // Whether the credentials actually work, which /status cannot say: it only
+    // knows the strings exist. A token that is expired, revoked, pasted twice
+    // or scoped to the wrong account looks identical to a good one from here,
+    // and the difference only shows up as reminders silently not arriving.
+    //
+    // Asks WhatsApp about the sending number and nothing else. Sends no
+    // message, needs no debtor, and reports what Meta said rather than a
+    // verdict of our own.
+    if (url.pathname === '/check' && request.method === 'GET') {
+      if (!env.WHATSAPP_TOKEN || !env.WHATSAPP_PHONE_ID) {
+        return Response.json(
+          { sends: false, detail: 'WhatsApp credentials are not set.' },
+          { headers: cors },
+        );
+      }
+
+      try {
+        const response = await fetch(
+          `https://graph.facebook.com/v21.0/${env.WHATSAPP_PHONE_ID}` +
+            '?fields=display_phone_number,verified_name,quality_rating',
+          { headers: { authorization: `Bearer ${env.WHATSAPP_TOKEN}` } },
+        );
+        const body = (await response.json()) as {
+          display_phone_number?: string;
+          verified_name?: string;
+          quality_rating?: string;
+          error?: { message?: string; code?: number };
+        };
+
+        if (!response.ok) {
+          return Response.json(
+            {
+              sends: false,
+              // Meta's own words. Code 190 is a token expired, revoked or
+              // malformed; 100 is usually a token with no rights over this
+              // number.
+              detail: body.error?.message ?? `HTTP ${response.status}`,
+              code: body.error?.code,
+            },
+            { headers: cors },
+          );
+        }
+
+        return Response.json(
+          {
+            sends: true,
+            number: body.display_phone_number,
+            name: body.verified_name,
+            quality: body.quality_rating,
+          },
+          { headers: cors },
+        );
+      } catch (error) {
+        return Response.json(
+          { sends: false, detail: String(error) },
+          { headers: cors },
+        );
+      }
+    }
+
     const missing = missingSecret(env);
     if (missing) {
       return Response.json(
