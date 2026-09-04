@@ -14,8 +14,16 @@ shows up later as reminders that never arrived.
 curl -s https://gabis-chaser.gabis-chaser.workers.dev/check
 ```
 
-Asks WhatsApp about the sending number and reports what it said. Sends no
-message and needs no debtor. A failure carries Meta's own sentence and its code:
+Asks WhatsApp about the sending number and Paystack which banks it can issue
+dedicated accounts with, and reports what each said. Sends no message, creates
+no account, needs no debtor.
+
+`mints: false` is the one worth watching. Per-invoice account numbers are the
+thing a customer notices, and they fail quietly: the invoice keeps the account
+the business already gives people, and nobody finds out until they wonder why
+payments still arrive unlabelled. `Invalid key` is a key problem; a message
+about no available bank is the Paystack business profile, which only the
+business can finish. A failure carries Meta's own sentence and its code:
 190 is a token expired, revoked or malformed; 100 is usually a token with no
 rights over that number.
 

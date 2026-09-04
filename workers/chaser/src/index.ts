@@ -273,12 +273,19 @@ export default {
           );
         }
 
+        const accounts = await new Paystack(env.PAYSTACK_SECRET).check();
+
         return Response.json(
           {
             sends: true,
             number: body.display_phone_number,
             name: body.verified_name,
             quality: body.quality_rating,
+            // Whether invoices will really get their own account number, which
+            // is a different question from whether a key is set.
+            mints: accounts.ok,
+            mintsDetail: accounts.detail,
+            banks: accounts.banks,
           },
           { headers: cors },
         );
@@ -365,11 +372,17 @@ export default {
         phone: body.phone,
       });
 
-      if (!account) {
+      if (!account.ok) {
+        // Both fall back to the account the business already gives people, but
+        // they are not the same problem: one is a key nobody has set, the other
+        // a Paystack account that cannot issue NUBANs yet. Saying which is the
+        // difference between a setting somebody fixes and a silence nobody
+        // notices.
         return Response.json(
           {
-            error: 'not_configured',
+            error: account.reason,
             detail:
+              account.detail ??
               'No payment provider is configured, so the invoice keeps the account the business already gives people.',
           },
           { status: 503, headers: cors },
@@ -386,7 +399,10 @@ export default {
         created_at: new Date().toISOString(),
       });
 
-      return Response.json({ ok: true, ...account }, { headers: cors });
+      return Response.json(
+        { ok: true, bank: account.bank, account: account.account, name: account.name },
+        { headers: cors },
+      );
     }
 
     // Money arriving. Signed by the provider, so this is the one route that
