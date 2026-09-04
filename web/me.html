@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex, nofollow">
-  <title>What you owe · gabis</title>
+  <title>Your portal · gabis</title>
   <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png">
   <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
   <style>
@@ -205,9 +205,10 @@
       if (!businesses.length) {
         document.getElementById('content').innerHTML =
           '<div class="empty">' +
-            '<h1>Nothing here yet</h1>' +
+            '<h1>Your portal is empty</h1>' +
             '<p>When a business sends you a gabis statement link, opening it ' +
-              'adds it here. Everything you owe, in one place, without an account.</p>' +
+              'adds it to this portal. Everything you owe, in one place, without ' +
+              'an account.</p>' +
             '<p style="margin:0">This page is kept on this device only. gabis ' +
               'never receives it.</p>' +
           '</div>' + rights;
@@ -271,12 +272,12 @@
       // nothing. When they differ, the businesses are still listed, each with
       // its own total, and no headline figure is invented.
       var head = mixed
-        ? '<p class="who">What you owe</p>' +
+        ? '<p class="who">Your portal</p>' +
           '<p class="amount">' + businesses.length + '</p>' +
           '<p class="what">business' + (businesses.length === 1 ? '' : 'es') +
             ', billed in different currencies — each total is shown separately below.</p>'
-        : '<p class="who">What you owe, across ' + businesses.length +
-            ' business' + (businesses.length === 1 ? '' : 'es') + '</p>' +
+        : '<p class="who">Your portal \u00b7 ' + businesses.length +
+            ' business' + (businesses.length === 1 ? '' : 'es') + ' you owe</p>' +
           '<p class="amount">' + esc(money(total, currency || 'NGN')) + '</p>' +
           '<p class="what">' +
             (total === 0
