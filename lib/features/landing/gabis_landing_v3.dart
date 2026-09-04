@@ -1216,48 +1216,125 @@ class _OrbitPainter extends CustomPainter {
 class _WordRail extends StatelessWidget {
   const _WordRail();
 
+  /// Each word goes somewhere, which is the whole change.
+  ///
+  /// The rail used to be eight words and a repeat, scaled to fit and clickable
+  /// nowhere — decoration that named the six things this product does and then
+  /// asked the reader to go and find them. Every one of them has a page, so
+  /// every one of them is now a way in. SAVE and GROW are gone because nothing
+  /// is behind them yet, and a word that leads nowhere is worse on a landing
+  /// page than one that was never there.
+  static const _stops = <(String, IconData, String)>[
+    ('SEND', Icons.north_east_rounded, '/wallet'),
+    ('SPEND', Icons.credit_card_rounded, '/virtual-cards'),
+    ('RECEIVE', Icons.download_rounded, '/usd-account'),
+    ('SWAP', Icons.swap_horiz_rounded, '/fx'),
+    ('INVOICE', Icons.receipt_long_rounded, '/invoicing'),
+    ('COLLECT', Icons.campaign_rounded, '/debt-recovery'),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 23),
       color: GabisV3.ink,
-      child: ClipRect(
-        child: Center(
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: RichText(
-              maxLines: 1,
-              text: TextSpan(
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 1.6,
-                  height: 1.1,
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      // Ink needs a Material above it or a tap lands with no ripple, which on
+      // a dark strip reads as a dead word.
+      child: Material(
+        type: MaterialType.transparency,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < _stops.length; i++) ...[
+                if (i > 0)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: Text('✦',
+                        style: TextStyle(
+                          color: GabisV3.lime,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900,
+                        )),
+                  ),
+                _RailStop(
+                  label: _stops[i].$1,
+                  icon: _stops[i].$2,
+                  route: _stops[i].$3,
                 ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RailStop extends StatefulWidget {
+  const _RailStop({
+    required this.label,
+    required this.icon,
+    required this.route,
+  });
+
+  final String label;
+  final IconData icon;
+  final String route;
+
+  @override
+  State<_RailStop> createState() => _RailStopState();
+}
+
+class _RailStopState extends State<_RailStop> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final lit = _hovered;
+
+    return Semantics(
+      button: true,
+      label: '${widget.label} — read more',
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(100),
+          onTap: () => Navigator.pushNamed(context, widget.route),
+          child: ConstrainedBox(
+            // What a thumb can actually hit, one-handed, on a phone.
+            constraints: const BoxConstraints(minHeight: 48),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 140),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              decoration: BoxDecoration(
+                color: lit ? GabisV3.lime.withValues(alpha: .12) : null,
+                borderRadius: BorderRadius.circular(100),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  for (final word in const [
-                    'SEND',
-                    'SPEND',
-                    'RECEIVE',
-                    'SWAP',
-                    'INVOICE',
-                    'COLLECT',
-                    'SAVE',
-                    'GROW',
-                  ]) ...[
-                    TextSpan(
-                      text: word,
-                      style: const TextStyle(color: GabisV3.cream),
+                  Icon(
+                    widget.icon,
+                    size: 17,
+                    color: lit ? GabisV3.lime : GabisV3.cream,
+                  ),
+                  const SizedBox(width: 9),
+                  Text(
+                    widget.label,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 1.4,
+                      height: 1.1,
+                      color: lit ? GabisV3.lime : GabisV3.cream,
                     ),
-                    const TextSpan(
-                      text: '  ✦  ',
-                      style: TextStyle(color: GabisV3.lime),
-                    ),
-                  ],
-                  const TextSpan(
-                    text: 'SEND',
-                    style: TextStyle(color: GabisV3.cream),
                   ),
                 ],
               ),
