@@ -47,3 +47,52 @@ test('a payment with no account to match on is ignored', () => {
     null,
   );
 });
+
+test('a mint that fails says which kind of failure it was', async () => {
+  // No key at all: a setting nobody has filled in.
+  const unset = await new Paystack(undefined).create('INV-1', {
+    name: 'Adaeze Okafor',
+    email: 'inv-1@invoices.gabis.app',
+  });
+  assert.equal(unset.ok, false);
+  assert.equal(unset.ok === false && unset.reason, 'not_configured');
+
+  // A key that Paystack itself refuses is the other problem entirely, and the
+  // caller has to be able to tell them apart.
+  const original = globalThis.fetch;
+  globalThis.fetch = (async () =>
+    new Response(JSON.stringify({ message: 'Business profile incomplete' }), {
+      status: 403,
+    })) as typeof fetch;
+
+  try {
+    const refused = await new Paystack('sk_test_x').create('INV-2', {
+      name: 'Adaeze Okafor',
+      email: 'inv-2@invoices.gabis.app',
+    });
+    assert.equal(refused.ok, false);
+    assert.equal(refused.ok === false && refused.reason, 'refused');
+    assert.match(
+      refused.ok === false ? (refused.detail ?? '') : '',
+      /Business profile incomplete/,
+    );
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test('the entitlement check reports what Paystack said', async () => {
+  const original = globalThis.fetch;
+  globalThis.fetch = (async () =>
+    new Response(JSON.stringify({ data: [] }), { status: 200 })) as typeof fetch;
+
+  try {
+    // A key that works but offers no bank is the business profile, not the key,
+    // and the difference is the whole point of saying so.
+    const empty = await new Paystack('sk_test_x').check();
+    assert.equal(empty.ok, false);
+    assert.match(empty.detail ?? '', /business profile/i);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
