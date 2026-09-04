@@ -9,7 +9,22 @@ So these three have to exist in Meta before the chaser can send anything. They
 are generated from `workers/chaser/src/template.ts`; if the words change there,
 the template has to be resubmitted and approved again.
 
-## Submitting them
+## Submitting them with the script
+
+Three templates typed by hand is where the mistakes happen — a category left on
+Marketing, a language of `en_US` the worker will never match, a placeholder that
+drifted from its body. The script posts exactly what `src/template.ts` says:
+
+```
+cd workers/chaser
+WABA_ID=<WhatsApp Business account ID> WHATSAPP_TOKEN=<token> \
+  node --experimental-strip-types scripts/submit-templates.ts
+```
+
+Both values are on the WhatsApp **API Setup** page. Re-running is safe: a
+template that already exists is reported and skipped.
+
+## Submitting them by hand
 
 Meta dashboard → WhatsApp Manager → Message templates → Create template.
 
