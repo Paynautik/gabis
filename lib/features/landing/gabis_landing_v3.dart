@@ -1243,13 +1243,25 @@ class _WordRail extends StatelessWidget {
       // a dark strip reads as a dead word.
       child: Material(
         type: MaterialType.transparency,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+        // Centred when the six fit, scrolling from the left when they do not.
+        // A horizontal scroller lays its child out at the start whatever the
+        // width, which on a desktop leaves the rail hard against the left edge
+        // of a very wide band; giving the row the viewport as a minimum width
+        // lets it centre itself, and it still overflows into a scroll on a
+        // phone.
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: (constraints.maxWidth - 32).clamp(0.0, double.infinity),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
               for (var i = 0; i < _stops.length; i++) ...[
                 if (i > 0)
                   const Padding(
@@ -1261,13 +1273,15 @@ class _WordRail extends StatelessWidget {
                           fontWeight: FontWeight.w900,
                         )),
                   ),
-                _RailStop(
-                  label: _stops[i].$1,
-                  icon: _stops[i].$2,
-                  route: _stops[i].$3,
-                ),
+                  _RailStop(
+                    label: _stops[i].$1,
+                    icon: _stops[i].$2,
+                    route: _stops[i].$3,
+                  ),
+                ],
               ],
-            ],
+              ),
+            ),
           ),
         ),
       ),
