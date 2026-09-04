@@ -144,6 +144,13 @@
       margin-top: 1px;
     }
 
+    .mine {
+      margin: 18px 0 0;
+      font-size: 14px;
+    }
+
+    .mine a { color: var(--ink); }
+
     .foot {
       margin-top: 28px;
       padding-top: 18px;
@@ -367,10 +374,26 @@
 
       document.title = (data.to ? esc(data.to) + ' \u00b7 ' : '') + 'Your account \u00b7 gabis';
 
+      // Remembered on this device so the person can see every business they
+      // owe in one place, at /me. It never leaves the browser: gabis issues no
+      // account for this and keeps no list of who owes what to whom.
+      var supplier = dest.name || data.from || 'A business';
+      try {
+        var KEY = 'gabis.statements.v1';
+        var saved = JSON.parse(localStorage.getItem(KEY) || '{}');
+        saved[supplier] = { cur: cur, inv: items, raw: raw, seen: new Date().toISOString() };
+        localStorage.setItem(KEY, JSON.stringify(saved));
+      } catch (e) {
+        // Private browsing, or storage refused. The statement still works;
+        // only the across-business view is unavailable, and it says so there.
+      }
+
       document.getElementById('content').innerHTML = head +
         '<div class="section">Invoices</div>' +
         '<div class="list">' + rows + '</div>' +
         pay +
+        '<p class="mine"><a href="/me">See everything you owe, across every business</a></p>' +
+        '<p class="mine"><a href="/standard">What a business using gabis may and may not do</a></p>' +
         '<p class="foot">gabis is a financial technology company, not a bank. This page shows details supplied by ' +
           esc(dest.name || data.from || 'the business') + '; the transfer happens in your own bank app, and no payment is taken here.</p>';
 
