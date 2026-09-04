@@ -6,12 +6,9 @@ import {
   type Attempt,
   type Debtor,
 } from '../../../firebase/functions/src/policy';
-import {
-  chaseMessage,
-  isOptOut,
-  optOutLine,
-} from '../../../firebase/functions/src/message';
+import { isOptOut } from '../../../firebase/functions/src/message';
 import { send } from './send';
+import { render, templateFor, type TemplateMessage } from './template';
 import { uidFromIdToken } from './auth';
 import { Paystack, claim } from './payments';
 
@@ -121,6 +118,7 @@ export async function planFor(
     debtor: Debtor;
     attempt: number;
     message: string;
+    template: TemplateMessage;
     allowed: boolean;
     reason?: string;
   }[] = [];
@@ -132,23 +130,26 @@ export async function planFor(
       now,
     );
 
+    // The words are the template's, filled in for this debtor. Rendering them
+    // here means the queue and the attempts log show exactly what the customer
+    // reads, rather than a placeholder body nobody can check.
+    const template = templateFor({
+      name: debtor.name,
+      company,
+      outstanding: debtor.outstanding,
+      currency: debtor.currency,
+      daysOverdue: daysOverdue(debtor.due_on, now),
+      attempt: decision.attempt,
+      payLink: debtor.portal_link,
+    });
+
     plan.push({
       debtor,
       attempt: decision.attempt,
       allowed: decision.allowed,
       reason: decision.reason,
-      message:
-        chaseMessage({
-          name: debtor.name,
-          company,
-          outstanding: debtor.outstanding,
-          currency: debtor.currency,
-          daysOverdue: daysOverdue(debtor.due_on, now),
-          attempt: decision.attempt,
-          payLink: debtor.portal_link,
-        }) +
-        '\n\n' +
-        optOutLine(company),
+      template,
+      message: render(template),
     });
   }
 
@@ -167,7 +168,7 @@ async function runOnce(env: Env, now: Date) {
         continue;
       }
 
-      const outcome = await send(item.debtor.phone, item.message, {
+      const outcome = await send(item.debtor.phone, item.template, {
         token: env.WHATSAPP_TOKEN,
         phoneId: env.WHATSAPP_PHONE_ID,
       });
