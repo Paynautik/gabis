@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>The gabis collections standard</title>
+  <meta name="description" content="What a business chasing you through gabis may and may not do — the rules the software enforces, published in full.">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png">
+  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+  <style>
+    :root {
+      --cream: #F4F0E8;
+      --surface: #FFFFFF;
+      --ink: #1E0C62;
+      --ink-soft: #5B5372;
+      --ink-faint: #8B8399;
+      --line: #E2DCD1;
+      --lime: #D9FF43;
+      --green: #1F7A52;
+      --red: #B4231F;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--cream);
+      color: var(--ink);
+      font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .wrap { max-width: 660px; margin: 0 auto; padding: 32px 20px 64px; }
+    .brand { display: block; width: 88px; height: auto; margin-bottom: 30px; }
+
+    h1 { font-size: 30px; line-height: 1.2; letter-spacing: -0.8px; margin: 0 0 12px; }
+    .lede { font-size: 17px; color: var(--ink-soft); margin: 0 0 8px; }
+    .stamp { font-size: 13px; color: var(--ink-faint); margin: 0 0 32px; }
+
+    h2 { font-size: 18px; margin: 34px 0 10px; }
+    p { margin: 0 0 14px; }
+    .body { color: var(--ink-soft); font-size: 15px; }
+
+    .rule {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 10px;
+    }
+
+    .rule h3 { margin: 0 0 6px; font-size: 15.5px; }
+    .rule p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+    .rule code {
+      font-size: 12.5px;
+      background: var(--cream);
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 1px 6px;
+      color: var(--ink-faint);
+    }
+
+    .never {
+      background: #FBE9E8;
+      border: 1px solid #F2CFCD;
+      border-radius: 14px;
+      padding: 20px;
+      margin: 14px 0 0;
+    }
+
+    .never h3 { margin: 0 0 10px; font-size: 15.5px; color: var(--red); }
+    .never ul { margin: 0; padding-left: 18px; color: #7E2320; font-size: 14.5px; }
+    .never li { margin-bottom: 6px; }
+
+    .foot {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--ink-faint);
+      font-size: 13px;
+    }
+
+    .foot a, .body a { color: var(--ink); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <img class="brand" src="/gabis-wordmark.png" alt="gabis">
+
+    <h1>The gabis collections standard</h1>
+    <p class="lede">What a business chasing you through gabis may do, and what it
+      cannot do — because the software will not carry it.</p>
+    <p class="stamp">Version 1 · enforced in
+      <code>firebase/functions/src/policy.ts</code> · last changed 4 September 2026</p>
+
+    <p class="body">Debt collection has a reputation it earned. Messages at
+      midnight, the same demand six times a day, threats, and calls to somebody's
+      family or employer. Most of it is not illegal in Nigeria so much as
+      unpoliced, and every tool on the market leaves the choice to whoever is
+      chasing.</p>
+
+    <p class="body">gabis takes that choice away. The rules below are not a
+      promise about conduct — they are conditions the sending code checks before
+      a reminder goes anywhere. A business using gabis cannot turn them off,
+      raise the limits, or send outside them, and neither can we without
+      changing published software.</p>
+
+    <h2>The rules</h2>
+
+    <div class="rule">
+      <h3>Between 8am and 8pm, Lagos time</h3>
+      <p>A reminder due outside those hours is held, not queued up and released
+        at midnight. <code>outside_hours</code></p>
+    </div>
+
+    <div class="rule">
+      <h3>One a day. Three in a week.</h3>
+      <p>Counted from a log of every attempt, not from intent. A business that
+        also chases you by hand does not get a fourth automated one.
+        <code>already_today</code> · <code>weekly_cap</code></p>
+    </div>
+
+    <div class="rule">
+      <h3>Three attempts, then a person</h3>
+      <p>The third message says it is the last automated one, and it is. After
+        that a human from the business contacts you directly, or nothing does.</p>
+    </div>
+
+    <div class="rule">
+      <h3>Reply STOP and the automated reminders end. Permanently.</h3>
+      <p>Not for thirty days, not until the next invoice. The refusal is
+        recorded against you as a person, and it survives new invoices, new
+        debts, and the business trying again.
+        <code>refused</code> · <code>do_not_contact</code></p>
+    </div>
+
+    <div class="rule">
+      <h3>Nothing is chased before it is owed</h3>
+      <p>No reminder exists for an invoice that is not yet due, or for a balance
+        that is already zero. <code>not_due</code> · <code>nothing_owed</code></p>
+    </div>
+
+    <div class="rule">
+      <h3>Every attempt is written down, and nobody can edit it</h3>
+      <p>Each reminder is recorded with its time, its wording, and the rule that
+        held back the ones that were not sent. The log is append-only in the
+        database rules: the business that sent them cannot alter or delete one,
+        and neither can gabis staff. If you dispute what you were told, there is
+        a record that was not written by the side you are arguing with.</p>
+    </div>
+
+    <div class="never">
+      <h3>What gabis will never send</h3>
+      <ul>
+        <li>A message to your employer, your family, your guarantor, or anyone
+          who is not the person who owes the money.</li>
+        <li>A threat of arrest, prosecution, violence, or public exposure.</li>
+        <li>A claim that your name has been passed to a credit bureau, a
+          lawyer, or the police.</li>
+        <li>Anything pretending to come from a court, a bank, or a regulator.</li>
+        <li>A demand that hides which business is asking.</li>
+      </ul>
+    </div>
+
+    <h2>If something breaks these rules</h2>
+
+    <p class="body">Then it did not come from gabis, whatever it claims. A
+      business is free to pick up its own phone, and some will — that is between
+      you and them, and Nigerian law, not something this software did. But no
+      message sent through gabis can breach the rules above, because the code
+      that sends them checks first.</p>
+
+    <p class="body">If you received something through gabis that you believe
+      breaks this standard, tell us at
+      <a href="mailto:hello@gabis.africa">hello@gabis.africa</a> with the message.
+      The attempts log will show exactly what was sent and when, and it cannot
+      have been edited afterwards.</p>
+
+    <h2>Why publish it</h2>
+
+    <p class="body">Because a rule nobody can check is a marketing line. These
+      are in a file anyone can read, in software that businesses run against
+      their own customers, and the standard is the same whether or not anybody
+      is watching. If another collections product wants to claim the same, it
+      can publish its own and let people compare.</p>
+
+    <p class="foot">
+      <a href="/me">What you owe</a> ·
+      <a href="/privacy">Privacy</a> ·
+      <a href="/">gabis</a><br>
+      gabis is a financial technology company, not a bank.
+    </p>
+  </div>
+</body>
+</html>
