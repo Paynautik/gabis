@@ -14,12 +14,27 @@ import { Firestore, decode } from './firestore.ts';
  * able to keep them.
  */
 
+/**
+ * What came of trying to mint an account, including why not.
+ *
+ * A plain null was hiding the difference between no provider configured and a
+ * provider that refused, and those need opposite responses: one is a setting,
+ * the other is a business whose Paystack account cannot issue NUBANs yet. Both
+ * fall back to the shared account, so neither is visible in the invoice — only
+ * in what this says.
+ */
+export type Minted =
+  | { ok: true; bank: string; account: string; name: string }
+  | { ok: false; reason: 'not_configured' | 'refused'; detail?: string };
+
 export interface Provider {
-  /** Null when the provider is not configured, so callers can fall back. */
   create(
     invoiceId: string,
     customer: { name: string; email: string; phone?: string },
-  ): Promise<{ bank: string; account: string; name: string } | null>;
+  ): Promise<Minted>;
+
+  /** Whether the credentials work and NUBANs can actually be issued. */
+  check(): Promise<{ ok: boolean; detail?: string; banks?: string[] }>;
 
   /** Whether this webhook really came from the provider. */
   verify(body: string, signature: string): Promise<boolean>;
@@ -36,6 +51,12 @@ export interface Payment {
   paidAt: string;
   /** Whatever the sender typed, which is the fallback when nothing else matches. */
   narration: string;
+}
+
+/** Paystack says what is wrong in the body; the status alone never does. */
+async function message(response: Response, doing: string): Promise<string> {
+  const body = (await response.json().catch(() => null)) as { message?: string } | null;
+  return `Paystack refused ${doing}: ${body?.message ?? `HTTP ${response.status}`}`;
 }
 
 async function hmacSha512(secret: string, body: string): Promise<string> {
@@ -66,8 +87,8 @@ export class Paystack implements Provider {
   async create(
     invoiceId: string,
     customer: { name: string; email: string; phone?: string },
-  ) {
-    if (!this.secret) return null;
+  ): Promise<Minted> {
+    if (!this.secret) return { ok: false, reason: 'not_configured' };
 
     const created = await fetch('https://api.paystack.co/customer', {
       method: 'POST',
@@ -82,9 +103,17 @@ export class Paystack implements Provider {
         phone: customer.phone,
       }),
     });
-    if (!created.ok) return null;
+    if (!created.ok) {
+      return {
+        ok: false,
+        reason: 'refused',
+        detail: await message(created, 'creating the customer record'),
+      };
+    }
     const code = ((await created.json()) as any)?.data?.customer_code;
-    if (!code) return null;
+    if (!code) {
+      return { ok: false, reason: 'refused', detail: 'Paystack returned no customer code.' };
+    }
 
     const account = await fetch('https://api.paystack.co/dedicated_account', {
       method: 'POST',
@@ -94,16 +123,59 @@ export class Paystack implements Provider {
       },
       body: JSON.stringify({ customer: code, preferred_bank: 'wema-bank' }),
     });
-    if (!account.ok) return null;
+    if (!account.ok) {
+      return {
+        ok: false,
+        reason: 'refused',
+        detail: await message(account, 'issuing the account number'),
+      };
+    }
 
     const data = ((await account.json()) as any)?.data;
-    if (!data?.account_number) return null;
+    if (!data?.account_number) {
+      return { ok: false, reason: 'refused', detail: 'Paystack issued no account number.' };
+    }
 
     return {
+      ok: true,
       bank: data.bank?.name ?? 'Wema Bank',
       account: String(data.account_number),
       name: data.account_name ?? invoiceId,
     };
+  }
+
+  /**
+   * Whether this business can actually mint per-invoice accounts.
+   *
+   * Paystack gates dedicated NUBANs on a completed business profile, and a key
+   * that works everywhere else fails only here. Asking which banks are
+   * available answers both questions — the key, and the entitlement — without
+   * creating anything.
+   */
+  async check(): Promise<{ ok: boolean; detail?: string; banks?: string[] }> {
+    if (!this.secret) return { ok: false, detail: 'No Paystack key is set.' };
+
+    const response = await fetch(
+      'https://api.paystack.co/dedicated_account/available_providers',
+      { headers: { authorization: `Bearer ${this.secret}` } },
+    );
+
+    if (!response.ok) {
+      return { ok: false, detail: await message(response, 'listing the banks') };
+    }
+
+    const banks = (((await response.json()) as any)?.data ?? [])
+      .map((b: any) => String(b.provider_slug ?? b.bank_name ?? ''))
+      .filter(Boolean);
+
+    return banks.length
+      ? { ok: true, banks }
+      : {
+          ok: false,
+          detail:
+            'Paystack accepted the key but offers no bank for dedicated accounts. ' +
+            'That is the business profile, not the key: finish it in the Paystack dashboard.',
+        };
   }
 
   async verify(body: string, signature: string): Promise<boolean> {
