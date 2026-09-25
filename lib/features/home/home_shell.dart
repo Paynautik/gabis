@@ -271,7 +271,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     return Scaffold(
       body: IndexedStack(index: _index, children: _screens),
       bottomNavigationBar: NavigationBar(
-        selectedIndex: _index,
+        selectedIndex: _index < 4 ? _index : 0,
         onDestinationSelected: (i) {
           ref.read(homeTabProvider.notifier).state = i;
           setState(() => _index = i);
