@@ -57,6 +57,7 @@ class _LandingScreenState extends State<LandingScreen>
               const _CollectionsSection(),
               const _MoneyMovesSection(),
               const _IntelligenceSection(),
+              const _InnovationsSection(),
               const _CurrencyStage(),
               const _CardMoment(),
               const _FinalCta(),
@@ -106,7 +107,6 @@ class _Hero extends StatelessWidget {
           color: GabisV3.cream,
           child: Stack(
             children: [
-              Positioned.fill(child: _OrbitGame(motion: motion)),
               Column(
                 children: [
                   Padding(
@@ -490,7 +490,9 @@ class _HeroCopy extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 52),
+          const SizedBox(height: 32),
+          const _PointsChip(hint: true),
+          const SizedBox(height: 20),
           const _MicroProof(),
         ],
       ),
@@ -581,35 +583,42 @@ class _HeroProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: motion,
-      builder: (context, _) {
-        final t = motion.value * math.pi * 2;
-        return Stack(
-          clipBehavior: Clip.none,
-          alignment: Alignment.center,
-          children: [
-            Transform.rotate(
-              angle: -.08,
-              child: Container(
-                width: 410,
-                height: 525,
-                decoration: BoxDecoration(
-                  color: GabisV3.lime,
-                  borderRadius: BorderRadius.circular(44),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final center = Offset(constraints.maxWidth / 2, constraints.maxHeight / 2);
+
+        return AnimatedBuilder(
+          animation: motion,
+          builder: (context, _) {
+            final t = motion.value * math.pi * 2;
+            return Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                // Concentric circles & orbiting game perfectly centered on the phone
+                Positioned.fill(
+                  child: _OrbitGame(motion: motion, center: center),
                 ),
-              ),
-            ),
-            Transform.translate(
-              offset: Offset(0, math.sin(t) * 7),
-              child: const _Phone(),
-            ),
-            Positioned(
-              right: -34,
-              top: 96 + math.cos(t + 1.1) * 7,
-              child: const _BalanceBubble(),
-            ),
-          ],
+                // Rotated lime backing card
+                Transform.rotate(
+                  angle: -.08,
+                  child: Container(
+                    width: 360,
+                    height: 500,
+                    decoration: BoxDecoration(
+                      color: GabisV3.lime,
+                      borderRadius: BorderRadius.circular(44),
+                    ),
+                  ),
+                ),
+                // Phone mockup
+                Transform.translate(
+                  offset: Offset(0, math.sin(t) * 7),
+                  child: const _Phone(),
+                ),
+              ],
+            );
+          },
         );
       },
     );
@@ -619,185 +628,211 @@ class _HeroProduct extends StatelessWidget {
 class _Phone extends StatelessWidget {
   const _Phone();
 
+  Widget _phoneBtn(double h, {double w = 2.5}) {
+    return Container(
+      width: w,
+      height: h,
+      decoration: BoxDecoration(
+        color: GabisV3.ink.withValues(alpha: .7),
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 310,
-      height: 610,
-      padding: const EdgeInsets.all(9),
-      decoration: BoxDecoration(
-        color: GabisV3.ink,
-        borderRadius: BorderRadius.circular(48),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x33101010),
-            blurRadius: 50,
-            offset: Offset(0, 28),
+      height: 660,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // iPhone 17 hardware buttons
+          Positioned(left: -2.5, top: 110, child: _phoneBtn(22)), // Action Button
+          Positioned(left: -2.5, top: 150, child: _phoneBtn(44)), // Vol+
+          Positioned(left: -2.5, top: 200, child: _phoneBtn(44)), // Vol-
+          Positioned(right: -2.5, top: 160, child: _phoneBtn(54)), // Power Button
+          Positioned(right: -1.5, top: 290, child: _phoneBtn(28, w: 1.5)), // Camera Control
+          
+          Positioned.fill(
+            child: Container(
+              padding: const EdgeInsets.all(5), // Thinner bezels for 17
+              decoration: BoxDecoration(
+                color: GabisV3.ink,
+                borderRadius: BorderRadius.circular(44),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x33101010),
+                    blurRadius: 50,
+                    offset: Offset(0, 28),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(39),
+                child: Container(
+                  color: Colors.white,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 12),
+                      // Smaller Dynamic Island for iPhone 17
+                      Container(
+                        width: 66,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: GabisV3.ink,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 22),
+                        child: Row(
+                          children: [
+                            Image.asset('assets/gabis_logo.png', height: 24, fit: BoxFit.contain),
+                            const Spacer(),
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  'Welcome back',
+                                  style: TextStyle(
+                                    fontSize: 8.5,
+                                    color: Color(0xFF888888),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  'Deji Adewusi',
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    color: GabisV3.ink,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -.2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              width: 28,
+                              height: 28,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: NetworkImage('https://i.pravatar.cc/100?img=33'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 38),
+                      const Text(
+                        'Total balance',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: Color(0xFF888888),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        '₦ 860,000',
+                        style: TextStyle(
+                          fontSize: 32,
+                          color: GabisV3.ink,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -1,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 18),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _PhoneAction(
+                                icon: Icons.north_east_rounded,
+                                label: 'Send',
+                                color: GabisV3.electric,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: _PhoneAction(
+                                icon: Icons.south_west_rounded,
+                                label: 'Receive',
+                                color: GabisV3.ink,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: _PhoneAction(
+                                icon: Icons.swap_horiz_rounded,
+                                label: 'Swap',
+                                color: GabisV3.coral,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: _PhoneAction(
+                                icon: Icons.add_rounded,
+                                label: 'Deposit',
+                                color: GabisV3.lilac,
+                                iconColor: GabisV3.ink,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      Expanded(
+                        child: Container(
+                          width: double.infinity,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFF7F7F7),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(28),
+                              topRight: Radius.circular(28),
+                            ),
+                          ),
+                          padding: const EdgeInsets.fromLTRB(22, 28, 22, 0),
+                          child: const SingleChildScrollView(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                              Text(
+                                'Your currencies',
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              SizedBox(height: 18),
+                              _WalletRow(symbol: '₦', code: 'NGN', amount: '120,000'),
+                              SizedBox(height: 15),
+                              _WalletRow(symbol: r'$', code: 'USD', amount: '200.00'),
+                              SizedBox(height: 15),
+                              _WalletRow(symbol: '£', code: 'GBP', amount: '100.00'),
+                              SizedBox(height: 15),
+                              _WalletRow(symbol: r'C$', code: 'CAD', amount: '100.00'),
+                              SizedBox(height: 15),
+                              _WalletRow(symbol: '¥', code: 'JPY', amount: '10,000'),
+                              SizedBox(height: 8),
+                            ],
+                          ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(40),
-        child: Container(
-          color: Colors.white,
-          child: Column(
-            children: [
-              const SizedBox(height: 17),
-              Container(
-                width: 82,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: GabisV3.ink,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              const SizedBox(height: 27),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: Row(
-                  children: [
-                    Image.asset('assets/gabis_logo.png',
-                        height: 24, fit: BoxFit.contain),
-                    const Spacer(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Welcome back',
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: GabisV3.ink.withValues(alpha: .45),
-                            )),
-                        const SizedBox(height: 2),
-                        const Text('Deji Adewusi',
-                            style: TextStyle(
-                                fontSize: 12.5,
-                                fontWeight: FontWeight.w800,
-                                height: 1.1)),
-                      ],
-                    ),
-                    const SizedBox(width: 9),
-                    Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: GabisV3.lilac,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                            color: GabisV3.ink.withValues(alpha: .08), width: 1),
-                        image: const DecorationImage(
-                          image: AssetImage('assets/images/avatar_user.jpg'),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 27),
-              const Text(
-                'Total balance',
-                style: TextStyle(
-                  color: Color(0xFF777777),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                ),
-              ),
-              const SizedBox(height: 5),
-              const Text(
-                '₦ 860,000',
-                style: TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 31,
-                  letterSpacing: -1.3,
-                ),
-              ),
-              const SizedBox(height: 22),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 18),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _PhoneAction(
-                        icon: Icons.north_east_rounded,
-                        label: 'Send',
-                        color: GabisV3.electric,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: _PhoneAction(
-                        icon: Icons.south_west_rounded,
-                        label: 'Receive',
-                        color: GabisV3.ink,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: _PhoneAction(
-                        icon: Icons.swap_horiz_rounded,
-                        label: 'Swap',
-                        color: GabisV3.coral,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: _PhoneAction(
-                        icon: Icons.add_rounded,
-                        label: 'Deposit',
-                        color: GabisV3.lilac,
-                        iconColor: GabisV3.ink,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 26),
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF5F5F3),
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(30),
-                    ),
-                  ),
-                  // On a short viewport the phone mock-up is not tall enough
-                  // for five currencies, and a Column simply overflows. The
-                  // list scrolls inside the panel instead, which clips rather
-                  // than paints a striped error over the marketing page.
-                  child: const SingleChildScrollView(
-                    child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Your currencies',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                      SizedBox(height: 18),
-                      _WalletRow(symbol: '₦', code: 'NGN', amount: '120,000'),
-                      SizedBox(height: 15),
-                      _WalletRow(symbol: r'$', code: 'USD', amount: '200.00'),
-                      SizedBox(height: 15),
-                      _WalletRow(symbol: '£', code: 'GBP', amount: '100.00'),
-                      SizedBox(height: 15),
-                      _WalletRow(symbol: r'C$', code: 'CAD', amount: '100.00'),
-                      SizedBox(height: 15),
-                      _WalletRow(symbol: '¥', code: 'JPY', amount: '10,000'),
-                      SizedBox(height: 8),
-                    ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -922,7 +957,8 @@ void _bankPendingPoints(int value) => writeRaw(kPendingPointsKey, '$value');
 /// The hero decoration doubles as a small game: catch an orb, earn points.
 class _OrbitGame extends StatefulWidget {
   final Animation<double> motion;
-  const _OrbitGame({required this.motion});
+  final Offset center;
+  const _OrbitGame({required this.motion, required this.center});
 
   @override
   State<_OrbitGame> createState() => _OrbitGameState();
@@ -934,6 +970,9 @@ class _OrbitGameState extends State<_OrbitGame>
   final _pops = <_Pop>[];
   double _speed = 1;
   bool _played = false;
+
+  DateTime? _outerCaughtAt;
+  DateTime? _innerCaughtAt;
 
   @override
   void initState() {
@@ -950,7 +989,15 @@ class _OrbitGameState extends State<_OrbitGame>
     super.dispose();
   }
 
-  void _catch(Offset at, int worth) {
+  void _catch(Offset at, int worth, bool isOuter) {
+    if (isOuter) {
+      if (_outerCaughtAt != null && DateTime.now().difference(_outerCaughtAt!).inSeconds < 3) return;
+      _outerCaughtAt = DateTime.now();
+    } else {
+      if (_innerCaughtAt != null && DateTime.now().difference(_innerCaughtAt!).inSeconds < 3) return;
+      _innerCaughtAt = DateTime.now();
+    }
+
     gabisPoints.value += worth;
     _bankPendingPoints(gabisPoints.value);
     setState(() {
@@ -964,48 +1011,57 @@ class _OrbitGameState extends State<_OrbitGame>
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, c) {
-        final size = Size(c.maxWidth, c.maxHeight);
-        final center = Offset(size.width * .72, size.height * .5);
-        final radius = math.min(size.width, size.height) * .40;
-        final inner = radius * .68;
+    const rOuter = 390.0;
+    const rMiddle = 310.0;
+    const rInner = 235.0;
+    final center = widget.center;
 
-        return AnimatedBuilder(
-          animation: Listenable.merge([widget.motion, _spin]),
-          builder: (context, _) {
-            final theta = _spin.value * math.pi * 2 * _speed;
-            final outerAt = Offset(center.dx + math.cos(theta) * radius,
-                center.dy + math.sin(theta) * radius);
-            final innerAt = Offset(
-                center.dx + math.cos(-theta + math.pi) * inner,
-                center.dy + math.sin(-theta + math.pi) * inner);
+    // Static 5 Wallets bubble on middle circle
+    const bubbleAngle = -math.pi / 4.4;
+    final bubbleOffset = Offset(
+      center.dx + math.cos(bubbleAngle) * rMiddle - 58,
+      center.dy + math.sin(bubbleAngle) * rMiddle - 58,
+    );
 
-            return Stack(
-              children: [
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: CustomPaint(painter: const _OrbitRingsPainter()),
-                  ),
+    return AnimatedBuilder(
+      animation: Listenable.merge([widget.motion, _spin]),
+      builder: (context, _) {
+        final theta = _spin.value * math.pi * 2 * _speed;
+        final outerAt = Offset(center.dx + math.cos(theta) * rOuter,
+            center.dy + math.sin(theta) * rOuter);
+        final innerAt = Offset(
+            center.dx + math.cos(-theta + math.pi) * rInner,
+            center.dy + math.sin(-theta + math.pi) * rInner);
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned.fill(
+              child: IgnorePointer(
+                child: CustomPaint(
+                  painter: _OrbitRingsPainter(center: center),
                 ),
-                _orb(outerAt, 13, GabisV3.electric, 5),
-                _orb(innerAt, 10, GabisV3.coral, 10),
-                for (final pop in _pops) _popLabel(pop),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 14,
-                  child: Center(child: _PointsChip(hint: !_played)),
-                ),
-              ],
-            );
-          },
+              ),
+            ),
+            // Static 5 Wallets card locked onto middle ring
+            Positioned(
+              left: bubbleOffset.dx,
+              top: bubbleOffset.dy,
+              child: const _BalanceBubble(),
+            ),
+            _orb(outerAt, 13, GabisV3.electric, 5, true),
+            _orb(innerAt, 10, GabisV3.coral, 10, false),
+            for (final pop in _pops) _popLabel(pop),
+          ],
         );
       },
     );
   }
 
-  Widget _orb(Offset at, double r, Color color, int worth) {
+  Widget _orb(Offset at, double r, Color color, int worth, bool isOuter) {
+    final caughtAt = isOuter ? _outerCaughtAt : _innerCaughtAt;
+    final isCaught = caughtAt != null && DateTime.now().difference(caughtAt).inSeconds < 3;
+
     return Positioned(
       left: at.dx - r * 2.4,
       top: at.dy - r * 2.4,
@@ -1014,30 +1070,24 @@ class _OrbitGameState extends State<_OrbitGame>
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
-          onTap: () => _catch(at, worth),
+          onTap: () => _catch(at, worth, isOuter),
           child: Center(
-            child: Container(
-              width: r * 2,
-              height: r * 2,
-              decoration: BoxDecoration(
-                color: color,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                      color: color.withValues(alpha: .38),
-                      blurRadius: 18,
-                      spreadRadius: 2),
-                ],
-              ),
-              child: Align(
-                alignment: const Alignment(-.4, -.4),
-                child: Container(
-                  width: r * .7,
-                  height: r * .7,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: .55),
-                    shape: BoxShape.circle,
-                  ),
+            child: AnimatedScale(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutBack,
+              scale: isCaught ? 0.0 : 1.0,
+              child: Container(
+                width: r * 2,
+                height: r * 2,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                        color: color.withValues(alpha: .38),
+                        blurRadius: 12,
+                        spreadRadius: 4),
+                  ],
                 ),
               ),
             ),
@@ -1121,19 +1171,24 @@ class _PointsChip extends StatelessWidget {
 
 /// Rings only — the balls are widgets now, so they can be caught.
 class _OrbitRingsPainter extends CustomPainter {
-  const _OrbitRingsPainter();
+  final Offset center;
+  const _OrbitRingsPainter({required this.center});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width * .72, size.height * .5);
-    final radius = math.min(size.width, size.height) * .40;
+    // 3 Concentric Circles: Outer (390), Middle (310), Inner (235)
+    const rings = [
+      (390.0, 0.16),
+      (310.0, 0.12),
+      (235.0, 0.14),
+    ];
 
-    for (final r in [radius, radius * .68]) {
+    for (final (r, alpha) in rings) {
       canvas.drawCircle(
         center,
         r,
         Paint()
-          ..color = GabisV3.ink.withValues(alpha: r == radius ? .16 : .10)
+          ..color = GabisV3.ink.withValues(alpha: alpha)
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.6,
       );
@@ -2342,6 +2397,879 @@ class _LayerCard extends StatelessWidget {
               )),
         ],
       ),
+    );
+  }
+}
+
+
+class _InnovationsCurvePainter extends CustomPainter {
+  final Color color;
+  final Color fillColor;
+
+  const _InnovationsCurvePainter({
+    required this.color,
+    required this.fillColor,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+
+    final path = Path();
+    path.moveTo(0, h * 0.7);
+    path.cubicTo(w * 0.25, h * 0.9, w * 0.45, h * 0.2, w * 0.65, h * 0.35);
+    path.cubicTo(w * 0.8, h * 0.45, w * 0.9, h * 0.1, w, h * 0.15);
+
+    final fillPath = Path.from(path)
+      ..lineTo(w, h)
+      ..lineTo(0, h)
+      ..close();
+
+    final fillPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [fillColor.withValues(alpha: .35), fillColor.withValues(alpha: .02)],
+      ).createShader(Rect.fromLTWH(0, 0, w, h));
+    canvas.drawPath(fillPath, fillPaint);
+
+    final linePaint = Paint()
+      ..color = color
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round;
+    canvas.drawPath(path, linePaint);
+
+    // Draw peak point
+    final peak = Offset(w * 0.45, h * 0.2);
+    canvas.drawCircle(peak, 5, Paint()..color = Colors.white);
+    canvas.drawCircle(peak, 3, Paint()..color = color);
+
+    final endPt = Offset(w * 0.98, h * 0.16);
+    canvas.drawCircle(endPt, 4.5, Paint()..color = color);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _InnovationsRipplePainter extends CustomPainter {
+  final Color color;
+
+  const _InnovationsRipplePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radiuses = [38.0, 56.0, 76.0, 96.0];
+    final opacities = [0.25, 0.15, 0.08, 0.04];
+
+    for (int i = 0; i < radiuses.length; i++) {
+      final paint = Paint()
+        ..color = color.withValues(alpha: opacities[i])
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0;
+      canvas.drawCircle(center, radiuses[i], paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _SpokeCirclePainter extends CustomPainter {
+  final Color color;
+
+  const _SpokeCirclePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final r = size.width / 2;
+    const spokeCount = 16;
+
+    for (int i = 0; i < spokeCount; i++) {
+      final angle = (i * 2 * 3.1415926535) / spokeCount;
+      final p1 = Offset(center.dx + (r - 10) * math.cos(angle), center.dy + (r - 10) * math.sin(angle));
+      final p2 = Offset(center.dx + r * math.cos(angle), center.dy + r * math.sin(angle));
+
+      final paint = Paint()
+        ..color = color.withValues(alpha: .5)
+        ..strokeWidth = 2
+        ..strokeCap = StrokeCap.round;
+      canvas.drawLine(p1, p2, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _InnovationsSection extends StatelessWidget {
+  const _InnovationsSection();
+
+  Widget _pillTag({required String text, required Color bgColor, required Color textColor, IconData? icon}) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, color: textColor, size: 14),
+            const SizedBox(width: 6),
+          ],
+          Text(
+            text,
+            style: TextStyle(
+              color: textColor,
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _iconBox(IconData icon, Color bg, Color iconColor) {
+    return Container(
+      width: 44,
+      height: 44,
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Center(
+        child: Icon(icon, color: iconColor, size: 24),
+      ),
+    );
+  }
+
+  // --- CARD 1: Autonomous Forex Sniping ---
+  Widget _buildForexCard() {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFEAFBF3), Color(0xFFF2FDF8)],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0x2810B981), width: 1.5),
+        boxShadow: const [
+          BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
+        ],
+      ),
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final stackCol = c.maxWidth < 480;
+          return Flex(
+            direction: stackCol ? Axis.vertical : Axis.horizontal,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: stackCol ? 0 : 5,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _iconBox(Icons.trending_up_rounded, const Color(0xFFD1FAE5), const Color(0xFF059669)),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Autonomous\nForex Sniping',
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF111827), height: 1.15, letterSpacing: -.4),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Set a goal, and the Gabis AI will automatically swipe the best exchange rates 24/7 to dollar-cost average into your foreign wallets.',
+                      style: TextStyle(fontSize: 13.5, color: Color(0xFF4B5563), height: 1.5, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 20),
+                    _pillTag(
+                      text: 'Higher rates. Lower costs.',
+                      bgColor: const Color(0xFFD1FAE5),
+                      textColor: const Color(0xFF047857),
+                      icon: Icons.auto_awesome,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 20, height: 20),
+              Expanded(
+                flex: stackCol ? 0 : 6,
+                child: SizedBox(
+                  height: 170,
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      // Smooth curve
+                      const Positioned.fill(
+                        child: CustomPaint(
+                          painter: _InnovationsCurvePainter(
+                            color: Color(0xFF10B981),
+                            fillColor: Color(0xFF10B981),
+                          ),
+                        ),
+                      ),
+                      // Tooltip pill at peak
+                      Positioned(
+                        top: 2,
+                        left: 20,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: const [
+                              BoxShadow(color: Color(0x15000000), blurRadius: 18, offset: Offset(0, 6)),
+                            ],
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Best rate found', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 9.5, fontWeight: FontWeight.w600)),
+                              const SizedBox(height: 3),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Text('₦1,620', style: TextStyle(color: Color(0xFF111827), fontWeight: FontWeight.w900, fontSize: 13)),
+                                  const SizedBox(width: 6),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    decoration: BoxDecoration(color: const Color(0xFFDCFCE7), borderRadius: BorderRadius.circular(6)),
+                                    child: const Text('+2.4%', style: TextStyle(color: Color(0xFF16A34A), fontSize: 10, fontWeight: FontWeight.w800)),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      // Currency pair selector pill at bottom
+                      Positioned(
+                        bottom: 0,
+                        right: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(100),
+                            border: Border.all(color: const Color(0x15000000)),
+                            boxShadow: const [BoxShadow(color: Color(0x0C000000), blurRadius: 12)],
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('🇺🇸', style: TextStyle(fontSize: 14)),
+                              SizedBox(width: 4),
+                              Text('USD', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF374151))),
+                              SizedBox(width: 8),
+                              Icon(Icons.swap_horiz_rounded, size: 14, color: Color(0xFF9CA3AF)),
+                              SizedBox(width: 8),
+                              Text('🇳🇬', style: TextStyle(fontSize: 14)),
+                              SizedBox(width: 4),
+                              Text('NGN', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF374151))),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  // --- CARD 2: Voice-to-Execute ---
+  Widget _buildVoiceCard() {
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFF5F3FF), Color(0xFFFAF5FF)],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0x288B5CF6), width: 1.5),
+        boxShadow: const [
+          BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
+        ],
+      ),
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final stackCol = c.maxWidth < 480;
+          return Flex(
+            direction: stackCol ? Axis.vertical : Axis.horizontal,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: stackCol ? 0 : 5,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _iconBox(Icons.mic_none_rounded, const Color(0xFFEDE9FE), const Color(0xFF6D28D9)),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Voice-to-Execute',
+                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF111827), letterSpacing: -.4),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Zero taps required. Hold the mic and tell Gabis what you need. It parses and executes instantly.',
+                      style: TextStyle(fontSize: 13.5, color: Color(0xFF4B5563), height: 1.5, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 20),
+                    _pillTag(
+                      text: 'Just speak. It happens.',
+                      bgColor: const Color(0xFFEDE9FE),
+                      textColor: const Color(0xFF6D28D9),
+                      icon: Icons.graphic_eq_rounded,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 20, height: 20),
+              Expanded(
+                flex: stackCol ? 0 : 6,
+                child: SizedBox(
+                  height: 170,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
+                    children: [
+                      // Expanding Ripples
+                      const SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: CustomPaint(
+                          painter: _InnovationsRipplePainter(color: Color(0xFF8B5CF6)),
+                        ),
+                      ),
+                      // Glowing Blue Microphone Button
+                      Container(
+                        width: 60,
+                        height: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF2563EB).withValues(alpha: .45),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.mic_rounded, color: Colors.white, size: 28),
+                        ),
+                      ),
+                      // Floating Speech Bubble
+                      Positioned(
+                        top: 4,
+                        right: -10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: const [
+                              BoxShadow(color: Color(0x12000000), blurRadius: 16, offset: Offset(0, 4)),
+                            ],
+                          ),
+                          child: const Text(
+                            '"Swap 50k NGN to USD..."',
+                            style: TextStyle(
+                              color: Color(0xFF2563EB),
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  // --- CARD 3: Roast My Spending ---
+  Widget _buildRoastCard() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFFFF1EE), Color(0xFFFFF7F5)],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0x28F43F5E), width: 1.5),
+        boxShadow: const [
+          BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _iconBox(Icons.camera_alt_outlined, const Color(0xFFFFE4E6), const Color(0xFFE11D48)),
+              const Spacer(),
+              // Tilted Roast Card
+              Transform.rotate(
+                angle: -0.08,
+                child: Container(
+                  width: 150,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF111827),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: const [
+                      BoxShadow(color: Color(0x20000000), blurRadius: 16, offset: Offset(0, 8)),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: const BoxDecoration(color: Color(0xFFEA580C), shape: BoxShape.circle),
+                            child: const Icon(Icons.local_fire_department_rounded, color: Colors.white, size: 10),
+                          ),
+                          const SizedBox(width: 4),
+                          const Text('Gabis Roast', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900)),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'You spent ₦45,000\non Uber this month.\nAre your legs broken? 💀',
+                        style: TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w700, height: 1.25),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white.withValues(alpha: .2)),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Center(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.camera_alt_rounded, color: Colors.white, size: 8),
+                              SizedBox(width: 4),
+                              Text('Share to Instagram', style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w800)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          const Text(
+            'Roast My Spending',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF111827), letterSpacing: -.4),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Get hyper-personalized, hilariously brutal AI roasts of your monthly spending habits. Share directly to socials.',
+            style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.45, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 16),
+          // Share Button
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF43F5E),
+              borderRadius: BorderRadius.circular(100),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.share_rounded, color: Colors.white, size: 13),
+                SizedBox(width: 6),
+                Text(
+                  'Share the roast',
+                  style: TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- CARD 4: Level Up Your Agent ---
+  Widget _buildLevelCard() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFF0FDF4), Color(0xFFF7FEFA)],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0x2810B981), width: 1.5),
+        boxShadow: const [
+          BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _iconBox(Icons.smart_toy_rounded, const Color(0xFFD1FAE5), const Color(0xFF059669)),
+              const Spacer(),
+              // Level Spoke Dial
+              SizedBox(
+                width: 120,
+                height: 100,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    const SizedBox(
+                      width: 90,
+                      height: 90,
+                      child: CustomPaint(
+                        painter: _SpokeCirclePainter(color: Color(0xFF10B981)),
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('AGENT LEVEL', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF6B7280), letterSpacing: .8)),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 24,
+                              height: 24,
+                              decoration: const BoxDecoration(color: Color(0xFFD9FF43), shape: BoxShape.circle),
+                              child: const Center(child: Text('15', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Color(0xFF111827)))),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.arrow_forward_rounded, size: 10, color: Color(0xFF9CA3AF)),
+                            const SizedBox(width: 4),
+                            Container(
+                              width: 24,
+                              height: 24,
+                              decoration: const BoxDecoration(color: Color(0xFF111827), shape: BoxShape.circle),
+                              child: const Center(child: Text('16', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.white))),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        const Text('Zero-fee transfers\nUNLOCKED!', textAlign: TextAlign.center, style: TextStyle(fontSize: 7.5, fontWeight: FontWeight.w800, color: Color(0xFF111827))),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          const Text(
+            'Level Up Your Agent',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF111827), letterSpacing: -.4),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Catch orbs, maintain savings streaks, and earn points to level up your AI Agent.',
+            style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.45, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 16),
+          _pillTag(
+            text: 'Play. Save. Earn.',
+            bgColor: const Color(0xFFD1FAE5),
+            textColor: const Color(0xFF047857),
+            icon: Icons.star_rounded,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- CARD 5: Tokyo Trip Fund (Squad Wealth) ---
+  Widget _buildSquadCard() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFFFFBEB), Color(0xFFFEFCE8)],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: const Color(0x28F59E0B), width: 1.5),
+        boxShadow: const [
+          BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _iconBox(Icons.account_balance_wallet_rounded, const Color(0xFFEDE9FE), const Color(0xFF6D28D9)),
+              const Spacer(),
+              // Mini Tokyo Trip Card
+              Container(
+                width: 140,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: const [
+                    BoxShadow(color: Color(0x10000000), blurRadius: 16, offset: Offset(0, 6)),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.flight_takeoff_rounded, size: 10, color: Color(0xFF4F46E5)),
+                        SizedBox(width: 4),
+                        Text('Tokyo Trip Fund', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Color(0xFF111827))),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    _squadMiniRow('S', const Color(0xFF8B5CF6), 'Sarah', r'$120 owed', const Color(0xFFFFE4E6), const Color(0xFFE11D48)),
+                    const SizedBox(height: 4),
+                    _squadMiniRow('D', const Color(0xFF3B82F6), 'Deji', 'Paid ✅', const Color(0xFFDCFCE7), const Color(0xFF16A34A)),
+                    const SizedBox(height: 4),
+                    _squadMiniRow('Y', const Color(0xFF3B82F6), 'You', 'Paid ✅', const Color(0xFFDCFCE7), const Color(0xFF16A34A)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          const Text(
+            'Tokyo Trip Fund',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF111827), letterSpacing: -.4),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Create shared wallets for trips, Gabis tracks who owes what and gently nudges your friends.',
+            style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.45, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(height: 16),
+          _pillTag(
+            text: 'Plan together',
+            bgColor: const Color(0xFFEDE9FE),
+            textColor: const Color(0xFF6D28D9),
+            icon: Icons.calendar_month_rounded,
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Widget _squadMiniRow(String initial, Color circleCol, String name, String status, Color statusBg, Color statusText) {
+    return Row(
+      children: [
+        Container(
+          width: 14,
+          height: 14,
+          decoration: BoxDecoration(color: circleCol, shape: BoxShape.circle),
+          child: Center(child: Text(initial, style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w900))),
+        ),
+        const SizedBox(width: 4),
+        Text(name, style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: Color(0xFF374151))),
+        const Spacer(),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+          decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(4)),
+          child: Text(status, style: TextStyle(fontSize: 6.5, fontWeight: FontWeight.w800, color: statusText)),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, c) {
+        final width = c.maxWidth;
+        final desktop = width >= 980;
+        final side = GabisV3.side(width);
+
+        return Container(
+          color: const Color(0xFFFAFAFD),
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: desktop ? 100 : 64),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: side),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Clean Header Copy without floating visual
+                    _pillTag(
+                      text: 'The Agent That Gets You Paid',
+                      bgColor: const Color(0xFFEDE9FE),
+                      textColor: const Color(0xFF4F46E5),
+                      icon: Icons.auto_awesome,
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'Irresistible',
+                      style: TextStyle(
+                        fontSize: desktop ? 54 : 38,
+                        fontWeight: FontWeight.w900,
+                        color: const Color(0xFF111827),
+                        letterSpacing: desktop ? -2 : -1.5,
+                        height: 1.0,
+                      ),
+                    ),
+                    ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [Color(0xFF2563EB), Color(0xFF9333EA)],
+                      ).createShader(bounds),
+                      child: Text(
+                        'Innovations',
+                        style: TextStyle(
+                          fontSize: desktop ? 54 : 38,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: desktop ? -2 : -1.5,
+                          height: 1.05,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      "Finance shouldn't be boring. Gabis is packed with next-generation\nAI features that feel like magic.",
+                      style: TextStyle(
+                        fontSize: desktop ? 16 : 15,
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xFF6B7280),
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    Row(
+                      children: [
+                        // Start using Gabis -> Button
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2563EB),
+                            borderRadius: BorderRadius.circular(100),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF2563EB).withValues(alpha: .32),
+                                blurRadius: 18,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Start using Gabis', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
+                              SizedBox(width: 8),
+                              Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Explore features Button
+                        const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.play_circle_outline_rounded, color: Color(0xFF4B5563), size: 18),
+                            SizedBox(width: 6),
+                            Text('Explore features', style: TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w700, fontSize: 14)),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 48),
+
+                    // BENTO ROW 1: Two Wide Cards
+                    if (desktop)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: _buildForexCard()),
+                          const SizedBox(width: 20),
+                          Expanded(child: _buildVoiceCard()),
+                        ],
+                      )
+                    else ...[
+                      _buildForexCard(),
+                      const SizedBox(height: 18),
+                      _buildVoiceCard(),
+                    ],
+
+                    const SizedBox(height: 20),
+
+                    // BENTO ROW 2: Three Cards
+                    if (desktop)
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(child: _buildRoastCard()),
+                          const SizedBox(width: 20),
+                          Expanded(child: _buildLevelCard()),
+                          const SizedBox(width: 20),
+                          Expanded(child: _buildSquadCard()),
+                        ],
+                      )
+                    else ...[
+                      _buildRoastCard(),
+                      const SizedBox(height: 18),
+                      _buildLevelCard(),
+                      const SizedBox(height: 18),
+                      _buildSquadCard(),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
