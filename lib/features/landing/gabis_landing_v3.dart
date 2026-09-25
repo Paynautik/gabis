@@ -678,7 +678,7 @@ class _Phone extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 22),
                 child: Row(
                   children: [
-                    Image.asset('assets/gabis_logo.png',
+                    Image.asset('assets/gabislogo.png',
                         height: 24, fit: BoxFit.contain),
                     const Spacer(),
                     Column(
@@ -2857,7 +2857,7 @@ class _Card extends StatelessWidget {
             children: [
               Image.asset(
                 darkText
-                    ? 'assets/gabis_logo.png'
+                    ? 'assets/gabislogo.png'
                     : 'assets/gabis_logo_white.png',
                 height: 34 * scale,
                 fit: BoxFit.contain,
