@@ -2581,7 +2581,7 @@ class _InnovationsSection extends StatelessWidget {
                     _iconBox(Icons.trending_up_rounded, const Color(0xFFD1FAE5), const Color(0xFF059669)),
                     const SizedBox(height: 16),
                     const Text(
-                      'Autonomous\nForex Sniping',
+                      'Autonomous\nCurrency Sniping',
                       style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF111827), height: 1.15, letterSpacing: -.4),
                     ),
                     const SizedBox(height: 12),
@@ -2831,67 +2831,70 @@ class _InnovationsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _iconBox(Icons.camera_alt_outlined, const Color(0xFFFFE4E6), const Color(0xFFE11D48)),
-              const Spacer(),
-              // Tilted Roast Card
-              Transform.rotate(
-                angle: -0.08,
-                child: Container(
-                  width: 150,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF111827),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: const [
-                      BoxShadow(color: Color(0x20000000), blurRadius: 16, offset: Offset(0, 8)),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(3),
-                            decoration: const BoxDecoration(color: Color(0xFFEA580C), shape: BoxShape.circle),
-                            child: const Icon(Icons.local_fire_department_rounded, color: Colors.white, size: 10),
-                          ),
-                          const SizedBox(width: 4),
-                          const Text('Gabis Roast', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900)),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        'You spent ₦45,000\non Uber this month.\nAre your legs broken? 💀',
-                        style: TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w700, height: 1.25),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white.withValues(alpha: .2)),
-                          borderRadius: BorderRadius.circular(6),
+          SizedBox(
+            height: 110,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _iconBox(Icons.camera_alt_outlined, const Color(0xFFFFE4E6), const Color(0xFFE11D48)),
+                const Spacer(),
+                // Tilted Roast Card
+                Transform.rotate(
+                  angle: -0.08,
+                  child: Container(
+                    width: 150,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF111827),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(color: Color(0x20000000), blurRadius: 16, offset: Offset(0, 8)),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: const BoxDecoration(color: Color(0xFFEA580C), shape: BoxShape.circle),
+                              child: const Icon(Icons.local_fire_department_rounded, color: Colors.white, size: 10),
+                            ),
+                            const SizedBox(width: 4),
+                            const Text('Gabis Roast', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900)),
+                          ],
                         ),
-                        child: const Center(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.camera_alt_rounded, color: Colors.white, size: 8),
-                              SizedBox(width: 4),
-                              Text('Share to Instagram', style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w800)),
-                            ],
+                        const SizedBox(height: 8),
+                        const Text(
+                          'You spent ₦45,000\non Uber this month.\nAre your legs broken? 💀',
+                          style: TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w700, height: 1.25),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white.withValues(alpha: .2)),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Center(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.camera_alt_rounded, color: Colors.white, size: 8),
+                                SizedBox(width: 4),
+                                Text('Share to Instagram', style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w800)),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 18),
           const Text(
@@ -2903,7 +2906,8 @@ class _InnovationsSection extends StatelessWidget {
             'Get hyper-personalized, hilariously brutal AI roasts of your monthly spending habits. Share directly to socials.',
             style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.45, fontWeight: FontWeight.w500),
           ),
-          const SizedBox(height: 16),
+          const Spacer(),
+          const SizedBox(height: 20),
           // Share Button
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
@@ -2947,58 +2951,61 @@ class _InnovationsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _iconBox(Icons.smart_toy_rounded, const Color(0xFFD1FAE5), const Color(0xFF059669)),
-              const Spacer(),
-              // Level Spoke Dial
-              SizedBox(
-                width: 120,
-                height: 100,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    const SizedBox(
-                      width: 90,
-                      height: 90,
-                      child: CustomPaint(
-                        painter: _SpokeCirclePainter(color: Color(0xFF10B981)),
-                      ),
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('AGENT LEVEL', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF6B7280), letterSpacing: .8)),
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              width: 24,
-                              height: 24,
-                              decoration: const BoxDecoration(color: Color(0xFFD9FF43), shape: BoxShape.circle),
-                              child: const Center(child: Text('15', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Color(0xFF111827)))),
-                            ),
-                            const SizedBox(width: 4),
-                            const Icon(Icons.arrow_forward_rounded, size: 10, color: Color(0xFF9CA3AF)),
-                            const SizedBox(width: 4),
-                            Container(
-                              width: 24,
-                              height: 24,
-                              decoration: const BoxDecoration(color: Color(0xFF111827), shape: BoxShape.circle),
-                              child: const Center(child: Text('16', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.white))),
-                            ),
-                          ],
+          SizedBox(
+            height: 110,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _iconBox(Icons.smart_toy_rounded, const Color(0xFFD1FAE5), const Color(0xFF059669)),
+                const Spacer(),
+                // Level Spoke Dial
+                SizedBox(
+                  width: 120,
+                  height: 105,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      const SizedBox(
+                        width: 90,
+                        height: 90,
+                        child: CustomPaint(
+                          painter: _SpokeCirclePainter(color: Color(0xFF10B981)),
                         ),
-                        const SizedBox(height: 4),
-                        const Text('Zero-fee transfers\nUNLOCKED!', textAlign: TextAlign.center, style: TextStyle(fontSize: 7.5, fontWeight: FontWeight.w800, color: Color(0xFF111827))),
-                      ],
-                    ),
-                  ],
+                      ),
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('AGENT LEVEL', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF6B7280), letterSpacing: .8)),
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: const BoxDecoration(color: Color(0xFFD9FF43), shape: BoxShape.circle),
+                                child: const Center(child: Text('15', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Color(0xFF111827)))),
+                              ),
+                              const SizedBox(width: 4),
+                              const Icon(Icons.arrow_forward_rounded, size: 10, color: Color(0xFF9CA3AF)),
+                              const SizedBox(width: 4),
+                              Container(
+                                width: 24,
+                                height: 24,
+                                decoration: const BoxDecoration(color: Color(0xFF111827), shape: BoxShape.circle),
+                                child: const Center(child: Text('16', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.white))),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          const Text('Zero-fee transfers\nUNLOCKED!', textAlign: TextAlign.center, style: TextStyle(fontSize: 7.5, fontWeight: FontWeight.w800, color: Color(0xFF111827))),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 18),
           const Text(
@@ -3010,7 +3017,8 @@ class _InnovationsSection extends StatelessWidget {
             'Catch orbs, maintain savings streaks, and earn points to level up your AI Agent.',
             style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.45, fontWeight: FontWeight.w500),
           ),
-          const SizedBox(height: 16),
+          const Spacer(),
+          const SizedBox(height: 20),
           _pillTag(
             text: 'Play. Save. Earn.',
             bgColor: const Color(0xFFD1FAE5),
@@ -3041,43 +3049,46 @@ class _InnovationsSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _iconBox(Icons.account_balance_wallet_rounded, const Color(0xFFEDE9FE), const Color(0xFF6D28D9)),
-              const Spacer(),
-              // Mini Tokyo Trip Card
-              Container(
-                width: 140,
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
-                    BoxShadow(color: Color(0x10000000), blurRadius: 16, offset: Offset(0, 6)),
-                  ],
+          SizedBox(
+            height: 110,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _iconBox(Icons.account_balance_wallet_rounded, const Color(0xFFEDE9FE), const Color(0xFF6D28D9)),
+                const Spacer(),
+                // Mini Tokyo Trip Card
+                Container(
+                  width: 140,
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: const [
+                      BoxShadow(color: Color(0x10000000), blurRadius: 16, offset: Offset(0, 6)),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.flight_takeoff_rounded, size: 10, color: Color(0xFF4F46E5)),
+                          SizedBox(width: 4),
+                          Text('Tokyo Trip Fund', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Color(0xFF111827))),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      _squadMiniRow('S', const Color(0xFF8B5CF6), 'Sarah', r'$120 owed', const Color(0xFFFFE4E6), const Color(0xFFE11D48)),
+                      const SizedBox(height: 4),
+                      _squadMiniRow('D', const Color(0xFF3B82F6), 'Deji', 'Paid ✅', const Color(0xFFDCFCE7), const Color(0xFF16A34A)),
+                      const SizedBox(height: 4),
+                      _squadMiniRow('Y', const Color(0xFF3B82F6), 'You', 'Paid ✅', const Color(0xFFDCFCE7), const Color(0xFF16A34A)),
+                    ],
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.flight_takeoff_rounded, size: 10, color: Color(0xFF4F46E5)),
-                        SizedBox(width: 4),
-                        Text('Tokyo Trip Fund', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Color(0xFF111827))),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    _squadMiniRow('S', const Color(0xFF8B5CF6), 'Sarah', r'$120 owed', const Color(0xFFFFE4E6), const Color(0xFFE11D48)),
-                    const SizedBox(height: 4),
-                    _squadMiniRow('D', const Color(0xFF3B82F6), 'Deji', 'Paid ✅', const Color(0xFFDCFCE7), const Color(0xFF16A34A)),
-                    const SizedBox(height: 4),
-                    _squadMiniRow('Y', const Color(0xFF3B82F6), 'You', 'Paid ✅', const Color(0xFFDCFCE7), const Color(0xFF16A34A)),
-                  ],
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 18),
           const Text(
@@ -3089,7 +3100,8 @@ class _InnovationsSection extends StatelessWidget {
             'Create shared wallets for trips, Gabis tracks who owes what and gently nudges your friends.',
             style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.45, fontWeight: FontWeight.w500),
           ),
-          const SizedBox(height: 16),
+          const Spacer(),
+          const SizedBox(height: 20),
           _pillTag(
             text: 'Plan together',
             bgColor: const Color(0xFFEDE9FE),
@@ -3226,15 +3238,17 @@ class _InnovationsSection extends StatelessWidget {
 
                     const SizedBox(height: 48),
 
-                    // BENTO ROW 1: Two Wide Cards
+                    // BENTO ROW 1: Two Wide Cards (Equal Height)
                     if (desktop)
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(child: _buildForexCard()),
-                          const SizedBox(width: 20),
-                          Expanded(child: _buildVoiceCard()),
-                        ],
+                      IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(child: _buildForexCard()),
+                            const SizedBox(width: 20),
+                            Expanded(child: _buildVoiceCard()),
+                          ],
+                        ),
                       )
                     else ...[
                       _buildForexCard(),
@@ -3244,17 +3258,19 @@ class _InnovationsSection extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    // BENTO ROW 2: Three Cards
+                    // BENTO ROW 2: Three Cards (Exact Same Height)
                     if (desktop)
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(child: _buildRoastCard()),
-                          const SizedBox(width: 20),
-                          Expanded(child: _buildLevelCard()),
-                          const SizedBox(width: 20),
-                          Expanded(child: _buildSquadCard()),
-                        ],
+                      IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(child: _buildRoastCard()),
+                            const SizedBox(width: 20),
+                            Expanded(child: _buildLevelCard()),
+                            const SizedBox(width: 20),
+                            Expanded(child: _buildSquadCard()),
+                          ],
+                        ),
                       )
                     else ...[
                       _buildRoastCard(),
