@@ -101,12 +101,25 @@ class _Hero extends StatelessWidget {
         final width = c.maxWidth;
         final desktop = width >= 980;
         final side = GabisV3.side(width);
+        
+        final cw = math.min(width, 1440.0);
+        final sideSpace = (width - cw) / 2;
+        final centerX = desktop ? sideSpace + cw * (16 / 21) + 4.76 : width / 2;
+        final topPadding = desktop ? 150.0 : 80.0;
+        final boxHeight = desktop ? 680.0 : (width < 600 ? 520.0 : 600.0);
+        final centerY = 18.0 + 72.0 + topPadding + boxHeight / 2;
+        
+        final center = Offset(centerX, centerY);
+        final cwRight = desktop ? (cw - 20) * (10 / 21) : cw;
+        final radius = math.min(cwRight, boxHeight) * .65;
 
         return Container(
           color: GabisV3.cream,
           child: Stack(
             children: [
-              Positioned.fill(child: _OrbitGame(motion: motion)),
+              Positioned.fill(
+                child: _OrbitGame(motion: motion, center: center, radius: radius),
+              ),
               Column(
                 children: [
                   Padding(
@@ -116,7 +129,7 @@ class _Hero extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.fromLTRB(
                       side,
-                      desktop ? 52 : 40,
+                      desktop ? 150 : 80,
                       side,
                       desktop ? 70 : 48,
                     ),
@@ -490,7 +503,9 @@ class _HeroCopy extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 52),
+          const SizedBox(height: 32),
+          const _PointsChip(),
+          const SizedBox(height: 20),
           const _MicroProof(),
         ],
       ),
@@ -880,8 +895,8 @@ class _BalanceBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 116,
-      height: 116,
+      width: 90,
+      height: 90,
       decoration: const BoxDecoration(
         color: GabisV3.coral,
         shape: BoxShape.circle,
@@ -891,7 +906,7 @@ class _BalanceBubble extends StatelessWidget {
           '5\nWALLETS',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 17,
+            fontSize: 14,
             height: .95,
             fontWeight: FontWeight.w900,
             color: GabisV3.ink,
@@ -922,7 +937,13 @@ void _bankPendingPoints(int value) => writeRaw(kPendingPointsKey, '$value');
 /// The hero decoration doubles as a small game: catch an orb, earn points.
 class _OrbitGame extends StatefulWidget {
   final Animation<double> motion;
-  const _OrbitGame({required this.motion});
+  final Offset center;
+  final double radius;
+  const _OrbitGame({
+    required this.motion,
+    required this.center,
+    required this.radius,
+  });
 
   @override
   State<_OrbitGame> createState() => _OrbitGameState();
@@ -966,10 +987,10 @@ class _OrbitGameState extends State<_OrbitGame>
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, c) {
-        final size = Size(c.maxWidth, c.maxHeight);
-        final center = Offset(size.width * .72, size.height * .5);
-        final radius = math.min(size.width, size.height) * .40;
-        final inner = radius * .68;
+        final center = widget.center;
+        final radius = widget.radius;
+        final inner = radius * .88;
+        final innermost = radius * .65;
 
         return AnimatedBuilder(
           animation: Listenable.merge([widget.motion, _spin]),
@@ -982,21 +1003,16 @@ class _OrbitGameState extends State<_OrbitGame>
                 center.dy + math.sin(-theta + math.pi) * inner);
 
             return Stack(
+              clipBehavior: Clip.none,
               children: [
                 Positioned.fill(
                   child: IgnorePointer(
-                    child: CustomPaint(painter: const _OrbitRingsPainter()),
+                    child: CustomPaint(painter: _OrbitRingsPainter(center, radius)),
                   ),
                 ),
                 _orb(outerAt, 13, GabisV3.electric, 5),
                 _orb(innerAt, 10, GabisV3.coral, 10),
                 for (final pop in _pops) _popLabel(pop),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 14,
-                  child: Center(child: _PointsChip(hint: !_played)),
-                ),
               ],
             );
           },
@@ -1078,8 +1094,7 @@ class _Pop {
 }
 
 class _PointsChip extends StatelessWidget {
-  final bool hint;
-  const _PointsChip({required this.hint});
+  const _PointsChip();
 
   @override
   Widget build(BuildContext context) {
@@ -1102,7 +1117,7 @@ class _PointsChip extends StatelessWidget {
             ),
             const SizedBox(width: 9),
             Text(
-              hint
+              points == 0
                   ? 'Catch the orbs — earn gabis points'
                   : 'gabis points  $points  ·  saved to your wallet',
               style: const TextStyle(
@@ -1121,14 +1136,13 @@ class _PointsChip extends StatelessWidget {
 
 /// Rings only — the balls are widgets now, so they can be caught.
 class _OrbitRingsPainter extends CustomPainter {
-  const _OrbitRingsPainter();
+  final Offset center;
+  final double radius;
+  const _OrbitRingsPainter(this.center, this.radius);
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width * .72, size.height * .5);
-    final radius = math.min(size.width, size.height) * .40;
-
-    for (final r in [radius, radius * .68]) {
+    for (final r in [radius, radius * .88, radius * .65]) {
       canvas.drawCircle(
         center,
         r,
