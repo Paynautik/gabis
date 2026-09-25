@@ -101,32 +101,12 @@ class _Hero extends StatelessWidget {
         final width = c.maxWidth;
         final desktop = width >= 980;
         final side = GabisV3.side(width);
-        
-        final rw = math.min(width - side * 2, 1440.0);
-        final sideSpace = (width - side * 2 - rw) / 2;
-        final startX = side + sideSpace;
-        
-        final topPadding = desktop ? 150.0 : 80.0;
-        final boxHeight = desktop ? 680.0 : (width < 600 ? 520.0 : 600.0);
-        
-        // On desktop, the row has Expanded(11) - SizedBox(20) - Expanded(10).
-        final centerX = desktop ? startX + (rw - 20) * (16 / 21) + 20 : width / 2;
-        
-        // Height of _Nav is 72. Top padding is 18.
-        final centerY = desktop ? 18.0 + 72.0 + topPadding + boxHeight / 2 : width * 1.2; 
-        // Note: Mobile Y is pushed down by _HeroCopy, using a rough estimate for mobile center.
-        
-        final center = Offset(centerX, centerY);
-        final cwRight = desktop ? (rw - 20) * (10 / 21) : rw;
-        final radius = math.min(cwRight, boxHeight) * .65;
 
         return Container(
           color: GabisV3.cream,
           child: Stack(
             children: [
-              Positioned.fill(
-                child: _OrbitGame(motion: motion, center: center, radius: radius),
-              ),
+              Positioned.fill(child: _OrbitGame(motion: motion)),
               Column(
                 children: [
                   Padding(
@@ -136,7 +116,7 @@ class _Hero extends StatelessWidget {
                   Padding(
                     padding: EdgeInsets.fromLTRB(
                       side,
-                      desktop ? 150 : 80,
+                      desktop ? 52 : 40,
                       side,
                       desktop ? 70 : 48,
                     ),
@@ -510,9 +490,7 @@ class _HeroCopy extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 32),
-          const _PointsChip(),
-          const SizedBox(height: 20),
+          const SizedBox(height: 52),
           const _MicroProof(),
         ],
       ),
@@ -676,48 +654,43 @@ class _Phone extends StatelessWidget {
               const SizedBox(height: 27),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 22),
-                child: Stack(
-                  alignment: Alignment.center,
+                child: Row(
                   children: [
-                    Image.asset('assets/gabislogo.png',
+                    Image.asset('assets/gabis_logo.png',
                         height: 24, fit: BoxFit.contain),
-                    Row(
+                    const Spacer(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Spacer(),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('Welcome back',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                  color: GabisV3.ink.withValues(alpha: .45),
-                                )),
-                            const SizedBox(height: 2),
-                            const Text('Deji Adewusi',
-                                style: TextStyle(
-                                    fontSize: 12.5,
-                                    fontWeight: FontWeight.w800,
-                                    height: 1.1)),
-                          ],
-                        ),
-                        const SizedBox(width: 9),
-                        Container(
-                          width: 34,
-                          height: 34,
-                          decoration: BoxDecoration(
-                            color: GabisV3.lilac,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                                color: GabisV3.ink.withValues(alpha: .08), width: 1),
-                            image: const DecorationImage(
-                              image: AssetImage('assets/images/avatar_user.jpg'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                        Text('Welcome back',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                              color: GabisV3.ink.withValues(alpha: .45),
+                            )),
+                        const SizedBox(height: 2),
+                        const Text('Deji Adewusi',
+                            style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w800,
+                                height: 1.1)),
                       ],
+                    ),
+                    const SizedBox(width: 9),
+                    Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: GabisV3.lilac,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                            color: GabisV3.ink.withValues(alpha: .08), width: 1),
+                        image: const DecorationImage(
+                          image: AssetImage('assets/images/avatar_user.jpg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -907,8 +880,8 @@ class _BalanceBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 90,
-      height: 90,
+      width: 116,
+      height: 116,
       decoration: const BoxDecoration(
         color: GabisV3.coral,
         shape: BoxShape.circle,
@@ -918,7 +891,7 @@ class _BalanceBubble extends StatelessWidget {
           '5\nWALLETS',
           textAlign: TextAlign.center,
           style: TextStyle(
-            fontSize: 14,
+            fontSize: 17,
             height: .95,
             fontWeight: FontWeight.w900,
             color: GabisV3.ink,
@@ -949,13 +922,7 @@ void _bankPendingPoints(int value) => writeRaw(kPendingPointsKey, '$value');
 /// The hero decoration doubles as a small game: catch an orb, earn points.
 class _OrbitGame extends StatefulWidget {
   final Animation<double> motion;
-  final Offset center;
-  final double radius;
-  const _OrbitGame({
-    required this.motion,
-    required this.center,
-    required this.radius,
-  });
+  const _OrbitGame({required this.motion});
 
   @override
   State<_OrbitGame> createState() => _OrbitGameState();
@@ -999,10 +966,10 @@ class _OrbitGameState extends State<_OrbitGame>
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, c) {
-        final center = widget.center;
-        final radius = widget.radius;
-        final inner = radius * .88;
-        final innermost = radius * .65;
+        final size = Size(c.maxWidth, c.maxHeight);
+        final center = Offset(size.width * .72, size.height * .5);
+        final radius = math.min(size.width, size.height) * .40;
+        final inner = radius * .68;
 
         return AnimatedBuilder(
           animation: Listenable.merge([widget.motion, _spin]),
@@ -1015,16 +982,21 @@ class _OrbitGameState extends State<_OrbitGame>
                 center.dy + math.sin(-theta + math.pi) * inner);
 
             return Stack(
-              clipBehavior: Clip.none,
               children: [
                 Positioned.fill(
                   child: IgnorePointer(
-                    child: CustomPaint(painter: _OrbitRingsPainter(center, radius)),
+                    child: CustomPaint(painter: const _OrbitRingsPainter()),
                   ),
                 ),
                 _orb(outerAt, 13, GabisV3.electric, 5),
                 _orb(innerAt, 10, GabisV3.coral, 10),
                 for (final pop in _pops) _popLabel(pop),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 14,
+                  child: Center(child: _PointsChip(hint: !_played)),
+                ),
               ],
             );
           },
@@ -1106,7 +1078,8 @@ class _Pop {
 }
 
 class _PointsChip extends StatelessWidget {
-  const _PointsChip();
+  final bool hint;
+  const _PointsChip({required this.hint});
 
   @override
   Widget build(BuildContext context) {
@@ -1129,7 +1102,7 @@ class _PointsChip extends StatelessWidget {
             ),
             const SizedBox(width: 9),
             Text(
-              points == 0
+              hint
                   ? 'Catch the orbs — earn gabis points'
                   : 'gabis points  $points  ·  saved to your wallet',
               style: const TextStyle(
@@ -1148,13 +1121,14 @@ class _PointsChip extends StatelessWidget {
 
 /// Rings only — the balls are widgets now, so they can be caught.
 class _OrbitRingsPainter extends CustomPainter {
-  final Offset center;
-  final double radius;
-  const _OrbitRingsPainter(this.center, this.radius);
+  const _OrbitRingsPainter();
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (final r in [radius, radius * .88, radius * .65]) {
+    final center = Offset(size.width * .72, size.height * .5);
+    final radius = math.min(size.width, size.height) * .40;
+
+    for (final r in [radius, radius * .68]) {
       canvas.drawCircle(
         center,
         r,
@@ -2862,7 +2836,7 @@ class _Card extends StatelessWidget {
             children: [
               Image.asset(
                 darkText
-                    ? 'assets/gabislogo.png'
+                    ? 'assets/gabis_logo.png'
                     : 'assets/gabis_logo_white.png',
                 height: 34 * scale,
                 fit: BoxFit.contain,
