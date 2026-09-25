@@ -1,6 +1,7 @@
 import '../business/business_dashboard_screen.dart';
 import '../../shared/widgets/nautik_logo.dart';
 import 'package:flutter/material.dart';
+import 'package:gabis/features/community/community_screen.dart';
 import '../../core/theme/app_theme.dart';
 import '../accounts/accounts_screen.dart';
 import '../cards/cards_screen.dart';
@@ -47,6 +48,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     SettingsScreen(),
     SupportScreen(),
     CopilotScreen(),
+    CommunityScreen(),
   ];
 
   @override
@@ -95,6 +97,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                         _buildSidebarItem(4, Icons.receipt_long_rounded, 'Transactions'),
                         _buildSidebarItem(5, Icons.bar_chart_rounded, 'Analytics'),
                         _buildSidebarItem(6, Icons.people_rounded, 'Beneficiaries'),
+                        _buildSidebarItem(10, Icons.diversity_3_rounded, 'Community & Trust'),
                         _buildSidebarItem(7, Icons.settings_rounded, 'Settings'),
                         _buildSidebarItem(8, Icons.help_outline_rounded, 'Support'),
                         
