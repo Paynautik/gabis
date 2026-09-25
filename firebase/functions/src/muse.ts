@@ -43,7 +43,7 @@ export async function generateMuseResponse(prompt: string, contextData: any = {}
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as any;
         logger.info('Successfully generated response using PRIMARY (Meta Llama 3)');
         return data.choices[0].message.content;
       } else {

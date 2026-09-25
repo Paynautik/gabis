@@ -1,7 +1,7 @@
 import '../business/business_dashboard_screen.dart';
 import '../../shared/widgets/nautik_logo.dart';
 import 'package:flutter/material.dart';
-import 'package:gabis/features/community/community_screen.dart';
+import '../community/community_screen.dart';
 import '../../core/theme/app_theme.dart';
 import '../accounts/accounts_screen.dart';
 import '../cards/cards_screen.dart';
