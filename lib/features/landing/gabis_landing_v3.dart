@@ -2178,23 +2178,23 @@ class _IntelligenceSection extends StatelessWidget {
 
   static const _layers = [
     (
-      'ON DEVICE',
-      'A core that cannot hallucinate',
-      'Categorisation, recurring commitments, month-over-month drift, daily burn and what is genuinely spare are computed on your phone. Correct, offline, and free to run — the figures are arithmetic, not a guess.',
-      Icons.memory_rounded,
+      'AJO SAVING CIRCLE',
+      'Rotate funds with trust',
+      'Join or create saving circles with your community. Gabis automates the collection and payout schedules, ensuring everyone gets paid on time without the administrative headache.',
+      Icons.groups_rounded,
       GabisV3.lime,
     ),
     (
-      'WITH GEMINI',
-      'A model that does the talking',
-      'Gemini handles what arithmetic cannot: open-ended questions about your own money, receipts and bank statements read straight from a photo, and collections calls that hold a real conversation in five Nigerian languages.',
-      Icons.auto_awesome_rounded,
+      'SECURE ESCROW',
+      'Protect every transaction',
+      'Buy and sell with complete confidence. Gabis holds the funds securely until both parties are satisfied, making fraud impossible and resolving disputes fairly.',
+      Icons.lock_outline_rounded,
       GabisV3.sky,
     ),
     (
       'ALWAYS',
       'You approve before money moves',
-      'The model explains, drafts and asks. Every transfer, sweep and settlement waits for you. No automation here can spend on your behalf.',
+      'Transparency is built-in. Every contribution, payout, and escrow release waits for your approval. No automation here can spend on your behalf.',
       Icons.verified_user_outlined,
       GabisV3.lilac,
     ),
@@ -2227,7 +2227,7 @@ class _IntelligenceSection extends StatelessWidget {
                           border: Border.all(color: Colors.white.withValues(alpha: .2)),
                           borderRadius: BorderRadius.circular(100),
                         ),
-                        child: const Text('BUILT WITH GEMINI',
+                        child: const Text('COMMUNITY & TRUST',
                             style: TextStyle(
                                 color: GabisV3.cream,
                                 fontSize: 10.5,
@@ -2238,7 +2238,7 @@ class _IntelligenceSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'THE NUMBERS ARE COMPUTED.\nTHE JUDGEMENT IS THE MODEL’S.',
+                    'THE FUNDS ARE SECURE.\nTHE COMMUNITY IS EMPOWERED.',
                     style: TextStyle(
                       color: GabisV3.cream,
                       fontSize: desktop ? 42 : 28,
