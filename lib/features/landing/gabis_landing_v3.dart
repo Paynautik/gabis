@@ -102,15 +102,22 @@ class _Hero extends StatelessWidget {
         final desktop = width >= 980;
         final side = GabisV3.side(width);
         
-        final cw = math.min(width, 1440.0);
-        final sideSpace = (width - cw) / 2;
-        final centerX = desktop ? sideSpace + cw * (16 / 21) + 4.76 : width / 2;
+        final rw = math.min(width - side * 2, 1440.0);
+        final sideSpace = (width - side * 2 - rw) / 2;
+        final startX = side + sideSpace;
+        
         final topPadding = desktop ? 150.0 : 80.0;
         final boxHeight = desktop ? 680.0 : (width < 600 ? 520.0 : 600.0);
-        final centerY = 18.0 + 72.0 + topPadding + boxHeight / 2;
+        
+        // On desktop, the row has Expanded(11) - SizedBox(20) - Expanded(10).
+        final centerX = desktop ? startX + (rw - 20) * (16 / 21) + 20 : width / 2;
+        
+        // Height of _Nav is 72. Top padding is 18.
+        final centerY = desktop ? 18.0 + 72.0 + topPadding + boxHeight / 2 : width * 1.2; 
+        // Note: Mobile Y is pushed down by _HeroCopy, using a rough estimate for mobile center.
         
         final center = Offset(centerX, centerY);
-        final cwRight = desktop ? (cw - 20) * (10 / 21) : cw;
+        final cwRight = desktop ? (rw - 20) * (10 / 21) : rw;
         final radius = math.min(cwRight, boxHeight) * .65;
 
         return Container(
