@@ -2965,7 +2965,7 @@ class _InnovationsSection extends StatelessWidget {
           Expanded(
             flex: stackCol ? 0 : 6,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 25),
               decoration: BoxDecoration(
                 color: const Color(0xFF0B0F19),
                 borderRadius: BorderRadius.circular(20),
