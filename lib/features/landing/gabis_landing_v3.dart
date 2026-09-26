@@ -4655,6 +4655,8 @@ class _ProofRow extends StatelessWidget {
 class _FinalCta extends StatelessWidget {
   const _FinalCta();
 
+  static const _stone = Color(0xFFE7E0D9);
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, c) {
@@ -4677,8 +4679,7 @@ class _FinalCta extends StatelessWidget {
             const GabisLogo(size: 42),
             SizedBox(height: desktop ? 40 : 28),
             Text(
-              'Money should
-feel this easy.',
+              'Money should\nfeel this easy.',
               style: TextStyle(
                 color: GabisV3.ink,
                 fontSize: desktop ? 52 : 36,
