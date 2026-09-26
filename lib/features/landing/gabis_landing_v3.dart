@@ -1997,7 +1997,7 @@ class _MoveDetailPanel extends StatelessWidget {
                                   point,
                                   style: const TextStyle(
                                       fontSize: 14.5,
-                                      height: 1.45,
+                                      height: 1.5,
                                       fontWeight: FontWeight.w600),
                                 ),
                               ),
@@ -2225,7 +2225,7 @@ class _CollectStep extends StatelessWidget {
           Text(step.$3,
               style: TextStyle(
                 fontSize: 12.5,
-                height: 1.45,
+                height: 1.5,
                 fontWeight: FontWeight.w500,
                 color: GabisV3.ink.withValues(alpha: .74),
               )),
@@ -2688,7 +2688,7 @@ class _InnovationsSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     color: Color(0xFF4B5563),
-                    height: 1.45,
+                    height: 1.5,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -2697,7 +2697,7 @@ class _InnovationsSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.0),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF5F3FF),
                         borderRadius: BorderRadius.circular(6),
@@ -2709,7 +2709,7 @@ class _InnovationsSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.0),
                       decoration: BoxDecoration(
                         color: const Color(0xFFECFDF5),
                         borderRadius: BorderRadius.circular(6),
@@ -2925,7 +2925,7 @@ class _InnovationsSection extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 13,
                     color: Color(0xFF4B5563),
-                    height: 1.45,
+                    height: 1.5,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -2934,7 +2934,7 @@ class _InnovationsSection extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.0),
                       decoration: BoxDecoration(
                         color: const Color(0xFFECFDF5),
                         borderRadius: BorderRadius.circular(6),
@@ -2946,7 +2946,7 @@ class _InnovationsSection extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.0),
                       decoration: BoxDecoration(
                         color: const Color(0xFFF3F4F6),
                         borderRadius: BorderRadius.circular(6),
@@ -3530,7 +3530,7 @@ class _InnovationsSection extends StatelessWidget {
                 const SizedBox(height: 12),
                 const Text(
                   'AI that keeps you disciplined through brutally witty spending accountability.',
-                  style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.45, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.5, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -3596,7 +3596,7 @@ class _InnovationsSection extends StatelessWidget {
                 const SizedBox(height: 12),
                 const Text(
                   'Gabis monitors global interbank order books 24/7 across 5 currencies, automatically finding the most advantageous moments to convert.',
-                  style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.45, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.5, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -4651,7 +4651,7 @@ class _ProofRow extends StatelessWidget {
                   flex: 5,
                   child: Text(body,
                       style: const TextStyle(
-                          fontSize: 14.5, height: 1.45, fontWeight: FontWeight.w500)),
+                          fontSize: 14.5, height: 1.5, fontWeight: FontWeight.w500)),
                 ),
               ],
             )
@@ -4669,7 +4669,7 @@ class _ProofRow extends StatelessWidget {
                         letterSpacing: -.7)),
                 const SizedBox(height: 8),
                 Text(body,
-                    style: const TextStyle(fontSize: 14.5, height: 1.45)),
+                    style: const TextStyle(fontSize: 14.5, height: 1.5)),
               ],
             ),
     );
