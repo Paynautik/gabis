@@ -4743,7 +4743,7 @@ class _FinalCta extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: desktop
-                  ? SizedBox(height: 400, 
+                  ? IntrinsicHeight(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
