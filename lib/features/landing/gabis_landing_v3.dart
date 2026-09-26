@@ -4655,8 +4655,6 @@ class _ProofRow extends StatelessWidget {
 class _FinalCta extends StatelessWidget {
   const _FinalCta();
 
-  static const _stone = Color(0xFFE7E0D9);
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, c) {
@@ -4664,71 +4662,62 @@ class _FinalCta extends StatelessWidget {
       final desktop = width > 900;
       final side = GabisV3.side(width);
 
-      final panel = Container(
+      final textPanel = Container(
         color: _stone,
         padding: EdgeInsets.fromLTRB(
-          desktop ? 56 : 28,
-          desktop ? 64 : 40,
-          desktop ? 48 : 28,
-          desktop ? 64 : 40,
+          desktop ? 64 : 32,
+          desktop ? 80 : 48,
+          desktop ? 48 : 32,
+          desktop ? 80 : 48,
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const GabisLogo(size: 40),
-            SizedBox(height: desktop ? 34 : 24),
+            const GabisLogo(size: 42),
+            SizedBox(height: desktop ? 40 : 28),
             Text(
-              'money should\nfeel this easy',
+              'Money should
+feel this easy.',
               style: TextStyle(
                 color: GabisV3.ink,
-                fontSize: desktop ? 46 : 32,
-                height: 1.12,
-                letterSpacing: -1.8,
-                fontWeight: FontWeight.w700,
+                fontSize: desktop ? 52 : 36,
+                height: 1.05,
+                letterSpacing: -2.0,
+                fontWeight: FontWeight.w800,
               ),
             ),
-            SizedBox(height: desktop ? 24 : 18),
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 460),
-              child: Text(
-                'Open an account in minutes, hold the currencies you actually use, '
-                'and move your first payment the same day.',
-                style: TextStyle(
-                  color: GabisV3.ink.withValues(alpha: .72),
-                  fontSize: desktop ? 16.5 : 15,
-                  height: 1.6,
-                ),
+            SizedBox(height: desktop ? 24 : 16),
+            Text(
+              'Open an account in minutes, hold the currencies you actually use, and move your first payment the same day.',
+              style: TextStyle(
+                color: GabisV3.ink.withValues(alpha: .7),
+                fontSize: desktop ? 18 : 16,
+                height: 1.5,
+                fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(height: desktop ? 34 : 26),
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () => Navigator.pushNamed(context, '/login'),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 20),
-                  decoration: BoxDecoration(
-                    color: GabisV3.electric,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'Open your account',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
+            SizedBox(height: desktop ? 40 : 32),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/login'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: GabisV3.electric,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 22),
+                elevation: 4,
+                shadowColor: GabisV3.electric.withValues(alpha: 0.4),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              child: const Text(
+                'Open your account',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
               ),
             ),
           ],
         ),
       );
 
-      const photo = WebVideoPanel(
+      const videoPanel = WebVideoPanel(
         src: 'media/testimonial_loop.mp4',
         posterAsset: 'assets/images/testimonial_hero_african.jpg',
       );
@@ -4736,27 +4725,27 @@ class _FinalCta extends StatelessWidget {
       return Container(
         width: double.infinity,
         color: GabisV3.cream,
-        padding: EdgeInsets.fromLTRB(side, desktop ? 96 : 64, side, desktop ? 96 : 64),
+        padding: EdgeInsets.symmetric(horizontal: side, vertical: desktop ? 100 : 64),
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1320),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(24),
               child: desktop
-                  ? SizedBox(height: 520, 
+                  ? IntrinsicHeight(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Expanded(flex: 1, child: panel),
-                          Expanded(flex: 1, child: photo),
+                          Expanded(flex: 5, child: SingleChildScrollView(physics: const NeverScrollableScrollPhysics(), child: textPanel)),
+                          const Expanded(flex: 6, child: videoPanel),
                         ],
                       ),
                     )
                   : Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        panel,
-                        SizedBox(height: 300, width: double.infinity, child: photo),
+                        textPanel,
+                        const SizedBox(height: 350, width: double.infinity, child: videoPanel),
                       ],
                     ),
             ),
