@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' show FontFeature;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../core/util/web_splash_dismiss.dart';
 import '../../shared/widgets/nautik_logo.dart';
 import '../business/business_persistence_stub.dart'
     if (dart.library.js_interop) '../business/business_persistence_web.dart';
@@ -34,6 +35,9 @@ class _LandingScreenState extends State<LandingScreen>
       vsync: this,
       duration: const Duration(seconds: 12),
     )..repeat();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyFirstFrameRendered();
+    });
   }
 
   @override
@@ -717,11 +721,17 @@ class _Phone extends StatelessWidget {
                             Container(
                               width: 28,
                               height: 28,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: NetworkImage('https://i.pravatar.cc/100?img=33'),
-                                  fit: BoxFit.cover,
+                                color: GabisV3.ink.withValues(alpha: 0.1),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                'DA',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: GabisV3.ink,
                                 ),
                               ),
                             ),
@@ -2402,25 +2412,38 @@ class _LayerCard extends StatelessWidget {
 }
 
 
-class _InnovationsCurvePainter extends CustomPainter {
+class _RealisticFxChartPainter extends CustomPainter {
   final Color color;
-  final Color fillColor;
 
-  const _InnovationsCurvePainter({
-    required this.color,
-    required this.fillColor,
-  });
+  const _RealisticFxChartPainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
     final w = size.width;
     final h = size.height;
 
-    final path = Path();
-    path.moveTo(0, h * 0.7);
-    path.cubicTo(w * 0.25, h * 0.9, w * 0.45, h * 0.2, w * 0.65, h * 0.35);
-    path.cubicTo(w * 0.8, h * 0.45, w * 0.9, h * 0.1, w, h * 0.15);
+    // 1. Subtle horizontal dashed grid lines
+    final gridPaint = Paint()
+      ..color = const Color(0xFFE2E8F0).withValues(alpha: 0.8)
+      ..strokeWidth = 0.8;
 
+    for (final yFrac in [0.25, 0.50, 0.75]) {
+      final y = h * yFrac;
+      double startX = 0;
+      while (startX < w) {
+        canvas.drawLine(Offset(startX, y), Offset(math.min(startX + 4, w), y), gridPaint);
+        startX += 8;
+      }
+    }
+
+    // 2. Realistic Price Trajectory (subtle dips then a breakout surge)
+    final path = Path();
+    path.moveTo(0, h * 0.68);
+    path.cubicTo(w * 0.15, h * 0.72, w * 0.25, h * 0.56, w * 0.38, h * 0.60);
+    path.cubicTo(w * 0.50, h * 0.64, w * 0.58, h * 0.40, w * 0.70, h * 0.26);
+    path.cubicTo(w * 0.80, h * 0.16, w * 0.90, h * 0.22, w, h * 0.18);
+
+    // 3. Area gradient fill under curve
     final fillPath = Path.from(path)
       ..lineTo(w, h)
       ..lineTo(0, h)
@@ -2430,47 +2453,85 @@ class _InnovationsCurvePainter extends CustomPainter {
       ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
-        colors: [fillColor.withValues(alpha: .35), fillColor.withValues(alpha: .02)],
+        colors: [
+          color.withValues(alpha: 0.25),
+          color.withValues(alpha: 0.0),
+        ],
       ).createShader(Rect.fromLTWH(0, 0, w, h));
     canvas.drawPath(fillPath, fillPaint);
 
+    // 4. Main price stroke line
     final linePaint = Paint()
       ..color = color
-      ..strokeWidth = 3
+      ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
     canvas.drawPath(path, linePaint);
 
-    // Draw peak point
-    final peak = Offset(w * 0.45, h * 0.2);
-    canvas.drawCircle(peak, 5, Paint()..color = Colors.white);
-    canvas.drawCircle(peak, 3, Paint()..color = color);
+    // 5. Target strike line (dashed emerald)
+    final targetY = h * 0.26;
+    final targetPaint = Paint()
+      ..color = const Color(0xFF10B981).withValues(alpha: 0.5)
+      ..strokeWidth = 1.0;
+    double tx = 0;
+    while (tx < w * 0.70) {
+      canvas.drawLine(Offset(tx, targetY), Offset(math.min(tx + 3, w * 0.70), targetY), targetPaint);
+      tx += 6;
+    }
 
-    final endPt = Offset(w * 0.98, h * 0.16);
-    canvas.drawCircle(endPt, 4.5, Paint()..color = color);
+    // 6. Glowing strike beacon at (w * 0.70, targetY)
+    final beacon = Offset(w * 0.70, targetY);
+    canvas.drawCircle(beacon, 9, Paint()..color = color.withValues(alpha: 0.25));
+    canvas.drawCircle(beacon, 5.5, Paint()..color = Colors.white);
+    canvas.drawCircle(beacon, 3.5, Paint()..color = color);
+
+    // End point beacon
+    final endPoint = Offset(w, h * 0.18);
+    canvas.drawCircle(endPoint, 4, Paint()..color = color);
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _InnovationsRipplePainter extends CustomPainter {
-  final Color color;
+class _AudioEqualizerPainter extends CustomPainter {
+  final Color primaryColor;
+  final Color secondaryColor;
 
-  const _InnovationsRipplePainter({required this.color});
+  const _AudioEqualizerPainter({
+    required this.primaryColor,
+    required this.secondaryColor,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radiuses = [38.0, 56.0, 76.0, 96.0];
-    final opacities = [0.25, 0.15, 0.08, 0.04];
+    const barCount = 19;
+    final barWidth = (size.width / (barCount * 1.8)).clamp(3.0, 5.0);
+    final gap = barWidth * 0.8;
+    final totalWidth = barCount * barWidth + (barCount - 1) * gap;
+    double startX = (size.width - totalWidth) / 2;
 
-    for (int i = 0; i < radiuses.length; i++) {
+    // Realistic voice speech frequency distribution
+    final heights = [
+      0.18, 0.32, 0.55, 0.42, 0.78, 0.95, 0.68, 0.85, 1.0, 0.88,
+      0.92, 0.74, 0.82, 0.58, 0.62, 0.40, 0.48, 0.25, 0.15
+    ];
+
+    for (int i = 0; i < barCount; i++) {
+      final barH = size.height * heights[i % heights.length];
+      final top = (size.height - barH) / 2;
+      final rect = Rect.fromLTWH(startX, top, barWidth, barH);
+      final rrect = RRect.fromRectAndRadius(rect, Radius.circular(barWidth / 2));
+
       final paint = Paint()
-        ..color = color.withValues(alpha: opacities[i])
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0;
-      canvas.drawCircle(center, radiuses[i], paint);
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [primaryColor, secondaryColor],
+        ).createShader(rect);
+
+      canvas.drawRRect(rrect, paint);
+      startX += barWidth + gap;
     }
   }
 
@@ -2478,28 +2539,51 @@ class _InnovationsRipplePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-class _SpokeCirclePainter extends CustomPainter {
-  final Color color;
+class _TierShieldRingPainter extends CustomPainter {
+  final Color trackColor;
+  final Color progressColor;
+  final double progress;
 
-  const _SpokeCirclePainter({required this.color});
+  const _TierShieldRingPainter({
+    required this.trackColor,
+    required this.progressColor,
+    this.progress = 0.82,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final r = size.width / 2;
-    const spokeCount = 16;
+    final radius = (size.width - 12) / 2;
 
-    for (int i = 0; i < spokeCount; i++) {
-      final angle = (i * 2 * 3.1415926535) / spokeCount;
-      final p1 = Offset(center.dx + (r - 10) * math.cos(angle), center.dy + (r - 10) * math.sin(angle));
-      final p2 = Offset(center.dx + r * math.cos(angle), center.dy + r * math.sin(angle));
+    // Track
+    final trackPaint = Paint()
+      ..color = trackColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6.0;
+    canvas.drawCircle(center, radius, trackPaint);
 
-      final paint = Paint()
-        ..color = color.withValues(alpha: .5)
-        ..strokeWidth = 2
-        ..strokeCap = StrokeCap.round;
-      canvas.drawLine(p1, p2, paint);
-    }
+    // Active Progress Arc
+    final progressPaint = Paint()
+      ..shader = SweepGradient(
+        startAngle: -math.pi / 2,
+        endAngle: 3 * math.pi / 2,
+        colors: [
+          progressColor,
+          const Color(0xFF10B981),
+          const Color(0xFF34D399),
+        ],
+      ).createShader(Rect.fromCircle(center: center, radius: radius))
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeWidth = 6.0;
+
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -math.pi / 2,
+      2 * math.pi * progress,
+      false,
+      progressPaint,
+    );
   }
 
   @override
@@ -2556,132 +2640,167 @@ class _InnovationsSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFEAFBF3), Color(0xFFF2FDF8)],
-        ),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0x2810B981), width: 1.5),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.0),
         boxShadow: const [
           BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
+          BoxShadow(color: Color(0x03000000), blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Flex(
         direction: stackCol ? Axis.vertical : Axis.horizontal,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-              Expanded(
-                flex: stackCol ? 0 : 5,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          Expanded(
+            flex: stackCol ? 0 : 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _pillTag(
+                  text: 'LIVE FX SNIPER',
+                  bgColor: const Color(0xFFECFDF5),
+                  textColor: const Color(0xFF047857),
+                  icon: Icons.radar_rounded,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Autonomous\nCurrency Sniping',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF111827),
+                    height: 1.15,
+                    letterSpacing: -.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Set your target strike rate. Gabis monitors interbank order books 24/7 and auto-swaps the millisecond rates peak.',
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    color: Color(0xFF4B5563),
+                    height: 1.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    _iconBox(Icons.trending_up_rounded, const Color(0xFFD1FAE5), const Color(0xFF059669)),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Autonomous\nCurrency Sniping',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF111827), height: 1.15, letterSpacing: -.4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF3F4F6),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        '⚡ 120ms Execution',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF374151)),
+                      ),
                     ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Set a goal, and the Gabis AI will automatically swipe the best exchange rates 24/7 to dollar-cost average into your foreign wallets.',
-                      style: TextStyle(fontSize: 13.5, color: Color(0xFF4B5563), height: 1.5, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 20),
-                    _pillTag(
-                      text: 'Higher rates. Lower costs.',
-                      bgColor: const Color(0xFFD1FAE5),
-                      textColor: const Color(0xFF047857),
-                      icon: Icons.auto_awesome,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFECFDF5),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text(
+                        '+3.4% Spread Yield',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF059669)),
+                      ),
                     ),
                   ],
                 ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 24, height: 24),
+          Expanded(
+            flex: stackCol ? 0 : 6,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0B0F19),
+                borderRadius: BorderRadius.circular(18),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x18000000), blurRadius: 20, offset: Offset(0, 8)),
+                ],
               ),
-              const SizedBox(width: 20, height: 20),
-              Expanded(
-                flex: stackCol ? 0 : 6,
-                child: SizedBox(
-                  height: 170,
-                  child: Stack(
-                    clipBehavior: Clip.none,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Terminal Header Bar
+                  Row(
                     children: [
-                      // Smooth curve
-                      const Positioned.fill(
-                        child: CustomPaint(
-                          painter: _InnovationsCurvePainter(
-                            color: Color(0xFF10B981),
-                            fillColor: Color(0xFF10B981),
-                          ),
+                      const Text(
+                        'USD / NGN',
+                        style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.circle, color: Color(0xFF10B981), size: 6),
+                            SizedBox(width: 4),
+                            Text('LIVE', style: TextStyle(color: Color(0xFF10B981), fontSize: 9, fontWeight: FontWeight.w800)),
+                          ],
                         ),
                       ),
-                      // Tooltip pill at peak
-                      Positioned(
-                        top: 2,
-                        left: 20,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: const [
-                              BoxShadow(color: Color(0x15000000), blurRadius: 18, offset: Offset(0, 6)),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Best rate found', style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 9.5, fontWeight: FontWeight.w600)),
-                              const SizedBox(height: 3),
-                              Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text('₦1,620', style: TextStyle(color: Color(0xFF111827), fontWeight: FontWeight.w900, fontSize: 13)),
-                                  const SizedBox(width: 6),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(color: const Color(0xFFDCFCE7), borderRadius: BorderRadius.circular(6)),
-                                    child: const Text('+2.4%', style: TextStyle(color: Color(0xFF16A34A), fontSize: 10, fontWeight: FontWeight.w800)),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Currency pair selector pill at bottom
-                      Positioned(
-                        bottom: 0,
-                        right: 10,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(100),
-                            border: Border.all(color: const Color(0x15000000)),
-                            boxShadow: const [BoxShadow(color: Color(0x0C000000), blurRadius: 12)],
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('🇺🇸', style: TextStyle(fontSize: 14)),
-                              SizedBox(width: 4),
-                              Text('USD', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF374151))),
-                              SizedBox(width: 8),
-                              Icon(Icons.swap_horiz_rounded, size: 14, color: Color(0xFF9CA3AF)),
-                              SizedBox(width: 8),
-                              Text('🇳🇬', style: TextStyle(fontSize: 14)),
-                              SizedBox(width: 4),
-                              Text('NGN', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF374151))),
-                            ],
-                          ),
-                        ),
+                      const Spacer(),
+                      const Text(
+                        '₦1,620.40',
+                        style: TextStyle(color: Colors.white, fontSize: 13.5, fontWeight: FontWeight.w900),
                       ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  // Real High-Precision FX Area Graph
+                  const SizedBox(
+                    height: 100,
+                    width: double.infinity,
+                    child: CustomPaint(
+                      painter: _RealisticFxChartPainter(color: Color(0xFF10B981)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  // Executed Order Toast Notification
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.check_circle_rounded, color: Color(0xFF10B981), size: 14),
+                        SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            'Auto-sniped \$250.00 at ₦1,620.40 target',
+                            style: TextStyle(color: Color(0xFFE2E8F0), fontSize: 11, fontWeight: FontWeight.w600),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
+        ],
+      ),
     );
   }
 
@@ -2691,116 +2810,178 @@ class _InnovationsSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFF5F3FF), Color(0xFFFAF5FF)],
-        ),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0x288B5CF6), width: 1.5),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.0),
         boxShadow: const [
           BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
+          BoxShadow(color: Color(0x03000000), blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Flex(
         direction: stackCol ? Axis.vertical : Axis.horizontal,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-              Expanded(
-                flex: stackCol ? 0 : 5,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _iconBox(Icons.mic_none_rounded, const Color(0xFFEDE9FE), const Color(0xFF6D28D9)),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Voice-to-Execute',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Color(0xFF111827), letterSpacing: -.4),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'Zero taps required. Hold the mic and tell Gabis what you need. It parses and executes instantly.',
-                      style: TextStyle(fontSize: 13.5, color: Color(0xFF4B5563), height: 1.5, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 20),
-                    _pillTag(
-                      text: 'Just speak. It happens.',
-                      bgColor: const Color(0xFFEDE9FE),
-                      textColor: const Color(0xFF6D28D9),
-                      icon: Icons.graphic_eq_rounded,
-                    ),
-                  ],
+          Expanded(
+            flex: stackCol ? 0 : 5,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _pillTag(
+                  text: 'VOICE INTENT ENGINE',
+                  bgColor: const Color(0xFFF5F3FF),
+                  textColor: const Color(0xFF6D28D9),
+                  icon: Icons.mic_none_rounded,
                 ),
-              ),
-              const SizedBox(width: 20, height: 20),
-              Expanded(
-                flex: stackCol ? 0 : 6,
-                child: SizedBox(
-                  height: 170,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    clipBehavior: Clip.none,
-                    children: [
-                      // Expanding Ripples
-                      const SizedBox(
-                        width: 200,
-                        height: 200,
-                        child: CustomPaint(
-                          painter: _InnovationsRipplePainter(color: Color(0xFF8B5CF6)),
-                        ),
-                      ),
-                      // Glowing Blue Microphone Button
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: const LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF2563EB).withValues(alpha: .45),
-                              blurRadius: 20,
-                              offset: const Offset(0, 8),
-                            ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.mic_rounded, color: Colors.white, size: 28),
-                        ),
-                      ),
-                      // Floating Speech Bubble
-                      Positioned(
-                        top: 4,
-                        right: -10,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: const [
-                              BoxShadow(color: Color(0x12000000), blurRadius: 16, offset: Offset(0, 4)),
-                            ],
-                          ),
-                          child: const Text(
-                            '"Swap 50k NGN to USD..."',
-                            style: TextStyle(
-                              color: Color(0xFF2563EB),
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w800,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                const SizedBox(height: 16),
+                const Text(
+                  'Voice-to-Execute',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w900,
+                    color: Color(0xFF111827),
+                    height: 1.15,
+                    letterSpacing: -.5,
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                const Text(
+                  'Zero taps required. Speak naturally in English, Pidgin, Yoruba, Hausa or Igbo. Gabis parses recipient, amount, and intent in milliseconds.',
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    color: Color(0xFF4B5563),
+                    height: 1.5,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4.5),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F3FF),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    '🇳🇬 5 African Languages Native',
+                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF6D28D9)),
+                  ),
+                ),
+              ],
+            ),
           ),
+          const SizedBox(width: 24, height: 24),
+          Expanded(
+            flex: stackCol ? 0 : 6,
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Floating User Speech Pill
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(color: Color(0x0A000000), blurRadius: 10, offset: Offset(0, 3)),
+                      ],
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.graphic_eq_rounded, color: Color(0xFF8B5CF6), size: 16),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '"Send ₦45,000 to Chidi for supply invoice..."',
+                            style: TextStyle(
+                              color: Color(0xFF1E293B),
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  // Dynamic Audio Waveform Equalizer
+                  const SizedBox(
+                    height: 40,
+                    width: double.infinity,
+                    child: CustomPaint(
+                      painter: _AudioEqualizerPainter(
+                        primaryColor: Color(0xFF8B5CF6),
+                        secondaryColor: Color(0xFF3B82F6),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  // Intent Parsed Action Card
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF2563EB),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'CO',
+                              style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Chidi Okonkwo · Access Bank',
+                                style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+                              ),
+                              SizedBox(height: 1),
+                              Text(
+                                '₦45,000.00 · Ready to execute',
+                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF059669)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2563EB),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text('Confirm', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -2809,115 +2990,95 @@ class _InnovationsSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFFFF1EE), Color(0xFFFFF7F5)],
-        ),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0x28F43F5E), width: 1.5),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.0),
         boxShadow: const [
           BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
+          BoxShadow(color: Color(0x03000000), blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 110,
-            child: Row(
+          // Realistic Instagram Story / Viral Receipt Card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F172A),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: const [
+                BoxShadow(color: Color(0x18000000), blurRadius: 16, offset: Offset(0, 6)),
+              ],
+            ),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                _iconBox(Icons.camera_alt_outlined, const Color(0xFFFFE4E6), const Color(0xFFE11D48)),
-                const Spacer(),
-                // Tilted Roast Card
-                Transform.rotate(
-                  angle: -0.08,
-                  child: Container(
-                    width: 150,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF111827),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: const [
-                        BoxShadow(color: Color(0x20000000), blurRadius: 16, offset: Offset(0, 8)),
-                      ],
+                Row(
+                  children: [
+                    Container(
+                      width: 20,
+                      height: 20,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFE11D48),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Icon(Icons.local_fire_department_rounded, color: Colors.white, size: 12),
+                      ),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(3),
-                              decoration: const BoxDecoration(color: Color(0xFFEA580C), shape: BoxShape.circle),
-                              child: const Icon(Icons.local_fire_department_rounded, color: Colors.white, size: 10),
-                            ),
-                            const SizedBox(width: 4),
-                            const Text('Gabis Roast', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900)),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'You spent ₦45,000\non Uber this month.\nAre your legs broken? 💀',
-                          style: TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w700, height: 1.25),
-                        ),
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.white.withValues(alpha: .2)),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.camera_alt_rounded, color: Colors.white, size: 8),
-                                SizedBox(width: 4),
-                                Text('Share to Instagram', style: TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w800)),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                    const SizedBox(width: 6),
+                    const Text('Weekly Roast · Fri 8:30 PM', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 9.5, fontWeight: FontWeight.w700)),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                      decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(4)),
+                      child: const Text('UBER', style: TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.w900)),
                     ),
-                  ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'You spent ₦48,200 on rides this month. Your destination was 800m away. Are your legs ornamental? 💀',
+                  style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800, height: 1.35),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE11D48).withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text('₦48,200 Total · 14 Rides', style: TextStyle(color: Color(0xFFFDA4AF), fontSize: 9, fontWeight: FontWeight.w700)),
+                    ),
+                    const Spacer(),
+                    const Text('Share 📸', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 9, fontWeight: FontWeight.w700)),
+                  ],
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           const Text(
             'Roast My Spending',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF111827), letterSpacing: -.4),
           ),
           const SizedBox(height: 8),
           const Text(
-            'Get hyper-personalized, hilariously brutal AI roasts of your monthly spending habits. Share directly to socials.',
+            'Hyper-personalized, hilariously brutal AI breakdowns of your spending habits. Generated every Friday.',
             style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.45, fontWeight: FontWeight.w500),
           ),
           const Spacer(),
           const SizedBox(height: 20),
-          // Share Button
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF43F5E),
-              borderRadius: BorderRadius.circular(100),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.share_rounded, color: Colors.white, size: 13),
-                SizedBox(width: 6),
-                Text(
-                  'Share the roast',
-                  style: TextStyle(color: Colors.white, fontSize: 11.5, fontWeight: FontWeight.w700),
-                ),
-              ],
-            ),
+          _pillTag(
+            text: 'Share the roast',
+            bgColor: const Color(0xFFFFF1F2),
+            textColor: const Color(0xFFE11D48),
+            icon: Icons.share_rounded,
           ),
         ],
       ),
@@ -2929,69 +3090,77 @@ class _InnovationsSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFF0FDF4), Color(0xFFF7FEFA)],
-        ),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0x2810B981), width: 1.5),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.0),
         boxShadow: const [
           BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
+          BoxShadow(color: Color(0x03000000), blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 110,
+          // Activity Ring & Tier Dial
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _iconBox(Icons.smart_toy_rounded, const Color(0xFFD1FAE5), const Color(0xFF059669)),
-                const Spacer(),
-                // Level Spoke Dial
-                SizedBox(
-                  width: 120,
-                  height: 105,
+                // Dial
+                const SizedBox(
+                  width: 58,
+                  height: 58,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      const SizedBox(
-                        width: 90,
-                        height: 90,
+                      Positioned.fill(
                         child: CustomPaint(
-                          painter: _SpokeCirclePainter(color: Color(0xFF10B981)),
+                          painter: _TierShieldRingPainter(
+                            trackColor: Color(0xFFE2E8F0),
+                            progressColor: Color(0xFF059669),
+                            progress: 0.84,
+                          ),
                         ),
                       ),
                       Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('AGENT LEVEL', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF6B7280), letterSpacing: .8)),
-                          const SizedBox(height: 4),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: const BoxDecoration(color: Color(0xFFD9FF43), shape: BoxShape.circle),
-                                child: const Center(child: Text('15', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Color(0xFF111827)))),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.arrow_forward_rounded, size: 10, color: Color(0xFF9CA3AF)),
-                              const SizedBox(width: 4),
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: const BoxDecoration(color: Color(0xFF111827), shape: BoxShape.circle),
-                                child: const Center(child: Text('16', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.white))),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          const Text('Zero-fee transfers\nUNLOCKED!', textAlign: TextAlign.center, style: TextStyle(fontSize: 7.5, fontWeight: FontWeight.w800, color: Color(0xFF111827))),
+                          Text('LVL', style: TextStyle(fontSize: 7.5, fontWeight: FontWeight.w900, color: Color(0xFF64748B))),
+                          Text('16', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
                         ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFECFDF5),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text('TIER 2 UNLOCKED', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Color(0xFF047857))),
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        '0% Cross-Border FX',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
+                      ),
+                      const SizedBox(height: 2),
+                      const Text(
+                        '🔥 24-Day Savings Streak',
+                        style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w600, color: Color(0xFF64748B)),
                       ),
                     ],
                   ),
@@ -2999,105 +3168,105 @@ class _InnovationsSection extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           const Text(
             'Level Up Your Agent',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF111827), letterSpacing: -.4),
           ),
           const SizedBox(height: 8),
           const Text(
-            'Catch orbs, maintain savings streaks, and earn points to level up your AI Agent.',
+            'Turn financial discipline into superpowers. Keep savings streaks to upgrade your agent’s autonomy and tier perks.',
             style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.45, fontWeight: FontWeight.w500),
           ),
           const Spacer(),
           const SizedBox(height: 20),
           _pillTag(
             text: 'Play. Save. Earn.',
-            bgColor: const Color(0xFFD1FAE5),
+            bgColor: const Color(0xFFECFDF5),
             textColor: const Color(0xFF047857),
-            icon: Icons.star_rounded,
+            icon: Icons.military_tech_rounded,
           ),
         ],
       ),
     );
   }
 
-  // --- CARD 5: Tokyo Trip Fund (Squad Wealth) ---
+  // --- CARD 5: Tokyo Trip Fund (Shared Group Vault) ---
   Widget _buildSquadCard() {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFFFFBEB), Color(0xFFFEFCE8)],
-        ),
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: const Color(0x28F59E0B), width: 1.5),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 1.0),
         boxShadow: const [
           BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
+          BoxShadow(color: Color(0x03000000), blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            height: 110,
-            child: Row(
+          // Boarding Pass / Group Travel Vault Widget
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                _iconBox(Icons.account_balance_wallet_rounded, const Color(0xFFEDE9FE), const Color(0xFF6D28D9)),
-                const Spacer(),
-                // Mini Tokyo Trip Card
-                Container(
-                  width: 140,
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: const [
-                      BoxShadow(color: Color(0x10000000), blurRadius: 16, offset: Offset(0, 6)),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Row(
-                        children: [
-                          Icon(Icons.flight_takeoff_rounded, size: 10, color: Color(0xFF4F46E5)),
-                          SizedBox(width: 4),
-                          Text('Tokyo Trip Fund', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w900, color: Color(0xFF111827))),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      _squadMiniRow('S', const Color(0xFF8B5CF6), 'Sarah', r'$120 owed', const Color(0xFFFFE4E6), const Color(0xFFE11D48)),
-                      const SizedBox(height: 4),
-                      _squadMiniRow('D', const Color(0xFF3B82F6), 'Deji', 'Paid ✅', const Color(0xFFDCFCE7), const Color(0xFF16A34A)),
-                      const SizedBox(height: 4),
-                      _squadMiniRow('Y', const Color(0xFF3B82F6), 'You', 'Paid ✅', const Color(0xFFDCFCE7), const Color(0xFF16A34A)),
-                    ],
+                const Row(
+                  children: [
+                    Icon(Icons.flight_takeoff_rounded, size: 12, color: Color(0xFF4F46E5)),
+                    SizedBox(width: 4),
+                    Text('TOKYO 2026 · HND', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Color(0xFF0F172A))),
+                    Spacer(),
+                    Text('77% funded', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: Color(0xFF4F46E5))),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                // Progress Bar
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: const SizedBox(
+                    height: 4,
+                    child: LinearProgressIndicator(
+                      value: 0.77,
+                      backgroundColor: Color(0xFFE2E8F0),
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF4F46E5)),
+                    ),
                   ),
                 ),
+                const SizedBox(height: 8),
+                _squadMiniRow('SK', const Color(0xFF8B5CF6), 'Sarah K.', '₦150k deposited', const Color(0xFFECFDF5), const Color(0xFF059669)),
+                const SizedBox(height: 4),
+                _squadMiniRow('DA', const Color(0xFF2563EB), 'Deji A.', '₦150k deposited', const Color(0xFFECFDF5), const Color(0xFF059669)),
+                const SizedBox(height: 4),
+                _squadMiniRow('AM', const Color(0xFFF59E0B), 'Amara M.', 'Pending ₦150k', const Color(0xFFFEF3C7), const Color(0xFFD97706)),
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 20),
           const Text(
             'Tokyo Trip Fund',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Color(0xFF111827), letterSpacing: -.4),
           ),
           const SizedBox(height: 8),
           const Text(
-            'Create shared wallets for trips, Gabis tracks who owes what and gently nudges your friends.',
+            'Collaborative multi-currency pots for group trips. Gabis tracks who owes what and sends polite auto-nudges.',
             style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.45, fontWeight: FontWeight.w500),
           ),
           const Spacer(),
           const SizedBox(height: 20),
           _pillTag(
             text: 'Plan together',
-            bgColor: const Color(0xFFEDE9FE),
-            textColor: const Color(0xFF6D28D9),
+            bgColor: const Color(0xFFEEF2FF),
+            textColor: const Color(0xFF4F46E5),
             icon: Icons.calendar_month_rounded,
           ),
         ],
@@ -3109,18 +3278,23 @@ class _InnovationsSection extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 14,
-          height: 14,
+          width: 16,
+          height: 16,
           decoration: BoxDecoration(color: circleCol, shape: BoxShape.circle),
-          child: Center(child: Text(initial, style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w900))),
+          child: Center(
+            child: Text(
+              initial,
+              style: const TextStyle(color: Colors.white, fontSize: 7, fontWeight: FontWeight.w900),
+            ),
+          ),
         ),
-        const SizedBox(width: 4),
-        Text(name, style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: Color(0xFF374151))),
+        const SizedBox(width: 6),
+        Text(name, style: const TextStyle(fontSize: 8.5, fontWeight: FontWeight.w700, color: Color(0xFF334155))),
         const Spacer(),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
           decoration: BoxDecoration(color: statusBg, borderRadius: BorderRadius.circular(4)),
-          child: Text(status, style: TextStyle(fontSize: 6.5, fontWeight: FontWeight.w800, color: statusText)),
+          child: Text(status, style: TextStyle(fontSize: 7.5, fontWeight: FontWeight.w800, color: statusText)),
         ),
       ],
     );

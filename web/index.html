@@ -74,11 +74,11 @@
 
     #gabis-splash.is-done { opacity: 0; pointer-events: none; }
 
-    /* The logo asset itself, so the loading screen and the app agree. */
     .gabis-splash__mark {
-      width: clamp(150px, 44vw, 224px);
+      width: clamp(140px, 36vw, 200px);
       height: auto;
       display: block;
+      object-fit: contain;
     }
 
     .gabis-splash__mark--dark { display: none; }
@@ -145,9 +145,9 @@
 <body>
   <div id="gabis-splash" role="status" aria-live="polite">
     <img class="gabis-splash__mark gabis-splash__mark--light"
-         src="gabis-wordmark.png" alt="gabis" width="720" height="321" fetchpriority="high">
+         src="gabis_logo.png" alt="gabis" width="930" height="457" fetchpriority="high">
     <img class="gabis-splash__mark gabis-splash__mark--dark"
-         src="gabis-wordmark-white.png" alt="" aria-hidden="true" width="720" height="321">
+         src="gabis_logo_white.png" alt="gabis" aria-hidden="true" width="930" height="457">
     <div class="gabis-splash__bar"></div>
     <div class="gabis-splash__line">Loading the agent that gets you paid.</div>
     <div class="gabis-splash__slow">Still loading — a slow connection can take a moment.</div>
@@ -163,28 +163,33 @@
         if (done) return;
         done = true;
         splash.classList.add('is-done');
-        // Removed rather than left transparent, so it never eats a tap.
         setTimeout(function () { splash.remove(); }, 400);
       }
 
-      // The event Flutter fires once it has painted something.
+      window.dismissGabisSplash = dismiss;
       window.addEventListener('flutter-first-frame', dismiss);
+      window.addEventListener('flutter-app-ready', dismiss);
 
-      // Older engines do not fire it, so also watch for the view itself.
+      // Only dismiss via DOM observer if Flutter has actually rendered a non-empty canvas
       var observer = new MutationObserver(function () {
-        if (document.querySelector('flt-glass-pane, flutter-view, flt-scene-host')) {
-          observer.disconnect();
-          dismiss();
+        var fv = document.querySelector('flutter-view, flt-glass-pane');
+        if (fv) {
+          var target = fv.shadowRoot || fv;
+          var canvases = target.querySelectorAll('canvas');
+          if (canvases.length > 0 && (canvases[0].width > 50 || canvases[0].offsetHeight > 50)) {
+            observer.disconnect();
+            dismiss();
+          }
         }
       });
       observer.observe(document.body, { childList: true, subtree: true });
 
       setTimeout(function () {
         if (!done) splash.classList.add('is-slow');
-      }, 8000);
+      }, 7000);
 
-      // A last resort: never leave the splash covering a working app.
-      setTimeout(dismiss, 30000);
+      // A last resort fallback
+      setTimeout(dismiss, 16000);
     })();
   </script>
 
