@@ -2157,7 +2157,7 @@ class _CollectionsSection extends StatelessWidget {
                   ],
                   const SizedBox(height: 30),
                   if (desktop)
-                    SizedBox(height: 400, 
+                    IntrinsicHeight(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -2328,7 +2328,7 @@ class _IntelligenceSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
                   if (desktop)
-                    SizedBox(height: 400, 
+                    IntrinsicHeight(
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
