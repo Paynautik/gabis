@@ -2157,7 +2157,7 @@ class _CollectionsSection extends StatelessWidget {
                   ],
                   const SizedBox(height: 30),
                   if (desktop)
-                    IntrinsicHeight(
+                    SizedBox(height: 400, 
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -2328,7 +2328,7 @@ class _IntelligenceSection extends StatelessWidget {
                   ),
                   const SizedBox(height: 30),
                   if (desktop)
-                    IntrinsicHeight(
+                    SizedBox(height: 400, 
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -2879,10 +2879,12 @@ class _InnovationsSection extends StatelessWidget {
   // =========================================================================
   // CARD 2: ⚡ GABIS AUTOPILOT
   // =========================================================================
+// =========================================================================
+  // CARD 2: ⚡ GABIS AUTOPILOT (Redesigned)
+  // =========================================================================
   Widget _buildAutopilotCard({bool isMobile = false}) {
-    final stackCol = isMobile;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -2892,163 +2894,117 @@ class _InnovationsSection extends StatelessWidget {
           BoxShadow(color: Color(0x03000000), blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
-      child: Flex(
-        direction: stackCol ? Axis.vertical : Axis.horizontal,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: stackCol ? 0 : 5,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                _pillTag(
-                  text: 'FEATURE 02 · AUTOPILOT',
-                  bgColor: const Color(0xFFECFDF5),
-                  textColor: const Color(0xFF047857),
-                  icon: Icons.bolt_rounded,
-                ),
-                const SizedBox(height: 14),
-                const Text(
-                  'Give your money goals.\nGabis handles the routine.',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    color: Color(0xFF111827),
-                    height: 1.18,
-                    letterSpacing: -.5,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Traditional apps hand you tools and leave you to do the work. With Gabis, you tell it what you want your money to accomplish. When income hits, your automated wealth waterfall executes in milliseconds.',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF4B5563),
-                    height: 1.5,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Column(
+          // Header Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.0),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFECFDF5),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Text(
-                        '⚡ Zero Manual Transfers',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF047857)),
-                      ),
+                    _pillTag(
+                      text: 'FEATURE 02 · AUTOPILOT',
+                      bgColor: const Color(0xFFECFDF5),
+                      textColor: const Color(0xFF047857),
+                      icon: Icons.bolt_rounded,
                     ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.0),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF3F4F6),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: const Text(
-                        '100% Deterministic Rules',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF374151)),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Give your money goals.\nGabis handles the routine.',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        color: Color(0xFF111827),
+                        height: 1.15,
+                        letterSpacing: -.5,
                       ),
                     ),
                   ],
                 ),
-              ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF047857).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.all_inclusive_rounded, color: Color(0xFF047857), size: 28),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 16),
+          const Text(
+            'Traditional apps hand you tools and leave you to do the work. With Gabis, you tell it what you want your money to accomplish. When income hits, your automated wealth waterfall executes in milliseconds.',
+            style: TextStyle(
+              fontSize: 13,
+              color: Color(0xFF4B5563),
+              height: 1.5,
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(width: 24, height: 24),
-          Expanded(
-            flex: stackCol ? 0 : 6,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 25),
-              decoration: BoxDecoration(
-                color: const Color(0xFF0B0F19),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x18000000), blurRadius: 20, offset: Offset(0, 8)),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Trigger Event Banner
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.25)),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(Icons.flash_on_rounded, color: Color(0xFF10B981), size: 14),
-                            SizedBox(width: 6),
-                            Text('INCOME DETECTED', style: TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.w900)),
-                          ],
-                        ),
-                        Text('₦1,200,000', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w900)),
-                      ],
-                    ),
+          
+          const Spacer(),
+          
+          // Terminal UI at the bottom
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0B0F19),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+              boxShadow: const [
+                BoxShadow(color: Color(0x18000000), blurRadius: 20, offset: Offset(0, 8)),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('⚡ INCOME DETECTED', style: TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.w900)),
+                    const Text('₦1,200,000', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w900)),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.04),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  const SizedBox(height: 10),
-                  // Waterfall Rules Checklist
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.05),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('AUTOPILOT WATERFALL', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 9.5, fontWeight: FontWeight.w800)),
-                        const SizedBox(height: 6),
-                        _autopilotRuleRow('Bills & Rent', '₦180,000'),
-                        const SizedBox(height: 4),
-                        _autopilotRuleRow('High-Yield Savings', '₦250,000'),
-                        const SizedBox(height: 4),
-                        _autopilotRuleRow('Global Investment', '₦100,000'),
-                        const SizedBox(height: 4),
-                        _autopilotRuleRow('Emergency Vault', '₦70,000'),
-                      ],
-                    ),
+                  child: Column(
+                    children: [
+                      _autopilotRuleRow('Bills & Rent', '₦180,000'),
+                      const SizedBox(height: 6),
+                      _autopilotRuleRow('High-Yield Savings', '₦250,000'),
+                      const SizedBox(height: 6),
+                      _autopilotRuleRow('Global Investment', '₦100,000'),
+                    ],
                   ),
-                  const SizedBox(height: 10),
-                  // Safe to spend outcome
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981),
-                      borderRadius: BorderRadius.circular(10),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('SAFE TO SPEND', style: TextStyle(color: Color(0xFFD1FAE5), fontSize: 9, fontWeight: FontWeight.w900)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Text('₦670,000', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900)),
                     ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('SAFE TO SPEND', style: TextStyle(color: Color(0xFFD1FAE5), fontSize: 8.5, fontWeight: FontWeight.w900)),
-                            Text('₦600,000', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900)),
-                          ],
-                        ),
-                        Text('0 taps needed ✓', style: TextStyle(color: Colors.white, fontSize: 9.5, fontWeight: FontWeight.w700)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -3712,7 +3668,7 @@ class _InnovationsSection extends StatelessWidget {
 
                     // BENTO ROW 1: 🧠 GABIS MONEY TWIN & ⚡ GABIS AUTOPILOT
                     if (desktop)
-                      IntrinsicHeight(
+                      SizedBox(height: 400, 
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -3732,7 +3688,7 @@ class _InnovationsSection extends StatelessWidget {
 
                     // BENTO ROW 2: 🛡️ FIREWALL, 🔮 FUTURE MODE, 🗣️ EXECUTIVE
                     if (desktop)
-                      IntrinsicHeight(
+                      SizedBox(height: 400, 
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -4769,7 +4725,7 @@ class _FinalCta extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: desktop
-                  ? IntrinsicHeight(
+                  ? SizedBox(height: 400, 
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
