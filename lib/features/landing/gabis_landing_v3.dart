@@ -2550,8 +2550,9 @@ class _InnovationsSection extends StatelessWidget {
     );
   }
 
-  // --- CARD 1: Autonomous Forex Sniping ---
-  Widget _buildForexCard() {
+  // --- CARD 1: Autonomous Currency Sniping ---
+  Widget _buildForexCard({bool isMobile = false}) {
+    final stackCol = isMobile;
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
@@ -2566,13 +2567,10 @@ class _InnovationsSection extends StatelessWidget {
           BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
         ],
       ),
-      child: LayoutBuilder(
-        builder: (context, c) {
-          final stackCol = c.maxWidth < 480;
-          return Flex(
-            direction: stackCol ? Axis.vertical : Axis.horizontal,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+      child: Flex(
+        direction: stackCol ? Axis.vertical : Axis.horizontal,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
               Expanded(
                 flex: stackCol ? 0 : 5,
                 child: Column(
@@ -2683,14 +2681,13 @@ class _InnovationsSection extends StatelessWidget {
                 ),
               ),
             ],
-          );
-        },
-      ),
+          ),
     );
   }
 
   // --- CARD 2: Voice-to-Execute ---
-  Widget _buildVoiceCard() {
+  Widget _buildVoiceCard({bool isMobile = false}) {
+    final stackCol = isMobile;
     return Container(
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
@@ -2705,13 +2702,10 @@ class _InnovationsSection extends StatelessWidget {
           BoxShadow(color: Color(0x08000000), blurRadius: 24, offset: Offset(0, 10)),
         ],
       ),
-      child: LayoutBuilder(
-        builder: (context, c) {
-          final stackCol = c.maxWidth < 480;
-          return Flex(
-            direction: stackCol ? Axis.vertical : Axis.horizontal,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
+      child: Flex(
+        direction: stackCol ? Axis.vertical : Axis.horizontal,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
               Expanded(
                 flex: stackCol ? 0 : 5,
                 child: Column(
@@ -2806,9 +2800,7 @@ class _InnovationsSection extends StatelessWidget {
                 ),
               ),
             ],
-          );
-        },
-      ),
+          ),
     );
   }
 
@@ -3251,9 +3243,9 @@ class _InnovationsSection extends StatelessWidget {
                         ),
                       )
                     else ...[
-                      _buildForexCard(),
+                      _buildForexCard(isMobile: true),
                       const SizedBox(height: 18),
-                      _buildVoiceCard(),
+                      _buildVoiceCard(isMobile: true),
                     ],
 
                     const SizedBox(height: 20),

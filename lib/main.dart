@@ -22,13 +22,17 @@ Future<void> main() async {
   // one.
   try {
     final options = DefaultFirebaseOptions.currentPlatform;
+    debugPrint('Initializing Firebase...');
     await (options == null
-        ? Firebase.initializeApp()
-        : Firebase.initializeApp(options: options));
+            ? Firebase.initializeApp()
+            : Firebase.initializeApp(options: options))
+        .timeout(const Duration(seconds: 2));
+    debugPrint('Firebase initialized successfully.');
   } catch (error, stack) {
     firebaseInitError = '$error';
     debugPrint('Firebase unavailable, running locally: $error\n$stack');
   }
 
+  debugPrint('Calling runApp...');
   runApp(const ProviderScope(child: GabisApp()));
 }
