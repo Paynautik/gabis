@@ -3627,22 +3627,40 @@ class _InnovationsSection extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 28),
-                    Row(
+Row(
                       children: [
                         // Start using Gabis -> Button
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF2563EB),
-                            borderRadius: BorderRadius.circular(100),
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color(0xFF2563EB).withValues(alpha: .32),
-                                blurRadius: 18,
-                                offset: const Offset(0, 8),
-                              ),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF2563EB),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                            elevation: 8,
+                            shadowColor: const Color(0xFF2563EB).withValues(alpha: 0.5),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('Experience Gabis AI', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14, letterSpacing: -0.2)),
+                              SizedBox(width: 8),
+                              Icon(Icons.arrow_forward_rounded, size: 16),
                             ],
                           ),
+                        ),
+                        const SizedBox(width: 16),
+                        TextButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.play_circle_outline_rounded, color: Color(0xFF4B5563), size: 20),
+                          label: const Text('See live simulations', style: TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w700, fontSize: 14, letterSpacing: -0.2)),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(100)),
+                          ),
+                        ),
+                      ],
+                    ),
                           child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
