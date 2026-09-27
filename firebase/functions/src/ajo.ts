@@ -1,30 +1,40 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import * as admin from 'firebase-admin';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+
 import { orpay } from './openreserve';
 
-export const createAjo = onCall(async (request) => {
-  const { data, auth } = request;
-  if (!auth) throw new HttpsError('unauthenticated', 'User must be logged in.');
+const db = () => getFirestore(process.env.FIRESTORE_DB ?? '(default)');
 
-  const { circleName, contribution, frequency } = data as any;
+/** A checkout for one member's Ajo contribution, paid in ORPay. */
+export const createAjo = onCall({ secrets: ['ORPAY_API_KEY'] }, async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) throw new HttpsError('unauthenticated', 'Sign in first.');
 
-  // Create Checkout using OpenReserve SDK for initial contribution
-  const checkout = await orpay.createCheckout({
-    amount: contribution.toString(),
-    description: `Ajo Contribution: ${circleName}`,
+  const { circleName, contribution, frequency } = (request.data ?? {}) as {
+    circleName?: string;
+    contribution?: number;
+    frequency?: string;
+  };
+  if (!circleName || !contribution || contribution <= 0) {
+    throw new HttpsError('invalid-argument', 'Circle name and a positive contribution are required.');
+  }
+
+  const ref = db().collection('ajos').doc();
+  const checkout = await (await orpay()).createCheckout({
+    amount: contribution.toFixed(2),
+    description: `Ajo contribution: ${circleName}`,
+    reference: ref.id,
   });
 
-  // Save to Firestore
-  const docRef = admin.firestore().collection('ajos').doc();
-  await docRef.set({
+  await ref.set({
     name: circleName,
     contribution,
-    frequency,
-    members: [auth.uid],
-    creator: auth.uid,
+    frequency: frequency ?? 'monthly',
+    members: [uid],
+    creator: uid,
     status: 'active',
-    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
 
-  return { success: true, ajoId: docRef.id, checkoutUrl: checkout.checkout_url };
+  return { ajoId: ref.id, checkoutUrl: checkout.checkout_url };
 });
