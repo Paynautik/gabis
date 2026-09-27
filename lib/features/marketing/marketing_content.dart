@@ -61,10 +61,10 @@ const marketingPages = <String, MarketingPage>{
   '/wallet': MarketingPage(
     route: '/wallet',
     eyebrow: 'Multi-currency wallet',
-    title: 'Five currencies.\nOne account.',
+    title: 'Twelve currencies.\nOne account.',
     lede:
-        'Hold naira, dollars, pounds, Canadian dollars and yen side by side. Money stays in the currency it arrived in until you decide otherwise, so nobody converts on your behalf at a rate you never saw.',
-    highlights: ['NGN · USD · GBP · CAD · JPY', 'No forced conversion', 'One login, one balance sheet'],
+        'Hold naira, shillings, cedis and Liberian dollars alongside dollars, pounds, euros, Canadian dollars and yen. Money stays in the currency it arrived in until you decide otherwise, so nobody converts on your behalf at a rate you never saw.',
+    highlights: ['NGN · KES · GHS · UGX · TZS · SSP · LRD · USD · GBP · EUR · CAD · JPY', 'No forced conversion', 'One login, one balance sheet'],
     features: [
       MarketingFeature(Icons.account_balance_wallet_outlined, 'Balances that stay put',
           'Get paid in dollars, keep dollars. Convert when the rate suits you, not when a settlement job runs.'),
@@ -77,7 +77,7 @@ const marketingPages = <String, MarketingPage>{
     ],
     faqs: [
       MarketingFaq('Which currencies can I hold?',
-          'NGN, USD, GBP, CAD and JPY today. New currencies are added when the local rails behind them are reliable, not before.'),
+          'NGN, KES, GHS, UGX, TZS, SSP and LRD, plus USD, GBP, EUR, CAD and JPY today. New currencies are added when the local rails behind them are reliable, not before.'),
       MarketingFaq('Do you convert my money automatically?',
           'No. Funds stay in the currency they arrived in. Conversion only happens when you ask for it.'),
       MarketingFaq('What rate do you use?',

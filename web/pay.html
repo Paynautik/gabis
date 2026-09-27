@@ -224,7 +224,7 @@
       var dest = data.dest || {};
       if (!dest.acct) return truncated('invoice');
 
-      var symbols = { NGN: '₦', USD: '$', GBP: '£', KES: 'KSh ', GHS: 'GH₵ ' };
+      var symbols = { NGN: '₦', KES: 'KSh ', GHS: 'GH₵ ', UGX: 'USh ', TZS: 'TSh ', SSP: 'SSP ', LRD: 'L$', USD: '$', GBP: '£', EUR: '€', CAD: 'C$', JPY: '¥' };
       var symbol = symbols[data.cur] || (data.cur ? data.cur + ' ' : '');
       var amount = symbol + Number(data.amt || 0).toLocaleString(undefined, {
         minimumFractionDigits: 2,

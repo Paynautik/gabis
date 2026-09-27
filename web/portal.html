@@ -286,7 +286,7 @@
       var items = (data.inv || []).filter(function (i) { return i.st !== 'draft'; });
       if (!items.length) return truncated('statement');
 
-      var symbols = { NGN: '₦', USD: '$', GBP: '£', KES: 'KSh ', GHS: 'GH₵ ' };
+      var symbols = { NGN: '₦', KES: 'KSh ', GHS: 'GH₵ ', UGX: 'USh ', TZS: 'TSh ', SSP: 'SSP ', LRD: 'L$', USD: '$', GBP: '£', EUR: '€', CAD: 'C$', JPY: '¥' };
 
       function esc(s) {
         return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {

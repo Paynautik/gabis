@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../shared/wallets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
@@ -195,7 +196,11 @@ class _AccountsScreenState extends ConsumerState<AccountsScreen> {
     final flag = _getFlag(account.currency);
     final accountName = isNgn ? 'gabis Nigerian Naira Account' : 'gabis Global USD Multi-Currency Account';
     final accountNumber = isNgn ? '9928371102' : '0294817492';
-    final bankName = isNgn ? 'gabis Partner Bank (Providus)' : 'Evolve Bank & Trust / gabis US';
+    final bankName = switch (account.currency) {
+      'NGN' => 'gabis Partner Bank (Providus)',
+      'USD' => 'Evolve Bank & Trust / gabis US',
+      _ => 'gabis · ${walletFor(account.currency)?.details ?? 'Partner bank'}',
+    };
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -446,7 +451,7 @@ class _AccountsScreenState extends ConsumerState<AccountsScreen> {
               keyboardType: TextInputType.number,
               style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w800, fontSize: 18),
               decoration: InputDecoration(
-                prefixText: account.currency == 'NGN' ? '₦ ' : '\$ ',
+                prefixText: '${account.balance.symbol.trim()} ',
                 labelText: 'Amount',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
               ),
@@ -586,75 +591,59 @@ class _AccountsScreenState extends ConsumerState<AccountsScreen> {
   }
 
   void _showOpenAccountDialog(BuildContext context) {
+    final held = ref.read(accountsProvider).map((a) => a.currency).toSet();
+    final available = walletCurrencies.where((w) => !held.contains(w.code)).toList();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: context.colors.bgSoft,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (ctx) => ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * .8),
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.all(24),
           children: [
-            Text('Open New Currency Wallet', style: TextStyle(color: context.colors.ink, fontSize: 18, fontWeight: FontWeight.w900)),
+            Text('Open a currency wallet', style: TextStyle(color: context.colors.ink, fontSize: 18, fontWeight: FontWeight.w900)),
             const SizedBox(height: 8),
-            Text('Select a currency to get dedicated IBAN and routing numbers:', style: TextStyle(color: context.colors.inkSoft, fontSize: 13)),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: const Text('🇬🇧', style: TextStyle(fontSize: 24)),
-              title: Text('British Pound (GBP)', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w800)),
-              subtitle: Text('UK Sort Code & Account Number', style: TextStyle(color: context.colors.inkSoft, fontSize: 11)),
-              trailing: Icon(Icons.add_circle_outline, color: context.colors.bluePrimary),
-              onTap: () {
-                ref.read(accountsProvider.notifier).addAccount(
-                  Account(
-                    id: 'acc_gbp',
-                    currency: 'GBP',
-                    balance: const Money(minorUnits: 0, currency: 'GBP'),
-                    type: AccountType.personal,
+            Text(
+                available.isEmpty
+                    ? 'You already hold all ${walletCurrencies.length} currencies.'
+                    : 'Hold up to ${walletCurrencies.length} currencies: 7 African and 5 global.',
+                style: TextStyle(color: context.colors.inkSoft, fontSize: 13)),
+            for (final group in [true, false])
+              if (available.any((w) => w.african == group)) ...[
+                Padding(
+                  padding: const EdgeInsets.only(top: 18, bottom: 4),
+                  child: Text(group ? 'AFRICAN CURRENCIES' : 'GLOBAL CURRENCIES',
+                      style: TextStyle(color: context.colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1)),
+                ),
+                for (final w in available.where((w) => w.african == group))
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Text(w.flag, style: const TextStyle(fontSize: 24)),
+                    title: Text('${w.name} (${w.code})', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w800)),
+                    subtitle: Text(w.details, style: TextStyle(color: context.colors.inkSoft, fontSize: 11)),
+                    trailing: Icon(Icons.add_circle_outline, color: context.colors.bluePrimary),
+                    onTap: () {
+                      ref.read(accountsProvider.notifier).addAccount(
+                            Account(
+                              id: 'acc_${w.code.toLowerCase()}',
+                              currency: w.code,
+                              balance: Money(minorUnits: 0, currency: w.code),
+                              type: AccountType.personal,
+                            ),
+                          );
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${w.code} wallet opened')));
+                    },
                   ),
-                );
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('GBP Account successfully activated!')));
-              },
-            ),
-            ListTile(
-              leading: const Text('🇪🇺', style: TextStyle(fontSize: 24)),
-              title: Text('Euro (EUR)', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w800)),
-              subtitle: Text('European SEPA IBAN', style: TextStyle(color: context.colors.inkSoft, fontSize: 11)),
-              trailing: Icon(Icons.add_circle_outline, color: context.colors.bluePrimary),
-              onTap: () {
-                ref.read(accountsProvider.notifier).addAccount(
-                  Account(
-                    id: 'acc_eur',
-                    currency: 'EUR',
-                    balance: const Money(minorUnits: 0, currency: 'EUR'),
-                    type: AccountType.personal,
-                  ),
-                );
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('EUR Account successfully activated!')));
-              },
-            ),
+              ],
           ],
         ),
       ),
     );
   }
 
-  String _getFlag(String currency) {
-    switch (currency) {
-      case 'NGN':
-        return '🇳🇬';
-      case 'USD':
-        return '🇺🇸';
-      case 'GBP':
-        return '🇬🇧';
-      case 'EUR':
-        return '🇪🇺';
-      default:
-        return '🌐';
-    }
-  }
+  String _getFlag(String currency) => walletFor(currency)?.flag ?? '🌐';
 }

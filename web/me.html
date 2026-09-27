@@ -169,7 +169,7 @@
         });
       }
 
-      var symbols = { NGN: '₦', USD: '$', GBP: '£', KES: 'KSh ', GHS: 'GH₵ ' };
+      var symbols = { NGN: '₦', KES: 'KSh ', GHS: 'GH₵ ', UGX: 'USh ', TZS: 'TSh ', SSP: 'SSP ', LRD: 'L$', USD: '$', GBP: '£', EUR: '€', CAD: 'C$', JPY: '¥' };
 
       function money(n, cur) {
         var symbol = symbols[cur] || (cur ? cur + ' ' : '');
