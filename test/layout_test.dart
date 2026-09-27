@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nautik_money/core/theme/app_theme.dart';
 import 'package:nautik_money/features/accounts/accounts_screen.dart';
 import 'package:nautik_money/features/community/ajo_screen.dart';
+import 'package:nautik_money/features/fx/fx_screen.dart';
 import 'package:nautik_money/features/community/escrow_screen.dart';
 import 'package:nautik_money/features/intelligence/intelligence_screen.dart';
 import 'package:nautik_money/features/partners/global_money_screen.dart';
@@ -87,4 +88,15 @@ void main() {
       expect(t.takeException(), isNull);
     });
   }
+
+  testWidgets('exchange form stays a centred column and blocks a short balance', (t) async {
+    await pump(t, const FxScreen(), overrides: [accountsProvider.overrideWith((ref) => AccountsNotifier())]);
+    await t.enterText(find.byType(TextField), '500,000');
+    await t.pump();
+    final button = find.widgetWithText(ElevatedButton, 'Not enough NGN');
+    expect(button, findsOneWidget);
+    expect(t.getSize(button).width, lessThanOrEqualTo(520));
+    expect(t.widget<ElevatedButton>(button).onPressed, isNull);
+    expect(t.takeException(), isNull);
+  });
 }
