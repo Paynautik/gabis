@@ -70,6 +70,8 @@ class HomeTab {
   static const support = 8;
   static const copilot = 9;
   static const community = 10;
+  static const intelligence = 11;
+  static const globalMoney = 12;
 }
 final isBusinessModeProvider = StateProvider<bool>((ref) => false);
 /// The picture on the account: null for initials, `fun:<n>` for one of the
