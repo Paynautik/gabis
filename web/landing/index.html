@@ -884,8 +884,8 @@ function place(){var w=stage.clientWidth,h=stage.clientHeight,mob=window.innerWi
 orbs.forEach(function(o){var r=mob?o.mob:o.ring;o.x=w/2+Math.cos(o.a)*r;o.y=h/2+Math.sin(o.a)*r;o.el.style.left=o.x+'px';o.el.style.top=o.y+'px';});}
 var tick=function(t){var dt=Math.min((t-last)/1000,.05);last=t;
  if(!reduce){orbs.forEach(function(o){
-  // Erratic: every so often pick a new pace, and sometimes turn back.
-  if(t>o.next){o.v=.5+Math.random()*.8;if(Math.random()<.3)o.dir*=-1;o.next=t+500+Math.random()*1100;}
+  // Always travelling round its circle; the pace drifts smoothly now and then.
+  if(t>o.next){o.tv=.75+Math.random()*.6;o.next=t+2500+Math.random()*2500;}o.v+=(o.tv-o.v)*Math.min(1,dt*1.5);
   // Dodge: an orb near the pointer darts away.
   var near=Math.hypot(o.x-px,o.y-py)<90?1.7:1;
   o.a+=o.dir*dt*(Math.PI*2/18)*o.base*o.v*speed*near;});}
