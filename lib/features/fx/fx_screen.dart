@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/models/money.dart';
@@ -28,14 +29,23 @@ class _FxScreenState extends ConsumerState<FxScreen> {
     final accounts = ref.watch(accountsProvider);
     final ngnAccount = accounts.firstWhere((a) => a.currency == 'NGN');
     
-    final amount = double.tryParse(_controller.text) ?? 0;
+    final amount = double.tryParse(_controller.text.replaceAll(',', '').trim()) ?? 0;
     final fee = amount * 0.002; // 0.2% fee
     final amountWithFee = amount + fee;
     final receive = amount / rate;
+    final available = ngnAccount.balance.minorUnits / 100;
+    // The fee comes out of the same balance, so the whole cost has to fit.
+    final short = amountWithFee > available;
+    final n = NumberFormat('#,##0.00');
 
     return Scaffold(
       appBar: AppBar(title: const Text('Exchange')),
-      body: Padding(
+      // A form reads as a column, not a banner: centred and capped on wide screens.
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,8 +74,10 @@ class _FxScreenState extends ConsumerState<FxScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Available: ${ngnAccount.balance.format()}', 
-              style: TextStyle(color: context.colors.inkSoft, fontSize: 12, fontWeight: FontWeight.w600)
+              short && amount > 0
+                  ? 'Available: ${ngnAccount.balance.format()} · you need ₦${n.format(amountWithFee)}'
+                  : 'Available: ${ngnAccount.balance.format()}',
+              style: TextStyle(color: short && amount > 0 ? context.colors.danger : context.colors.inkSoft, fontSize: 12, fontWeight: FontWeight.w600)
             ),
             const SizedBox(height: 12),
             Center(child: Icon(Icons.arrow_downward_rounded, color: context.colors.bluePrimary)),
@@ -80,23 +92,25 @@ class _FxScreenState extends ConsumerState<FxScreen> {
                 children: [
                   Text('USD', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: context.colors.ink)),
                   Text(
-                    '\$${receive.toStringAsFixed(2)}', 
+                    '\$${n.format(receive)}', 
                     style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, color: context.colors.ink, letterSpacing: -0.2)
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 24),
-            _row('Exchange Rate', '1 USD = ₦${rate.toStringAsFixed(0)}'),
-            _row('gabis Fee (0.2%)', '₦${fee.toStringAsFixed(2)}'),
-            _row('Total Cost', '₦${amountWithFee.toStringAsFixed(2)}'),
+            _row('Exchange rate', '1 USD = ₦${NumberFormat('#,##0').format(rate)}'),
+            _row('gabis fee (0.2%)', '₦${n.format(fee)}'),
+            _row('Total cost', '₦${n.format(amountWithFee)}'),
             const Spacer(),
             ElevatedButton(
-              onPressed: amount > 0 ? () => _showExchangeReviewSheet(context, amount, receive, fee, rate) : null, 
-              child: const Text('Review exchange'),
+              onPressed: amount > 0 && !short ? () => _showExchangeReviewSheet(context, amount, receive, fee, rate) : null, 
+              child: Text(short ? 'Not enough NGN' : 'Review exchange'),
             ),
           ],
         ),
+      ),
+      ),
       ),
     );
   }
