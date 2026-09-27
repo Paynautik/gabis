@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'business_store.dart';
+import 'business_extra_tabs.dart';
 import 'contact_policy.dart';
 import 'invoice_ai.dart';
 import 'payment_link.dart';
@@ -96,7 +97,7 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -154,7 +155,8 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
                 Tab(text: 'Smart Invoices'),
                 Tab(text: 'Connected Payments'),
                 Tab(text: 'AI Debt Collection'),
-                Tab(text: 'Multi-Currency Tax'),
+                Tab(text: 'Tax · 7 corridors'),
+                Tab(text: 'Refunds'),
               ],
             ),
           ),
@@ -168,7 +170,8 @@ class _BusinessDashboardScreenState extends ConsumerState<BusinessDashboardScree
           _SmartInvoicesTab(),
           _ConnectedPaymentsTab(),
           _AIDebtCollectionTab(),
-          _MultiCurrencyTaxTab(),
+          TaxCorridorsTab(),
+          RefundsTab(),
         ],
         )),
       ]),

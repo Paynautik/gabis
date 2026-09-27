@@ -8,5 +8,9 @@
 # /pay, so rewriting /pay to /pay.html made the two redirect at each other and
 # the payment page never loaded at all.
 
+# The homepage is the static landing page (web/landing/), not the Flutter app.
+# It loads in one request on mobile data; the app still owns every other path.
+/    /landing/    200
+
 # Anything else belongs to the Flutter app.
 /*    /index.html    200
