@@ -933,7 +933,7 @@ class _BalanceBubble extends StatelessWidget {
       ),
       child: const Center(
         child: Text(
-          '5\nWALLETS',
+          '12\nWALLETS',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 17,
@@ -1026,7 +1026,7 @@ class _OrbitGameState extends State<_OrbitGame>
     const rInner = 235.0;
     final center = widget.center;
 
-    // Static 5 Wallets bubble on middle circle
+    // Static 12 Wallets bubble on middle circle
     const bubbleAngle = -math.pi / 4.4;
     final bubbleOffset = Offset(
       center.dx + math.cos(bubbleAngle) * rMiddle - 58,
@@ -1053,7 +1053,7 @@ class _OrbitGameState extends State<_OrbitGame>
                 ),
               ),
             ),
-            // Static 5 Wallets card locked onto middle ring
+            // Static 12 Wallets card locked onto middle ring
             Positioned(
               left: bubbleOffset.dx,
               top: bubbleOffset.dy,
@@ -1459,7 +1459,7 @@ class _MoneyMovesSection extends StatelessWidget {
                   constraints: const BoxConstraints(maxWidth: 640),
                   child: Text(
                     'The wallet is the infrastructure underneath the agent. Hold, send, '
-                    'spend and settle across five currencies — so when the money is '
+                    'spend and settle across twelve currencies — so when the money is '
                     'collected, it has somewhere to land.',
                     style: TextStyle(
                       color: GabisV3.ink.withValues(alpha: .62),
@@ -1513,11 +1513,11 @@ const _moves = <_Move>[
         'Most transfers settle in under 60 seconds',
         'Every transfer has a receipt you can share',
       ]),
-  _Move('02', 'HOLD', 'NGN, USD, GBP, CAD and JPY in one place.', GabisV3.lilac, Icons.account_balance_wallet_outlined,
+  _Move('02', 'HOLD', 'Twelve currencies, 7 African and 5 global, in one place.', GabisV3.lilac, Icons.account_balance_wallet_outlined,
       detail:
-          'Five balances under one login. Money stays in the currency you were paid in until you decide otherwise, so you are never forced to convert at somebody else\u2019s timing.',
+          'Twelve balances under one login. Money stays in the currency you were paid in until you decide otherwise, so you are never forced to convert at somebody else\u2019s timing.',
       points: [
-        'NGN, USD, GBP, CAD and JPY',
+        'NGN, KES, GHS, UGX, TZS, SSP and LRD, plus USD, GBP, EUR, CAD and JPY',
         'No forced conversion on receipt',
         'Per-currency statements you can export',
         'Total value in your home currency at a glance',
@@ -1581,7 +1581,7 @@ const _moves = <_Move>[
           'Convert between your balances at a rate you can check against the market, with the fee stated up front. No hidden spread buried in a rounded number.',
       points: [
         'Mid-market rate with the fee shown',
-        'Any of your five balances, either direction',
+        'Any of your twelve balances, either direction',
         'Settles instantly against your balance',
         'Rate locked while you confirm',
       ]),
@@ -3551,7 +3551,7 @@ class _InnovationsSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 const Text(
-                  'Gabis monitors global interbank order books 24/7 across 5 currencies, automatically finding the most advantageous moments to convert.',
+                  'Gabis monitors global interbank order books 24/7 across 12 currencies, automatically finding the most advantageous moments to convert.',
                   style: TextStyle(fontSize: 12.5, color: Color(0xFF4B5563), height: 1.5, fontWeight: FontWeight.w500),
                 ),
               ],
@@ -4056,7 +4056,7 @@ class _CardMoment extends StatelessWidget {
                 children: const [
                   _CardPill(icon: Icons.ac_unit_rounded, label: 'Freeze instantly'),
                   SizedBox(width: 8),
-                  _CardPill(icon: Icons.bolt_rounded, label: 'Spend in 5 currencies'),
+                  _CardPill(icon: Icons.bolt_rounded, label: 'Spend in 12 currencies'),
                   SizedBox(width: 8),
                   _CardPill(icon: Icons.lock_rounded, label: 'Details you can rotate'),
                 ],

@@ -23,6 +23,8 @@ class Money {
     'LRD': 'L\$',
     'EUR': '€',
     'GBP': '£',
+    'CAD': 'C\$',
+    'JPY': '¥',
   };
 
   String get symbol => _symbols[currency] ?? '$currency ';
