@@ -398,6 +398,9 @@ button.mb.danger{background:#16123a !important}
 .ppop.big{font-size:24px;color:#b87900}
 .pchip.hot{background:#f5b301;color:#16123a}.pchip.hot .pdot{background:#16123a}
 .pmore{font-size:12px;color:#8a8699;padding:6px 0 0 56px}
+#afsim .runway,#afsim .opts{display:none !important}
+#afsim .balp{background:none;padding:0;color:#8a8699;font-weight:500}
+#afsim{gap:12px !important}
 </style>
 </head>
 <body>
@@ -938,7 +941,9 @@ var upd=function(p,name){
  r.querySelector('#afs2').textContent=k(half)+' now, '+k(p-half)+' after salary';
  var rec2=left<BUF&&split>left;r.querySelector('#afo2').classList.toggle('rec',rec2);r.querySelector('#afo1').classList.toggle('rec',!rec2);
  var tag=r.querySelector('#aftag');(rec2?r.querySelector('#afo2'):r.querySelector('#afo1')).appendChild(tag);
- r.querySelector('#afcta').textContent=rec2?'Split it for me':'Buy it today';
+ r.querySelector('#afcta').textContent=rec2?'Split it · keep '+k(split):'Buy it · '+k(left)+' left';
+ r.querySelector('#afbuy').textContent=rec2?(left<0?'Buy anyway · '+k(-left)+' short':'Buy anyway · '+k(left)+' left'):'Not now';
+ if(rec2)a.innerHTML+=' Split it across two paydays and you keep <b>'+f(split)+'</b>.';
 };
 
 sl.addEventListener('input',function(){var p=+sl.value;r.querySelector('#afprice').textContent=f(p);upd(p,'this')});
@@ -949,7 +954,7 @@ function finish(t,d){r.querySelector('#afdt').textContent=t;r.querySelector('#af
 r.querySelector('#afcta').addEventListener('click',function(){var p=cur.p,left=BAL-BILLS-p,half=Math.ceil(p/2/1000)*1000;
  if(r.querySelector('#afcta').textContent.indexOf('Split')===0){finish('Split scheduled','Paying '+f(half)+' today and '+f(p-half)+' on salary day. You keep '+f(BAL-BILLS-half)+' until then.');}
  else{finish('Bought','Paid '+f(p)+'. You still have '+f(left)+' for the next '+DAYS+' days.');}});
-r.querySelector('#afbuy').addEventListener('click',function(){var left=BAL-BILLS-cur.p;
+r.querySelector('#afbuy').addEventListener('click',function(){if(this.textContent==='Not now'){finish('Not today','Nothing was bought. Ask again whenever you are ready.');return;}var left=BAL-BILLS-cur.p;
  r.querySelector('#afct').textContent='Buy '+cur.name+' for '+f(cur.p)+' anyway?';
  r.querySelector('#afcd').textContent=left<0?'You would be '+f(-left)+' short after bills. Payments due before salary could fail.':'This leaves '+f(left)+' for the next '+DAYS+' days after bills. gabis recommends keeping at least '+f(BUF)+'.';
  show(conf);r.querySelector('#afno').focus();});
