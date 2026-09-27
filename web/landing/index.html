@@ -57,8 +57,22 @@ img,video{max-width:100%}
 .pblob{position:absolute;width:380px;height:620px;background:#dff76a;border-radius:48px;transform:rotate(-5deg)}
 .pring{position:absolute;width:660px;height:660px;border:1.5px solid #d9d2c6;border-radius:50%}
 .pbadge{position:absolute;right:0;top:90px;width:150px;height:150px;border-radius:50%;background:#ef7f5d;color:#16123a;display:flex;align-items:center;justify-content:center;text-align:center;font:800 22px/1.05 Sora,sans-serif;z-index:3}
-.phone{position:relative;z-index:2;width:340px;height:680px;background:#fff;border:10px solid #111;border-radius:52px;overflow:hidden;box-shadow:0 40px 80px rgba(22,18,58,.22);font-family:'DM Sans',sans-serif;color:#16123a}
-.notch{width:110px;height:30px;background:#111;border-radius:20px;margin:12px auto 0}
+.phone-frame{position:relative;z-index:2;display:flex;align-items:center;justify-content:center}
+.hw-btn{position:absolute;background:linear-gradient(to right,#38383a,#1e1e20);border-radius:2px;z-index:1}
+.hw-action{left:-3.5px;top:105px;width:4px;height:24px}
+.hw-vol-up{left:-3.5px;top:144px;width:4px;height:48px}
+.hw-vol-down{left:-3.5px;top:204px;width:4px;height:48px}
+.hw-power{right:-3.5px;top:160px;width:4px;height:68px}
+.hw-camera-control{right:-2.5px;top:310px;width:3px;height:42px;border-radius:3px;background:linear-gradient(to left,#2c2c2e,#141416);box-shadow:inset 0 0 1px rgba(255,255,255,.3)}
+.phone{position:relative;z-index:2;width:338px;height:688px;background:#fff;border:3.5px solid #1c1c1e;border-radius:54px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.12) inset,0 0 0 1px #3a3a3c,0 0 0 3px #18181a,0 30px 70px -10px rgba(22,18,58,.28),0 50px 100px -20px rgba(0,0,0,.22);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','DM Sans',sans-serif;color:#16123a;display:flex;flex-direction:column}
+.phone::after{content:"";position:absolute;inset:0;background:linear-gradient(125deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,.02) 28%,transparent 48%);pointer-events:none;z-index:20;border-radius:50px}
+.status-bar{display:flex;justify-content:space-between;align-items:center;padding:10px 22px 2px;height:36px;box-sizing:border-box;position:relative;z-index:10;background:#fff}
+.status-time{font-size:13px;font-weight:700;letter-spacing:-.02em;color:#16123a;width:48px}
+.dynamic-island{position:absolute;left:50%;top:9px;transform:translateX(-50%);width:92px;height:25px;background:#000;border-radius:999px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;box-sizing:border-box;box-shadow:0 1px 3px rgba(0,0,0,.6);z-index:15}
+.sensor-lens{width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#1c233c 0%,#050811 75%);box-shadow:inset 0 0 1px rgba(80,110,200,.5)}
+.status-icons{display:flex;align-items:center;gap:5px;color:#16123a;width:48px;justify-content:flex-end}
+.home-indicator{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:130px;height:4.5px;background:#16123a;border-radius:999px;opacity:.75;z-index:12;pointer-events:none}
+.notch{display:none}
 .ptop{display:flex;justify-content:space-between;align-items:center;padding:18px 22px 0}
 .pwho{display:flex;gap:10px;align-items:center;text-align:right}.pwho span{display:flex;flex-direction:column;font-size:13px}.pwho small{color:#8a8699;font-size:11px}
 .pwho i{font-style:normal;font-weight:700;width:38px;height:38px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-size:14px}
@@ -355,6 +369,17 @@ button.mb.danger{background:#16123a !important}
 .afok{width:26px !important;height:26px !important;font-size:13px}
 .afagain{color:#4b45f5 !important;font-size:12px !important}
 </style>
+<style>
+.csteps{position:relative}
+.csteps::before{content:"";position:absolute;left:4%;right:4%;top:44px;border-top:2px dotted #d6cfc3;z-index:0}
+.cstep{position:relative;z-index:1;border:1px solid #e5dfd5 !important;box-shadow:0 1px 2px rgba(22,18,58,.04)}
+.c1{background:#eef6fd !important}.c2{background:#f3f0fe !important}.c3{background:#f6fae3 !important}.c4{background:#fdf0ea !important}
+.c4 p{color:#3a3552 !important}
+.cstep .ctop svg{width:36px;height:36px;padding:8px;border-radius:50%;color:#fff;box-sizing:border-box}
+.c1 .ctop svg{background:#3b82f6}.c2 .ctop svg{background:#7c6cf0}.c3 .ctop svg{background:#6b8e00}.c4 .ctop svg{background:#e0643c}
+.cstep .ctop span{font-size:12px;color:#8a8699;letter-spacing:.08em}
+@media (max-width:1024px){.csteps::before{display:none}}
+</style>
 </head>
 <body>
 
@@ -408,7 +433,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 </div>
 <div style="position: relative; height: 620px">
-<img src="/landing/media/hero.jpg?v=2" alt="Smiling young woman using her phone" style="position: absolute; left: 60px; top: 0; width: 540px; height: 620px; object-fit: cover; border-radius: 28px">
+<img src="/landing/media/hero.jpg?v=4" alt="Young African woman transacting seamlessly on her phone in a cafe" style="position: absolute; left: 60px; top: 0; width: 540px; height: 620px; object-fit: cover; border-radius: 28px">
 <div style="position: absolute; right: 44px; bottom: 20px; width: 236px; background: rgba(255,255,255,0.97); border: 1px solid #d6cfc3; border-radius: 16px; padding: 14px 16px; box-sizing: border-box; box-shadow: 0 30px 70px rgba(22,18,58,0.16); display: flex; flex-direction: column; gap: 6px">
 <div style="display: flex; gap: 8px; align-items: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; color: #4b45f5"><span style="width: 8px; height: 8px; border-radius: 99px; background: #4b45f5"></span>MATCHED BY AI</div>
 <div style="font-size: 13px; line-height: 1.4">NIP transfer “S OKAFOR BRND DSGN” → Invoice #0142</div>
@@ -438,8 +463,23 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <div class="pstage">
 <div class="pblob"></div><div class="pring r1"></div><div class="pring r2"></div><div class="pring r3"></div>
 <button type="button" class="orb o1" aria-label="Catch blue orb, 5 points"></button><button type="button" class="orb o2" aria-label="Catch coral orb, 10 points"></button><div class="pbadge">5<br>WALLETS</div>
-<div class="phone"><div class="notch"></div>
-<div class="ptop"><img src="/landing/media/gabis-logo.png" alt="gabis" style="height: 26px"><div class="pwho"><span><small>Welcome back</small><b>Deji Adewusi</b></span><i>DA</i></div></div>
+<div class="phone-frame">
+<div class="hw-btn hw-action"></div>
+<div class="hw-btn hw-vol-up"></div>
+<div class="hw-btn hw-vol-down"></div>
+<div class="hw-btn hw-power"></div>
+<div class="hw-btn hw-camera-control"></div>
+<div class="phone">
+<div class="status-bar">
+<span class="status-time">9:41</span>
+<div class="dynamic-island"><span class="sensor-lens"></span></div>
+<div class="status-icons">
+<svg width="15" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="8" width="2.5" height="3" rx="0.6"/><rect x="4.5" y="5.5" width="2.5" height="5.5" rx="0.6"/><rect x="9" y="3" width="2.5" height="8" rx="0.6"/><rect x="13.5" y="0" width="2.5" height="11" rx="0.6"/></svg>
+<svg width="13" height="10" viewBox="0 0 16 12" fill="currentColor"><path d="M8 12a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-4.24-4.24a6 6 0 018.48 0 .8.8 0 001.14-1.13 7.6 7.6 0 00-10.76 0 .8.8 0 001.14 1.13zm-2.83-2.83a10 10 0 0114.14 0 .8.8 0 001.14-1.13 11.6 11.6 0 00-16.42 0 .8.8 0 101.14 1.13z"/></svg>
+<svg width="22" height="11" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-width="1"/><rect x="2" y="2" width="15" height="8" rx="2" fill="currentColor"/><path d="M23 4v4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+</div>
+</div>
+<div class="ptop"><img src="/landing/media/gabis-logo.png" alt="gabis" style="height: 24px"><div class="pwho"><span><small>Welcome back</small><b>Deji Adewusi</b></span><i>DA</i></div></div>
 <div class="pview" data-view="home">
 <div class="pbal"><small>Total balance</small><b>₦ 860,000</b></div>
 <div class="pacts"><button type="button" data-v="send" class="a1" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg><span>Send</span></button><button type="button" data-v="receive" class="a2" aria-label="Receive"><svg viewBox="0 0 24 24"><path d="M17 7L7 17M15 17H7V9"/></svg><span>Receive</span></button><button type="button" data-v="swap" class="a3" aria-label="Swap"><svg viewBox="0 0 24 24"><path d="M4 9h14l-3-3M20 15H6l3 3"/></svg><span>Swap</span></button><button type="button" data-v="deposit" class="a4" aria-label="Deposit"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Deposit</span></button></div>
@@ -450,6 +490,8 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <div class="pview" data-view="swap" hidden><h3>Swap</h3><label>From<input value="200.00 USD" readonly></label><div class="pnote" style="text-align:center">↓ Rate locked for 30s</div><label>To<input value="[AMOUNT] NGN" readonly></label><button type="button" class="pgo" data-done="Swapped USD → NGN">Swap now</button><button type="button" class="pback" data-v="home">Back</button></div>
 <div class="pview" data-view="deposit" hidden><h3>Add money</h3><div class="pcard"><small>Bank transfer</small><b>Instant</b><span>Free · NGN</span></div><div class="pcard"><small>Debit card</small><b>Visa · Mastercard · Verve</b><span>1.5% fee</span></div><button type="button" class="pgo" data-done="Deposit started">Continue</button><button type="button" class="pback" data-v="home">Back</button></div>
 <div class="ptoast" role="status" aria-live="polite"></div>
+<div class="home-indicator"></div>
+</div>
 </div>
 </div>
 </section>
@@ -587,7 +629,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
 <div style="background: #ffffff; border: 1px solid #e5dfd5; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column">
-<img src="/landing/media/tailor.jpg" alt="Tailor smiling at his sewing machine" style="width: 100%; height: 380px; object-fit: cover">
+<img src="/landing/media/tailor.jpg?v=4" alt="African fashion designer in his tailoring workshop" style="width: 100%; height: 380px; object-fit: cover">
 <div style="padding: 26px; display: flex; flex-direction: column; gap: 12px">
 <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: #4b45f5">TAILORS &amp; FASHION</div>
 <div style="font-family: Sora, sans-serif; font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em">Deposits and balances, settled before pickup.</div>
@@ -595,7 +637,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 </div>
 <div style="background: #ffffff; border: 1px solid #e5dfd5; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column">
-<img src="/landing/media/photog.jpg" alt="Photographer holding a camera with flash" style="width: 100%; height: 380px; object-fit: cover">
+<img src="/landing/media/photog.jpg?v=4" alt="Creative photographer in studio with camera and gabis invoice" style="width: 100%; height: 380px; object-fit: cover">
 <div style="padding: 26px; display: flex; flex-direction: column; gap: 12px">
 <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: #4b45f5">CREATIVES</div>
 <div style="font-family: Sora, sans-serif; font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em">Bill a shoot in one sentence.</div>
@@ -603,7 +645,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 </div>
 <div style="background: #ffffff; border: 1px solid #e5dfd5; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column">
-<img src="/landing/media/salon.jpg" alt="Client smiling while getting her hair done" style="width: 100%; height: 380px; object-fit: cover">
+<img src="/landing/media/salon.jpg?v=4" alt="African client smiling in modern beauty salon with settled payment" style="width: 100%; height: 380px; object-fit: cover">
 <div style="padding: 26px; display: flex; flex-direction: column; gap: 12px">
 <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: #4b45f5">SALONS &amp; SERVICES</div>
 <div style="font-family: Sora, sans-serif; font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em">Every walk‑in, on the books.</div>
@@ -710,11 +752,11 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <p style="margin: 0; font-size: 20px; line-height: 1.6; color: #4d4963; max-width: 480px">Open an account in minutes, hold the currencies you actually use, and move your first payment the same day.</p>
 <a href="/login" style="text-decoration: none; text-align: center; font-size: 18px; font-weight: 700; padding: 20px 28px; border-radius: 16px; background: #4b45f5; color: #ffffff; max-width: 440px; box-shadow: 0 12px 28px rgba(75,69,245,0.28)">Open your account</a>
 </div>
-<video src="/landing/media/loop.mp4" poster="/landing/media/poster.jpg" autoplay="" muted="" loop="" playsinline="" aria-label="Smiling woman in a café using her phone" style="width: 100%; height: 100%; min-height: 560px; object-fit: cover; display: block"></video>
+<video src="/landing/media/loop.mp4" poster="/landing/media/poster.jpg?v=4" autoplay="" muted="" loop="" playsinline="" aria-label="Smiling woman in a café using her phone" style="width: 100%; height: 100%; min-height: 560px; object-fit: cover; display: block"></video>
 </section>
 
 <section id="start" style="position: relative; margin: 0 64px 96px; height: 420px; flex-shrink: 0; border-radius: 28px; overflow: hidden; display: flex; align-items: center">
-<img src="/landing/media/cta.jpg" alt="Woman smiling at her phone on a sofa" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%">
+<img src="/landing/media/cta.jpg?v=4" alt="Woman smiling at her phone on a sofa" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%">
 <div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(12,12,12,0.88) 0%, rgba(12,12,12,0.7) 30%, rgba(12,12,12,0.15) 58%, rgba(12,12,12,0) 75%)"></div>
 <div style="position: relative; padding: 0 56px; display: flex; flex-direction: column; gap: 18px; color: #ffffff; max-width: 520px">
 <h2 style="margin: 0; font-size: 56px; line-height: 0.95; font-weight: 800; letter-spacing: -0.03em">DOWNLOAD<br>FOR FREE.</h2>
