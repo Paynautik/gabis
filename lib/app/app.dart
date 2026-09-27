@@ -1,6 +1,5 @@
-// V3 landing. The previous page is still at landing_screen.dart —
-// swap this import back to revert.
-import '../features/landing/gabis_landing_v3.dart';
+// On the web, "/" is the static homepage (web/landing); SiteHome sends the
+// app there. Native builds still show the in-app landing screen.
 import '../features/marketing/marketing_content.dart';
 import '../core/session/auth_gate.dart';
 import '../features/kyc/kyc_screen.dart';
@@ -9,6 +8,7 @@ import '../features/business/business_dashboard_screen.dart';
 import '../features/marketing/marketing_screen.dart';
 import '../features/bills/bills_screen.dart';
 import 'package:flutter/material.dart';
+import '../core/util/site_home.dart';
 import '../core/theme/app_theme.dart';
 import '../features/auth/login_screen.dart';
 import '../features/auth/splash_screen.dart';
@@ -35,9 +35,9 @@ class GabisApp extends ConsumerWidget {
       darkTheme: AppTheme.getTheme(Brightness.dark),
       initialRoute: '/',
       routes: {
-        '/': (_) => const LandingScreen(),
+        '/': (_) => const SiteHome(),
         '/splash': (_) => const SplashScreen(),
-        '/landing': (_) => const LandingScreen(),
+        '/landing': (_) => const SiteHome(),
         '/login': (_) => const LoginScreen(),
         // Anything holding money or customer data sits behind the gate.
         '/home': (_) => const AuthGate(child: HomeShell()),
@@ -61,7 +61,7 @@ class GabisApp extends ConsumerWidget {
       },
       onUnknownRoute: (settings) => MaterialPageRoute(
         settings: settings,
-        builder: (_) => const LandingScreen(),
+        builder: (_) => const SiteHome(),
       ),
     );
   }

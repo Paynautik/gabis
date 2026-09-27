@@ -7,7 +7,7 @@ import '../../shared/models/account.dart';
 import '../../shared/models/money.dart';
 import '../../shared/models/transaction.dart';
 import '../../shared/providers/app_providers.dart';
-import '../../shared/widgets/glowing_background.dart';
+import '../partners/partner_rails.dart';
 
 class AccountsScreen extends ConsumerStatefulWidget {
   const AccountsScreen({super.key});
@@ -17,20 +17,43 @@ class AccountsScreen extends ConsumerStatefulWidget {
 }
 
 class _AccountsScreenState extends ConsumerState<AccountsScreen> {
-  String _selectedCurrency = 'ALL';
+  String? _selected;
   String _searchQuery = '';
+
+  /// Naira value of a balance, for the total. NGN and USD use the app's rate;
+  /// the rest go through the reference rates until a live FX feed is wired.
+  double _toNaira(Money m, double fxRate) {
+    final major = m.minorUnits / 100;
+    if (m.currency == 'NGN') return major;
+    if (m.currency == 'USD') return major * fxRate;
+    final perUsd = sandboxReferenceRates['USD/${m.currency}'];
+    return perUsd == null ? 0 : major / perUsd * fxRate;
+  }
+
+  String _naira(double v) {
+    final s = v.round().toString();
+    final b = StringBuffer();
+    for (var i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) b.write(',');
+      b.write(s[i]);
+    }
+    return '₦$b';
+  }
 
   @override
   Widget build(BuildContext context) {
     final accounts = ref.watch(accountsProvider);
     final allTransactions = ref.watch(transactionsProvider);
     final fxRate = ref.watch(fxRateProvider);
+    final current = accounts.firstWhere((a) => a.currency == _selected, orElse: () => accounts.first);
+    final total = accounts.fold(0.0, (t, a) => t + _toNaira(a.balance, fxRate));
 
     final filteredTransactions = allTransactions.where((tx) {
-      final matchesSearch = tx.counterparty?.toLowerCase().contains(_searchQuery.toLowerCase()) == true ||
-          tx.description?.toLowerCase().contains(_searchQuery.toLowerCase()) == true;
-      if (_selectedCurrency == 'ALL') return matchesSearch;
-      return matchesSearch && tx.amount.currency == _selectedCurrency;
+      final q = _searchQuery.toLowerCase();
+      final matchesSearch = q.isEmpty ||
+          tx.counterparty?.toLowerCase().contains(q) == true ||
+          tx.description?.toLowerCase().contains(q) == true;
+      return matchesSearch && tx.amount.currency == current.currency;
     }).toList();
 
     return Scaffold(
@@ -39,319 +62,204 @@ class _AccountsScreenState extends ConsumerState<AccountsScreen> {
         title: Text('Accounts & Wallets', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900)),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add_circle_outline_rounded, color: context.colors.bluePrimary),
-            tooltip: 'Open New Currency Account',
-            onPressed: () => _showOpenAccountDialog(context),
-          ),
-        ],
       ),
-      body: GlowingBackground(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          children: [
-            // Currency selector tabs
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 880),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 30),
+            children: [
+              // Total across every wallet.
+              Text('Total balance', style: TextStyle(color: context.colors.inkSoft, fontSize: 13, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 4),
+              Text(_naira(total),
+                  style: TextStyle(color: context.colors.ink, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: -1)),
+              Text('across ${accounts.length} wallet${accounts.length == 1 ? '' : 's'}',
+                  style: TextStyle(color: context.colors.inkSoft, fontSize: 12)),
+              const SizedBox(height: 18),
+
+              // Wallet tiles.
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: IntrinsicHeight(
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    for (final acc in accounts) _walletTile(context, acc, acc.currency == current.currency),
+                    _openTile(context, accounts.length),
+                  ]),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              _buildDetailedAccountCard(context, current, fxRate),
+              const SizedBox(height: 26),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildCurrencyFilterChip('ALL', 'All Accounts'),
-                  for (final acc in accounts)
-                    _buildCurrencyFilterChip(acc.currency, '${_getFlag(acc.currency)} ${acc.currency}'),
-                  GestureDetector(
-                    onTap: () => _showOpenAccountDialog(context),
-                    child: Container(
-                      margin: const EdgeInsets.only(left: 6),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: context.colors.border, style: BorderStyle.solid),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.add, size: 14, color: context.colors.bluePrimary),
-                          const SizedBox(width: 4),
-                          Text('New', style: TextStyle(color: context.colors.bluePrimary, fontSize: 12, fontWeight: FontWeight.w800)),
-                        ],
-                      ),
-                    ),
-                  ),
+                  Text('${current.currency} ACTIVITY',
+                      style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: context.colors.inkSoft, letterSpacing: 1.0)),
+                  Text('${filteredTransactions.length} item${filteredTransactions.length == 1 ? '' : 's'}',
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11, color: context.colors.inkSoft)),
                 ],
               ),
-            ),
-            const SizedBox(height: 16),
-
-            // Account Cards
-            for (final acc in accounts)
-              if (_selectedCurrency == 'ALL' || _selectedCurrency == acc.currency)
-                _buildDetailedAccountCard(context, acc, fxRate),
-
-            const SizedBox(height: 24),
-
-            // Transactions Header & Search
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'ACTIVITY',
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 11, color: context.colors.inkSoft, letterSpacing: 1.0),
+              const SizedBox(height: 10),
+              TextField(
+                style: TextStyle(color: context.colors.ink, fontSize: 13),
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.search_rounded, color: context.colors.inkSoft, size: 20),
+                  hintText: 'Search ${current.currency} activity',
+                  hintStyle: TextStyle(color: context.colors.inkSoft, fontSize: 13),
+                  filled: true,
+                  fillColor: context.colors.bgSoft,
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: context.colors.border)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: context.colors.border)),
                 ),
-                Text(
-                  '${filteredTransactions.length} items',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 11, color: context.colors.inkSoft),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-
-            // Search Bar
-            Container(
-              decoration: BoxDecoration(
-                color: context.colors.bgSoft,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: context.colors.border),
+                onChanged: (val) => setState(() => _searchQuery = val),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              child: Row(
-                children: [
-                  Icon(Icons.search_rounded, color: context.colors.inkSoft, size: 20),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      style: TextStyle(color: context.colors.ink, fontSize: 13),
-                      decoration: InputDecoration(
-                        hintText: 'Search account activity...',
-                        hintStyle: TextStyle(color: context.colors.inkSoft, fontSize: 13),
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      onChanged: (val) => setState(() => _searchQuery = val),
-                    ),
-                  ),
-                  if (_searchQuery.isNotEmpty)
-                    GestureDetector(
-                      onTap: () => setState(() => _searchQuery = ''),
-                      child: Icon(Icons.close_rounded, size: 16, color: context.colors.inkSoft),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 14),
-
-            // Transactions List
-            if (filteredTransactions.isEmpty)
-              Container(
-                padding: const EdgeInsets.all(32),
-                alignment: Alignment.center,
-                child: Column(
-                  children: [
-                    Icon(Icons.receipt_long_outlined, size: 40, color: context.colors.inkSoft.withValues(alpha: 0.5)),
-                    const SizedBox(height: 10),
-                    Text('No transactions found', style: TextStyle(color: context.colors.inkSoft, fontWeight: FontWeight.w700)),
-                  ],
-                ),
-              )
-            else
-              for (final tx in filteredTransactions)
-                _buildTransactionRow(context, tx),
-
-            const SizedBox(height: 30),
-          ],
+              const SizedBox(height: 14),
+              if (filteredTransactions.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 28),
+                  child: Column(children: [
+                    Icon(Icons.receipt_long_outlined, size: 32, color: context.colors.inkSoft.withValues(alpha: 0.5)),
+                    const SizedBox(height: 8),
+                    Text(_searchQuery.isEmpty ? 'No ${current.currency} activity yet' : 'Nothing matches “$_searchQuery”',
+                        style: TextStyle(color: context.colors.inkSoft, fontWeight: FontWeight.w600)),
+                  ]),
+                )
+              else
+                for (final tx in filteredTransactions) _buildTransactionRow(context, tx),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildCurrencyFilterChip(String key, String label) {
-    final isSelected = _selectedCurrency == key;
-    return GestureDetector(
-      onTap: () => setState(() => _selectedCurrency = key),
-      child: Container(
-        margin: const EdgeInsets.only(right: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? context.colors.bluePrimary : context.colors.bgSoft,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isSelected ? context.colors.bluePrimary : context.colors.border),
-          boxShadow: isSelected
-              ? [BoxShadow(color: context.colors.bluePrimary.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 3))]
-              : null,
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : context.colors.ink,
-            fontWeight: FontWeight.w800,
-            fontSize: 12.5,
+  Widget _walletTile(BuildContext context, Account acc, bool selected) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => setState(() => _selected = acc.currency),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          width: 150,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: selected ? context.colors.ink : context.colors.bgSoft,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: selected ? context.colors.ink : context.colors.border),
           ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Text(_getFlag(acc.currency), style: const TextStyle(fontSize: 18)),
+              const SizedBox(width: 8),
+              Text(acc.currency,
+                  style: TextStyle(fontWeight: FontWeight.w800, color: selected ? Colors.white : context.colors.ink)),
+            ]),
+            const SizedBox(height: 14),
+            Text(acc.balance.format(),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    fontWeight: FontWeight.w800, fontSize: 15, color: selected ? Colors.white : context.colors.ink)),
+          ]),
         ),
+      ),
+    );
+  }
+
+  Widget _openTile(BuildContext context, int held) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () => _showOpenAccountDialog(context),
+      child: Container(
+        width: 150,
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: context.colors.border),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Icon(Icons.add_rounded, color: context.colors.bluePrimary),
+          const SizedBox(height: 10),
+          Text('Open a wallet', style: TextStyle(fontWeight: FontWeight.w800, color: context.colors.ink)),
+          Text('$held of ${walletCurrencies.length} held', style: TextStyle(fontSize: 11, color: context.colors.inkSoft)),
+        ]),
       ),
     );
   }
 
   Widget _buildDetailedAccountCard(BuildContext context, Account account, double fxRate) {
-    final isNgn = account.currency == 'NGN';
-    final flag = _getFlag(account.currency);
-    final accountName = isNgn ? 'gabis Nigerian Naira Account' : 'gabis Global USD Multi-Currency Account';
-    final accountNumber = isNgn ? '9928371102' : '0294817492';
+    final w = walletFor(account.currency);
+    final accountNumber = switch (account.currency) { 'NGN' => '9928371102', 'USD' => '0294817492', _ => null };
     final bankName = switch (account.currency) {
       'NGN' => 'gabis Partner Bank (Providus)',
       'USD' => 'Evolve Bank & Trust / gabis US',
-      _ => 'gabis · ${walletFor(account.currency)?.details ?? 'Partner bank'}',
+      _ => w?.details ?? 'Partner bank',
     };
+    final approx = account.currency == 'NGN'
+        ? '≈ \$${(account.balance.minorUnits / 100 / fxRate).toStringAsFixed(2)}'
+        : '≈ ${_naira(_toNaira(account.balance, fxRate))}';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: context.colors.bgSoft,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(color: context.colors.border),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Top row: Flag + Currency + Details
-          Padding(
-            padding: const EdgeInsets.all(18),
-            child: Row(
-              children: [
-                Text(flag, style: const TextStyle(fontSize: 28)),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(account.currency, style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: context.colors.ink)),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: context.colors.bluePrimary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text('Active', style: TextStyle(color: context.colors.bluePrimary, fontSize: 10, fontWeight: FontWeight.w800)),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 2),
-                      Text(bankName, style: TextStyle(color: context.colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      account.balance.format(),
-                      style: TextStyle(fontWeight: FontWeight.w900, fontSize: 20, color: context.colors.ink, letterSpacing: -0.5),
-                    ),
-                    if (isNgn)
-                      Text('≈ \$${(account.balance.minorUnits / 100 / fxRate).toStringAsFixed(2)} USD',
-                          style: TextStyle(color: context.colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w600))
-                    else
-                      Text('≈ ₦${(account.balance.minorUnits / 100 * fxRate).toStringAsFixed(0)} NGN',
-                          style: TextStyle(color: context.colors.inkSoft, fontSize: 11, fontWeight: FontWeight.w600)),
-                  ],
-                ),
-              ],
-            ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Text(w?.flag ?? '🌐', style: const TextStyle(fontSize: 26)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(w?.name ?? account.currency,
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: context.colors.ink)),
+              Text(bankName, style: TextStyle(color: context.colors.inkSoft, fontSize: 12)),
+            ]),
           ),
-
-          // Account Details Bar (Virtual account number & copy)
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: context.colors.scaffoldBg,
-              borderRadius: BorderRadius.circular(14),
+        ]),
+        const SizedBox(height: 18),
+        Text(account.balance.format(),
+            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 30, color: context.colors.ink, letterSpacing: -1)),
+        Text(approx, style: TextStyle(color: context.colors.inkSoft, fontSize: 12)),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(color: context.colors.scaffoldBg, borderRadius: BorderRadius.circular(14)),
+          child: Row(children: [
+            Icon(Icons.account_balance_outlined, size: 16, color: context.colors.inkSoft),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(accountNumber == null ? 'Account details issued once the ${account.currency} partner is live' : 'Account $accountNumber',
+                  style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w600, fontSize: 13)),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.account_balance_rounded, size: 16, color: context.colors.inkSoft),
-                    const SizedBox(width: 8),
-                    Text('Acct: $accountNumber', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w700, fontSize: 12)),
-                  ],
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(text: accountNumber));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('$account.currency Account Number copied to clipboard!')),
-                    );
-                  },
-                  child: Row(
-                    children: [
-                      Text('Copy', style: TextStyle(color: context.colors.bluePrimary, fontSize: 12, fontWeight: FontWeight.w800)),
-                      const SizedBox(width: 4),
-                      Icon(Icons.copy_rounded, color: context.colors.bluePrimary, size: 14),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // Action Buttons Bar
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildActionButton(
-                    icon: Icons.add_rounded,
-                    label: 'Top Up',
-                    color: context.colors.bluePrimary,
-                    onTap: () => _showTopUpSheet(context, account),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildActionButton(
-                    icon: Icons.send_rounded,
-                    label: 'Transfer',
-                    color: const Color(0xFF16A34A),
-                    onTap: () => Navigator.of(context).pushNamed('/send'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildActionButton(
-                    icon: Icons.swap_horiz_rounded,
-                    label: 'Convert',
-                    color: const Color(0xFFF79009),
-                    onTap: () => Navigator.of(context).pushNamed('/fx'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _buildActionButton(
-                    icon: Icons.receipt_long_rounded,
-                    label: 'Statement',
-                    color: const Color(0xFF7C3AED),
-                    onTap: () => _showAccountStatement(context, account),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-        ],
-      ),
+            if (accountNumber != null)
+              TextButton.icon(
+                style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+                onPressed: () {
+                  Clipboard.setData(ClipboardData(text: accountNumber));
+                  ScaffoldMessenger.of(context)
+                      .showSnackBar(SnackBar(content: Text('${account.currency} account number copied')));
+                },
+                icon: const Icon(Icons.copy_rounded, size: 14),
+                label: const Text('Copy'),
+              ),
+          ]),
+        ),
+        const SizedBox(height: 18),
+        Row(children: [
+          Expanded(child: _buildActionButton(icon: Icons.add_rounded, label: 'Top up', color: context.colors.bluePrimary, onTap: () => _showTopUpSheet(context, account))),
+          Expanded(child: _buildActionButton(icon: Icons.north_east_rounded, label: 'Send', color: const Color(0xFF4B45F5), onTap: () => Navigator.of(context).pushNamed('/send'))),
+          Expanded(child: _buildActionButton(icon: Icons.swap_horiz_rounded, label: 'Convert', color: const Color(0xFFE0643C), onTap: () => Navigator.of(context).pushNamed('/fx'))),
+          Expanded(child: _buildActionButton(icon: Icons.receipt_long_outlined, label: 'Statement', color: const Color(0xFF7C3AED), onTap: () => _showAccountStatement(context, account))),
+        ]),
+      ]),
     );
   }
 
@@ -363,20 +271,19 @@ class _AccountsScreenState extends ConsumerState<AccountsScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, size: 18, color: color),
-            const SizedBox(height: 4),
-            Text(label, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w800)),
-          ],
-        ),
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        child: Column(children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(color: context.colors.scaffoldBg, shape: BoxShape.circle, border: Border.all(color: context.colors.border)),
+            child: Icon(icon, size: 20, color: color),
+          ),
+          const SizedBox(height: 6),
+          Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: context.colors.ink, fontSize: 12, fontWeight: FontWeight.w600)),
+        ]),
       ),
     );
   }
