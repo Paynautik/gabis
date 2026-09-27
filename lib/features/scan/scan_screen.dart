@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
@@ -66,9 +67,18 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
   String? _error;
 
+  /// Laptops and desktops point the webcam at the user, which cannot scan a
+  /// code on a phone screen. They start with typing or pasting instead.
+  late bool _manual = kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.macOS ||
+          defaultTargetPlatform == TargetPlatform.windows ||
+          defaultTargetPlatform == TargetPlatform.linux);
+  final _entry = TextEditingController();
+
   @override
   void dispose() {
     _controller.dispose();
+    _entry.dispose();
     super.dispose();
   }
 
@@ -98,9 +108,13 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
+        // Explicit colour: the app theme's title style would otherwise paint
+        // dark text on this black bar.
         title: const Text('Scan to pay',
-            style: TextStyle(fontWeight: FontWeight.w900)),
-        actions: [
+            style: TextStyle(fontWeight: FontWeight.w900, color: Colors.white, fontSize: 18)),
+        actions: _manual
+            ? null
+            : [
           IconButton(
             tooltip: 'Torch',
             onPressed: () => _controller.toggleTorch(),
@@ -113,19 +127,89 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
           ),
         ],
       ),
-      body: Stack(
-        alignment: Alignment.center,
-        children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: _onDetect,
-            // A camera that cannot start is the common case on the web, where
-            // the browser may refuse or the page may not be on https.
-            errorBuilder: (context, error) => _CameraProblem(error: error),
-          ),
-          // The frame people aim with.
-          IgnorePointer(
-            child: Container(
+      body: _manual ? _manualEntry(context) : _camera(context),
+    );
+  }
+
+  void _submitEntry() {
+    final payee = ScannedPayee.parse(_entry.text);
+    if (payee == null) {
+      setState(() => _error = 'Enter a 10-digit account number or paste a gabis payment link.');
+      return;
+    }
+    Navigator.pop(context, payee);
+  }
+
+  Widget _manualEntry(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 440),
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.all(28),
+          children: [
+            const Icon(Icons.smartphone_rounded, color: Colors.white54, size: 44),
+            const SizedBox(height: 14),
+            const Text('Scanning works best on your phone',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 8),
+            const Text(
+              'Open gabis on your phone to scan a code, or enter the account number or payment link here.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.45),
+            ),
+            const SizedBox(height: 22),
+            TextField(
+              controller: _entry,
+              autofocus: true,
+              style: const TextStyle(color: Colors.white),
+              cursorColor: Colors.white,
+              onSubmitted: (_) => _submitEntry(),
+              decoration: InputDecoration(
+                hintText: '0123456789 or https://…/pay?to=…',
+                hintStyle: const TextStyle(color: Colors.white38),
+                filled: true,
+                fillColor: Colors.white.withValues(alpha: 0.08),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide.none),
+                errorText: _error,
+              ),
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: _submitEntry,
+              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+              child: const Text('Continue'),
+            ),
+            TextButton(
+              onPressed: () => setState(() {
+                _manual = false;
+                _error = null;
+              }),
+              child: const Text('Use this computer\'s camera instead', style: TextStyle(color: Colors.white70)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _camera(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        MobileScanner(
+          controller: _controller,
+          onDetect: _onDetect,
+          // A camera that cannot start is the common case on the web, where
+          // the browser may refuse or the page may not be on https.
+          errorBuilder: (context, error) => _CameraProblem(error: error),
+        ),
+        // The frame, with the instruction right under it where the eye
+        // already is, and clear of messages that pop up at the bottom.
+        IgnorePointer(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
               width: 240,
               height: 240,
               decoration: BoxDecoration(
@@ -133,38 +217,23 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-          ),
-          Positioned(
-            bottom: 40,
-            left: 24,
-            right: 24,
-            child: Column(
-              children: [
-                if (_error != null) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(_error!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                            color: Colors.white, fontSize: 12.5)),
-                  ),
-                  const SizedBox(height: 12),
-                ],
-                const Text(
-                  'Point at a gabis code, or any code holding an account number.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70, fontSize: 12.5),
-                ),
-              ],
+            const SizedBox(height: 18),
+            Container(
+              constraints: const BoxConstraints(maxWidth: 320),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.6),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                _error ?? 'Point at a gabis code, or any code holding an account number.',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: _error != null ? const Color(0xFFFFB4A6) : Colors.white, fontSize: 13, height: 1.4),
+              ),
             ),
-          ),
-        ],
-      ),
+          ]),
+        ),
+      ],
     );
   }
 }
