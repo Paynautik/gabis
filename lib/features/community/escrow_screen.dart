@@ -11,6 +11,9 @@ import '../partners/partner_stores.dart';
 const _indigo = Color(0xFF4B45F5);
 const _green = Color(0xFF0F9D6B);
 
+/// The app theme makes outlined buttons full-width, which breaks a Wrap of actions.
+final _compact = OutlinedButton.styleFrom(minimumSize: const Size(0, 44));
+
 String _n(int minor) => '₦${NumberFormat('#,##0').format(minor / 100)}';
 
 /// Escrow: the buyer's money is held by the custody partner until delivery
@@ -165,6 +168,7 @@ class _DealCard extends ConsumerWidget {
               ),
             if (d.iAmBuyer)
               OutlinedButton(
+                style: _compact,
                 onPressed: () async {
                   if (!await _confirm(context, 'Cancel this escrow?', 'Nothing has been paid in yet, so it simply closes.')) return;
                   final r = await n.cancel(d.id);
@@ -184,7 +188,7 @@ class _DealCard extends ConsumerWidget {
                       onPressed: () => _run(context, ref, st),
                       child: Text(_stepCopy[st]!.$1),
                     )
-                  : OutlinedButton(onPressed: () => _run(context, ref, st), child: Text(_stepCopy[st]!.$1)),
+                  : OutlinedButton(style: _compact, onPressed: () => _run(context, ref, st), child: Text(_stepCopy[st]!.$1)),
           ]),
         if (!sandbox && d.stepsForMe().isNotEmpty)
           Padding(
