@@ -290,9 +290,13 @@ class DismissedNotifier extends StateNotifier<Set<String>> {
 final dismissedFindingsProvider =
     StateNotifierProvider<DismissedNotifier, Set<String>>((ref) => DismissedNotifier());
 
-/// What the agents currently want the user to see, dismissed ones removed.
-final agentFindingsProvider = Provider<List<AgentFinding>>((ref) {
-  final snap = AgentSnapshot(
+/// When the agents last ran. Bumped by "Check now"; every data change also
+/// re-runs them, because the snapshot below watches that data.
+final agentLastRunProvider = StateProvider<DateTime>((ref) => DateTime.now());
+
+final agentSnapshotProvider = Provider<AgentSnapshot>((ref) {
+  ref.watch(agentLastRunProvider);
+  return AgentSnapshot(
     engine: ref.watch(intelligenceEngineProvider),
     goals: ref.watch(goalsProvider),
     pendingIncome: ref.watch(pendingIncomeProvider),
@@ -302,9 +306,86 @@ final agentFindingsProvider = Provider<List<AgentFinding>>((ref) {
     watches: ref.watch(rateWatchProvider),
     now: DateTime.now(),
   );
+});
+
+/// What the agents currently want the user to see, dismissed ones removed.
+final agentFindingsProvider = Provider<List<AgentFinding>>((ref) {
+  final snap = ref.watch(agentSnapshotProvider);
   final dismissed = ref.watch(dismissedFindingsProvider);
   return runAgents(snap).where((f) => !dismissed.contains(f.id)).toList();
 });
+
+/// One rule an agent evaluates, with the live value it read.
+class AgentCheck {
+  final String label;
+  final String value;
+  final bool tripped;
+  const AgentCheck(this.label, this.value, {this.tripped = false});
+}
+
+/// What each agent checks and what it found, from the same snapshot the
+/// findings come from. Shown when the user opens an agent.
+List<AgentCheck> agentChecks(AgentKind k, AgentSnapshot s) {
+  final hasData = s.engine.core.transactions.isNotEmpty;
+  switch (k) {
+    case AgentKind.money:
+      if (!hasData) return const [AgentCheck('Transaction history', 'None yet', tripped: false)];
+      final f = s.engine.forecast();
+      final buffer = s.engine.discretionaryDailyNaira * 7;
+      return [
+        AgentCheck('Balance today', _n(s.engine.core.balanceNaira)),
+        AgentCheck('Safe to spend today', _n(f.safeTodayNaira)),
+        AgentCheck('Lowest point in 30 days', '${_n(f.lowestNaira)} on ${_d(f.lowestOn)}', tripped: f.lowestNaira < buffer),
+        AgentCheck('One-week cushion', _n(buffer)),
+      ];
+    case AgentKind.security:
+      final week = s.guardLog.where((e) => s.now.difference(e.at).inDays < 7).toList();
+      return [
+        const AgentCheck('Every outgoing transfer', 'Checked before you confirm'),
+        AgentCheck('Paused this week', '${week.length}'),
+        AgentCheck('Approved despite a warning', '${week.where((e) => e.outcome == 'approved').length}',
+            tripped: week.any((e) => e.outcome == 'approved')),
+        AgentCheck('Stopped by you', '${week.where((e) => e.outcome == 'cancelled').length}'),
+      ];
+    case AgentKind.fx:
+      final open = s.watches.where((w) => w.firedAt == null).length;
+      final hit = s.watches.where((w) => w.firedAt != null && s.now.difference(w.firedAt!).inDays < 3).length;
+      return [
+        const AgentCheck('Currency pairs watched', 'USD against 7 African currencies'),
+        AgentCheck('Your rate alerts', open == 0 ? 'None set' : '$open active'),
+        AgentCheck('Targets reached (3 days)', '$hit', tripped: hit > 0),
+      ];
+    case AgentKind.wealth:
+      final behind = wealthAgent(s).where((f) => f.action == ActionKind.contribute).length;
+      return [
+        AgentCheck('Goals', s.goals.isEmpty ? 'None set' : '${s.goals.length}'),
+        AgentCheck('Goals behind schedule', '$behind', tripped: behind > 0),
+        AgentCheck('Autopilot', s.autopilot.armed ? 'On' : 'Off'),
+        AgentCheck('New income to split', s.pendingIncome == null ? 'None' : _n((s.pendingIncome!.amount.minorUnits / 100).round()),
+            tripped: s.pendingIncome != null),
+      ];
+    case AgentKind.bills:
+      final commitments = s.engine.core.recurringCommitments();
+      final due = billsAgent(s).where((f) => f.id.startsWith('bills.due')).length;
+      final subs = s.engine.core.trimmableSubscriptions();
+      final closing = s.refundWindows.where((w) => w.closingSoon(s.now)).length;
+      return [
+        AgentCheck('Recurring payments found', hasData ? '${commitments.length}' : 'None yet'),
+        AgentCheck('Due in the next 3 days', '$due', tripped: due > 0),
+        AgentCheck('Subscriptions', subs.isEmpty ? '0' : '${subs.length} · ${_n(subs.fold(0, (a, c) => a + c.monthlyNaira))}/mo', tripped: subs.length >= 3),
+        AgentCheck('Refund windows closing', '$closing', tripped: closing > 0),
+      ];
+  }
+}
+
+/// What the agent does when a check trips, in one line.
+const agentPromise = {
+  AgentKind.money: 'Warns you before your balance runs short, with the date and how much to hold back.',
+  AgentKind.security: 'Pauses unusual transfers and follows up if you approved one anyway.',
+  AgentKind.fx: 'Alerts you, or converts if you allowed it, when a rate reaches your target.',
+  AgentKind.wealth: 'Proposes a split when income lands and a catch-up when a goal falls behind.',
+  AgentKind.bills: 'Reminds you of bills due soon, subscription creep and refund windows about to close.',
+};
 
 /// Carries out an agent's proposed action. Called only from a button the
 /// user pressed.

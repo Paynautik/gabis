@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../shared/providers/app_providers.dart';
 import '../copilot/copilot_engine.dart';
-import '../partners/partner_stores.dart';
 import 'agents.dart';
 import 'intelligence_engine.dart';
 import 'intelligence_stores.dart';
@@ -96,7 +98,7 @@ Widget _row(BuildContext c, String k, String v, {Color? color, bool bold = false
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(children: [
         Expanded(child: Text(k, style: TextStyle(color: c.colors.inkSoft))),
-        Text(v, style: TextStyle(fontWeight: bold ? FontWeight.w800 : FontWeight.w700, color: color ?? c.colors.ink)),
+        Flexible(child: Text(v, textAlign: TextAlign.right, style: TextStyle(fontWeight: bold ? FontWeight.w800 : FontWeight.w700, color: color ?? c.colors.ink))),
       ]),
     );
 
@@ -129,7 +131,7 @@ class _FutureTabState extends ConsumerState<_FutureTab> {
       _Card(
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Row(children: [
-            Text('NEXT 30 DAYS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1, color: context.colors.inkSoft)),
+            Flexible(child: Text('NEXT 30 DAYS', overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1, color: context.colors.inkSoft))),
             const Spacer(),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -631,66 +633,251 @@ const _agentMeta = {
   AgentKind.bills: (Icons.receipt_long_rounded, 'Bills Agent', 'Commitments & refund windows', Color(0xFFF59E0B)),
 };
 
-class _AgentsTab extends ConsumerWidget {
+class _AgentsTab extends ConsumerStatefulWidget {
   const _AgentsTab();
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_AgentsTab> createState() => _AgentsTabState();
+}
+
+class _AgentsTabState extends ConsumerState<_AgentsTab> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))..repeat(reverse: true);
+  Timer? _clock;
+
+  @override
+  void initState() {
+    super.initState();
+    // Keeps "checked 12s ago" honest without anything else changing.
+    _clock = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    _clock?.cancel();
+    super.dispose();
+  }
+
+  String _ago(DateTime t) {
+    final d = DateTime.now().difference(t);
+    if (d.inSeconds < 10) return 'checked just now';
+    if (d.inMinutes < 1) return 'checked ${d.inSeconds}s ago';
+    if (d.inHours < 1) return 'checked ${d.inMinutes}m ago';
+    return 'checked ${d.inHours}h ago';
+  }
+
+  void _checkNow() {
+    ref.read(agentLastRunProvider.notifier).state = DateTime.now();
+    final n = ref.read(agentFindingsProvider).length;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(n == 0 ? 'All five agents re-checked. Nothing needs you.' : 'Re-checked. $n thing${n == 1 ? '' : 's'} need${n == 1 ? 's' : ''} you.')));
+  }
+
+  void _open(AgentKind k) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => _AgentSheet(kind: k, onCheck: _checkNow),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final findings = ref.watch(agentFindingsProvider);
+    final snap = ref.watch(agentSnapshotProvider);
+    final lastRun = ref.watch(agentLastRunProvider);
     final fx = ref.watch(fxAgentProvider);
-    final watching = ref.watch(rateWatchProvider).where((w) => w.firedAt == null).length;
+    final empty = snap.engine.core.transactions.isEmpty && snap.goals.isEmpty && snap.guardLog.isEmpty;
 
     String status(AgentKind k) {
       final mine = findings.where((f) => f.agent == k).length;
       if (mine > 0) return '$mine thing${mine == 1 ? '' : 's'} need${mine == 1 ? 's' : ''} you';
-      return switch (k) {
-        AgentKind.fx => fx.history.isEmpty ? 'Starting…' : 'Watching 7 rates · $watching alert${watching == 1 ? '' : 's'} set',
-        AgentKind.security => 'Checking every transfer',
-        _ => 'All clear',
-      };
+      final tripped = agentChecks(k, snap).where((c) => c.tripped).length;
+      if (k == AgentKind.fx && fx.history.isEmpty) return 'Starting…';
+      return tripped > 0 ? 'Watching $tripped signal${tripped == 1 ? '' : 's'}' : 'All clear';
     }
 
     return _page([
       _h(context, 'Your agent network',
-          'Each agent reads your own data, flags what needs you and proposes one action. Nothing moves without your approval.'),
+          'Each agent reads your own data, flags what needs you and proposes one action. Tap an agent to see what it checks.'),
+      Row(children: [
+        FadeTransition(
+          opacity: Tween(begin: .35, end: 1.0).animate(_pulse),
+          child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: _green, shape: BoxShape.circle)),
+        ),
+        const SizedBox(width: 8),
+        Expanded(child: Text('All agents running · ${_ago(lastRun)}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: context.colors.inkSoft, fontSize: 13))),
+        TextButton.icon(onPressed: _checkNow, icon: const Icon(Icons.refresh_rounded, size: 18), label: const Text('Check now')),
+      ]),
+      const SizedBox(height: 8),
       Wrap(spacing: 10, runSpacing: 10, children: [
         for (final k in AgentKind.values)
-          Container(
-            width: 220,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: context.colors.bgSoft,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: context.colors.border),
-            ),
-            child: Row(children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(color: _agentMeta[k]!.$4, borderRadius: BorderRadius.circular(10)),
-                child: Icon(_agentMeta[k]!.$1, color: Colors.white, size: 18),
+          InkWell(
+            borderRadius: BorderRadius.circular(14),
+            onTap: () => _open(k),
+            child: Container(
+              width: 220,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: context.colors.bgSoft,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: findings.any((f) => f.agent == k) ? _coral : context.colors.border),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(_agentMeta[k]!.$2, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
-                  Text(status(k),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontSize: 11,
-                          color: findings.any((f) => f.agent == k) ? _coral : context.colors.inkSoft,
-                          fontWeight: FontWeight.w600)),
+              child: Row(children: [
+                Stack(clipBehavior: Clip.none, children: [
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(color: _agentMeta[k]!.$4, borderRadius: BorderRadius.circular(10)),
+                    child: Icon(_agentMeta[k]!.$1, color: Colors.white, size: 18),
+                  ),
+                  Positioned(
+                    right: -2,
+                    bottom: -2,
+                    child: FadeTransition(
+                      opacity: Tween(begin: .4, end: 1.0).animate(_pulse),
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: findings.any((f) => f.agent == k) ? _coral : _green,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: context.colors.bgSoft, width: 2),
+                        ),
+                      ),
+                    ),
+                  ),
                 ]),
-              ),
-            ]),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(_agentMeta[k]!.$2, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                    Text(status(k),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: 11,
+                            color: findings.any((f) => f.agent == k) ? _coral : context.colors.inkSoft,
+                            fontWeight: FontWeight.w600)),
+                  ]),
+                ),
+                Icon(Icons.chevron_right_rounded, size: 18, color: context.colors.inkSoft),
+              ]),
+            ),
           ),
       ]),
+      if (empty) ...[
+        const SizedBox(height: 16),
+        _Card(
+          child: Row(children: [
+            Icon(Icons.info_outline_rounded, color: context.colors.inkSoft),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Your account has no transactions yet, so the agents have nothing to flag. Turn on demo data to watch them work.',
+                style: TextStyle(color: context.colors.inkSoft, height: 1.4),
+              ),
+            ),
+            const SizedBox(width: 12),
+            FilledButton(
+              onPressed: () => ref.read(demoDataProvider.notifier).set(true),
+              child: const Text('Try demo data'),
+            ),
+          ]),
+        ),
+      ],
       const SizedBox(height: 20),
       Text(findings.isEmpty ? 'Nothing needs you right now.' : 'Needs your attention',
           style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
       const SizedBox(height: 10),
       for (final f in findings) _FindingCard(f),
     ]);
+  }
+}
+
+class _AgentSheet extends ConsumerWidget {
+  final AgentKind kind;
+  final VoidCallback onCheck;
+  const _AgentSheet({required this.kind, required this.onCheck});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final m = _agentMeta[kind]!;
+    final snap = ref.watch(agentSnapshotProvider);
+    final checks = agentChecks(kind, snap);
+    final mine = ref.watch(agentFindingsProvider).where((f) => f.agent == kind).toList();
+    final target = switch (kind) {
+      AgentKind.fx => (HomeTab.globalMoney, 'Open Global money'),
+      AgentKind.bills => (HomeTab.copilot, 'Ask the copilot'),
+      _ => (null, ''),
+    };
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 28),
+      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(color: m.$4, borderRadius: BorderRadius.circular(12)),
+            child: Icon(m.$1, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(m.$2, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+              Text(m.$3, style: TextStyle(color: context.colors.inkSoft)),
+            ]),
+          ),
+        ]),
+        const SizedBox(height: 14),
+        Text(agentPromise[kind]!, style: TextStyle(color: context.colors.ink, height: 1.4)),
+        const SizedBox(height: 14),
+        Text('WHAT IT CHECKS', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1, color: context.colors.inkSoft)),
+        const SizedBox(height: 6),
+        for (final c in checks)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 6),
+            child: Row(children: [
+              Icon(c.tripped ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded,
+                  size: 18, color: c.tripped ? _coral : _green),
+              const SizedBox(width: 10),
+              Expanded(child: Text(c.label)),
+              Text(c.value, style: TextStyle(fontWeight: FontWeight.w700, color: c.tripped ? _coral : context.colors.ink)),
+            ]),
+          ),
+        if (mine.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          for (final f in mine) _FindingCard(f),
+        ],
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(minimumSize: const Size(0, 46)),
+              onPressed: onCheck,
+              icon: const Icon(Icons.refresh_rounded, size: 18),
+              label: const Text('Check now'),
+            ),
+          ),
+          if (target.$1 != null) ...[
+            const SizedBox(width: 10),
+            Expanded(
+              child: FilledButton(
+                style: FilledButton.styleFrom(minimumSize: const Size(0, 46)),
+                onPressed: () {
+                  Navigator.pop(context);
+                  ref.read(homeTabProvider.notifier).state = target.$1!;
+                },
+                child: Text(target.$2),
+              ),
+            ),
+          ],
+        ]),
+      ]),
+    );
   }
 }
 
@@ -720,7 +907,7 @@ class _FindingCard extends ConsumerWidget {
         const SizedBox(height: 4),
         Text(f.detail, style: TextStyle(color: context.colors.inkSoft, height: 1.4)),
         const SizedBox(height: 10),
-        Row(children: [
+        Wrap(spacing: 8, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
           if (f.actionLabel != null)
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: _indigo),
@@ -732,7 +919,6 @@ class _FindingCard extends ConsumerWidget {
               },
               child: Text(f.actionLabel!),
             ),
-          const SizedBox(width: 8),
           TextButton(
             onPressed: () => ref.read(dismissedFindingsProvider.notifier).dismiss(f.id),
             child: const Text('Dismiss'),
