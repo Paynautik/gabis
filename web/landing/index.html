@@ -313,6 +313,16 @@ img,video{max-width:100%}
 .tnote{justify-content:center;gap:6px !important;background:#f5f4ff !important;border-color:#dcd8ff !important}.tnote b{font-size:14px}.tnote span{font-size:13px;color:#5f5b73;line-height:1.5}
 .tcs{grid-template-columns:repeat(2,minmax(0,1fr))}.tc{padding:16px !important;gap:10px !important}.tvat b{font-size:32px !important}
 </style>
+<style>
+.afpick{display:flex;gap:8px;flex-wrap:wrap}.afpick button{font:600 13px 'DM Sans',sans-serif;padding:8px 12px;border-radius:999px;border:1px solid #e5dfd5;background:#fff;color:#16123a;cursor:pointer;min-height:36px}
+.afpick button.on{background:#16123a;color:#fff;border-color:#16123a}
+.afslide{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;font-size:13px;color:#5f5b73}.afslide input{accent-color:#4b45f5;width:100%}.afslide b{color:#16123a;font-variant-numeric:tabular-nums;min-width:80px;text-align:right}
+.rbar i{transition:width .35s ease}.rleg em{font-style:normal}
+.afmeter{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;font-size:12px;color:#5f5b73}
+.afm{height:8px;border-radius:99px;background:linear-gradient(90deg,#fde2d6,#fff3c4,#d7f3e6)}.afm{position:relative}.afm i{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:#16123a;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.25);transform:translate(-50%,-50%);transition:left .35s ease}
+#afmt{font-size:12px;min-width:84px;text-align:right}
+.opt{transition:border-color .2s,background .2s}
+</style>
 </head>
 <body>
 
@@ -453,19 +463,24 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <div class="xcta"><a href="/login" class="xbtn">Experience Gabis AI</a><a href="#intel-twin" class="xbtn ghost">See live simulations</a></div></div>
 
 <div class="feat" id="intel-twin"><div class="fcopy"><span class="ftag">FEATURE 01 · MONEY TWIN</span><h3>Simulate your financial future before you spend.</h3><p>A continuous AI model of your financial life. When you ask “Can I afford this?”, gabis doesn’t just check your current balance — it simulates upcoming obligations, salary timelines and a safe buffer.</p><div class="chips"><span>Predictive twin simulation</span><span>₦320k safety buffer guard</span></div></div>
-<div class="mock af2">
-<div class="mrow"><small class="mlbl">AFFORDABILITY SIMULATOR</small><span class="balp">Balance ₦620,000</span></div>
-<div class="bub me">Can I buy a MacBook Pro for ₦480,000?</div>
-<div class="bub ai"><span class="aiava">g</span><span>You can, but it leaves just <b>₦44,000</b> for the next 18 days after bills.</span></div>
-<div class="runway" role="img" aria-label="Of ₦620,000: MacBook ₦480,000, bills ₦96,000, ₦44,000 left">
-<div class="rbar"><i class="r1" style="width:77.4%"></i><i class="r2" style="width:15.5%"></i><i class="r3" style="width:7.1%"></i></div>
-<div class="rleg"><span><i class="d1"></i>MacBook ₦480k</span><span><i class="d2"></i>Bills ₦96k</span><span class="warn"><i class="d3"></i>Left ₦44k</span></div>
+<div class="mock af2" id="afsim">
+<div class="mrow"><small class="mlbl">AFFORDABILITY SIMULATOR</small><span class="balp">Balance ₦620,000 · bills ₦96,000</span></div>
+<div class="afpick" role="group" aria-label="Pick something to buy">
+<button type="button" data-p="180000" data-n="a phone">Phone ₦180k</button>
+<button type="button" data-p="320000" data-n="a generator">Generator ₦320k</button>
+<button type="button" data-p="480000" data-n="a MacBook Pro" class="on">MacBook ₦480k</button>
 </div>
+<label class="afslide"><span>Or set a price</span><input type="range" min="20000" max="520000" step="10000" value="480000" aria-label="Price"><b id="afprice">₦480,000</b></label>
+<div class="bub me" id="afq">Can I buy a MacBook Pro for ₦480,000?</div>
+<div class="bub ai"><span class="aiava">g</span><span id="afa">You can, but it leaves just <b>₦44,000</b> for the next 18 days after bills.</span></div>
+<div class="runway"><div class="rbar"><i class="r1" id="afb1"></i><i class="r2" style="width:15.5%"></i><i class="r3" id="afb3"></i></div>
+<div class="rleg"><span><i class="d1"></i><em id="afl1">Purchase ₦480k</em></span><span><i class="d2"></i>Bills ₦96k</span><span class="warn" id="aflw"><i class="d3"></i><em id="afl3">Left ₦44k</em></span></div>
+<div class="afmeter"><span>Room for surprises</span><div class="afm"><i id="afm"></i></div><b id="afmt">Tight</b></div></div>
 <div class="opts">
-<div class="opt"><small>Buy today</small><b class="bad">₦44k</b><span>left until salary · 18 days</span></div>
-<div class="opt rec"><span class="rtag">Recommended</span><small>Wait 6 days</small><b class="good">₦320k</b><span>safety buffer kept</span></div>
+<div class="opt" id="afo1"><small>Buy today</small><b id="afv1">₦44k</b><span>left for 18 days</span></div>
+<div class="opt" id="afo2"><span class="rtag" id="aftag">Recommended</span><small>Split across two paydays</small><b id="afv2">₦284k</b><span id="afs2">₦240k now, ₦240k after salary</span></div>
 </div>
-<div class="mbtns"><span class="mb pri">Remind me in 6 days</span><span class="mb">Buy anyway</span></div>
+<div class="mbtns"><span class="mb pri" id="afcta">Split it for me</span><span class="mb">Buy anyway</span></div>
 </div></div>
 
 <div class="feat rev"><div class="fcopy"><span class="ftag">FEATURE 02 · AUTOPILOT</span><h3>Give your money goals. gabis handles the routine.</h3><p>Traditional apps hand you tools and leave you to do the work. With gabis, you tell it what you want your money to accomplish. When income hits, your automated wealth waterfall runs in milliseconds.</p></div>
@@ -777,6 +792,33 @@ var p=document.createElement('div');p.className='ppop';p.textContent='+'+o.worth
 setTimeout(function(){o.el.classList.remove('gone')},3000);});});
 requestAnimationFrame(tick);
 })();
+</script>
+<script>
+(function(){var r=document.getElementById('afsim');if(!r)return;
+var BAL=620000,BILLS=96000,DAYS=18,BUF=150000;
+var sl=r.querySelector('input[type=range]'),chips=r.querySelectorAll('.afpick button'),q=r.querySelector('#afq'),a=r.querySelector('#afa');
+function k(n){return '₦'+Math.round(n/1000)+'k'} function f(n){return '₦'+n.toLocaleString('en-NG')}
+function upd(p,name){
+ var left=BAL-BILLS-p,half=Math.ceil(p/2/1000)*1000,split=BAL-BILLS-half;
+ q.textContent='Can I buy '+name+' for '+f(p)+'?';
+ if(left<0){a.innerHTML='Not this month. You would be <b>'+f(-left)+'</b> short after bills.'}
+ else if(left<BUF){a.innerHTML='You can, but it leaves just <b>'+f(left)+'</b> for the next '+DAYS+' days after bills.'}
+ else{a.innerHTML='Yes. You still keep <b>'+f(left)+'</b> for the next '+DAYS+' days after bills.'}
+ var used=Math.min(p,BAL-BILLS);r.querySelector('#afb1').style.width=(used/BAL*100)+'%';r.querySelector('#afb3').style.width=(Math.max(left,0)/BAL*100)+'%';
+ r.querySelector('#afl1').textContent='Purchase '+k(p);r.querySelector('#afl3').textContent=left<0?'Short '+k(-left):'Left '+k(left);
+ r.querySelector('#aflw').classList.toggle('warn',left<BUF);
+ var pct=Math.max(0,Math.min(1,left/(BAL-BILLS)));r.querySelector('#afm').style.left=(pct*100)+'%';
+ r.querySelector('#afmt').textContent=left<0?'Short':left<BUF?'Tight':left<300000?'Okay':'Comfortable';
+ var v1=r.querySelector('#afv1');v1.textContent=left<0?'−'+k(-left):k(left);v1.className=left<BUF?'bad':'good';
+ var v2=r.querySelector('#afv2');v2.textContent=k(split);v2.className=split<BUF?'bad':'good';
+ r.querySelector('#afs2').textContent=k(half)+' now, '+k(p-half)+' after salary';
+ var rec2=left<BUF&&split>left;r.querySelector('#afo2').classList.toggle('rec',rec2);r.querySelector('#afo1').classList.toggle('rec',!rec2);
+ var tag=r.querySelector('#aftag');(rec2?r.querySelector('#afo2'):r.querySelector('#afo1')).appendChild(tag);
+ r.querySelector('#afcta').textContent=rec2?'Split it for me':'Buy it today';
+}
+chips.forEach(function(b){b.addEventListener('click',function(){chips.forEach(function(x){x.classList.remove('on')});b.classList.add('on');sl.value=b.dataset.p;r.querySelector('#afprice').textContent=f(+b.dataset.p);upd(+b.dataset.p,b.dataset.n)})});
+sl.addEventListener('input',function(){chips.forEach(function(x){x.classList.remove('on')});var p=+sl.value;r.querySelector('#afprice').textContent=f(p);upd(p,'this')});
+upd(480000,'a MacBook Pro');})();
 </script>
 </body>
 </html>
