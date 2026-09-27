@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nautik_money/core/theme/app_theme.dart';
 import 'package:nautik_money/features/accounts/accounts_screen.dart';
+import 'package:nautik_money/features/community/ajo_screen.dart';
 import 'package:nautik_money/features/community/escrow_screen.dart';
 import 'package:nautik_money/features/intelligence/intelligence_screen.dart';
 import 'package:nautik_money/features/partners/global_money_screen.dart';
@@ -71,6 +72,18 @@ void main() {
         await t.pump(const Duration(milliseconds: 100));
       }
       expect(find.text('WHAT IT CHECKS'), findsOneWidget);
+      expect(t.takeException(), isNull);
+    });
+  }
+
+  for (final size in const [Size(390, 844), Size(1400, 1000)]) {
+    testWidgets('ajo circle lays out at ${size.width.toInt()}px', (t) async {
+      final n = AjoNotifier();
+      n.create(name: 'Christmas chicken', members: const ['Collins', 'Raphael', 'Jesse', 'Mummy'], contributionNaira: 1000, frequency: 'monthly');
+      n.markPaid(n.debugState.single.id, 'Raphael');
+      await pump(t, const Scaffold(body: AjoScreen()), size: size, overrides: [ajoProvider.overrideWith((ref) => n)]);
+      expect(find.text('SCHEDULE'), findsOneWidget);
+      expect(find.textContaining('Remind 3 on WhatsApp'), findsOneWidget);
       expect(t.takeException(), isNull);
     });
   }

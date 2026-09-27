@@ -260,6 +260,33 @@ void main() {
     });
   });
 
+  group('ajo automation', () {
+    test('auto-payout releases the pot on the last contribution, and logs it', () {
+      final n = AjoNotifier();
+      n.create(name: 'Rent', members: const ['Amaka', 'Kemi', 'Tunde'], contributionNaira: 50000, frequency: 'monthly', autoPayout: true);
+      final id = n.debugState.single.id;
+      expect(n.markPaid(id, 'Amaka'), isFalse);
+      expect(n.markPaid(id, 'Kemi'), isFalse);
+      expect(n.markPaid(id, 'Tunde'), isTrue);
+      final c = n.debugState.single;
+      expect(c.round, 1);
+      expect(c.recipient, 'Kemi');
+      expect(c.paidThisRound, isEmpty);
+      expect(c.history.last.text, contains('paid to Amaka automatically'));
+    });
+
+    test('without auto-payout the pot waits for approval', () {
+      final n = AjoNotifier();
+      n.create(name: 'Rent', members: const ['A', 'B'], contributionNaira: 1000, frequency: 'weekly');
+      final id = n.debugState.single.id;
+      n.markPaid(id, 'A');
+      expect(n.markPaid(id, 'B'), isFalse);
+      expect(n.debugState.single.round, 0);
+      n.payOut(id);
+      expect(n.debugState.single.round, 1);
+    });
+  });
+
 }
 
 // ── Agents: each one reacts to real data, and is silent without it ───────
