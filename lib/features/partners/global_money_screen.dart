@@ -196,7 +196,13 @@ class _UsdcTabState extends ConsumerState<_UsdcTab> {
             ]),
           ),
           if (sandbox)
-            OutlinedButton.icon(onPressed: _simulate, icon: const Icon(Icons.call_received_rounded), label: const Text('Receive')),
+            OutlinedButton.icon(
+              onPressed: _simulate,
+              // The app theme makes outlined buttons full-width; in a row that squeezes the balance.
+              style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
+              icon: const Icon(Icons.call_received_rounded),
+              label: const Text('Receive'),
+            ),
         ]),
       ),
       const SizedBox(height: 14),
