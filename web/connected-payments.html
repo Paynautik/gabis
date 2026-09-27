@@ -26,7 +26,7 @@ color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
 a{color:inherit}
 header{border-bottom:1px solid var(--line)}
 header .wrap{display:flex;align-items:center;gap:28px;height:72px}
-.brand{font-size:22px;font-weight:800;letter-spacing:-.8px;text-decoration:none}
+.brand{font-size:22px;font-weight:800;letter-spacing:-.8px;text-decoration:none}.brand img{height:30px;width:auto;display:block}
 nav{display:flex;gap:20px;margin-left:12px;flex-wrap:wrap}
 nav a{font-size:14px;font-weight:700;text-decoration:none}
 .spacer{flex:1}
@@ -70,7 +70,7 @@ footer .cols{grid-template-columns:repeat(2,1fr)}nav{display:none}}
 </head>
 <body>
 <header><div class="wrap">
-  <a class="brand" href="/">gabis</a>
+  <a class="brand" href="/" aria-label="gabis home"><img src="/landing/media/gabis-logo.png" alt="gabis"></a>
   <nav><a href="/wallet">Money</a><a href="/virtual-cards">Cards</a><a href="/business">Business</a><a href="/help">Help</a></nav>
   <span class="spacer"></span>
   <a class="btn" href="/login">Open your account</a>

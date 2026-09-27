@@ -286,12 +286,10 @@ class _Crumb extends StatelessWidget {
           cursor: SystemMouseCursors.click,
           child: GestureDetector(
             onTap: () => Navigator.popUntil(context, (r) => r.isFirst),
-            child: Text('gabis',
-                style: TextStyle(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                    color: GabisV3.ink.withValues(alpha: .45))),
+            child: Opacity(
+              opacity: .55,
+              child: Image.asset('assets/gabis_logo.png', height: 16, fit: BoxFit.contain, semanticLabel: 'gabis'),
+            ),
           ),
         ),
         Padding(
