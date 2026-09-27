@@ -11,6 +11,7 @@ import 'package:nautik_money/features/partners/global_money_screen.dart';
 import 'package:nautik_money/features/partners/partner_rails.dart';
 import 'package:nautik_money/features/partners/partner_stores.dart';
 import 'package:nautik_money/shared/providers/app_providers.dart';
+import 'package:nautik_money/shared/widgets/screen_banner.dart';
 
 /// The app theme gives outlined buttons an infinite minimum width. These
 /// screens put them in rows and wraps, which must still lay out sensibly.
@@ -99,4 +100,14 @@ void main() {
     expect(t.widget<ElevatedButton>(button).onPressed, isNull);
     expect(t.takeException(), isNull);
   });
+
+  for (final size in const [Size(390, 844), Size(1400, 1000)]) {
+    testWidgets('every screen banner fits at ${size.width.toInt()}px', (t) async {
+      for (final tab in screenBanners.keys) {
+        await pump(t, Scaffold(body: BannerFrame(tab: tab, child: const SizedBox.expand())), size: size);
+        expect(find.text(screenBanners[tab]!.title), findsOneWidget);
+        expect(t.takeException(), isNull, reason: 'banner $tab');
+      }
+    });
+  }
 }
