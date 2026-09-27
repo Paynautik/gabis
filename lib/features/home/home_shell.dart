@@ -18,6 +18,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/session/session.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/user_avatar.dart';
+import '../../shared/widgets/screen_banner.dart';
 
 class HomeShell extends ConsumerStatefulWidget {
   const HomeShell({super.key});
@@ -55,6 +56,9 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     IntelligenceScreen(),
     GlobalMoneyScreen(),
   ];
+
+  /// Each sidebar screen with its header banner; the dashboard keeps its own.
+  Widget _framed(int i) => BannerFrame(tab: i, child: _screens[i]);
 
   @override
   Widget build(BuildContext context) {
@@ -273,7 +277,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                 alignment: Alignment.topCenter,
                 child: ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: 1000),
-                  child: _screens[_index],
+                  child: _framed(_index),
                 ),
               ),
             ),
@@ -284,7 +288,7 @@ class _HomeShellState extends ConsumerState<HomeShell> {
 
     // Mobile navigation bottom bar
     return Scaffold(
-      body: IndexedStack(index: _index, children: _screens),
+      body: IndexedStack(index: _index, children: [for (var i = 0; i < _screens.length; i++) _framed(i)]),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index < 4 ? _index : 0,
         onDestinationSelected: (i) {
