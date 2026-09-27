@@ -323,6 +323,21 @@ img,video{max-width:100%}
 #afmt{font-size:12px;min-width:84px;text-align:right}
 .opt{transition:border-color .2s,background .2s}
 </style>
+<style>
+button.mb{border:0;font:700 14px 'DM Sans',sans-serif;cursor:pointer;color:#16123a;transition:transform .12s,filter .15s,background .15s}
+button.mb.pri{color:#fff}button.mb:hover{filter:brightness(.95)}button.mb:active{transform:scale(.97)}
+button.mb:focus-visible,.afagain:focus-visible{outline:3px solid #16123a;outline-offset:2px}
+button.mb.danger{background:#c2410c;color:#fff}
+.afconfirm{display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:14px;background:#fff4e8;border:1px solid #f4c9a8;animation:afin .2s ease}
+.afconfirm b{font-size:15px;color:#9a3412}.afconfirm span{font-size:13px;color:#6b4a1f;line-height:1.5}
+.afdone{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;padding:14px;border-radius:14px;background:#e6f7ef;animation:afin .2s ease}
+.afdone b{display:block;font-size:15px;color:#0b6b47}.afdone span{font-size:13px;color:#2f5f4a}
+.afok{width:36px;height:36px;border-radius:50%;background:#0f9d6b;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+.afagain{border:0;background:none;font:700 13px 'DM Sans',sans-serif;color:#0b6b47;text-decoration:underline;cursor:pointer;padding:8px}
+@keyframes afin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+header a{white-space:nowrap}
+@media (max-width:400px){header [style*="padding: 12px 22px"]{padding:10px 12px !important;font-size:13px !important}}
+</style>
 </head>
 <body>
 
@@ -480,7 +495,12 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <div class="opt" id="afo1"><small>Buy today</small><b id="afv1">₦44k</b><span>left for 18 days</span></div>
 <div class="opt" id="afo2"><span class="rtag" id="aftag">Recommended</span><small>Split across two paydays</small><b id="afv2">₦284k</b><span id="afs2">₦240k now, ₦240k after salary</span></div>
 </div>
-<div class="mbtns"><span class="mb pri" id="afcta">Split it for me</span><span class="mb">Buy anyway</span></div>
+<div class="mbtns" id="afbtns"><button type="button" class="mb pri" id="afcta">Split it for me</button><button type="button" class="mb" id="afbuy">Buy anyway</button></div>
+<div class="afconfirm" id="afconfirm" hidden role="alertdialog" aria-labelledby="afct">
+<b id="afct">Buy it anyway?</b><span id="afcd"></span>
+<div class="mbtns"><button type="button" class="mb danger" id="afyes">Yes, buy it</button><button type="button" class="mb" id="afno">Cancel</button></div>
+</div>
+<div class="afdone" id="afdone" hidden role="status"><span class="afok">✓</span><div><b id="afdt"></b><span id="afdd"></span></div><button type="button" class="afagain" id="afagain">Try another</button></div>
 </div></div>
 
 <div class="feat rev"><div class="fcopy"><span class="ftag">FEATURE 02 · AUTOPILOT</span><h3>Give your money goals. gabis handles the routine.</h3><p>Traditional apps hand you tools and leave you to do the work. With gabis, you tell it what you want your money to accomplish. When income hits, your automated wealth waterfall runs in milliseconds.</p></div>
@@ -798,7 +818,7 @@ requestAnimationFrame(tick);
 var BAL=620000,BILLS=96000,DAYS=18,BUF=150000;
 var sl=r.querySelector('input[type=range]'),chips=r.querySelectorAll('.afpick button'),q=r.querySelector('#afq'),a=r.querySelector('#afa');
 function k(n){return '₦'+Math.round(n/1000)+'k'} function f(n){return '₦'+n.toLocaleString('en-NG')}
-function upd(p,name){
+var upd=function(p,name){
  var left=BAL-BILLS-p,half=Math.ceil(p/2/1000)*1000,split=BAL-BILLS-half;
  q.textContent='Can I buy '+name+' for '+f(p)+'?';
  if(left<0){a.innerHTML='Not this month. You would be <b>'+f(-left)+'</b> short after bills.'}
@@ -815,9 +835,24 @@ function upd(p,name){
  var rec2=left<BUF&&split>left;r.querySelector('#afo2').classList.toggle('rec',rec2);r.querySelector('#afo1').classList.toggle('rec',!rec2);
  var tag=r.querySelector('#aftag');(rec2?r.querySelector('#afo2'):r.querySelector('#afo1')).appendChild(tag);
  r.querySelector('#afcta').textContent=rec2?'Split it for me':'Buy it today';
-}
+};
 chips.forEach(function(b){b.addEventListener('click',function(){chips.forEach(function(x){x.classList.remove('on')});b.classList.add('on');sl.value=b.dataset.p;r.querySelector('#afprice').textContent=f(+b.dataset.p);upd(+b.dataset.p,b.dataset.n)})});
 sl.addEventListener('input',function(){chips.forEach(function(x){x.classList.remove('on')});var p=+sl.value;r.querySelector('#afprice').textContent=f(p);upd(p,'this')});
+var cur={p:480000,name:'a MacBook Pro'};
+var btns=r.querySelector('#afbtns'),conf=r.querySelector('#afconfirm'),done=r.querySelector('#afdone');
+function show(el){[btns,conf,done].forEach(function(x){x.hidden=x!==el});}
+function finish(t,d){r.querySelector('#afdt').textContent=t;r.querySelector('#afdd').textContent=d;show(done);r.querySelector('#afagain').focus();}
+r.querySelector('#afcta').addEventListener('click',function(){var p=cur.p,left=BAL-BILLS-p,half=Math.ceil(p/2/1000)*1000;
+ if(r.querySelector('#afcta').textContent.indexOf('Split')===0){finish('Split scheduled','Paying '+f(half)+' today and '+f(p-half)+' on salary day. You keep '+f(BAL-BILLS-half)+' until then.');}
+ else{finish('Bought','Paid '+f(p)+'. You still have '+f(left)+' for the next '+DAYS+' days.');}});
+r.querySelector('#afbuy').addEventListener('click',function(){var left=BAL-BILLS-cur.p;
+ r.querySelector('#afct').textContent='Buy '+cur.name+' for '+f(cur.p)+' anyway?';
+ r.querySelector('#afcd').textContent=left<0?'You would be '+f(-left)+' short after bills. Payments due before salary could fail.':'This leaves '+f(left)+' for the next '+DAYS+' days after bills. gabis recommends keeping at least '+f(BUF)+'.';
+ show(conf);r.querySelector('#afno').focus();});
+r.querySelector('#afno').addEventListener('click',function(){show(btns);r.querySelector('#afbuy').focus();});
+r.querySelector('#afyes').addEventListener('click',function(){var left=BAL-BILLS-cur.p;finish('Bought against advice',left<0?'Paid '+f(cur.p)+'. You are '+f(-left)+' short; gabis will warn you before each bill.':'Paid '+f(cur.p)+'. '+f(left)+' left. gabis will keep an eye on your bills.');});
+r.querySelector('#afagain').addEventListener('click',function(){show(btns);});
+var _upd=upd;upd=function(p,name){cur={p:p,name:name==='this'?'this':name};show(btns);_upd(p,name);};
 upd(480000,'a MacBook Pro');})();
 </script>
 </body>
