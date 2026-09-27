@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'explore_strip.dart';
+import '../../shared/widgets/scan_icon.dart';
 import '../points/points_store.dart';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
@@ -230,7 +231,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
               IconButton(
                 onPressed: () => _openScanner(context),
-                icon: Icon(Icons.qr_code_scanner_rounded, color: context.colors.ink, size: 22),
+                tooltip: 'Scan to pay',
+                icon: ScanIcon(color: context.colors.ink, size: 24),
               ),
               Stack(
                 clipBehavior: Clip.none,
