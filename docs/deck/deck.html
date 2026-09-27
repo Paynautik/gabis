@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>gabis · Company deck</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;500;600;700&display=swap">
+<style>
+@page{size:960px 540px;margin:0}
+*{box-sizing:border-box}
+html,body{margin:0;background:#f6f3ee;color:#16123a;font-family:'DM Sans',sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.s{width:960px;height:540px;position:relative;overflow:hidden;padding:44px 52px 40px;page-break-after:always;background:#f6f3ee;display:flex;flex-direction:column}
+.s.dark{background:#16123a;color:#fff}
+.tag{font-size:11px;font-weight:700;letter-spacing:.14em;color:#4b45f5;text-transform:uppercase}
+.dark .tag{color:#dff76a}
+h1{font:700 44px/1.04 Sora,sans-serif;letter-spacing:-.04em;margin:12px 0 0}
+h2{font:700 34px/1.06 Sora,sans-serif;letter-spacing:-.035em;margin:10px 0 0}
+h1 em,h2 em{font-style:normal;color:#4b45f5}.dark h2 em{color:#b6b2ff}
+p.lede{font-size:15px;line-height:1.55;color:#5f5b73;margin:12px 0 0;max-width:760px}.dark p.lede{color:#c9c5e6}
+.foot{position:absolute;left:52px;right:52px;bottom:20px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#8a8699}
+.dark .foot{color:#8f89b8}
+.foot img{height:16px}
+.grid{display:grid;gap:12px;margin-top:auto}
+.g2{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:#fff;border:1px solid #e5dfd5;border-radius:16px;padding:14px 16px}
+.dark .card{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+.card small{display:block;font-size:10px;font-weight:700;letter-spacing:.12em;color:#8a8699;text-transform:uppercase}
+.card b{display:block;font:700 15px/1.25 Sora,sans-serif;letter-spacing:-.015em;margin:6px 0 4px}
+.card span{font-size:12px;line-height:1.5;color:#5f5b73}.dark .card span{color:#c9c5e6}
+.pill{display:inline-flex;gap:8px;align-items:center;font-size:12px;font-weight:600;padding:7px 12px;border-radius:999px;background:#fff;border:1px solid #e5dfd5}
+.pill i{width:8px;height:8px;border-radius:50%;background:#4b45f5}
+.num{font:700 12px Sora,sans-serif;color:#8a8699}
+.ic{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font:700 12px Sora,sans-serif}
+.card .ic{color:#fff !important;font-size:11px}
+.row{display:flex;gap:10px;align-items:center}
+.note{margin-top:10px;font-size:12px;color:#5f5b73}.dark .note{color:#c9c5e6}
+.badge{font-size:10px;font-weight:800;letter-spacing:.08em;padding:3px 8px;border-radius:6px;text-transform:uppercase}
+.live{background:#e6f7ef;color:#0b6b47}.sbx{background:#fbf1dc;color:#9a6207}.next{background:#eeedff;color:#4b45f5}
+</style>
+</head>
+<body>
+
+<!-- 01 COVER -->
+<section class="s" style="padding:0;flex-direction:row">
+  <div style="width:52%;padding:44px 40px 40px 52px;display:flex;flex-direction:column">
+    <img src="gabis-logo.png" alt="gabis" style="height:34px;align-self:flex-start">
+    <div class="tag" style="margin-top:auto">Company deck · 2026</div>
+    <h1>The AI agent that gets African businesses <em>paid.</em></h1>
+    <p class="lede" style="font-size:14px">An AI-native financial operating system: agents that collect what you are owed, explain where your money goes, and protect it before it leaves. Not a wallet with AI bolted on.</p>
+    <div class="row" style="flex-wrap:wrap;margin-top:18px;gap:8px">
+      <span class="pill"><i></i>Collections in 5 Nigerian languages</span>
+      <span class="pill"><i style="background:#0f9d6b"></i>5 financial agents</span>
+      <span class="pill"><i style="background:#ef7f5d"></i>7 African tax corridors</span>
+    </div>
+    <div style="margin-top:auto;font-size:11px;color:#8a8699">gabis.pages.dev · Raphael Gab-Momoh</div>
+  </div>
+  <div style="width:48%;position:relative">
+    <img src="poster.jpg" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+    <div style="position:absolute;left:24px;right:24px;bottom:28px;background:rgba(255,255,255,.96);border-radius:14px;padding:12px 14px;box-shadow:0 20px 40px rgba(22,18,58,.2)">
+      <div style="font-size:10px;font-weight:800;letter-spacing:.1em;color:#4b45f5">● MATCHED BY AI</div>
+      <div style="font-size:13px;margin-top:4px">NIP transfer “S OKAFOR BRND DSGN” → Invoice #0142</div>
+      <div style="font-size:11px;color:#5f5b73;margin-top:2px">Access Bank · 2 min ago</div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 PROBLEM -->
+<section class="s">
+  <div class="tag">The problem</div>
+  <h2>Financial data exists.<br><em>Financial intelligence does not.</em></h2>
+  <p class="lede">A Lagos merchant's money moves across a bank account, mobile money, cash, informal credit and two currencies. Every transaction is recorded somewhere. Almost none of it is turned into a decision, and money owed is rarely chased twice.</p>
+  <div class="grid g3">
+    <div class="card"><small>What they get today</small><b>A list of transactions.</b><span>A balance and statements they cannot interpret, in an app that waits to be told what to do.</span></div>
+    <div class="card"><small>What they need</small><b>An answer, and action.</b><span>Can I afford stock this month? Who owes me, and who is about to default? What is quietly draining me?</span></div>
+    <div class="card"><small>Why nobody solved it</small><b>Reasoning was too expensive.</b><span>And too shallow: no product understood Nigerian merchant behaviour, Pidgin, or mobile money.</span></div>
+  </div>
+  <div class="foot"><img src="gabis-logo.png" alt=""><span>02</span></div>
+</section>
+
+<!-- 03 INSIGHT -->
+<section class="s dark">
+  <div class="tag">The insight</div>
+  <h2>Africa fixed payments infrastructure.<br><em>It never built the intelligence layer on top.</em></h2>
+  <p class="lede">A decade of work made money move: Paystack, Flutterwave, M-Pesa, instant NIP transfers. The rails are solved. What sits on top is still a ledger with a search box.</p>
+  <div style="margin-top:auto;font:700 22px/1.3 Sora,sans-serif;letter-spacing:-.02em;max-width:640px">gabis is the layer that reads those rails and acts on them, with the person approving every move.</div>
+  <div class="foot"><img src="gabis-logo-white.png" alt=""><span>03</span></div>
+</section>
+
+<!-- 04 COLLECTIONS -->
+<section class="s">
+  <div class="row" style="justify-content:space-between"><div class="tag">Product · Collections agent</div><span class="badge live">Live</span></div>
+  <h2>Most businesses are owed money<br><em>they never ask for twice.</em></h2>
+  <p class="lede">The agent asks for them, in English, Pidgin, Yoruba, Hausa or Igbo. It hears the promise, sets the follow-up, and clears the invoice when the money lands.</p>
+  <div class="grid g4">
+    <div class="card" style="background:#eef6fd"><div class="row" style="justify-content:space-between"><span class="num">01</span><span class="ic" style="background:#3b82f6">+</span></div><b>Add whoever owes you</b><span>Import debtors once: name, number, amount, due date.</span></div>
+    <div class="card" style="background:#f3f0fe"><div class="row" style="justify-content:space-between"><span class="num">02</span><span class="ic" style="background:#7c6cf0">◷</span></div><b>Reminders on time</b><span>Ten days before, on the day, and after. Within contact rules.</span></div>
+    <div class="card" style="background:#f6fae3"><div class="row" style="justify-content:space-between"><span class="num">03</span><span class="ic" style="background:#6b8e00">✆</span></div><b>The agent asks</b><span>Negotiates in the customer's language and records the promise.</span></div>
+    <div class="card" style="background:#fdf0ea"><div class="row" style="justify-content:space-between"><span class="num">04</span><span class="ic" style="background:#e0643c">✓</span></div><b>Payment clears it</b><span>One-tap WhatsApp link; the ledger reconciles itself.</span></div>
+  </div>
+  <div class="note">Runs on African telecom rails, in African languages, against African payment behaviour. That is the part that is hard to copy.</div>
+  <div class="foot"><img src="gabis-logo.png" alt=""><span>04</span></div>
+</section>
+
+<!-- 05 INTELLIGENCE -->
+<section class="s">
+  <div class="row" style="justify-content:space-between"><div class="tag">Product · Intelligence</div><span class="badge live">Live</span></div>
+  <h2>Stop managing money.<br><em>Start telling it what to do.</em></h2>
+  <p class="lede">Every number comes from the user's own transactions. The model explains; the person decides.</p>
+  <div class="grid g3">
+    <div class="card"><small>Money Twin</small><b>“Can I afford this?”</b><span>Checks the purchase against commitments, burn rate and a buffer, and offers a safer split.</span></div>
+    <div class="card"><small>Future Mode</small><b>Balance before payday</b><span>30-day forecast, safe-to-spend today, and what-if tests that show a goal date move.</span></div>
+    <div class="card"><small>Goals</small><b>“Save ₦2M by December.”</b><span>Plain-language goals become a monthly plan, checked against what is genuinely spare.</span></div>
+    <div class="card"><small>Autopilot</small><b>Income waterfall</b><span>When salary lands, a split into bills, savings and spending is proposed for approval.</span></div>
+    <div class="card"><small>Financial Firewall</small><b>A second opinion</b><span>Pauses first-time or unusually large transfers and explains why. The person can always proceed.</span></div>
+    <div class="card"><small>Friday Roast</small><b>Accountability with wit</b><span>A weekly roast written from real spending, with a polite mode.</span></div>
+  </div>
+  <div class="foot"><img src="gabis-logo.png" alt=""><span>05</span></div>
+</section>
+
+<!-- 06 AGENTS -->
+<section class="s dark">
+  <div class="row" style="justify-content:space-between"><div class="tag">Flagship architecture</div><span class="badge live">Live</span></div>
+  <h2>Five agents, <em>each doing real work.</em></h2>
+  <p class="lede">Each agent reads the user's data, flags what needs attention and proposes one action. Nothing moves without approval, except what the user explicitly allowed.</p>
+  <div class="grid" style="grid-template-columns:repeat(5,1fr)">
+    <div class="card"><span class="ic" style="background:#8b5cf6">M</span><b>Money</b><span>Warns before the balance runs short, with the date.</span></div>
+    <div class="card"><span class="ic" style="background:#ef4444">S</span><b>Security</b><span>Follows up on flagged payments the user approved anyway.</span></div>
+    <div class="card"><span class="ic" style="background:#3b82f6">F</span><b>Travel &amp; FX</b><span>Watches 7 currency pairs and alerts or converts at the target.</span></div>
+    <div class="card"><span class="ic" style="background:#10b981">W</span><b>Wealth</b><span>Proposes the income split; flags goals falling behind with the catch-up.</span></div>
+    <div class="card"><span class="ic" style="background:#f59e0b">B</span><b>Bills</b><span>Bills due in 3 days, subscription creep, refund windows closing.</span></div>
+  </div>
+  <div class="foot"><img src="gabis-logo-white.png" alt=""><span>06</span></div>
+</section>
+
+<!-- 07 BUSINESS -->
+<section class="s">
+  <div class="row" style="justify-content:space-between"><div class="tag">Product · Business OS</div><span class="badge live">Live</span></div>
+  <h2>Every step from <em>payment to proof.</em></h2>
+  <div class="grid g4" style="margin-top:auto">
+    <div class="card"><small>Receipts</small><b>Instant, compliant proof</b><span>Issued and logged the moment money settles.</span></div>
+    <div class="card"><small>Installments</small><b>Credit sales to the naira</b><span>Paid, remaining, next due date, service cut-off.</span></div>
+    <div class="card"><small>Refunds</small><b>Windows that count down</b><span>7, 14 or 30-day policies with a 24-hour warning.</span></div>
+    <div class="card"><small>Invoicing</small><b>Bill in one sentence</b><span>“Bill Sarah 150k for brand design” becomes an invoice.</span></div>
+  </div>
+  <div class="card" style="margin-top:14px;display:grid;grid-template-columns:230px 1fr;gap:18px;align-items:center">
+    <div><small>Tax compliance</small><b style="font-size:18px">Seven corridors</b><span>VAT, GST or sales tax plus withholding tax on every invoice, ready to remit.</span></div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center">
+      <div><span class="ic" style="background:#0f9d6b;margin:0 auto">NG</span><div style="font-size:11px;margin-top:4px"><b style="font-size:13px;margin:0">7.5%</b>FIRS</div></div>
+      <div><span class="ic" style="background:#e0453a;margin:0 auto">KE</span><div style="font-size:11px;margin-top:4px"><b style="font-size:13px;margin:0">16%</b>KRA</div></div>
+      <div><span class="ic" style="background:#e3a008;margin:0 auto">GH</span><div style="font-size:11px;margin-top:4px"><b style="font-size:13px;margin:0">15%</b>GRA</div></div>
+      <div><span class="ic" style="background:#7c3aed;margin:0 auto">UG</span><div style="font-size:11px;margin-top:4px"><b style="font-size:13px;margin:0">18%</b>URA</div></div>
+      <div><span class="ic" style="background:#0891b2;margin:0 auto">TZ</span><div style="font-size:11px;margin-top:4px"><b style="font-size:13px;margin:0">18%</b>TRA</div></div>
+      <div><span class="ic" style="background:#2563eb;margin:0 auto">SS</span><div style="font-size:11px;margin-top:4px"><b style="font-size:13px;margin:0">18%</b>NRA</div></div>
+      <div><span class="ic" style="background:#be185d;margin:0 auto">LR</span><div style="font-size:11px;margin-top:4px"><b style="font-size:13px;margin:0">10%</b>LRA</div></div>
+    </div>
+  </div>
+  <div class="foot"><img src="gabis-logo.png" alt=""><span>07</span></div>
+</section>
+
+<!-- 08 TRUST -->
+<section class="s">
+  <div class="tag">Community &amp; trust</div>
+  <h2>The funds are secure.<br><em>The community is empowered.</em></h2>
+  <div class="grid g3">
+    <div class="card"><div class="row" style="justify-content:space-between"><small>Ajo saving circles</small><span class="badge live">Live</span></div><b>Rotate funds with trust</b><span>Contributions tracked per round; the pot pays out in agreed order, on the organiser's approval.</span></div>
+    <div class="card"><div class="row" style="justify-content:space-between"><small>Escrow on ORPay</small><span class="badge sbx">Sandbox</span></div><b>Keys that cannot move money</b><span>gabis opens an escrow and can cancel it before funding. After that, buyer and seller sign each step themselves, so a stolen key cannot empty an escrow.</span></div>
+    <div class="card"><div class="row" style="justify-content:space-between"><small>Always</small><span class="badge live">Live</span></div><b>You approve before money moves</b><span>Every contribution, payout, split and release waits for the person. No automation here spends on anyone's behalf.</span></div>
+  </div>
+  <div class="foot"><img src="gabis-logo.png" alt=""><span>08</span></div>
+</section>
+
+<!-- 09 GLOBAL MONEY + PARTNERS -->
+<section class="s dark">
+  <div class="row" style="justify-content:space-between"><div class="tag">Global money · partner model</div><span class="badge sbx">Sandbox</span></div>
+  <h2>Get paid from anywhere.<br><em>Settle in USDC or local currency.</em></h2>
+  <p class="lede">A client abroad pays in dollars; the business holds USDC or converts to naira, shillings, cedis or Liberian dollars when it chooses, at a rate held for 30 seconds.</p>
+  <div class="grid g4">
+    <div class="card"><small>Stablecoin rail</small><b>USDC wallet &amp; off-ramp</b><span>Deposit, quote, convert to 7 currencies.</span></div>
+    <div class="card"><small>Escrow custody</small><b>ORPay</b><span>Parties sign; state arrives by webhook.</span></div>
+    <div class="card"><small>Tax remittance</small><b>Authority gateways</b><span>File and pay FIRS, KRA, GRA, URA, TRA, NRA, LRA.</span></div>
+    <div class="card"><small>Market data</small><b>FX rate feed</b><span>Live rates for the FX agent and quotes.</span></div>
+  </div>
+  <div class="note">gabis does not hold customer money. Each capability sits behind one interface; the flows run in sandbox today and a licensed partner plugs in without changing a screen.</div>
+  <div class="foot"><img src="gabis-logo-white.png" alt=""><span>09</span></div>
+</section>
+
+<!-- 10 HOW IT WORKS -->
+<section class="s">
+  <div class="tag">How it works</div>
+  <h2>The numbers are computed.<br><em>The judgement is the model's.</em></h2>
+  <p class="lede">Most finance apps ask a model to do arithmetic and hope it is right. We do the opposite.</p>
+  <div class="grid g3">
+    <div class="card"><small>Deterministic core</small><b>A core that cannot hallucinate</b><span>Categorisation, recurring commitments, drift, burn rate, forecasts, affordability, tax. Correct, offline, no per-query cost.</span></div>
+    <div class="card"><small>Reasoning layer</small><b>Frontier models do the talking</b><span>Dialogue over that state, invoice drafting from plain language, and collections conversations. Swappable by design.</span></div>
+    <div class="card"><small>Always</small><b>People approve before money moves</b><span>The model explains, drafts and asks. Transfers, splits, payouts and releases wait for a human.</span></div>
+  </div>
+  <div class="foot"><img src="gabis-logo.png" alt=""><span>10</span></div>
+</section>
+
+<!-- 11 WHY NOW -->
+<section class="s">
+  <div class="tag">Why now</div>
+  <h2>Three things became true <em>at once.</em></h2>
+  <div class="grid g3">
+    <div class="card"><span class="num">01</span><b>Reasoning got cheap</b><span>Per-user financial reasoning was uneconomic at African ARPU two years ago. It is viable now.</span></div>
+    <div class="card"><span class="num">02</span><b>Voice crossed the line</b><span>Agents can hold a real collections call in Pidgin or Swahili, not a recorded IVR tree.</span></div>
+    <div class="card"><span class="num">03</span><b>The data finally exists</b><span>Mobile money and instant transfers created a decade of machine-readable behaviour nobody reads.</span></div>
+  </div>
+  <div class="note">The window is the gap between the rails maturing and the intelligence layer being claimed. It is open now.</div>
+  <div class="foot"><img src="gabis-logo.png" alt=""><span>11</span></div>
+</section>
+
+<!-- 12 WHERE WE ARE -->
+<section class="s">
+  <div class="tag">Where we are</div>
+  <h2>Built, <em>not pitched.</em></h2>
+  <div class="grid g3">
+    <div class="card"><span class="badge live">Live today</span><b>Working product on web</b><span>Accounts, cards, transfers, invoicing with instalments, bills, the copilot, collections agent, Intelligence (forecast, goals, autopilot, firewall, roast, 5 agents), Ajo, refunds and 7-corridor tax. gabis.pages.dev</span></div>
+    <div class="card"><span class="badge sbx">Sandbox · partner-ready</span><b>Money rails behind one seam</b><span>USDC settlement, escrow on ORPay, tax remittance and live FX. Flows, state and history are real; money moves once each licensed partner is connected.</span></div>
+    <div class="card"><span class="badge next">Next</span><b>Go live with partners</b><span>Sign stablecoin, custody and tax-gateway partners; switch escrow to ORPay; push notifications for the agents; ingestion of photographed receipts and PDF statements.</span></div>
+  </div>
+  <div class="note">Founder-built. Everything in this deck marked Live is running code, not mockups.</div>
+  <div class="foot"><img src="gabis-logo.png" alt=""><span>12</span></div>
+</section>
+
+<!-- 13 ASK -->
+<section class="s dark" style="justify-content:center">
+  <img src="gabis-logo-white.png" alt="gabis" style="height:40px;align-self:flex-start">
+  <h2 style="font-size:44px;margin-top:28px">Every African business will have<br>a financial brain. <em>We are building it.</em></h2>
+  <p class="lede">gabis starts as the agent that collects what you are owed and the copilot that reads your money. It ends as the AI-native operating system every African merchant, freelancer and institution runs their financial life on.</p>
+  <div style="margin-top:30px;font-size:13px;color:#c9c5e6">Raphael Gab-Momoh · gabis.pages.dev</div>
+</section>
+
+</body>
+</html>
