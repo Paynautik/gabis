@@ -204,6 +204,17 @@ final escrowProvider = StateNotifierProvider<EscrowNotifier, List<EscrowDeal>>(
 
 // ── Ajo saving circles ───────────────────────────────────────────────────
 
+class AjoEvent {
+  final String text;
+  final DateTime at;
+  const AjoEvent(this.text, this.at);
+  Map<String, dynamic> toJson() => {'t': text, 'at': at.toIso8601String()};
+  static AjoEvent? fromJson(Map<String, dynamic> j) {
+    final at = readDate(j['at']);
+    return at == null ? null : AjoEvent('${j['t']}', at);
+  }
+}
+
 class AjoCircle {
   final String id;
   final String name;
@@ -214,6 +225,11 @@ class AjoCircle {
   final Set<String> paidThisRound;
   final DateTime startedAt;
 
+  /// Organiser's standing approval: pay the pot out the moment the last
+  /// contribution arrives, instead of approving each round by hand.
+  final bool autoPayout;
+  final List<AjoEvent> history;
+
   const AjoCircle({
     required this.id,
     required this.name,
@@ -223,16 +239,21 @@ class AjoCircle {
     required this.round,
     required this.paidThisRound,
     required this.startedAt,
+    this.autoPayout = false,
+    this.history = const [],
   });
 
   int get potNaira => contributionNaira * members.length;
   String get recipient => members[round % members.length];
   bool get complete => round >= members.length;
   bool get everyonePaid => paidThisRound.length == members.length;
+  List<String> get unpaid => members.where((m) => !paidThisRound.contains(m)).toList();
+  int get periodDays => frequency == 'weekly' ? 7 : 30;
 
-  DateTime get nextPayoutOn => startedAt.add(Duration(days: (frequency == 'weekly' ? 7 : 30) * (round + 1)));
+  DateTime payoutOn(int r) => startedAt.add(Duration(days: periodDays * (r + 1)));
+  DateTime get nextPayoutOn => payoutOn(round);
 
-  AjoCircle copyWith({int? round, Set<String>? paidThisRound}) => AjoCircle(
+  AjoCircle copyWith({int? round, Set<String>? paidThisRound, bool? autoPayout, List<AjoEvent>? history}) => AjoCircle(
         id: id,
         name: name,
         members: members,
@@ -241,6 +262,8 @@ class AjoCircle {
         round: round ?? this.round,
         paidThisRound: paidThisRound ?? this.paidThisRound,
         startedAt: startedAt,
+        autoPayout: autoPayout ?? this.autoPayout,
+        history: history ?? this.history,
       );
 
   Map<String, dynamic> toJson() => {
@@ -252,6 +275,8 @@ class AjoCircle {
         'r': round,
         'paid': paidThisRound.toList(),
         'at': startedAt.toIso8601String(),
+        'auto': autoPayout,
+        'h': history.map((e) => e.toJson()).toList(),
       };
 
   static AjoCircle? fromJson(Map<String, dynamic> j) {
@@ -267,6 +292,12 @@ class AjoCircle {
       round: (j['r'] as int?) ?? 0,
       paidThisRound: ((j['paid'] as List?) ?? const []).map((e) => '$e').toSet(),
       startedAt: at,
+      autoPayout: j['auto'] == true,
+      history: ((j['h'] as List?) ?? const [])
+          .whereType<Map<String, dynamic>>()
+          .map(AjoEvent.fromJson)
+          .whereType<AjoEvent>()
+          .toList(),
     );
   }
 }
@@ -277,11 +308,29 @@ class AjoNotifier extends StateNotifier<List<AjoCircle>> {
 
   void _save() => writeJson(_key, state.map((c) => c.toJson()).toList());
 
+  void _put(AjoCircle c) {
+    state = [for (final x in state) if (x.id == c.id) c else x];
+    _save();
+  }
+
+  AjoCircle _get(String id) => state.firstWhere((c) => c.id == id);
+
+  static String _n(int v) {
+    final s = v.toString();
+    final b = StringBuffer();
+    for (var i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) b.write(',');
+      b.write(s[i]);
+    }
+    return '₦$b';
+  }
+
   void create({
     required String name,
     required List<String> members,
     required int contributionNaira,
     required String frequency,
+    bool autoPayout = false,
   }) {
     state = [
       AjoCircle(
@@ -293,28 +342,52 @@ class AjoNotifier extends StateNotifier<List<AjoCircle>> {
         round: 0,
         paidThisRound: const {},
         startedAt: DateTime.now(),
+        autoPayout: autoPayout,
+        history: [AjoEvent('Circle started with ${members.length} members', DateTime.now())],
       ),
       ...state,
     ];
     _save();
   }
 
-  void markPaid(String id, String member) {
-    state = [
-      for (final c in state)
-        if (c.id == id) c.copyWith(paidThisRound: {...c.paidThisRound, member}) else c
-    ];
-    _save();
+  void setAutoPayout(String id, bool v) {
+    final c = _get(id);
+    _put(c.copyWith(
+        autoPayout: v,
+        history: [...c.history, AjoEvent(v ? 'Auto-payout turned on' : 'Auto-payout turned off', DateTime.now())]));
   }
 
-  /// Pays the pot to this round's recipient. Only allowed once everyone has
-  /// contributed; the screen asks the organiser to approve first.
-  void payOut(String id) {
-    state = [
-      for (final c in state)
-        if (c.id == id && c.everyonePaid) c.copyWith(round: c.round + 1, paidThisRound: const {}) else c
-    ];
-    _save();
+  /// Records a contribution. With auto-payout on, the last one releases the
+  /// pot at once. Returns true when that happened.
+  bool markPaid(String id, String member) {
+    var c = _get(id);
+    if (c.complete || c.paidThisRound.contains(member)) return false;
+    c = c.copyWith(
+      paidThisRound: {...c.paidThisRound, member},
+      history: [...c.history, AjoEvent('$member paid ${_n(c.contributionNaira)}', DateTime.now())],
+    );
+    _put(c);
+    if (c.autoPayout && c.everyonePaid) {
+      payOut(id, auto: true);
+      return true;
+    }
+    return false;
+  }
+
+  /// Pays the pot to this round's recipient. Only once everyone has paid.
+  void payOut(String id, {bool auto = false}) {
+    final c = _get(id);
+    if (!c.everyonePaid || c.complete) return;
+    _put(c.copyWith(
+      round: c.round + 1,
+      paidThisRound: const {},
+      history: [...c.history, AjoEvent('${_n(c.potNaira)} paid to ${c.recipient}${auto ? ' automatically' : ''}', DateTime.now())],
+    ));
+  }
+
+  void logReminder(String id, List<String> who) {
+    final c = _get(id);
+    _put(c.copyWith(history: [...c.history, AjoEvent('Reminder sent to ${who.join(', ')}', DateTime.now())]));
   }
 }
 
