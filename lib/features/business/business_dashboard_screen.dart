@@ -8,6 +8,8 @@ import 'invoice_ai.dart';
 import 'payment_link.dart';
 import '../kyc/kyc_store.dart';
 import 'outreach.dart';
+import 'receipt_card.dart';
+import 'package:share_plus/share_plus.dart';
 import 'autonomous_reminders.dart';
 import 'reconciliation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -510,14 +512,24 @@ class _SmartInvoicesTabState extends ConsumerState<_SmartInvoicesTab> {
         ? 'gabis'
         : ref.read(businessProvider).companies.first.name;
 
-    final opened = await Outreach.whatsapp(
-        phone, Outreach.receiptMessage(invoice: inv, company: company));
+    final paidAt = DateTime.now();
+    final png = await captureWidgetAsPng(
+        context, ReceiptCard(invoice: inv, company: company, paidAt: paidAt));
     if (!mounted) return;
+
+    final result = await Share.shareXFiles(
+      [XFile.fromData(png, name: 'receipt-${inv.id}.png', mimeType: 'image/png')],
+      text: '${inv.client}, here is your receipt for ${inv.id}. '
+          'Paid in full — thank you from $company.',
+      subject: 'Receipt · ${inv.id}',
+    );
+    if (!mounted) return;
+    final opened = result.status == ShareResultStatus.success || result.status == ShareResultStatus.dismissed;
     Outreach.toast(
         context,
         opened
             ? 'Receipt ready to send to ${inv.client}.'
-            : 'Could not open WhatsApp on this device.',
+            : 'Could not share the receipt on this device.',
         ok: opened);
   }
 

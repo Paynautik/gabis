@@ -28,7 +28,8 @@ const screenBanners = <int, BannerSpec>{
       eyebrow: 'COPILOT',
       title: 'Ask your money anything.',
       body: 'Answers come from your own transactions: what is recurring, what changed, what you can safely spend.',
-      image: 'assets/images/usecase_creators.jpg'),
+      image: 'assets/images/usecase_creators.jpg',
+      focus: Alignment(0.15, -0.55)),
   11: BannerSpec(
       eyebrow: 'INTELLIGENCE',
       title: 'See payday before it arrives.',
@@ -63,7 +64,8 @@ const screenBanners = <int, BannerSpec>{
       title: 'Know where it goes.',
       body: 'Spending by category, month on month, from your real history.',
       image: 'assets/images/african_person_mockup.jpg',
-      tint: Color(0xFF2B2380)),
+      tint: Color(0xFF2B2380),
+      focus: Alignment(0, -0.65)),
   6: BannerSpec(
       eyebrow: 'BENEFICIARIES',
       title: 'The people you pay, in one place.',
@@ -83,8 +85,8 @@ const screenBanners = <int, BannerSpec>{
       focus: Alignment(0, -.3)),
   8: BannerSpec(
       eyebrow: 'SUPPORT',
-      title: 'Real help, when you need it.',
-      body: 'Chat, email or WhatsApp, from people who understand African business.',
+      title: 'How can we help you?',
+      body: 'Our 24/7 dedicated fintech support is ready, over chat, email or WhatsApp.',
       image: 'assets/images/testimonial_hero_african_prev.jpg',
       tint: Color(0xFF0B4D34)),
 };
