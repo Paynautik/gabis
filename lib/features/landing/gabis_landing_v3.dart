@@ -3661,26 +3661,6 @@ Row(
                         ),
                       ],
                     ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text('Experience Gabis AI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
-                              SizedBox(width: 8),
-                              Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.play_circle_outline_rounded, color: Color(0xFF4B5563), size: 18),
-                            SizedBox(width: 6),
-                            Text('See live simulations', style: TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w700, fontSize: 14)),
-                          ],
-                        ),
-                      ],
-                    ),
 
                     const SizedBox(height: 48),
 
