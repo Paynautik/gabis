@@ -1059,8 +1059,8 @@ class _OrbitGameState extends State<_OrbitGame>
               top: bubbleOffset.dy,
               child: const _BalanceBubble(),
             ),
-            _orb(outerAt, 13, GabisV3.electric, 5, true),
-            _orb(innerAt, 10, GabisV3.coral, 10, false),
+            _orb(outerAt, 13, GabisV3.electric, 2, true),
+            _orb(innerAt, 10, GabisV3.coral, 2, false),
             for (final pop in _pops) _popLabel(pop),
           ],
         );
