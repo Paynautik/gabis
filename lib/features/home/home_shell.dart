@@ -9,6 +9,9 @@ import '../profile/profile_screen.dart';
 import 'home_screen.dart';
 import 'sidebar_screens.dart';
 import '../copilot/copilot_screen.dart';
+import '../intelligence/agents.dart';
+import '../intelligence/intelligence_screen.dart';
+import '../partners/global_money_screen.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -49,11 +52,21 @@ class _HomeShellState extends ConsumerState<HomeShell> {
     SupportScreen(),
     CopilotScreen(),
     CommunityScreen(),
+    IntelligenceScreen(),
+    GlobalMoneyScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     _syncFromProvider();
+    // Keep the FX agent running while the app is open, and surface what it did.
+    ref.watch(fxAgentProvider);
+    ref.listen<FxAgentState>(fxAgentProvider, (prev, next) {
+      final m = next.lastMessage;
+      if (m != null && m != prev?.lastMessage) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('FX agent: $m')));
+      }
+    });
     final isBusinessMode = ref.watch(isBusinessModeProvider);
     if (isBusinessMode) {
       return const BusinessDashboardScreen();
@@ -92,6 +105,8 @@ class _HomeShellState extends ConsumerState<HomeShell> {
                       children: [
                         _buildSidebarItem(0, Icons.home_rounded, 'Dashboard'),
                         _buildSidebarItem(9, Icons.auto_awesome_rounded, 'Copilot'),
+                        _buildSidebarItem(11, Icons.insights_rounded, 'Intelligence'),
+                        _buildSidebarItem(12, Icons.public_rounded, 'Global money'),
                         _buildSidebarItem(1, Icons.wallet_rounded, 'Accounts'),
                         _buildSidebarItem(2, Icons.credit_card_rounded, 'Cards'),
                         _buildSidebarItem(4, Icons.receipt_long_rounded, 'Transactions'),

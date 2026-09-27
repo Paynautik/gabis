@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'explore_strip.dart';
 import '../points/points_store.dart';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
@@ -150,6 +151,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     
                     // ================= QUICK ACTIONS =================
                     _buildQuickActionsSection(context),
+                    const SizedBox(height: 24),
+                    const ExploreStrip(),
                     const SizedBox(height: 24),
                     
                     // ================= STANDALONE SECURITY BANNER =================

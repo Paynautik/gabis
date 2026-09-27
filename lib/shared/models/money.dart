@@ -17,6 +17,10 @@ class Money {
     'USD': '\$',
     'GHS': 'GH₵',
     'KES': 'KSh',
+    'UGX': 'USh',
+    'TZS': 'TSh',
+    'SSP': 'SSP ',
+    'LRD': 'L\$',
     'EUR': '€',
     'GBP': '£',
   };
