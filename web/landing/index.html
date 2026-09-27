@@ -401,6 +401,11 @@ button.mb.danger{background:#16123a !important}
 #afsim .runway,#afsim .opts{display:none !important}
 #afsim .balp{background:none;padding:0;color:#8a8699;font-weight:500}
 #afsim{gap:12px !important}
+.csteps::before{border-top:2px dashed #b9b4ff !important;top:92px !important;left:6% !important;right:6% !important}
+.cstep{overflow:visible}
+.cstep:not(:last-child)::after{content:"";position:absolute;z-index:2;top:78px;right:-24px;width:30px;height:30px;border-radius:50%;background:#4b45f5 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h13M13 6l6 6-6 6'/%3E%3C/svg%3E") center/16px no-repeat;box-shadow:0 0 0 4px #f6f3ee,0 4px 10px rgba(75,69,245,.35)}
+@media (max-width:1024px){.cstep:not(:last-child)::after{display:none}}
+@media (max-width:720px){.csteps{gap:26px}.cstep:not(:last-child)::after{display:block;top:auto;bottom:-28px;right:auto;left:50%;margin-left:-15px;transform:rotate(90deg)}}
 </style>
 </head>
 <body>
