@@ -52,9 +52,25 @@ class _CircleCard extends ConsumerWidget {
 
   static const _palette = [Color(0xFF8B5CF6), Color(0xFFEF7F5D), Color(0xFF0F9D6B), Color(0xFF3B82F6), Color(0xFFE3A008), Color(0xFF4B45F5)];
 
-  String _reminder(List<String> who) =>
-      'Hi ${who.length == 1 ? who.first : 'all'}, a friendly reminder: your ${_n(c.contributionNaira)} for "${c.name}" is due for round ${c.round + 1}. '
-      '${c.recipient} receives ${_n(c.potNaira)} on ${DateFormat('EEE d MMM').format(c.nextPayoutOn)}. Thank you!';
+  /// WhatsApp formatting: *bold*, one fact per line, and a gabis link last so
+  /// WhatsApp shows the preview card with the gabis logo.
+  String _reminder(List<String> who) {
+    final date = DateFormat('EEE d MMM').format(c.nextPayoutOn);
+    return [
+      '*gabis · Ajo reminder*',
+      '',
+      'Hi ${who.length == 1 ? who.first : 'everyone'},',
+      'your contribution to *${c.name}* is due.',
+      '',
+      'Amount: *${_n(c.contributionNaira)}*',
+      'Round: *${c.round + 1} of ${c.members.length}*',
+      'This round: *${c.recipient}* receives *${_n(c.potNaira)}* on *$date*',
+      'Paid so far: ${c.paidThisRound.length} of ${c.members.length}',
+      '',
+      'Thank you for keeping the circle strong.',
+      'https://gabis.pages.dev/ajo',
+    ].join('\n');
+  }
 
   Future<void> _remind(BuildContext context, WidgetRef ref, List<String> who) async {
     final url = Uri.parse('https://wa.me/?text=${Uri.encodeComponent(_reminder(who))}');
