@@ -87,12 +87,30 @@ final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 /// WebViews) the IndexedDB persistence layer it depends on can stall
 /// indefinitely. Without a bound on that wait, AuthGate's brief loading
 /// spinner never resolves — login looks stuck rather than showing the
-/// login screen. A timeout is not a real auth state, so it does not
-/// cancel the underlying subscription: if the real event does arrive
-/// late, it still comes through and replaces the timeout error.
-final authUserProvider = StreamProvider<User?>(
-  (ref) => ref
-      .watch(authServiceProvider)
-      .changes
-      .timeout(const Duration(seconds: 6)),
-);
+/// login screen.
+///
+/// The bound only ever applies to that FIRST wait. Stream.timeout()
+/// re-arms after every event, and authStateChanges() is silent for as
+/// long as nothing changes — which is the entire time someone stays
+/// signed in. A naive `.timeout(...)` on the whole stream fires on that
+/// normal silence too, throwing a TimeoutException that AuthGate reads
+/// as "signed out" and bounces a perfectly logged-in user back to the
+/// login screen a few seconds after landing on /home. So only the
+/// first stall (no cached state has arrived yet) is turned into a
+/// synthetic "signed out" event; every later quiet period is left
+/// alone.
+final authUserProvider = StreamProvider<User?>((ref) async* {
+  final changes = ref.watch(authServiceProvider).changes;
+  var gotFirstEvent = false;
+  await for (final user in changes.timeout(
+    const Duration(seconds: 6),
+    onTimeout: (sink) {
+      if (!gotFirstEvent) sink.add(null);
+      // A later timeout just means nobody's auth state changed recently
+      // — expected, not an error. Emit nothing and keep waiting.
+    },
+  )) {
+    gotFirstEvent = true;
+    yield user;
+  }
+});
