@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'dart:ui' show FontFeature;
+import 'dart:ui' show FontFeature, ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../core/util/web_splash_dismiss.dart';
@@ -190,64 +190,85 @@ class _Nav extends StatelessWidget {
 
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 1440),
-      child: Container(
-        height: 72,
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: GabisV3.line),
-          ),
-        ),
-        child: Row(
-          children: [
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () {
-                  // From a marketing page this pops back; on home it is a no-op.
-                  if (Navigator.canPop(context)) {
-                    Navigator.popUntil(context, (r) => r.isFirst);
-                  } else {
-                    Navigator.pushNamedAndRemoveUntil(context, '/', (r) => false);
-                  }
-                },
-                child: const GabisLogo(size: 36),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16.0, sigmaY: 16.0),
+          child: Container(
+            height: 72,
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            decoration: BoxDecoration(
+              color: GabisV3.ink.withValues(alpha: 0.8),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.15),
               ),
+              borderRadius: BorderRadius.circular(16),
             ),
-            if (desktop) ...[
-              const SizedBox(width: 42),
-              const _NavText('Money'),
-              const _NavText('Cards'),
-              const _NavText('Business'),
-              const _NavText('Company'),
-            ],
-            const Spacer(),
-            if (desktop)
-              TextButton(
-                onPressed: () => Navigator.pushNamed(context, '/login'),
-                style: TextButton.styleFrom(
-                  foregroundColor: GabisV3.ink,
-                  textStyle: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 15,
+            child: Row(
+              children: [
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: GestureDetector(
+                    onTap: () {
+                      if (Navigator.canPop(context)) {
+                        Navigator.popUntil(context, (r) => r.isFirst);
+                      } else {
+                        Navigator.pushNamedAndRemoveUntil(context, '/', (r) => false);
+                      }
+                    },
+                    child: const GabisLogo(size: 36, isWhite: true),
                   ),
                 ),
-                child: const Text('Sign in'),
-              ),
-            const SizedBox(width: 8),
-            _MagneticButton(
-              label: desktop ? 'Get Gabis' : 'Get app',
-              onTap: () => Navigator.pushNamed(context, '/login'),
+                if (desktop) ...[
+                  const SizedBox(width: 42),
+                  const _NavText('Money'),
+                  const _NavText('Cards'),
+                  const _NavText('Business'),
+                  const _NavText('Company'),
+                ],
+                const Spacer(),
+                if (desktop)
+                  TextButton(
+                    onPressed: () => Navigator.pushNamed(context, '/login'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      textStyle: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                      ),
+                    ),
+                    child: const Text('Sign in'),
+                  ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/login'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: GabisV3.ink,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 17),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    textStyle: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 15,
+                    ),
+                  ),
+                  child: Text(desktop ? 'Get Gabis' : 'Get app'),
+                ),
+                if (!desktop) ...[
+                  const SizedBox(width: 16),
+                  IconButton(
+                    onPressed: () => _showMobileMenu(context),
+                    icon: const Icon(Icons.menu_rounded),
+                    color: Colors.white,
+                    tooltip: 'Menu',
+                  ),
+                ],
+              ],
             ),
-            if (!desktop) ...[
-              const SizedBox(width: 6),
-              IconButton(
-                onPressed: () => _showMobileMenu(context),
-                icon: const Icon(Icons.menu_rounded),
-                color: GabisV3.ink,
-                tooltip: 'Menu',
-              ),
-            ],
-          ],
+          ),
         ),
       ),
     );
@@ -401,7 +422,7 @@ class _NavText extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(
-          color: GabisV3.ink,
+          color: Colors.white,
           fontWeight: FontWeight.w700,
           fontSize: 14,
         ),
