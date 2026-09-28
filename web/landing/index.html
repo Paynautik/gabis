@@ -6,6 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="gabis: the AI agent that gets African businesses paid. Payments, receipts, refunds, installments and reconciliation in one place.">
 <style>
+/* Cards throughout this page set padding without a box-sizing rule, which
+   on some mobile renderers adds that padding on top of the grid track's
+   width instead of eating into it — the card then overflows its column
+   and reads as edge-to-edge rather than inset. box-sizing: border-box
+   everywhere keeps padding inside the width a container actually gives
+   an element. */
+*,*::before,*::after{box-sizing:border-box}
 html,body{overflow-x:hidden}
 img,video{max-width:100%}
 @media (max-width: 1024px){
@@ -418,20 +425,20 @@ a{color:#16123a}a:hover{color:#4b45f5}
 
 <div style="width: 100%; min-width: 1200px; box-sizing: border-box; background: #f6f3ee; color: #16123a; display: flex; flex-direction: column; zoom: 0.75">
 
-<header style="display: flex; align-items: center; justify-content: space-between; padding: 20px 64px; border-bottom: 1px solid #e5dfd5">
+<header style="display: flex; align-items: center; justify-content: space-between; padding: 20px 64px; background: #1a1147; border-bottom: 1px solid rgba(255,255,255,0.14)">
 <div style="display: flex; align-items: center; gap: 56px">
-<a href="/" aria-label="gabis home" style="display: flex; align-items: center"><img src="/landing/media/gabis-logo.png" alt="gabis" style="height: 28px; width: auto"></a>
-<nav style="display: flex; gap: 32px; font-size: 15px; font-weight: 700; color: #16123a">
-<a href="#app" style="text-decoration: none; color: #16123a">App</a>
-<a href="#collect" style="text-decoration: none; color: #16123a">Collections</a>
-<a href="#intel" style="text-decoration: none; color: #16123a">Intelligence</a>
-<a href="#who" style="text-decoration: none; color: #16123a">Business</a>
-<a href="#rails" style="text-decoration: none; color: #16123a">Stablecoin rails</a>
-<a href="#tax" style="text-decoration: none; color: #16123a">Tax</a>
+<a href="/" aria-label="gabis home" style="display: flex; align-items: center"><img src="/landing/media/gabis-logo-white.png" alt="gabis" style="height: 28px; width: auto"></a>
+<nav style="display: flex; gap: 32px; font-size: 15px; font-weight: 700; color: #ffffff">
+<a href="#app" style="text-decoration: none; color: #ffffff">App</a>
+<a href="#collect" style="text-decoration: none; color: #ffffff">Collections</a>
+<a href="#intel" style="text-decoration: none; color: #ffffff">Intelligence</a>
+<a href="#who" style="text-decoration: none; color: #ffffff">Business</a>
+<a href="#rails" style="text-decoration: none; color: #ffffff">Stablecoin rails</a>
+<a href="#tax" style="text-decoration: none; color: #ffffff">Tax</a>
 </nav>
 </div>
 <div style="display: flex; gap: 10px; align-items: center">
-<a href="/login" style="text-decoration: none; font-size: 15px; font-weight: 500; padding: 12px 18px">Log in</a>
+<a href="/login" style="text-decoration: none; font-size: 15px; font-weight: 500; padding: 12px 18px; color: #ffffff">Log in</a>
 <a href="/login" style="text-decoration: none; font-size: 15px; font-weight: 700; padding: 12px 22px; border-radius: 999px; background: #4b45f5; color: #ffffff">Create account</a>
 </div>
 </header>
