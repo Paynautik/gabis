@@ -29,7 +29,7 @@ const screenBanners = <int, BannerSpec>{
       title: 'Ask your money anything.',
       body: 'Answers come from your own transactions: what is recurring, what changed, what you can safely spend.',
       image: 'assets/images/usecase_creators.jpg',
-      focus: Alignment(0.15, -0.55)),
+      focus: Alignment(0, -0.85)),
   11: BannerSpec(
       eyebrow: 'INTELLIGENCE',
       title: 'See payday before it arrives.',
@@ -76,7 +76,8 @@ const screenBanners = <int, BannerSpec>{
       title: 'Save together. Trade safely.',
       body: 'Ajo circles with reminders and payouts, and escrow where both sides sign.',
       image: 'assets/images/tailor.jpg',
-      tint: Color(0xFF3B2A1A)),
+      tint: Color(0xFF3B2A1A),
+      focus: Alignment(0, -0.82)),
   7: BannerSpec(
       eyebrow: 'SETTINGS',
       title: 'Your account, your rules.',
@@ -88,7 +89,8 @@ const screenBanners = <int, BannerSpec>{
       title: 'How can we help you?',
       body: 'Our 24/7 dedicated fintech support is ready, over chat, email or WhatsApp.',
       image: 'assets/images/testimonial_hero_african_prev.jpg',
-      tint: Color(0xFF0B4D34)),
+      tint: Color(0xFF0B4D34),
+      focus: Alignment(0, -0.75)),
 };
 
 /// A screen with its banner on top. The banner can be closed, and stays

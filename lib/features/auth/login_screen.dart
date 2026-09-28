@@ -61,9 +61,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     try {
       final auth = ref.read(authServiceProvider);
-      final user = _creatingAccount
-          ? await auth.signUp(email, password, name: name)
-          : await auth.signIn(email, password);
+      // A bound on the network call itself: some mobile browsers stall
+      // writing the auth session to storage rather than failing outright,
+      // which otherwise leaves this button spinning forever instead of
+      // showing a retry-able error.
+      final user = await (_creatingAccount
+              ? auth.signUp(email, password, name: name)
+              : auth.signIn(email, password))
+          .timeout(const Duration(seconds: 20));
 
       if (!mounted) return;
       ref.read(authStateProvider.notifier).state = true;

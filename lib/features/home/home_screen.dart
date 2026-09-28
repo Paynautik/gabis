@@ -153,15 +153,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     // ================= QUICK ACTIONS =================
                     _buildQuickActionsSection(context),
                     const SizedBox(height: 24),
-                    const ExploreStrip(),
-                    const SizedBox(height: 24),
-                    
+
                     // ================= STANDALONE SECURITY BANNER =================
                     if (_showSecurityBanner) ...[
                       _buildRealSecurityBanner(),
                       const SizedBox(height: 24),
                     ],
-                    
+
+                    const ExploreStrip(),
+                    const SizedBox(height: 24),
+
                     // ================= BUSINESS INSIGHTS GATEWAY =================
                     _buildBusinessInsightsCard(context),
                     const SizedBox(height: 24),

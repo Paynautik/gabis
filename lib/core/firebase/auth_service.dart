@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -48,6 +50,9 @@ class AuthService {
 
   /// Firebase's codes are not sentences; these are.
   static String describe(Object error) {
+    if (error is TimeoutException) {
+      return 'That is taking too long. Check your connection and try again.';
+    }
     if (error is FirebaseAuthException) {
       switch (error.code) {
         case 'invalid-email':
@@ -76,6 +81,18 @@ class AuthService {
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 
 /// The signed-in user, or null. Null means the landing page.
+///
+/// authStateChanges() normally resolves in milliseconds from a cached
+/// token, but on some mobile browsers (Safari private mode, in-app
+/// WebViews) the IndexedDB persistence layer it depends on can stall
+/// indefinitely. Without a bound on that wait, AuthGate's brief loading
+/// spinner never resolves — login looks stuck rather than showing the
+/// login screen. A timeout is not a real auth state, so it does not
+/// cancel the underlying subscription: if the real event does arrive
+/// late, it still comes through and replaces the timeout error.
 final authUserProvider = StreamProvider<User?>(
-  (ref) => ref.watch(authServiceProvider).changes,
+  (ref) => ref
+      .watch(authServiceProvider)
+      .changes
+      .timeout(const Duration(seconds: 6)),
 );
