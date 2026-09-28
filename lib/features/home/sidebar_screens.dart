@@ -874,30 +874,6 @@ class SupportScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          Container(
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(color: const Color(0xFF1D4ED8).withValues(alpha: 0.3), blurRadius: 16, offset: const Offset(0, 8)),
-              ],
-            ),
-            child: const Column(
-              children: [
-                Icon(Icons.headset_mic_rounded, color: Colors.white, size: 48),
-                SizedBox(height: 14),
-                Text('How can we help you?', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w900)),
-                SizedBox(height: 6),
-                Text('Our 24/7 dedicated fintech support is ready', style: TextStyle(color: Colors.white70, fontSize: 13)),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
           _buildContactTile(
             context,
             Icons.chat_bubble_rounded,
