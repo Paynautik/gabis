@@ -357,6 +357,13 @@ button.mb.danger{background:#c2410c;color:#fff}
 .afagain{border:0;background:none;font:700 13px 'DM Sans',sans-serif;color:#0b6b47;text-decoration:underline;cursor:pointer;padding:8px}
 @keyframes afin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 header a{white-space:nowrap}
+/* The page is drawn at zoom .75; undo that for the header on desktop so its logo and links match the other pages, and set the nav in a heavier weight. */
+@media (min-width:1025px){header{zoom:1.3333}}
+header nav{font-size:16px !important;font-weight:800 !important;letter-spacing:-.01em}
+header a[href="/login"]:first-of-type{font-weight:700 !important}
+header [style*="padding: 12px 22px"]{font-weight:800 !important}
+header a[aria-label="gabis home"] img{height:46px !important}
+@media (min-width:1025px){header a[aria-label="gabis home"]{margin-left:-34px}}
 @media (max-width:400px){header [style*="padding: 12px 22px"]{padding:10px 12px !important;font-size:13px !important}}
 </style>
 <style>
