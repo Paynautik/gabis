@@ -210,8 +210,13 @@ final userInitialsProvider = Provider<String>((ref) {
 });
 
 /// The name as it is printed on a card.
-final userCardNameProvider =
-    Provider<String>((ref) => ref.watch(userNameProvider).toUpperCase());
+///
+/// With example data on, the card belongs to the example persona, like the
+/// rest of the demo account. A real account always prints its own name.
+final userCardNameProvider = Provider<String>((ref) {
+  if (ref.watch(demoDataProvider)) return 'DEJI ADEWUSI';
+  return ref.watch(userNameProvider).toUpperCase();
+});
 
 // --- Accounts Stateful StateNotifier ---
 class AccountsNotifier extends StateNotifier<List<Account>> {

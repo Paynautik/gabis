@@ -6,6 +6,7 @@ import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/coming_soon.dart';
 import '../../shared/models/payment_card.dart';
 import '../../shared/widgets/glowing_background.dart';
+import 'metal_card_front.dart';
 
 class CardsScreen extends ConsumerStatefulWidget {
   const CardsScreen({super.key});
@@ -241,132 +242,13 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
 
   // Front Card representation
   Widget _buildCardFront(dynamic card, Map<String, dynamic> skin) {
-    return Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 400), child: AspectRatio(aspectRatio: 1.586, child: Container(
-            width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: skin['gradient'],
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // If frozen, display frost overlay
-          if (card.frozen)
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.lightBlueAccent.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.ac_unit_rounded, color: Colors.white, size: 48),
-                      SizedBox(height: 8),
-                      Text(
-                        'FROZEN',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          if (!card.frozen) ...[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Chip mockup
-                    Container(
-                      width: 44,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFE5A93C), Color(0xFFF9D976)],
-                        ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    const Text(
-                      'GABIS',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 3.0,
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  '•••• •••• •••• ${card.last4}',
-                  style: TextStyle(
-                    color: skin['textColor'],
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 3.5,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'CARDHOLDER',
-                          style: TextStyle(
-                            color: skin['accentColor'],
-                            fontSize: 8,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          ref.watch(userCardNameProvider),
-                          style: TextStyle(
-                            color: skin['textColor'],
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      card.scheme == CardScheme.visa ? 'VISA' : 'MC',
-                      style: TextStyle(
-                        color: skin['textColor'],
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    ))));
+    return MetalCardFront(
+      last4: card.last4,
+      holder: ref.watch(userCardNameProvider),
+      isVisa: card.scheme == CardScheme.visa,
+      frozen: card.frozen,
+      skin: skin,
+    );
   }
 
   // Back Card representation
