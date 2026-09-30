@@ -381,6 +381,15 @@ class TransactionsNotifier extends StateNotifier<List<AppTransaction>> {
   void addTransaction(AppTransaction tx) {
     state = [tx, ...state];
   }
+
+  /// Moves a transaction on, e.g. a bill that was still processing when it was
+  /// recorded and has now been delivered.
+  void updateTransaction(String id, {TransactionStatus? status, String? description}) {
+    state = [
+      for (final t in state)
+        if (t.id == id) t.copyWith(status: status, description: description) else t,
+    ];
+  }
 }
 
 final transactionsProvider =

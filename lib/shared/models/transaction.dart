@@ -26,4 +26,18 @@ class AppTransaction {
     required this.createdAt,
     this.isCredit = false,
   });
+
+  AppTransaction copyWith({TransactionStatus? status, String? description}) {
+    return AppTransaction(
+      id: id,
+      type: type,
+      status: status ?? this.status,
+      amount: amount,
+      fee: fee,
+      description: description ?? this.description,
+      counterparty: counterparty,
+      createdAt: createdAt,
+      isCredit: isCredit,
+    );
+  }
 }

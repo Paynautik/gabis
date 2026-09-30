@@ -6,6 +6,7 @@ import '../../shared/models/money.dart';
 import '../../shared/models/transaction.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/glowing_background.dart';
+import 'bills_api.dart';
 
 class BillCategory {
   final String title;
@@ -295,10 +296,12 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
           accountIcon: Icons.phone_iphone_rounded,
           keyboard: TextInputType.phone,
           validateAccount: _validatePhone,
-          minNaira: data ? 100 : 50,
-          maxNaira: 50000,
+          minNaira: 50,
+          maxNaira: data ? 60000 : 20000,
           quick: data ? const [500, 1000, 2000, 5000] : const [100, 200, 500, 1000],
           describe: (p, a) => '$p ${data ? 'data' : 'airtime'} ($a)',
+          serverKind: data ? 'data' : 'airtime',
+          planService: data ? (p) => '${p == '9mobile' ? 'etisalat' : p.toLowerCase()}-data' : null,
         ),
       );
     } else if (t == 'Electricity & Water' || t == 'Utilities') {
@@ -314,10 +317,12 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
           keyboard: TextInputType.number,
           validateAccount: _validateMeter,
           minNaira: 500,
-          maxNaira: 500000,
+          maxNaira: 100000,
           quick: const [1000, 2000, 5000, 10000],
           describe: (p, a) => '$p prepaid electricity ($a)',
           isPower: true,
+          serverKind: 'electricity',
+          needsContactPhone: true,
         ),
       );
     } else if (t == 'Cable TV') {
@@ -333,9 +338,12 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
           keyboard: TextInputType.number,
           validateAccount: _validateSmartcard,
           minNaira: 500,
-          maxNaira: 200000,
+          maxNaira: 60000,
           quick: const [2000, 4500, 8500, 14500],
           describe: (p, a) => '$p subscription ($a)',
+          serverKind: 'cable',
+          planService: (p) => p.toLowerCase(),
+          needsContactPhone: true,
         ),
       );
     } else {
@@ -396,80 +404,238 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
     return 0;
   }
 
-  void _openForm(BuildContext context, _BillForm form) {
+  Future<void> _openForm(BuildContext context, _BillForm form) async {
+    final api = ref.read(billsApiProvider);
+    final container = ProviderScope.containerOf(this.context);
+    final cfg = await ref.read(billsConfigProvider.future);
+    if (!mounted) return;
+    final demo = ref.read(demoDataProvider);
+    // Paid for real when a biller is connected. Otherwise it is only an example,
+    // and only in demo mode: nobody should be told a bill was paid when nothing
+    // was.
+    final live = cfg.enabled && form.serverKind != null;
+    if (!live && !demo) {
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        const SnackBar(content: Text('This kind of payment is not available yet.')),
+      );
+      return;
+    }
+    final usesPlans = live && form.planService != null;
+    final needsPhone = live && form.needsContactPhone;
+
     String? provider = form.providers?.first;
     final account = TextEditingController();
+    final phone = TextEditingController();
     final amount = TextEditingController();
     String? accountError;
+    String? phoneError;
     String? amountError;
     String? payError;
     var reviewing = false;
+    var busy = false;
+    var plansRequested = false;
+    var plansLoading = false;
+    String? plansError;
+    List<BillPlan>? plans;
+    BillPlan? plan;
+    String? verifiedName;
+    String? requestId;
+    StateSetter? sheetSet;
 
-    showModalBottomSheet<void>(
+    void update(VoidCallback fn) => sheetSet?.call(fn);
+
+    Future<void> loadPlans() async {
+      if (!usesPlans || provider == null) return;
+      final forProvider = provider;
+      update(() {
+        plans = null;
+        plan = null;
+        plansError = null;
+        plansLoading = true;
+      });
+      try {
+        final list = await api.plans(form.planService!(provider!));
+        if (forProvider != provider) return;
+        update(() {
+          plans = list;
+          plansLoading = false;
+        });
+      } catch (_) {
+        if (forProvider != provider) return;
+        update(() {
+          plansError = 'Plans could not be loaded. Check your connection and try again.';
+          plansLoading = false;
+        });
+      }
+    }
+
+    await showModalBottomSheet<void>(
       context: this.context,
       isScrollControlled: true,
       backgroundColor: this.context.colors.bgSoft,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheet) {
+          sheetSet = setSheet;
+          if (!plansRequested) {
+            plansRequested = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) => loadPlans());
+          }
           final balance = _nairaBalanceMinor();
 
           int? parsedAmount() => int.tryParse(amount.text.replaceAll(RegExp(r'[,\s₦]'), ''));
+          int? amountNaira() => usesPlans ? plan?.amount : parsedAmount();
 
-          void review() {
+          Future<void> review() async {
             final accErr = form.validateAccount(account.text);
-            final amt = parsedAmount();
+            final phoneErr = needsPhone ? _validatePhone(phone.text) : null;
+            final amt = amountNaira();
             String? amtErr;
-            if (amt == null) {
+            if (usesPlans) {
+              if (plan == null) amtErr = 'Choose a plan.';
+            } else if (amt == null) {
               amtErr = 'Enter an amount.';
             } else if (amt < form.minNaira) {
               amtErr = 'The smallest amount is ₦${_group(form.minNaira)}.';
             } else if (amt > form.maxNaira) {
               amtErr = 'The most you can pay here is ₦${_group(form.maxNaira)}.';
             }
+            if (accErr != null || phoneErr != null || amtErr != null) {
+              setSheet(() {
+                accountError = accErr;
+                phoneError = phoneErr;
+                amountError = amtErr;
+                payError = null;
+              });
+              return;
+            }
+
+            String? name;
+            if (live && (form.serverKind == 'electricity' || form.serverKind == 'cable')) {
+              setSheet(() {
+                busy = true;
+                accountError = null;
+                phoneError = null;
+                amountError = null;
+              });
+              final check = await api.verify(kind: form.serverKind!, provider: provider ?? '', account: account.text.trim());
+              if (check.valid == false) {
+                setSheet(() {
+                  busy = false;
+                  accountError = 'We could not find that ${form.serverKind == 'electricity' ? 'meter' : 'smartcard'}. Check the number.';
+                });
+                return;
+              }
+              if (check.minAmount != null && amt != null && amt < check.minAmount!) {
+                setSheet(() {
+                  busy = false;
+                  amountError = 'This account needs at least ₦${_group(check.minAmount!)}.';
+                });
+                return;
+              }
+              name = check.name;
+            }
             setSheet(() {
-              accountError = accErr;
-              amountError = amtErr;
-              payError = null;
-              reviewing = accErr == null && amtErr == null;
+              busy = false;
+              verifiedName = name;
+              accountError = phoneError = amountError = payError = null;
+              reviewing = true;
             });
           }
 
           Future<void> pay() async {
-            final naira = parsedAmount()!;
+            final naira = amountNaira()!;
             final minor = naira * 100;
             if (_nairaBalanceMinor() < minor) {
               setSheet(() => payError = 'Your naira wallet has ${Money(minorUnits: balance, currency: 'NGN').format()}, '
                   'which is not enough. Add money first.');
               return;
             }
-            final reference = _newReference();
-            final now = DateTime.now();
             final acct = account.text.trim();
             final desc = form.describe(provider ?? '', acct);
+            final now = DateTime.now();
 
-            ref.read(accountsProvider.notifier).subtractBalance('NGN', minor);
-            ref.read(transactionsProvider.notifier).addTransaction(
-                  AppTransaction(
-                    id: reference,
-                    type: TransactionType.billPayment,
-                    status: TransactionStatus.completed,
-                    amount: Money(minorUnits: minor, currency: 'NGN'),
-                    description: desc,
-                    counterparty: provider ?? form.title,
-                    createdAt: now,
-                    isCredit: false,
-                  ),
-                );
-            Navigator.pop(ctx);
+            if (!live) {
+              // Demo mode: an example payment. Only the example balance moves.
+              final reference = _newReference();
+              _record(reference, minor, desc, provider ?? form.title, now, TransactionStatus.completed);
+              Navigator.pop(ctx);
+              if (!mounted) return;
+              _showReceipt(form: form, provider: provider, account: acct, naira: naira, reference: reference, when: now, demo: true);
+              return;
+            }
+
+            // A real payment. One request id for the whole attempt, so asking
+            // again after a dropped connection can never pay twice.
+            requestId ??= BillsApi.newRequestId();
+            final id = requestId!;
+            setSheet(() {
+              busy = true;
+              payError = null;
+            });
+
+            BillPayResult result;
+            try {
+              result = await api.pay(
+                kind: form.serverKind!,
+                provider: provider ?? '',
+                account: acct,
+                amount: naira,
+                requestId: id,
+                phone: needsPhone ? phone.text.trim() : null,
+                planCode: plan?.code,
+              );
+            } on BillsApiException catch (e) {
+              setSheet(() {
+                busy = false;
+                payError = _apiMessage(e.code);
+              });
+              return;
+            }
+
+            // Still processing: look again a few times before giving up waiting.
+            final delay = ref.read(billsPollDelayProvider);
+            for (var i = 0; i < 3 && result.outcome == BillOutcome.pending; i++) {
+              await Future<void>.delayed(delay);
+              result = await api.status(id);
+            }
+
+            if (result.outcome == BillOutcome.failed) {
+              requestId = null; // the next try is a new payment
+              setSheet(() {
+                busy = false;
+                payError = result.message.isEmpty
+                    ? 'The payment did not go through. You have not been charged.'
+                    : '${result.message}. You have not been charged.';
+              });
+              return;
+            }
+
+            final delivered = result.outcome == BillOutcome.delivered;
+            _record(
+              id,
+              minor,
+              delivered ? desc : '$desc (processing)',
+              provider ?? form.title,
+              now,
+              delivered ? TransactionStatus.completed : TransactionStatus.pending,
+            );
+            if (!delivered) {
+              _settle(container, api, id, minor, desc, delay);
+            }
+            if (ctx.mounted) Navigator.pop(ctx);
             if (!mounted) return;
             _showReceipt(
               form: form,
               provider: provider,
               account: acct,
               naira: naira,
-              reference: reference,
+              reference: id,
               when: now,
+              planName: plan?.name,
+              token: result.token,
+              units: result.units,
+              processing: !delivered,
             );
           }
 
@@ -485,9 +651,21 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
                 focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: ctx.colors.bluePrimary, width: 2)),
               );
 
+          Widget primary(String label, VoidCallback? onPressed) => ElevatedButton(
+                onPressed: busy ? null : onPressed,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ctx.colors.bluePrimary,
+                  minimumSize: const Size.fromHeight(52),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                child: busy
+                    ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
+                    : Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
+              );
+
           final Widget body;
           if (reviewing) {
-            final naira = parsedAmount() ?? 0;
+            final naira = amountNaira() ?? 0;
             body = Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -495,7 +673,9 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
                 Text('Review payment', style: TextStyle(color: ctx.colors.ink, fontSize: 18, fontWeight: FontWeight.w900)),
                 const SizedBox(height: 14),
                 _reviewRow('Paying', provider ?? form.title),
+                if (plan != null) _reviewRow('Plan', plan!.name),
                 _reviewRow(form.accountLabel, account.text.trim()),
+                if (verifiedName != null) _reviewRow('Account name', verifiedName!),
                 _reviewRow('Amount', '₦${_group(naira)}'),
                 _reviewRow('Fee', '₦0'),
                 Divider(color: ctx.colors.border),
@@ -509,27 +689,18 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
                 Row(children: [
                   Expanded(
                     child: OutlinedButton(
-                      onPressed: () => setSheet(() {
-                        reviewing = false;
-                        payError = null;
-                      }),
+                      onPressed: busy
+                          ? null
+                          : () => setSheet(() {
+                                reviewing = false;
+                                payError = null;
+                              }),
                       style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
                       child: const Text('Back'),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    flex: 2,
-                    child: ElevatedButton(
-                      onPressed: pay,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: ctx.colors.bluePrimary,
-                        minimumSize: const Size.fromHeight(52),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      ),
-                      child: Text('Pay ₦${_group(naira)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
-                    ),
-                  ),
+                  Expanded(flex: 2, child: primary('Pay ₦${_group(naira)}', pay)),
                 ]),
               ],
             );
@@ -559,7 +730,10 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
                         ChoiceChip(
                           label: Text(p),
                           selected: provider == p,
-                          onSelected: (_) => setSheet(() => provider = p),
+                          onSelected: (_) {
+                            setSheet(() => provider = p);
+                            loadPlans();
+                          },
                         ),
                     ],
                   ),
@@ -574,40 +748,73 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
                     if (accountError != null) setSheet(() => accountError = null);
                   },
                 ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: amount,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(color: ctx.colors.ink, fontWeight: FontWeight.w900, fontSize: 18),
-                  decoration: deco('Amount', prefix: '₦ ', error: amountError),
-                  onChanged: (_) {
-                    if (amountError != null) setSheet(() => amountError = null);
-                  },
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  children: [
-                    for (final q in form.quick)
-                      ActionChip(
-                        label: Text('₦${_group(q)}'),
-                        onPressed: () => setSheet(() {
-                          amount.text = '$q';
-                          amountError = null;
-                        }),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 18),
-                ElevatedButton(
-                  onPressed: review,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ctx.colors.bluePrimary,
-                    minimumSize: const Size.fromHeight(52),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                if (needsPhone) ...[
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: phone,
+                    keyboardType: TextInputType.phone,
+                    style: TextStyle(color: ctx.colors.ink, fontWeight: FontWeight.w700),
+                    decoration: deco('Your phone number', hint: 'For the receipt', icon: Icons.phone_iphone_rounded, error: phoneError),
+                    onChanged: (_) {
+                      if (phoneError != null) setSheet(() => phoneError = null);
+                    },
                   ),
-                  child: const Text('Review payment', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
-                ),
+                ],
+                const SizedBox(height: 14),
+                if (usesPlans) ...[
+                  if (plansLoading)
+                    const Padding(padding: EdgeInsets.symmetric(vertical: 12), child: Center(child: CircularProgressIndicator()))
+                  else if (plansError != null)
+                    Row(children: [
+                      Expanded(child: Text(plansError!, style: const TextStyle(color: Color(0xFFDC2626), fontSize: 13, fontWeight: FontWeight.w600))),
+                      TextButton(onPressed: loadPlans, child: const Text('Retry')),
+                    ])
+                  else if (plans != null)
+                    DropdownButtonFormField<String>(
+                      isExpanded: true,
+                      initialValue: plan?.code,
+                      hint: const Text('Choose a plan'),
+                      dropdownColor: ctx.colors.bgSoft,
+                      decoration: deco('Plan', error: amountError),
+                      items: [
+                        for (final p in plans!)
+                          DropdownMenuItem(
+                            value: p.code,
+                            child: Text('${p.name} · ₦${_group(p.amount)}', overflow: TextOverflow.ellipsis),
+                          ),
+                      ],
+                      onChanged: (code) => setSheet(() {
+                        plan = plans!.firstWhere((p) => p.code == code);
+                        amountError = null;
+                      }),
+                    ),
+                ] else ...[
+                  TextField(
+                    controller: amount,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(color: ctx.colors.ink, fontWeight: FontWeight.w900, fontSize: 18),
+                    decoration: deco('Amount', prefix: '₦ ', error: amountError),
+                    onChanged: (_) {
+                      if (amountError != null) setSheet(() => amountError = null);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      for (final q in form.quick)
+                        ActionChip(
+                          label: Text('₦${_group(q)}'),
+                          onPressed: () => setSheet(() {
+                            amount.text = '$q';
+                            amountError = null;
+                          }),
+                        ),
+                    ],
+                  ),
+                ],
+                const SizedBox(height: 18),
+                primary('Review payment', review),
               ],
             );
           }
@@ -619,7 +826,54 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
         },
       ),
     );
+    sheetSet = null;
   }
+
+  /// Takes the money off the wallet and puts the payment in the history.
+  void _record(String id, int minor, String description, String biller, DateTime when, TransactionStatus status) {
+    ref.read(accountsProvider.notifier).subtractBalance('NGN', minor);
+    ref.read(transactionsProvider.notifier).addTransaction(
+          AppTransaction(
+            id: id,
+            type: TransactionType.billPayment,
+            status: status,
+            amount: Money(minorUnits: minor, currency: 'NGN'),
+            description: description,
+            counterparty: biller,
+            createdAt: when,
+            isCredit: false,
+          ),
+        );
+  }
+
+  /// Keeps looking at a payment that was still processing. When it lands the
+  /// history is updated; if it failed the money goes back to the wallet.
+  Future<void> _settle(ProviderContainer container, BillsApi api, String id, int minor, String description, Duration delay) async {
+    for (var i = 0; i < 30; i++) {
+      await Future<void>.delayed(delay);
+      final r = await api.status(id);
+      if (r.outcome == BillOutcome.pending) continue;
+      if (r.outcome == BillOutcome.delivered) {
+        container.read(transactionsProvider.notifier).updateTransaction(id, status: TransactionStatus.completed, description: description);
+      } else {
+        container.read(accountsProvider.notifier).addBalance('NGN', minor);
+        container.read(transactionsProvider.notifier).updateTransaction(id, status: TransactionStatus.reversed, description: '$description (refunded)');
+      }
+      return;
+    }
+  }
+
+  static String _apiMessage(String code) => switch (code) {
+        'unauthorized' => 'Please sign in again to pay bills.',
+        'not_configured' => 'Bill payments are not available yet.',
+        'invalid_phone' => 'That phone number is not valid.',
+        'invalid_meter' => 'That meter number is not valid.',
+        'invalid_smartcard' => 'That smartcard number is not valid.',
+        'amount_too_small' => 'That amount is below the smallest allowed.',
+        'amount_too_large' => 'That amount is above the most allowed in one payment.',
+        'plan_required' => 'Choose a plan first.',
+        _ => 'The payment could not be started. You have not been charged.',
+      };
 
   Widget _reviewRow(String label, String value, {bool strong = false}) {
     return Padding(
@@ -649,17 +903,25 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
     required int naira,
     required String reference,
     required DateTime when,
+    bool demo = false,
+    String? planName,
+    String? token,
+    String? units,
+    bool processing = false,
   }) {
-    final demo = ref.read(demoDataProvider);
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: context.colors.bgSoft,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Row(children: [
-          const Icon(Icons.check_circle_rounded, color: Color(0xFF16A34A), size: 28),
+          Icon(processing ? Icons.schedule_rounded : Icons.check_circle_rounded,
+              color: processing ? const Color(0xFFD97706) : const Color(0xFF16A34A), size: 28),
           const SizedBox(width: 10),
-          Expanded(child: Text('Payment successful', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900, fontSize: 18))),
+          Expanded(
+            child: Text(processing ? 'Payment processing' : 'Payment successful',
+                style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900, fontSize: 18)),
+          ),
         ]),
         content: SingleChildScrollView(
           child: Column(
@@ -667,15 +929,42 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _reviewRow('Paid', provider ?? form.title),
+              if (planName != null) _reviewRow('Plan', planName),
               _reviewRow(form.accountLabel, account),
               _reviewRow('Amount', '₦${_group(naira)}', strong: true),
               _reviewRow('Reference', reference),
               _reviewRow('Date', _formatWhen(when)),
+              if (token != null) ...[
+                const SizedBox(height: 10),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: context.colors.scaffoldBg,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: context.colors.border),
+                  ),
+                  child: Column(children: [
+                    Text('PREPAID TOKEN${units != null ? ' · $units units' : ''}',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: context.colors.inkSoft)),
+                    const SizedBox(height: 6),
+                    SelectableText(token,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, letterSpacing: 1.4, color: Color(0xFF059669))),
+                  ]),
+                ),
+              ],
+              if (processing) ...[
+                const SizedBox(height: 10),
+                Text(
+                  'The biller has not confirmed yet. We will keep checking and update your history. If it fails, the money goes back to your wallet.',
+                  style: TextStyle(color: context.colors.inkSoft, fontSize: 12, height: 1.4),
+                ),
+              ],
               if (demo) ...[
                 const SizedBox(height: 10),
                 Text(
-                  'Demo mode: this payment only changed the example balance. No biller was charged.'
-                  '${form.isPower ? ' A real purchase would show the meter token here.' : ''}',
+                  'Demo mode: this payment only changed the example balance. No biller was charged.',
                   style: TextStyle(color: context.colors.inkSoft, fontSize: 12, height: 1.4),
                 ),
               ],
@@ -683,6 +972,14 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
           ),
         ),
         actions: [
+          if (token != null)
+            TextButton(
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: token));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Token copied')));
+              },
+              child: const Text('Copy token'),
+            ),
           TextButton(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: reference));
@@ -736,6 +1033,17 @@ class _BillForm {
   final String Function(String provider, String account) describe;
   final bool isPower;
 
+  /// The biller's own kind ("airtime", "data", "electricity", "cable"), or null
+  /// for bills nobody is connected to yet.
+  final String? serverKind;
+
+  /// The plan list to load for a provider (data plans, TV bouquets), if this
+  /// bill is bought from a list rather than for an amount.
+  final String Function(String provider)? planService;
+
+  /// Electricity and TV need a phone number to send the receipt to.
+  final bool needsContactPhone;
+
   const _BillForm({
     required this.title,
     this.providerLabel = '',
@@ -750,5 +1058,8 @@ class _BillForm {
     required this.quick,
     required this.describe,
     this.isPower = false,
+    this.serverKind,
+    this.planService,
+    this.needsContactPhone = false,
   });
 }
