@@ -397,16 +397,13 @@ button.mb.danger{background:#16123a !important}
 #app .o1::after{width:20px;height:20px}#app .o2::after{width:16px;height:16px}
 .o3::after{width:13px;height:13px;background:#0f9d6b;box-shadow:0 0 0 5px rgba(15,157,107,.2),0 0 14px rgba(15,157,107,.5)}
 .shard.sg{background:#0f9d6b;width:16px;height:16px;margin:-8px 0 0 -8px;box-shadow:0 0 12px rgba(15,157,107,.5)}
-#app .orb.gold{z-index:5 !important;width:44px !important;height:44px !important;margin:-22px 0 0 -22px !important}
-.gold::after{width:22px;height:22px;background:radial-gradient(circle at 35% 30%,#fff6c2,#ffd84d 45%,#e89b00);box-shadow:0 0 0 5px rgba(255,200,40,.28),0 0 22px rgba(245,179,1,.8);animation:gpulse .8s ease-in-out infinite alternate}
-@keyframes gpulse{to{box-shadow:0 0 0 9px rgba(255,200,40,.18),0 0 30px rgba(245,179,1,.95)}}
-.shard.sgold{background:#f5b301;width:22px;height:22px;margin:-11px 0 0 -11px;box-shadow:0 0 14px rgba(245,179,1,.7)}
 .ppop.big{font-size:24px;color:#b87900}
 .pchip.hot{background:#f5b301;color:#16123a}.pchip.hot .pdot{background:#16123a}
 .pmore{font-size:12px;color:#8a8699;padding:6px 0 0 56px}
 #afsim .runway,#afsim .opts{display:none !important}
 #afsim .balp{background:none;padding:0;color:#8a8699;font-weight:500}
 #afsim{gap:12px !important}
+.mock.compact{width:100%;max-width:440px;justify-self:center;margin-inline:auto}
 .csteps::before{display:none !important}
 .cstep{overflow:visible}
 .cstep:not(:last-child)::after{content:"";position:absolute;z-index:2;top:41px;right:-20px;width:20px;height:2px;background:#4b45f5;border-radius:2px}
@@ -495,7 +492,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 <div class="pstage">
 <div class="pblob"></div><div class="pring r1"></div><div class="pring r2"></div><div class="pring r3"></div>
-<button type="button" class="orb o1" aria-label="Catch blue orb, 2 points"></button><button type="button" class="orb o2" aria-label="Catch coral orb, 2 points"></button><button type="button" class="orb o3" aria-label="Catch green orb, 2 points"></button><button type="button" class="orb gold" aria-label="Catch the golden orb: triples your next catch" hidden></button><div class="pbadge">12<br>WALLETS</div>
+<button type="button" class="orb o1" aria-label="Catch blue orb, 2 points"></button><button type="button" class="orb o2" aria-label="Catch coral orb, 2 points"></button><button type="button" class="orb o3" aria-label="Catch green orb, 2 points"></button><div class="pbadge">12<br>WALLETS</div>
 <div class="phone-frame">
 <div class="hw-btn hw-action"></div>
 <div class="hw-btn hw-vol-up"></div>
@@ -570,7 +567,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <div class="xcta"><a href="/login" class="xbtn">Experience Gabis AI</a><a href="#intel-twin" class="xbtn ghost">See live simulations</a></div></div>
 
 <div class="feat" id="intel-twin"><div class="fcopy"><span class="ftag">FEATURE 01 · MONEY TWIN</span><h3>Simulate your financial future before you spend.</h3><p>A continuous AI model of your financial life. When you ask “Can I afford this?”, gabis doesn’t just check your current balance — it simulates upcoming obligations, salary timelines and a safe buffer.</p><div class="chips"><span>Predictive twin simulation</span><span>₦320k safety buffer guard</span></div></div>
-<div class="mock af2" id="afsim">
+<div class="mock af2 compact" id="afsim">
 <div class="mrow"><small class="mlbl">AFFORDABILITY SIMULATOR</small><span class="balp">Balance ₦620,000 · bills ₦96,000</span></div>
 <label class="afslide"><span>Price</span><input type="range" min="20000" max="520000" step="10000" value="480000" aria-label="Price"><b id="afprice">₦480,000</b></label>
 <div class="bub me" id="afq">Can I buy a MacBook Pro for ₦480,000?</div>
@@ -591,7 +588,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div></div>
 
 <div class="feat rev"><div class="fcopy"><span class="ftag">FEATURE 02 · AUTOPILOT</span><h3>Give your money goals. gabis handles the routine.</h3><p>Traditional apps hand you tools and leave you to do the work. With gabis, you tell it what you want your money to accomplish. When income hits, your automated wealth waterfall runs in milliseconds.</p></div>
-<div class="mock"><div class="mrow"><small class="mlbl" style="color:#0f9d6b">INCOME DETECTED</small><b>₦1,200,000</b></div>
+<div class="mock compact"><div class="mrow"><small class="mlbl" style="color:#0f9d6b">INCOME DETECTED</small><b>₦1,200,000</b></div>
 <div class="fall"><div><span>Bills &amp; Rent</span><b>₦180,000</b></div><div><span>High-Yield Savings</span><b>₦250,000</b></div><div><span>Global Investment</span><b>₦100,000</b></div><div class="safe"><span>SAFE TO SPEND</span><b>₦670,000</b></div></div></div></div>
 
 <div class="fgrid">
@@ -913,23 +910,6 @@ if(!reduce){var cols=['#4b45f5','#ef7f5d','#dff76a','#0f9d6b','#8b7cf6','#f59e0b
 var p=document.createElement('div');p.className='ppop';p.textContent='+'+gain+(wasMult>1?' ×'+wasMult:'');if(wasMult>1)p.classList.add('big');p.style.left=o.x+'px';p.style.top=o.y+'px';stage.appendChild(p);setTimeout(function(){p.remove()},900);
 setTimeout(function(){o.el.classList.remove('gone')},4500);});});
 
-// Golden orb: pops out of the wallet badge now and then, flies out and back.
-// Catching it earns nothing itself; it triples the next catch.
-var gEl=stage.querySelector('.orb.gold'),badge=stage.querySelector('.pbadge'),g=null;
-function spawnGold(){if(reduce||!gEl){return}var sb=stage.getBoundingClientRect(),bb=badge.getBoundingClientRect();
- var sx=bb.left-sb.left+bb.width/2,sy=bb.top-sb.top+bb.height/2,ang=Math.random()*Math.PI*1.2-Math.PI*.9,d=140+Math.random()*120;
- g={sx:sx,sy:sy,tx:sx+Math.cos(ang)*d,ty:sy+Math.sin(ang)*d,t0:performance.now(),life:3800};gEl.hidden=false;gEl.classList.remove('gone');}
-function moveGold(t){if(!g)return;var k=(t-g.t0)/g.life;if(k>=1){g=null;gEl.hidden=true;schedule();return}
- var out=k<.2?k/.2:k>.8?(1-k)/.2:1,wob=Math.sin(t/140)*14;
- var x=g.sx+(g.tx-g.sx)*out+Math.cos(t/170)*wob,y=g.sy+(g.ty-g.sy)*out+Math.sin(t/120)*wob;
- gEl.style.left=x+'px';gEl.style.top=y+'px';g.x=x;g.y=y;}
-function schedule(){setTimeout(spawnGold,12000+Math.random()*8000);}
-if(gEl){gEl.addEventListener('click',function(){if(!g)return;mult=3;label();var x=g.x,y=g.y;g=null;gEl.hidden=true;
- [-1,1].forEach(function(d){var h=document.createElement('div');h.className='shard sgold'+(d<0?' L':' R');h.style.left=x+'px';h.style.top=y+'px';h.style.setProperty('--dx',(d*52)+'px');h.style.setProperty('--dy','-22px');h.style.setProperty('--r',(d*200)+'deg');stage.appendChild(h);setTimeout(function(){h.remove()},700);});
- for(var ci=0;ci<26;ci++){var cf=document.createElement('i');cf.className='conf';cf.style.left=x+'px';cf.style.top=y+'px';cf.style.background=['#f5b301','#ffd84d','#fff3b0','#e89b00'][ci%4];var an=Math.random()*Math.PI*2,di=50+Math.random()*80;cf.style.setProperty('--dx',Math.cos(an)*di+'px');cf.style.setProperty('--dy',(Math.sin(an)*di-30)+'px');cf.style.setProperty('--fall',(60+Math.random()*60)+'px');cf.style.setProperty('--r',(Math.random()*720-360)+'deg');stage.appendChild(cf);(function(el){setTimeout(function(){el.remove()},1300)})(cf);}
- var p=document.createElement('div');p.className='ppop big';p.textContent='×3 next!';p.style.left=x+'px';p.style.top=y+'px';stage.appendChild(p);setTimeout(function(){p.remove()},1100);
- schedule();});
- var _tick=tick;tick=function(t){moveGold(t);_tick(t);};schedule();}
 requestAnimationFrame(tick);
 })();
 </script>
