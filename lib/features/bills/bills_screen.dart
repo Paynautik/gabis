@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/models/money.dart';
@@ -280,498 +281,474 @@ class _BillsScreenState extends ConsumerState<BillsScreen> {
   }
 
   void _handleCategoryTap(BuildContext context, BillCategory item) {
-    if (item.title == 'Buy airtime' || item.title == 'Buy data') {
-      _showAirtimeDataSheet(context, isData: item.title == 'Buy data');
-    } else if (item.title == 'Electricity & Water' || item.title == 'Utilities') {
-      _showElectricitySheet(context);
-    } else if (item.title == 'Cable TV') {
-      _showCableTvSheet(context);
+    final t = item.title;
+    if (t == 'Buy airtime' || t == 'Buy data') {
+      final data = t == 'Buy data';
+      _openForm(
+        context,
+        _BillForm(
+          title: data ? 'Buy internet data' : 'Buy mobile airtime',
+          providerLabel: 'Network',
+          providers: const ['MTN', 'Airtel', 'Glo', '9mobile'],
+          accountLabel: 'Phone number',
+          accountHint: '08012345678',
+          accountIcon: Icons.phone_iphone_rounded,
+          keyboard: TextInputType.phone,
+          validateAccount: _validatePhone,
+          minNaira: data ? 100 : 50,
+          maxNaira: 50000,
+          quick: data ? const [500, 1000, 2000, 5000] : const [100, 200, 500, 1000],
+          describe: (p, a) => '$p ${data ? 'data' : 'airtime'} ($a)',
+        ),
+      );
+    } else if (t == 'Electricity & Water' || t == 'Utilities') {
+      _openForm(
+        context,
+        _BillForm(
+          title: 'Pay electricity bill',
+          providerLabel: 'Distribution company',
+          providers: const ['Ikeja Electric', 'Eko Electric', 'Abuja Electric', 'Ibadan Electric'],
+          accountLabel: 'Meter number',
+          accountHint: '11 or 13 digits',
+          accountIcon: Icons.electric_bolt_rounded,
+          keyboard: TextInputType.number,
+          validateAccount: _validateMeter,
+          minNaira: 500,
+          maxNaira: 500000,
+          quick: const [1000, 2000, 5000, 10000],
+          describe: (p, a) => '$p prepaid electricity ($a)',
+          isPower: true,
+        ),
+      );
+    } else if (t == 'Cable TV') {
+      _openForm(
+        context,
+        _BillForm(
+          title: 'Cable TV subscription',
+          providerLabel: 'Provider',
+          providers: const ['DSTV', 'GOtv', 'StarTimes', 'Showmax'],
+          accountLabel: 'Smartcard / IUC number',
+          accountHint: '10 or 11 digits',
+          accountIcon: Icons.credit_card_rounded,
+          keyboard: TextInputType.number,
+          validateAccount: _validateSmartcard,
+          minNaira: 500,
+          maxNaira: 200000,
+          quick: const [2000, 4500, 8500, 14500],
+          describe: (p, a) => '$p subscription ($a)',
+        ),
+      );
     } else {
-      _showGenericPaymentSheet(context, item);
+      _openForm(
+        context,
+        _BillForm(
+          title: item.title,
+          accountLabel: 'Account / reference / ID number',
+          accountHint: 'As shown on your invoice',
+          accountIcon: Icons.tag_rounded,
+          keyboard: TextInputType.text,
+          validateAccount: _validateReference,
+          minNaira: 100,
+          maxNaira: 5000000,
+          quick: const [1000, 5000, 10000, 50000],
+          describe: (p, a) => '${item.title} ($a)',
+        ),
+      );
     }
   }
 
-  void _showAirtimeDataSheet(BuildContext context, {required bool isData}) {
-    String selectedNetwork = 'MTN';
-    final phoneController = TextEditingController(text: '08139284719');
-    final amountController = TextEditingController(text: isData ? '2500' : '1000');
+  // --- Validation -----------------------------------------------------------
 
-    showModalBottomSheet(
-      context: context,
+  static String? _validatePhone(String v) {
+    final d = v.replaceAll(RegExp(r'[\s-]'), '');
+    if (d.isEmpty) return 'Enter the phone number.';
+    if (!RegExp(r'^0[789][01]\d{8}$').hasMatch(d)) {
+      return 'Use an 11-digit Nigerian number, like 08012345678.';
+    }
+    return null;
+  }
+
+  static String? _validateMeter(String v) {
+    final d = v.trim();
+    if (d.isEmpty) return 'Enter the meter number.';
+    if (!RegExp(r'^\d{11}$|^\d{13}$').hasMatch(d)) return 'A meter number has 11 or 13 digits.';
+    return null;
+  }
+
+  static String? _validateSmartcard(String v) {
+    final d = v.trim();
+    if (d.isEmpty) return 'Enter the smartcard number.';
+    if (!RegExp(r'^\d{10,11}$').hasMatch(d)) return 'A smartcard number has 10 or 11 digits.';
+    return null;
+  }
+
+  static String? _validateReference(String v) {
+    if (v.trim().length < 4) return 'Enter the account or reference number.';
+    return null;
+  }
+
+  // --- The flow: details, review, pay, receipt ------------------------------
+
+  int _nairaBalanceMinor() {
+    for (final a in ref.read(accountsProvider)) {
+      if (a.currency == 'NGN') return a.balance.minorUnits;
+    }
+    return 0;
+  }
+
+  void _openForm(BuildContext context, _BillForm form) {
+    String? provider = form.providers?.first;
+    final account = TextEditingController();
+    final amount = TextEditingController();
+    String? accountError;
+    String? amountError;
+    String? payError;
+    var reviewing = false;
+
+    showModalBottomSheet<void>(
+      context: this.context,
       isScrollControlled: true,
-      backgroundColor: context.colors.bgSoft,
+      backgroundColor: this.context.colors.bgSoft,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setSheetState) {
-          return Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 24, right: 24, top: 24),
-            child: Column(
+        builder: (ctx, setSheet) {
+          final balance = _nairaBalanceMinor();
+
+          int? parsedAmount() => int.tryParse(amount.text.replaceAll(RegExp(r'[,\s₦]'), ''));
+
+          void review() {
+            final accErr = form.validateAccount(account.text);
+            final amt = parsedAmount();
+            String? amtErr;
+            if (amt == null) {
+              amtErr = 'Enter an amount.';
+            } else if (amt < form.minNaira) {
+              amtErr = 'The smallest amount is ₦${_group(form.minNaira)}.';
+            } else if (amt > form.maxNaira) {
+              amtErr = 'The most you can pay here is ₦${_group(form.maxNaira)}.';
+            }
+            setSheet(() {
+              accountError = accErr;
+              amountError = amtErr;
+              payError = null;
+              reviewing = accErr == null && amtErr == null;
+            });
+          }
+
+          Future<void> pay() async {
+            final naira = parsedAmount()!;
+            final minor = naira * 100;
+            if (_nairaBalanceMinor() < minor) {
+              setSheet(() => payError = 'Your naira wallet has ${Money(minorUnits: balance, currency: 'NGN').format()}, '
+                  'which is not enough. Add money first.');
+              return;
+            }
+            final reference = _newReference();
+            final now = DateTime.now();
+            final acct = account.text.trim();
+            final desc = form.describe(provider ?? '', acct);
+
+            ref.read(accountsProvider.notifier).subtractBalance('NGN', minor);
+            ref.read(transactionsProvider.notifier).addTransaction(
+                  AppTransaction(
+                    id: reference,
+                    type: TransactionType.billPayment,
+                    status: TransactionStatus.completed,
+                    amount: Money(minorUnits: minor, currency: 'NGN'),
+                    description: desc,
+                    counterparty: provider ?? form.title,
+                    createdAt: now,
+                    isCredit: false,
+                  ),
+                );
+            Navigator.pop(ctx);
+            if (!mounted) return;
+            _showReceipt(
+              form: form,
+              provider: provider,
+              account: acct,
+              naira: naira,
+              reference: reference,
+              when: now,
+            );
+          }
+
+          InputDecoration deco(String label, {String? hint, IconData? icon, String? prefix, String? error}) => InputDecoration(
+                labelText: label,
+                hintText: hint,
+                errorText: error,
+                labelStyle: TextStyle(color: ctx.colors.inkSoft),
+                prefixIcon: icon == null ? null : Icon(icon, color: ctx.colors.inkSoft, size: 20),
+                prefixText: prefix,
+                prefixStyle: TextStyle(color: ctx.colors.ink, fontWeight: FontWeight.w900),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: ctx.colors.border)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: ctx.colors.bluePrimary, width: 2)),
+              );
+
+          final Widget body;
+          if (reviewing) {
+            final naira = parsedAmount() ?? 0;
+            body = Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      isData ? 'Buy Internet Data' : 'Buy Mobile Airtime',
-                      style: TextStyle(color: context.colors.ink, fontSize: 18, fontWeight: FontWeight.w900),
+                Text('Review payment', style: TextStyle(color: ctx.colors.ink, fontSize: 18, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 14),
+                _reviewRow('Paying', provider ?? form.title),
+                _reviewRow(form.accountLabel, account.text.trim()),
+                _reviewRow('Amount', '₦${_group(naira)}'),
+                _reviewRow('Fee', '₦0'),
+                Divider(color: ctx.colors.border),
+                _reviewRow('Total', '₦${_group(naira)}', strong: true),
+                _reviewRow('From', 'Naira wallet · ${Money(minorUnits: balance, currency: 'NGN').format()}'),
+                if (payError != null) ...[
+                  const SizedBox(height: 10),
+                  Text(payError!, style: const TextStyle(color: Color(0xFFDC2626), fontSize: 13, fontWeight: FontWeight.w600)),
+                ],
+                const SizedBox(height: 18),
+                Row(children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => setSheet(() {
+                        reviewing = false;
+                        payError = null;
+                      }),
+                      style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(52), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+                      child: const Text('Back'),
                     ),
-                    IconButton(icon: Icon(Icons.close_rounded, color: context.colors.inkSoft), onPressed: () => Navigator.pop(ctx)),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Text('Select Network Provider:', style: TextStyle(color: context.colors.inkSoft, fontSize: 12, fontWeight: FontWeight.w700)),
-                const SizedBox(height: 10),
-                Row(
-                  children: ['MTN', 'Airtel', 'Glo', '9mobile'].map((net) {
-                    final isSel = selectedNetwork == net;
-                    return Expanded(
-                      child: GestureDetector(
-                        onTap: () => setSheetState(() => selectedNetwork = net),
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: isSel ? context.colors.bluePrimary : context.colors.scaffoldBg,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: isSel ? context.colors.bluePrimary : context.colors.border),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            net,
-                            style: TextStyle(
-                              color: isSel ? Colors.white : context.colors.ink,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton(
+                      onPressed: pay,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ctx.colors.bluePrimary,
+                        minimumSize: const Size.fromHeight(52),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: phoneController,
-                  keyboardType: TextInputType.phone,
-                  style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w700),
-                  decoration: InputDecoration(
-                    labelText: 'Phone Number',
-                    labelStyle: TextStyle(color: context.colors.inkSoft),
-                    prefixIcon: Icon(Icons.phone_iphone_rounded, color: context.colors.inkSoft, size: 20),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.colors.border)),
-                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.colors.bluePrimary, width: 2)),
+                      child: Text('Pay ₦${_group(naira)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: amountController,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900, fontSize: 18),
-                  decoration: InputDecoration(
-                    labelText: 'Amount (₦)',
-                    labelStyle: TextStyle(color: context.colors.inkSoft),
-                    prefixText: '₦ ',
-                    prefixStyle: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.colors.border)),
-                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.colors.bluePrimary, width: 2)),
-                  ),
-                ),
-                const SizedBox(height: 22),
-                ElevatedButton(
-                  onPressed: () {
-                    final amt = int.tryParse(amountController.text) ?? 1000;
-                    final minor = amt * 100;
-                    ref.read(accountsProvider.notifier).subtractBalance('NGN', minor);
-                    ref.read(transactionsProvider.notifier).addTransaction(
-                      AppTransaction(
-                        id: 'tx_${DateTime.now().millisecondsSinceEpoch}',
-                        type: TransactionType.billPayment,
-                        status: TransactionStatus.completed,
-                        amount: Money(minorUnits: minor, currency: 'NGN'),
-                        description: '$selectedNetwork ${isData ? "Data Topup" : "Airtime"} (${phoneController.text})',
-                        counterparty: selectedNetwork,
-                        createdAt: DateTime.now(),
-                        isCredit: false,
-                      ),
-                    );
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('₦$amt $selectedNetwork ${isData ? "Data" : "Airtime"} purchased successfully!')),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: context.colors.bluePrimary,
-                    minimumSize: const Size.fromHeight(52),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  child: Text(
-                    'Pay Now',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white),
-                  ),
-                ),
-                const SizedBox(height: 24),
+                ]),
               ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  void _showElectricitySheet(BuildContext context) {
-    String selectedDisco = 'IKEDC (Ikeja Electric)';
-    final meterController = TextEditingController(text: '04291847291');
-    final amountController = TextEditingController(text: '5000');
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: context.colors.bgSoft,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setSheetState) {
-          return Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 24, right: 24, top: 24),
-            child: Column(
+            );
+          } else {
+            body = Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Pay Electricity Bill', style: TextStyle(color: context.colors.ink, fontSize: 18, fontWeight: FontWeight.w900)),
-                    IconButton(icon: Icon(Icons.close_rounded, color: context.colors.inkSoft), onPressed: () => Navigator.pop(ctx)),
+                    Expanded(child: Text(form.title, style: TextStyle(color: ctx.colors.ink, fontSize: 18, fontWeight: FontWeight.w900))),
+                    IconButton(icon: Icon(Icons.close_rounded, color: ctx.colors.inkSoft), onPressed: () => Navigator.pop(ctx)),
                   ],
                 ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: selectedDisco,
-                  dropdownColor: context.colors.bgSoft,
-                  style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w700),
-                  decoration: InputDecoration(
-                    labelText: 'Distribution Company (Disco)',
-                    labelStyle: TextStyle(color: context.colors.inkSoft),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.colors.border)),
-                  ),
-                  items: [
-                    'IKEDC (Ikeja Electric)',
-                    'EKEDC (Eko Electric)',
-                    'AEDC (Abuja Electric)',
-                    'IBEDC (Ibadan Electric)',
-                  ].map((e) => DropdownMenuItem(value: e, child: Text(e, style: TextStyle(fontSize: 13)))).toList(),
-                  onChanged: (v) => setSheetState(() => selectedDisco = v!),
-                ),
+                Text('Naira wallet: ${Money(minorUnits: balance, currency: 'NGN').format()}',
+                    style: TextStyle(color: ctx.colors.inkSoft, fontSize: 12.5, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 14),
-                TextField(
-                  controller: meterController,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w700),
-                  decoration: InputDecoration(
-                    labelText: 'Meter Number / Account Number',
-                    labelStyle: TextStyle(color: context.colors.inkSoft),
-                    prefixIcon: Icon(Icons.electric_bolt_rounded, color: context.colors.inkSoft, size: 20),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.colors.border)),
+                if (form.providers != null) ...[
+                  Text(form.providerLabel, style: TextStyle(color: ctx.colors.inkSoft, fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      for (final p in form.providers!)
+                        ChoiceChip(
+                          label: Text(p),
+                          selected: provider == p,
+                          onSelected: (_) => setSheet(() => provider = p),
+                        ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 14),
+                  const SizedBox(height: 14),
+                ],
                 TextField(
-                  controller: amountController,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900, fontSize: 18),
-                  decoration: InputDecoration(
-                    labelText: 'Amount (₦)',
-                    labelStyle: TextStyle(color: context.colors.inkSoft),
-                    prefixText: '₦ ',
-                    prefixStyle: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.colors.border)),
-                  ),
-                ),
-                const SizedBox(height: 22),
-                ElevatedButton(
-                  onPressed: () {
-                    final amt = int.tryParse(amountController.text) ?? 5000;
-                    final minor = amt * 100;
-                    ref.read(accountsProvider.notifier).subtractBalance('NGN', minor);
-                    ref.read(transactionsProvider.notifier).addTransaction(
-                      AppTransaction(
-                        id: 'tx_${DateTime.now().millisecondsSinceEpoch}',
-                        type: TransactionType.billPayment,
-                        status: TransactionStatus.completed,
-                        amount: Money(minorUnits: minor, currency: 'NGN'),
-                        description: 'Electricity Token (${meterController.text})',
-                        counterparty: selectedDisco.split(' ')[0],
-                        createdAt: DateTime.now(),
-                        isCredit: false,
-                      ),
-                    );
-                    Navigator.pop(ctx);
-                    _showTokenSuccessDialog(context, meterController.text, amt.toString());
+                  controller: account,
+                  keyboardType: form.keyboard,
+                  style: TextStyle(color: ctx.colors.ink, fontWeight: FontWeight.w700),
+                  decoration: deco(form.accountLabel, hint: form.accountHint, icon: form.accountIcon, error: accountError),
+                  onChanged: (_) {
+                    if (accountError != null) setSheet(() => accountError = null);
                   },
+                ),
+                const SizedBox(height: 14),
+                TextField(
+                  controller: amount,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(color: ctx.colors.ink, fontWeight: FontWeight.w900, fontSize: 18),
+                  decoration: deco('Amount', prefix: '₦ ', error: amountError),
+                  onChanged: (_) {
+                    if (amountError != null) setSheet(() => amountError = null);
+                  },
+                ),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final q in form.quick)
+                      ActionChip(
+                        label: Text('₦${_group(q)}'),
+                        onPressed: () => setSheet(() {
+                          amount.text = '$q';
+                          amountError = null;
+                        }),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 18),
+                ElevatedButton(
+                  onPressed: review,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: context.colors.bluePrimary,
+                    backgroundColor: ctx.colors.bluePrimary,
                     minimumSize: const Size.fromHeight(52),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: const Text('Purchase Power Token', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
+                  child: const Text('Review payment', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
                 ),
-                const SizedBox(height: 24),
               ],
-            ),
+            );
+          }
+
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 24, right: 24, top: 24),
+            child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [body, const SizedBox(height: 24)])),
           );
         },
       ),
     );
   }
 
-  void _showTokenSuccessDialog(BuildContext context, String meter, String amount) {
-    showDialog(
+  Widget _reviewRow(String label, String value, {bool strong = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(color: context.colors.inkSoft, fontSize: 13.5, fontWeight: FontWeight.w600)),
+          const SizedBox(width: 16),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.right,
+              style: TextStyle(color: context.colors.ink, fontSize: strong ? 16 : 13.5, fontWeight: strong ? FontWeight.w900 : FontWeight.w700),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showReceipt({
+    required _BillForm form,
+    required String? provider,
+    required String account,
+    required int naira,
+    required String reference,
+    required DateTime when,
+  }) {
+    final demo = ref.read(demoDataProvider);
+    showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: context.colors.bgSoft,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Row(
-          children: [
-            const Icon(Icons.check_circle_rounded, color: Color(0xFF16A34A), size: 28),
-            const SizedBox(width: 10),
-            Text('Power Token Ready', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900, fontSize: 18)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Payment of ₦$amount for Meter #$meter was successful.', style: TextStyle(color: context.colors.inkSoft, fontSize: 13)),
-            const SizedBox(height: 16),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: context.colors.scaffoldBg,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: context.colors.border),
-              ),
-              child: Column(
-                children: [
-                  const Text('PREPAID TOKEN', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: Colors.grey)),
-                  const SizedBox(height: 6),
-                  const Text('4829-1092-3819-0928-1192', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, letterSpacing: 1.5, color: Color(0xFF10B981))),
-                ],
-              ),
-            ),
-          ],
+        title: Row(children: [
+          const Icon(Icons.check_circle_rounded, color: Color(0xFF16A34A), size: 28),
+          const SizedBox(width: 10),
+          Expanded(child: Text('Payment successful', style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900, fontSize: 18))),
+        ]),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _reviewRow('Paid', provider ?? form.title),
+              _reviewRow(form.accountLabel, account),
+              _reviewRow('Amount', '₦${_group(naira)}', strong: true),
+              _reviewRow('Reference', reference),
+              _reviewRow('Date', _formatWhen(when)),
+              if (demo) ...[
+                const SizedBox(height: 10),
+                Text(
+                  'Demo mode: this payment only changed the example balance. No biller was charged.'
+                  '${form.isPower ? ' A real purchase would show the meter token here.' : ''}',
+                  style: TextStyle(color: context.colors.inkSoft, fontSize: 12, height: 1.4),
+                ),
+              ],
+            ],
+          ),
         ),
         actions: [
+          TextButton(
+            onPressed: () {
+              Clipboard.setData(ClipboardData(text: reference));
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reference copied')));
+            },
+            child: const Text('Copy reference'),
+          ),
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Done')),
         ],
       ),
     );
   }
 
-  void _showCableTvSheet(BuildContext context) {
-    String selectedProvider = 'DSTV';
-    final cardController = TextEditingController(text: '7029184719');
-    final amountController = TextEditingController(text: '14500');
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: context.colors.bgSoft,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setSheetState) {
-          return Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 24, right: 24, top: 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Cable TV Subscription', style: TextStyle(color: context.colors.ink, fontSize: 18, fontWeight: FontWeight.w900)),
-                    IconButton(icon: Icon(Icons.close_rounded, color: context.colors.inkSoft), onPressed: () => Navigator.pop(ctx)),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: ['DSTV', 'GOtv', 'StarTimes', 'Showmax'].map((provider) {
-                    final isSel = selectedProvider == provider;
-                    return Expanded(
-                      child: GestureDetector(
-                        onTap: () => setSheetState(() => selectedProvider = provider),
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: isSel ? context.colors.bluePrimary : context.colors.scaffoldBg,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: isSel ? context.colors.bluePrimary : context.colors.border),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            provider,
-                            style: TextStyle(
-                              color: isSel ? Colors.white : context.colors.ink,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: cardController,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w700),
-                  decoration: InputDecoration(
-                    labelText: 'IUC / Smartcard Number',
-                    labelStyle: TextStyle(color: context.colors.inkSoft),
-                    prefixIcon: Icon(Icons.credit_card_rounded, color: context.colors.inkSoft, size: 20),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.colors.border)),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: amountController,
-                  keyboardType: TextInputType.number,
-                  style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900, fontSize: 18),
-                  decoration: InputDecoration(
-                    labelText: 'Package Amount (₦)',
-                    labelStyle: TextStyle(color: context.colors.inkSoft),
-                    prefixText: '₦ ',
-                    prefixStyle: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900),
-                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.colors.border)),
-                  ),
-                ),
-                const SizedBox(height: 22),
-                ElevatedButton(
-                  onPressed: () {
-                    final amt = int.tryParse(amountController.text) ?? 14500;
-                    final minor = amt * 100;
-                    ref.read(accountsProvider.notifier).subtractBalance('NGN', minor);
-                    ref.read(transactionsProvider.notifier).addTransaction(
-                      AppTransaction(
-                        id: 'tx_${DateTime.now().millisecondsSinceEpoch}',
-                        type: TransactionType.billPayment,
-                        status: TransactionStatus.completed,
-                        amount: Money(minorUnits: minor, currency: 'NGN'),
-                        description: '$selectedProvider Renewal (${cardController.text})',
-                        counterparty: selectedProvider,
-                        createdAt: DateTime.now(),
-                        isCredit: false,
-                      ),
-                    );
-                    Navigator.pop(ctx);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('$selectedProvider subscription renewed successfully!')),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: context.colors.bluePrimary,
-                    minimumSize: const Size.fromHeight(52),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  child: const Text('Renew Subscription', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
-                ),
-                const SizedBox(height: 24),
-              ],
-            ),
-          );
-        },
-      ),
-    );
+  static String _newReference() {
+    final t = DateTime.now().millisecondsSinceEpoch.toRadixString(36).toUpperCase();
+    return 'GB$t';
   }
 
-  void _showGenericPaymentSheet(BuildContext context, BillCategory item) {
-    final refController = TextEditingController();
-    final amountController = TextEditingController(text: '5000');
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: context.colors.bgSoft,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom, left: 24, right: 24, top: 24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    item.title,
-                    style: TextStyle(color: context.colors.ink, fontSize: 17, fontWeight: FontWeight.w900),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                IconButton(icon: Icon(Icons.close_rounded, color: context.colors.inkSoft), onPressed: () => Navigator.pop(ctx)),
-              ],
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: refController,
-              style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w700),
-              decoration: InputDecoration(
-                labelText: 'Account / Reference / ID Number',
-                labelStyle: TextStyle(color: context.colors.inkSoft),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.colors.border)),
-              ),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: amountController,
-              keyboardType: TextInputType.number,
-              style: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900, fontSize: 18),
-              decoration: InputDecoration(
-                labelText: 'Amount (₦)',
-                labelStyle: TextStyle(color: context.colors.inkSoft),
-                prefixText: '₦ ',
-                prefixStyle: TextStyle(color: context.colors.ink, fontWeight: FontWeight.w900),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: context.colors.border)),
-              ),
-            ),
-            const SizedBox(height: 22),
-            ElevatedButton(
-              onPressed: () {
-                final amt = int.tryParse(amountController.text) ?? 5000;
-                final minor = amt * 100;
-                ref.read(accountsProvider.notifier).subtractBalance('NGN', minor);
-                ref.read(transactionsProvider.notifier).addTransaction(
-                  AppTransaction(
-                    id: 'tx_${DateTime.now().millisecondsSinceEpoch}',
-                    type: TransactionType.billPayment,
-                    status: TransactionStatus.completed,
-                    amount: Money(minorUnits: minor, currency: 'NGN'),
-                    description: '${item.title} Payment',
-                    counterparty: item.title,
-                    createdAt: DateTime.now(),
-                    isCredit: false,
-                  ),
-                );
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('${item.title} payment of ₦$amt completed!')),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: context.colors.bluePrimary,
-                minimumSize: const Size.fromHeight(52),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-              child: const Text('Proceed with Payment', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white)),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-    );
+  static String _group(int n) {
+    final s = n.toString();
+    final b = StringBuffer();
+    for (var i = 0; i < s.length; i++) {
+      if (i > 0 && (s.length - i) % 3 == 0) b.write(',');
+      b.write(s[i]);
+    }
+    return b.toString();
   }
+
+  static String _formatWhen(DateTime d) {
+    const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final h = d.hour % 12 == 0 ? 12 : d.hour % 12;
+    final mm = d.minute.toString().padLeft(2, '0');
+    return '${d.day} ${m[d.month - 1]} ${d.year}, $h:$mm ${d.hour < 12 ? 'AM' : 'PM'}';
+  }
+}
+
+/// What one kind of bill asks for: who it goes to, the account number that
+/// identifies you, and the limits on the amount.
+class _BillForm {
+  final String title;
+  final String providerLabel;
+  final List<String>? providers;
+  final String accountLabel;
+  final String accountHint;
+  final IconData accountIcon;
+  final TextInputType keyboard;
+  final String? Function(String) validateAccount;
+  final int minNaira;
+  final int maxNaira;
+  final List<int> quick;
+  final String Function(String provider, String account) describe;
+  final bool isPower;
+
+  const _BillForm({
+    required this.title,
+    this.providerLabel = '',
+    this.providers,
+    required this.accountLabel,
+    required this.accountHint,
+    required this.accountIcon,
+    required this.keyboard,
+    required this.validateAccount,
+    required this.minNaira,
+    required this.maxNaira,
+    required this.quick,
+    required this.describe,
+    this.isPower = false,
+  });
 }
