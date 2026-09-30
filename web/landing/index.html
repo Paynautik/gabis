@@ -172,24 +172,15 @@ img,video{max-width:100%}
 .agc-arrow::before{content:"\2193  "}
 .agc-bub{align-self:flex-end;background:#4b45f5;color:#fff;font-size:12px;font-weight:600;padding:8px 11px;border-radius:12px 12px 3px 12px;max-width:92%}
 .agc-chip{align-self:flex-start;font-size:10.5px;font-weight:700;color:#4b45f5;background:#eeecff;padding:4px 9px;border-radius:999px}
-.agc-call{display:flex;align-items:center;gap:10px}
-.agc-av{width:34px;height:34px;flex:none;border-radius:50%;background:#dff76a;color:#16123a;font:700 12px Sora,sans-serif;display:flex;align-items:center;justify-content:center}
-.agc-who{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-.agc-who b{font-size:13px;color:#fff}.agc-who small{font-size:10.5px;color:#a9a4d6;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.agc-time{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:#7ff0bd;background:rgba(15,157,107,.22);padding:4px 9px;border-radius:999px;font-variant-numeric:tabular-nums}
-.agc-live{width:6px;height:6px;border-radius:50%;background:#0f9d6b;animation:agcp 1.4s ease-in-out infinite}
-@keyframes agcp{50%{opacity:.35}}
-.agc-wave{display:flex;align-items:center;justify-content:center;gap:3px;height:52px}
-.agc-wave i{width:3px;border-radius:3px;background:linear-gradient(#dff76a,#8b7cf6);height:18%;animation:agcw 1.2s ease-in-out infinite}
-.agc-wave i:nth-child(2n){animation-delay:.12s}.agc-wave i:nth-child(3n){animation-delay:.27s}.agc-wave i:nth-child(5n){animation-delay:.41s}.agc-wave i:nth-child(7n){animation-delay:.08s}
 
-.agc-say{background:rgba(255,255,255,.08);border-radius:12px;padding:9px 11px;font-size:11.5px;line-height:1.45;color:#dcd8ff;font-style:italic}
-.agc-panel.dk{background:#16123a;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
-.agc-langs{display:flex;gap:6px;justify-content:center}
-.agc-langs span{font-size:10px;font-weight:700;letter-spacing:.04em;color:#a9a4d6;border:1px solid rgba(255,255,255,.16);padding:3px 9px;border-radius:999px}
-.agc-langs span.on{background:#dff76a;color:#16123a;border-color:#dff76a}
-@keyframes agcw{0%,100%{height:22%}50%{height:92%}}
-@media (prefers-reduced-motion:reduce){.fcard.dark{background:#16123a;color:#fff;justify-content:flex-end;min-height:260px}.fcard.dark p{color:#c9c5e6}.fcard.dark .ftag{color:#dff76a}
+.agc-voice{align-items:center;text-align:center;gap:4px}
+.agc-spk{position:relative;width:58px;height:58px;border-radius:50%;background:#4b45f5;display:flex;align-items:center;justify-content:center;margin-bottom:24px;box-shadow:0 10px 22px -8px rgba(75,69,245,.6)}
+.agc-spk::before,.agc-spk::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(75,69,245,.35);animation:agcr 2.4s ease-out infinite}
+.agc-spk::after{animation-delay:1.2s}
+@keyframes agcr{0%{transform:scale(1);opacity:.9}100%{transform:scale(2.1);opacity:0}}
+.agc-vn{font-size:14px;color:#16123a}.agc-vs{font-size:11.5px;color:#8a8699;font-weight:600}
+@media (prefers-reduced-motion:reduce){.agc{transition:none}.agc-spk::before,.agc-spk::after{animation:none;opacity:.35;transform:scale(1.5)}}
+.fcard.dark{background:#16123a;color:#fff;justify-content:flex-end;min-height:260px}.fcard.dark p{color:#c9c5e6}.fcard.dark .ftag{color:#dff76a}
 .mbig{font:700 20px Sora,sans-serif;letter-spacing:-.02em}
 .mock ul{margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:#5f5b73}
 .fc{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end;height:150px}.fc div{height:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:6px}.fc i{display:block;height:var(--h);max-height:80px;background:#dcd8ff;border-radius:8px}.fc div:first-child i{background:#4b45f5}.fc span{font-size:11px;color:#5f5b73;line-height:1.3}.fc b{color:#16123a;font-size:13px}
@@ -580,7 +571,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px">
 <article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h6l2-4 2 8 2-4h4"></path></svg></span><span class="agc-tag">Match</span></div><h4>Reconciliation engine</h4><p>Maps messy interbank feeds to invoices, even with fuzzy names.</p><div class="agc-demo"><div class="agc-panel"><div class="agc-row"><small>Zenith · NIP transfer</small><b>S OKAFOR BRND DSGN</b></div><div class="agc-arrow">matched by AI</div><div class="agc-row ok"><small>Invoice #0142</small><b>₦150,000 · Paid ✓</b></div></div></div></article>
-<article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg></span><span class="agc-tag">Call</span></div><h4>Voice reminders</h4><p>Localized, polite robot calls to customers with balances due.</p><div class="agc-demo"><div class="agc-panel dk"><div class="agc-call"><span class="agc-av">SO</span><div class="agc-who"><b>Sarah Okafor</b><small>Payment reminder · ₦150,000 due</small></div><span class="agc-time"><span class="agc-live"></span>0:12</span></div><div class="agc-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="agc-langs"><span class="on">English</span><span>Pidgin</span><span>Yoruba</span></div><div class="agc-say">“Hello Sarah, this is a reminder from Adebayo Retail…”</div></div></div></article>
+<article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg></span><span class="agc-tag">Call</span></div><h4>Voice reminders</h4><p>Localized, polite robot calls to customers with balances due.</p><div class="agc-demo"><div class="agc-panel agc-voice"><span class="agc-spk" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="#fff"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg></span><b class="agc-vn">Calling Sarah Okafor</b><small class="agc-vs">Payment reminder · ₦150,000 due</small></div></div></article>
 <article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"></path><path d="M9 12h7M9 16h5"></path></svg></span><span class="agc-tag">Draft</span></div><h4>Invoice assistant</h4><p>“Bill Sarah 150k for brand design” becomes a ready invoice.</p><div class="agc-demo"><div class="agc-panel"><div class="agc-bub">Bill Sarah 150k for brand design</div><div class="agc-row"><small>Brand design × 1</small><b>₦150,000</b></div><div class="agc-chip">Draft ready to send</div></div></div></article>
 <article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg></span><span class="agc-tag">Ask</span></div><h4>Ask your money</h4><p>“Who has overdue installments?” Answers from your own history.</p><div class="agc-demo"><div class="agc-panel"><div class="agc-bub">Who has overdue installments?</div><div class="agc-row"><small>2 overdue</small><b>Sarah Okafor · Tunde B.</b></div><div class="agc-chip">From your own history</div></div></div></article>
 </div>
