@@ -317,36 +317,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          // Middle Row: Big Balance + Add Money Button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              GestureDetector(
-                onTap: () => setState(() => _isBalanceHidden = !_isBalanceHidden),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
+          // Big balance
+          GestureDetector(
+            onTap: () => setState(() => _isBalanceHidden = !_isBalanceHidden),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
                       _isBalanceHidden ? '****' : balance.format(),
                       style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: -1.0),
                     ),
-                    const SizedBox(width: 4),
-                    const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 24),
-                  ],
+                  ),
+                ),
+                const SizedBox(width: 4),
+                const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 24),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          // The three things people do with their balance
+          Row(
+            children: [
+              Expanded(
+                child: _balanceAction(
+                  icon: Icons.add_rounded,
+                  label: 'Add money',
+                  primary: true,
+                  onTap: () => _showReceiveSheet(context),
                 ),
               ),
-              GestureDetector(
-                onTap: () => _showReceiveSheet(context),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                  child: Text('+ Add Money', style: TextStyle(color: context.colors.bluePrimary, fontWeight: FontWeight.w900, fontSize: 13)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _balanceAction(
+                  icon: Icons.swap_horiz_rounded,
+                  label: 'Exchange',
+                  onTap: () => Navigator.of(context).pushNamed('/fx'),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _balanceAction(
+                  icon: Icons.north_east_rounded,
+                  label: 'Send',
+                  onTap: () => Navigator.of(context).pushNamed('/send'),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           // Bottom Strip (Business Service)
           GestureDetector(
             onTap: () => _showBusinessInsights(context),
@@ -373,6 +395,44 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// One of the balance card's three buttons. The first is solid white; the
+  /// others are frosted so it stays the obvious one.
+  Widget _balanceAction({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+    bool primary = false,
+  }) {
+    final fg = primary ? context.colors.bluePrimary : Colors.white;
+    return Material(
+      color: primary ? Colors.white : Colors.white.withValues(alpha: 0.18),
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 6),
+          // Scales down rather than cutting the label off on a narrow phone.
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, size: 16, color: fg),
+                const SizedBox(width: 5),
+                Text(
+                  label,
+                  maxLines: 1,
+                  style: TextStyle(color: fg, fontWeight: FontWeight.w900, fontSize: 13),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
