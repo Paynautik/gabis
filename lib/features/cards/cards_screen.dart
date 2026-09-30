@@ -247,6 +247,9 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
       decoration: BoxDecoration(
         gradient: skin['gradient'],
         borderRadius: BorderRadius.circular(24),
+        border: skin['isDark'] == true
+            ? Border.all(color: Colors.white.withValues(alpha: 0.08))
+            : null,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.15),
@@ -257,6 +260,26 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
       ),
       child: Stack(
         children: [
+          // Brushed-metal sheen, so every skin reads as a physical card
+          Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withValues(alpha: 0.10),
+                      Colors.white.withValues(alpha: 0.0),
+                      Colors.white.withValues(alpha: 0.04),
+                    ],
+                    stops: const [0.0, 0.45, 1.0],
+                  ),
+                ),
+              ),
+            ),
+          ),
           // If frozen, display frost overlay
           if (card.frozen)
             Positioned.fill(
@@ -293,24 +316,42 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Chip mockup
-                    Container(
-                      width: 44,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFE5A93C), Color(0xFFF9D976)],
+                    // EMV chip + contactless mark
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 44,
+                          height: 32,
+                          child: CustomPaint(painter: _ChipPainter()),
                         ),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          Icons.contactless_rounded,
+                          size: 22,
+                          color: skin['isDark'] == true
+                              ? const Color(0xFFC9B79C)
+                              : skin['accentColor'] as Color,
+                        ),
+                      ],
                     ),
-                    const Text(
-                      'GABIS',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 3.0,
+                    // gabis wordmark, engraved: champagne on dark skins,
+                    // the skin's own text colour on light ones
+                    ColorFiltered(
+                      colorFilter: ColorFilter.mode(
+                        skin['isDark'] == true
+                            ? const Color(0xFFC9B79C)
+                            : skin['textColor'] as Color,
+                        BlendMode.srcIn,
+                      ),
+                      child: Align(
+                        widthFactor: 677 / 1216,
+                        heightFactor: 268 / 312,
+                        child: Image.asset(
+                          'assets/gabis_logo.png',
+                          height: 44,
+                          fit: BoxFit.contain,
+                          semanticLabel: 'gabis',
+                        ),
                       ),
                     ),
                   ],
@@ -458,4 +499,40 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
     ))));
   }
 
+}
+
+/// Champagne EMV chip with the usual contact-pad lines.
+class _ChipPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(7));
+    canvas.drawRRect(
+      rect,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFFE4D5B7), Color(0xFFA8946F)],
+        ).createShader(Offset.zero & size),
+    );
+    final line = Paint()
+      ..color = const Color(0xFF6E5F45).withValues(alpha: 0.55)
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+    final w = size.width, h = size.height;
+    canvas.drawLine(Offset(w * 0.34, 0), Offset(w * 0.34, h), line);
+    canvas.drawLine(Offset(w * 0.66, 0), Offset(w * 0.66, h), line);
+    canvas.drawLine(Offset(0, h * 0.5), Offset(w, h * 0.5), line);
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(w * 0.34, h * 0.28, w * 0.32, h * 0.44),
+        const Radius.circular(3),
+      ),
+      line,
+    );
+    canvas.drawRRect(rect, line);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
