@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/app_theme.dart';
 import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/coming_soon.dart';
+import '../../shared/models/account.dart';
+import '../../shared/models/money.dart';
 import '../../shared/models/payment_card.dart';
 import '../../shared/widgets/glowing_background.dart';
 import 'metal_card_front.dart';
@@ -211,6 +213,29 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
             ),
           ),
           const SizedBox(height: 24),
+          // Money in: fund the card from a wallet, or swap into its currency first
+          Row(
+            children: [
+              Expanded(
+                child: FilledButton.icon(
+                  onPressed: card.frozen ? null : () => _showFundSheet(card),
+                  icon: const Icon(Icons.add_card_rounded, size: 18),
+                  label: const Text('Fund card'),
+                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: FilledButton.tonalIcon(
+                  onPressed: () => Navigator.of(context).pushNamed('/fx'),
+                  icon: const Icon(Icons.swap_horiz_rounded, size: 18),
+                  label: const Text('Swap'),
+                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           // Action Buttons
           Row(
             children: [
@@ -238,6 +263,103 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
       ),
       ),
     );
+  }
+
+  /// Fund the card from the wallet in its currency. If the wallet is short the
+  /// person is sent to Swap, which is how money gets into that currency.
+  void _showFundSheet(PaymentCard card) {
+    final currency = card.balance.currency;
+    final controller = TextEditingController();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        String? error;
+        return StatefulBuilder(builder: (context, setSheet) {
+          final accounts = ref.read(accountsProvider);
+          final wallet = accounts.where((a) => a.currency == currency).cast<Account?>().firstWhere((_) => true, orElse: () => null);
+          final available = wallet?.balance ?? Money.zero(currency);
+
+          void fund(int minor) {
+            if (minor <= 0) {
+              setSheet(() => error = 'Enter an amount.');
+              return;
+            }
+            if (minor > available.minorUnits) {
+              setSheet(() => error = 'Your $currency wallet has ${available.format()}. Swap into $currency first.');
+              return;
+            }
+            final amount = Money(minorUnits: minor, currency: currency);
+            ref.read(accountsProvider.notifier).subtractBalance(currency, minor);
+            ref.read(cardsProvider.notifier).addFunds(card.id, amount);
+            Navigator.of(sheetContext).pop();
+            ScaffoldMessenger.of(this.context).showSnackBar(
+              SnackBar(content: Text('${amount.format()} added to your card')),
+            );
+          }
+
+          return Padding(
+            padding: EdgeInsets.fromLTRB(20, 4, 20, 20 + MediaQuery.of(context).viewInsets.bottom),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Fund card', style: TextStyle(color: context.colors.ink, fontSize: 20, fontWeight: FontWeight.w900)),
+                const SizedBox(height: 4),
+                Text('From your $currency wallet · ${available.format()} available',
+                    style: TextStyle(color: context.colors.inkSoft, fontSize: 13)),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    for (final v in const [25, 50, 100, 250])
+                      ActionChip(
+                        label: Text('${Money(minorUnits: 0, currency: currency).symbol}$v'),
+                        onPressed: () => controller.text = '$v',
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: controller,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                    labelText: 'Amount',
+                    prefixText: Money(minorUnits: 0, currency: currency).symbol,
+                    errorText: error,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(children: [
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: () {
+                        final major = double.tryParse(controller.text.trim()) ?? 0;
+                        fund((major * 100).round());
+                      },
+                      style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(48)),
+                      child: const Text('Add to card'),
+                    ),
+                  ),
+                  if (error != null) ...[
+                    const SizedBox(width: 12),
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(sheetContext).pop();
+                        Navigator.of(this.context).pushNamed('/fx');
+                      },
+                      style: OutlinedButton.styleFrom(minimumSize: const Size(0, 48)),
+                      child: const Text('Swap'),
+                    ),
+                  ],
+                ]),
+              ],
+            ),
+          );
+        });
+      },
+    ).whenComplete(controller.dispose);
   }
 
   // Front Card representation

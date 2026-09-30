@@ -17,12 +17,12 @@ class PaymentCard {
     this.frozen = false,
   });
 
-  PaymentCard copyWith({bool? frozen}) {
+  PaymentCard copyWith({bool? frozen, Money? balance}) {
     return PaymentCard(
       id: id,
       last4: last4,
       scheme: scheme,
-      balance: balance,
+      balance: balance ?? this.balance,
       frozen: frozen ?? this.frozen,
     );
   }

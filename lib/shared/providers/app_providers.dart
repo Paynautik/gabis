@@ -412,6 +412,17 @@ class CardsNotifier extends StateNotifier<List<PaymentCard>> {
   void addVirtualCard(PaymentCard card) {
     state = [...state, card];
   }
+
+  /// Puts money on a card. The caller takes it from the wallet it came from.
+  void addFunds(String cardId, Money amount) {
+    state = [
+      for (final card in state)
+        if (card.id == cardId && card.balance.currency == amount.currency)
+          card.copyWith(balance: card.balance + amount)
+        else
+          card,
+    ];
+  }
 }
 
 final cardsProvider =
