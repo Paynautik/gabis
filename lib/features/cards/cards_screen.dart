@@ -6,6 +6,7 @@ import '../../shared/providers/app_providers.dart';
 import '../../shared/widgets/coming_soon.dart';
 import '../../shared/models/payment_card.dart';
 import '../../shared/widgets/glowing_background.dart';
+import 'metal_card_front.dart';
 
 class CardsScreen extends ConsumerStatefulWidget {
   const CardsScreen({super.key});
@@ -241,173 +242,13 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
 
   // Front Card representation
   Widget _buildCardFront(dynamic card, Map<String, dynamic> skin) {
-    return Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 400), child: AspectRatio(aspectRatio: 1.586, child: Container(
-            width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: skin['gradient'],
-        borderRadius: BorderRadius.circular(24),
-        border: skin['isDark'] == true
-            ? Border.all(color: Colors.white.withValues(alpha: 0.08))
-            : null,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          // Brushed-metal sheen, so every skin reads as a physical card
-          Positioned.fill(
-            child: IgnorePointer(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(24),
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withValues(alpha: 0.10),
-                      Colors.white.withValues(alpha: 0.0),
-                      Colors.white.withValues(alpha: 0.04),
-                    ],
-                    stops: const [0.0, 0.45, 1.0],
-                  ),
-                ),
-              ),
-            ),
-          ),
-          // If frozen, display frost overlay
-          if (card.frozen)
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.lightBlueAccent.withValues(alpha: 0.25),
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.ac_unit_rounded, color: Colors.white, size: 48),
-                      SizedBox(height: 8),
-                      Text(
-                        'FROZEN',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 2.0,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          if (!card.frozen) ...[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // EMV chip + contactless mark
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 44,
-                          height: 32,
-                          child: CustomPaint(painter: _ChipPainter()),
-                        ),
-                        const SizedBox(width: 8),
-                        Icon(
-                          Icons.contactless_rounded,
-                          size: 22,
-                          color: skin['isDark'] == true
-                              ? const Color(0xFFC9B79C)
-                              : skin['accentColor'] as Color,
-                        ),
-                      ],
-                    ),
-                    // gabis wordmark, engraved: champagne on dark skins,
-                    // the skin's own text colour on light ones
-                    ColorFiltered(
-                      colorFilter: ColorFilter.mode(
-                        skin['isDark'] == true
-                            ? const Color(0xFFC9B79C)
-                            : skin['textColor'] as Color,
-                        BlendMode.srcIn,
-                      ),
-                      child: Align(
-                        widthFactor: 677 / 1216,
-                        heightFactor: 268 / 312,
-                        child: Image.asset(
-                          'assets/gabis_logo.png',
-                          height: 44,
-                          fit: BoxFit.contain,
-                          semanticLabel: 'gabis',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  '•••• •••• •••• ${card.last4}',
-                  style: TextStyle(
-                    color: skin['textColor'],
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 3.5,
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'CARDHOLDER',
-                          style: TextStyle(
-                            color: skin['accentColor'],
-                            fontSize: 8,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.0,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          ref.watch(userCardNameProvider),
-                          style: TextStyle(
-                            color: skin['textColor'],
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      card.scheme == CardScheme.visa ? 'VISA' : 'MC',
-                      style: TextStyle(
-                        color: skin['textColor'],
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    ))));
+    return MetalCardFront(
+      last4: card.last4,
+      holder: ref.watch(userCardNameProvider),
+      isVisa: card.scheme == CardScheme.visa,
+      frozen: card.frozen,
+      skin: skin,
+    );
   }
 
   // Back Card representation
@@ -499,40 +340,4 @@ class _CardsScreenState extends ConsumerState<CardsScreen> with SingleTickerProv
     ))));
   }
 
-}
-
-/// Champagne EMV chip with the usual contact-pad lines.
-class _ChipPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(7));
-    canvas.drawRRect(
-      rect,
-      Paint()
-        ..shader = const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFFE4D5B7), Color(0xFFA8946F)],
-        ).createShader(Offset.zero & size),
-    );
-    final line = Paint()
-      ..color = const Color(0xFF6E5F45).withValues(alpha: 0.55)
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-    final w = size.width, h = size.height;
-    canvas.drawLine(Offset(w * 0.34, 0), Offset(w * 0.34, h), line);
-    canvas.drawLine(Offset(w * 0.66, 0), Offset(w * 0.66, h), line);
-    canvas.drawLine(Offset(0, h * 0.5), Offset(w, h * 0.5), line);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(w * 0.34, h * 0.28, w * 0.32, h * 0.44),
-        const Radius.circular(3),
-      ),
-      line,
-    );
-    canvas.drawRRect(rect, line);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
