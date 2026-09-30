@@ -63,9 +63,9 @@ const screenBanners = <int, BannerSpec>{
       eyebrow: 'ANALYTICS',
       title: 'Know where it goes.',
       body: 'Spending by category, month on month, from your real history.',
-      image: 'assets/images/african_person_mockup.jpg',
+      image: 'assets/images/usecase_freelancers.jpg',
       tint: Color(0xFF2B2380),
-      focus: Alignment(0, -0.65)),
+      focus: Alignment(0, -0.35)),
   6: BannerSpec(
       eyebrow: 'BENEFICIARIES',
       title: 'The people you pay, in one place.',
