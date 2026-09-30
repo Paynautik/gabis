@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../landing/gabis_landing_v3.dart';
 import 'marketing_content.dart';
@@ -8,6 +9,16 @@ import 'marketing_content.dart';
 /// page, so a visitor never lands somewhere that feels like a different site.
 class MarketingScreen extends StatelessWidget {
   final MarketingPage page;
+
+  /// A page's button goes to a route in the app, or, for a link like
+  /// `mailto:`, out to it.
+  void _openCta(BuildContext context, MarketingPage page) {
+    if (page.ctaHref.startsWith('/')) {
+      Navigator.pushNamed(context, page.ctaHref);
+    } else {
+      launchUrl(Uri.parse(page.ctaHref), mode: LaunchMode.externalApplication);
+    }
+  }
 
   const MarketingScreen({super.key, required this.page});
 
@@ -101,8 +112,8 @@ class MarketingScreen extends StatelessWidget {
               ],
               const SizedBox(height: 30),
               _PrimaryButton(
-                label: 'Open your account',
-                onTap: () => Navigator.pushNamed(context, '/login'),
+                label: page.ctaLabel,
+                onTap: () => _openCta(context, page),
               ),
             ],
           ),
@@ -252,8 +263,8 @@ class MarketingScreen extends StatelessWidget {
                 const SizedBox(height: 22),
                 Wrap(spacing: 12, runSpacing: 12, children: [
                   _PrimaryButton(
-                    label: 'Open your account',
-                    onTap: () => Navigator.pushNamed(context, '/login'),
+                    label: page.ctaLabel,
+                    onTap: () => _openCta(context, page),
                     light: true,
                   ),
                   TextButton(

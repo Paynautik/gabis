@@ -20,6 +20,11 @@ class MarketingPage {
   final String ctaTitle;
   final String ctaBody;
 
+  /// The call-to-action button. By default it opens an account; a page can
+  /// point it somewhere else, e.g. a `mailto:` link, and rename it.
+  final String ctaLabel;
+  final String ctaHref;
+
   const MarketingPage({
     required this.route,
     required this.eyebrow,
@@ -32,6 +37,8 @@ class MarketingPage {
     this.ctaTitle = 'Open your account',
     this.ctaBody =
         'It takes a few minutes. Hold the currencies you actually use and move your first payment the same day.',
+    this.ctaLabel = 'Open your account',
+    this.ctaHref = '/login',
   });
 }
 
@@ -371,27 +378,29 @@ const marketingPages = <String, MarketingPage>{
     ],
     sections: [
       MarketingSection('How to apply',
-          'There is no formal listing pipeline yet. Write to careers@gabis.app with what you have built and what you want to work on. Links to real work beat a CV every time. We reply to everyone.'),
+          'There is no formal listing pipeline yet. Write to careers@gabispay.com with what you have built and what you want to work on. Links to real work beat a CV every time. We reply to everyone.'),
     ],
     ctaTitle: 'Work with us',
-    ctaBody: 'Send what you have built to careers@gabis.app. We read everything.',
+    ctaBody: 'Send what you have built to careers@gabispay.com. We read everything.',
+    ctaLabel: 'Email us',
+    ctaHref: 'mailto:careers@gabispay.com?subject=Work%20with%20gabis',
   ),
   '/press': MarketingPage(
     route: '/press',
     eyebrow: 'Press & news',
     title: 'What we have\nsaid publicly.',
     lede:
-        'Company news, product milestones and anything we have put on the record. For interviews or comment, write to press@gabis.app.',
+        'Company news, product milestones and anything we have put on the record. For interviews or comment, write to press@gabispay.com.',
     sections: [
       MarketingSection('Company deck',
           'Our current company deck covers the problem, the product, the architecture and where we are going. It is linked from the footer and free to quote with attribution.'),
       MarketingSection('Product milestones',
           'Multi-currency accounts, virtual cards, invoicing with instalments, the AI copilot over real transaction history, and the autonomous voice collections agent are all live. Multimodal ingestion of receipts and statements is in build.'),
       MarketingSection('Media enquiries',
-          'press@gabis.app for interviews, comment and fact-checking. We will tell you plainly what is shipped and what is not.'),
+          'press@gabispay.com for interviews, comment and fact-checking. We will tell you plainly what is shipped and what is not.'),
     ],
     ctaTitle: 'Get in touch',
-    ctaBody: 'press@gabis.app for interviews and comment.',
+    ctaBody: 'press@gabispay.com for interviews and comment.',
   ),
   '/brand': MarketingPage(
     route: '/brand',
@@ -411,10 +420,10 @@ const marketingPages = <String, MarketingPage>{
     ],
     sections: [
       MarketingSection('Requesting files',
-          'Write to brand@gabis.app for SVG and PNG versions of the wordmark in navy and white. Please do not extract the mark from screenshots.'),
+          'Write to brand@gabispay.com for SVG and PNG versions of the wordmark in navy and white. Please do not extract the mark from screenshots.'),
     ],
     ctaTitle: 'Need the files?',
-    ctaBody: 'brand@gabis.app and we will send the full set.',
+    ctaBody: 'brand@gabispay.com and we will send the full set.',
   ),
 
   // ── legal ─────────────────────────────────────────────────────────────
@@ -440,10 +449,10 @@ const marketingPages = <String, MarketingPage>{
       MarketingSection('Closing your account',
           'You can close your account at any time once your balance is settled. We will give you notice before closing an account ourselves, except where the law requires otherwise.'),
       MarketingSection('Changes and contact',
-          'We may update these terms; material changes are notified in the app before they take effect. Questions go to legal@gabis.app.'),
+          'We may update these terms; material changes are notified in the app before they take effect. Questions go to legal@gabispay.com.'),
     ],
     ctaTitle: 'Questions about these terms?',
-    ctaBody: 'legal@gabis.app — a person reads it.',
+    ctaBody: 'legal@gabispay.com — a person reads it.',
   ),
   '/privacy': MarketingPage(
     route: '/privacy',
@@ -463,10 +472,10 @@ const marketingPages = <String, MarketingPage>{
       MarketingSection('How long we keep it',
           'For as long as your account is open, and afterwards for the period financial regulation requires us to retain records. After that it is deleted.'),
       MarketingSection('Your rights',
-          'You can ask for a copy of your data, ask us to correct it, or ask for deletion where no legal retention duty applies. Write to privacy@gabis.app and we will respond within 30 days.'),
+          'You can ask for a copy of your data, ask us to correct it, or ask for deletion where no legal retention duty applies. Write to privacy@gabispay.com and we will respond within 30 days.'),
     ],
     ctaTitle: 'Exercise your rights',
-    ctaBody: 'privacy@gabis.app — access, correction or deletion requests.',
+    ctaBody: 'privacy@gabispay.com — access, correction or deletion requests.',
   ),
   '/security': MarketingPage(
     route: '/security',
@@ -486,14 +495,14 @@ const marketingPages = <String, MarketingPage>{
     ],
     sections: [
       MarketingSection('What we will never ask for',
-          'We will never ask for your PIN, your password, or a one-time code — not by phone, not on WhatsApp, not by email. Anyone who does is not us. Report it to security@gabis.app.'),
+          'We will never ask for your PIN, your password, or a one-time code — not by phone, not on WhatsApp, not by email. Anyone who does is not us. Report it to security@gabispay.com.'),
       MarketingSection('Reporting a vulnerability',
-          'If you have found a security issue, write to security@gabis.app with enough detail to reproduce it. We will acknowledge within two business days, keep you updated, and credit you if you would like us to. Please do not test against other people’s accounts.'),
+          'If you have found a security issue, write to security@gabispay.com with enough detail to reproduce it. We will acknowledge within two business days, keep you updated, and credit you if you would like us to. Please do not test against other people’s accounts.'),
       MarketingSection('If something goes wrong',
           'Freeze your cards from the app immediately, then contact support. A frozen card cannot be charged, and freezing costs nothing if it turns out to be a false alarm.'),
     ],
     ctaTitle: 'Report a security issue',
-    ctaBody: 'security@gabis.app — acknowledged within two business days.',
+    ctaBody: 'security@gabispay.com — acknowledged within two business days.',
   ),
   '/tax-compliance': MarketingPage(
     route: '/tax-compliance',
@@ -518,7 +527,7 @@ const marketingPages = <String, MarketingPage>{
           'Income received in foreign currency is reported in that currency and converted at the rate on the date it cleared, so the figures match your bank records rather than today’s rate.'),
     ],
     ctaTitle: 'Talk to us about filing',
-    ctaBody: 'support@gabis.app if your situation is unusual — most are.',
+    ctaBody: 'support@gabispay.com if your situation is unusual — most are.',
   ),
 
   // ── support ───────────────────────────────────────────────────────────
@@ -547,30 +556,30 @@ const marketingPages = <String, MarketingPage>{
           'Contact support with the reference. Failed payments are returned to your balance automatically; we will tell you when and why.'),
     ],
     ctaTitle: 'Still stuck?',
-    ctaBody: 'support@gabis.app, or WhatsApp +234 701 888 8303 — both reach a person.',
+    ctaBody: 'support@gabispay.com, or WhatsApp +234 701 888 8303 — both reach a person.',
   ),
   '/contact': MarketingPage(
     route: '/contact',
     eyebrow: 'Support',
     title: 'Contact support.',
     lede:
-        'Real people, sensible hours, and no phone tree. WhatsApp +234 701 888 8303, or write to support@gabis.app — tell us what happened and include a reference if you have one.',
+        'Real people, sensible hours, and no phone tree. WhatsApp +234 701 888 8303, or write to support@gabispay.com — tell us what happened and include a reference if you have one.',
     features: [
       MarketingFeature(Icons.chat_rounded, 'WhatsApp live chat',
           '+234 701 888 8303 — the fastest route for anything urgent, like a stuck payment or a card you need frozen.'),
       MarketingFeature(Icons.mail_outline_rounded, 'Email support',
-          'support@gabis.app for anything that needs a paper trail or a document attached.'),
+          'support@gabispay.com for anything that needs a paper trail or a document attached.'),
       MarketingFeature(Icons.business_center_rounded, 'Business enquiries',
-          'business@gabis.app for collections, payouts, API access and partnerships.'),
+          'business@gabispay.com for collections, payouts, API access and partnerships.'),
       MarketingFeature(Icons.gpp_good_outlined, 'Security reports',
-          'security@gabis.app, acknowledged within two business days.'),
+          'security@gabispay.com, acknowledged within two business days.'),
     ],
     sections: [
       MarketingSection('What to include',
           'The transaction reference, the amount, the date, and what you expected to happen. That is usually enough for us to find it on the first reply instead of the third.'),
     ],
     ctaTitle: 'Message us',
-    ctaBody: 'support@gabis.app, or WhatsApp +234 701 888 8303.',
+    ctaBody: 'support@gabispay.com, or WhatsApp +234 701 888 8303.',
   ),
   '/status': MarketingPage(
     route: '/status',
@@ -595,6 +604,6 @@ const marketingPages = <String, MarketingPage>{
           'Anything that could interrupt payments is announced at least 48 hours ahead and scheduled outside Nigerian business hours.'),
     ],
     ctaTitle: 'Seeing something we are not?',
-    ctaBody: 'support@gabis.app — tell us and we will check immediately.',
+    ctaBody: 'support@gabispay.com — tell us and we will check immediately.',
   ),
 };

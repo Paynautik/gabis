@@ -587,17 +587,19 @@
       "sections": [
         {
           "heading": "How to apply",
-          "body": "There is no formal listing pipeline yet. Write to careers@gabis.app with what you have built and what you want to work on. Links to real work beat a CV every time. We reply to everyone."
+          "body": "There is no formal listing pipeline yet. Write to careers@gabispay.com with what you have built and what you want to work on. Links to real work beat a CV every time. We reply to everyone."
         }
       ],
       "ctaTitle": "Work with us",
-      "ctaBody": "Send what you have built to careers@gabis.app. We read everything."
+      "ctaBody": "Send what you have built to careers@gabispay.com. We read everything.",
+      "ctaLabel": "Email us",
+      "ctaHref": "mailto:careers@gabispay.com?subject=Work%20with%20gabis"
     },
     {
       "route": "/press",
       "eyebrow": "Press & news",
       "title": "What we have\nsaid publicly.",
-      "lede": "Company news, product milestones and anything we have put on the record. For interviews or comment, write to press@gabis.app.",
+      "lede": "Company news, product milestones and anything we have put on the record. For interviews or comment, write to press@gabispay.com.",
       "highlights": [],
       "features": [],
       "faqs": [],
@@ -612,11 +614,11 @@
         },
         {
           "heading": "Media enquiries",
-          "body": "press@gabis.app for interviews, comment and fact-checking. We will tell you plainly what is shipped and what is not."
+          "body": "press@gabispay.com for interviews, comment and fact-checking. We will tell you plainly what is shipped and what is not."
         }
       ],
       "ctaTitle": "Get in touch",
-      "ctaBody": "press@gabis.app for interviews and comment."
+      "ctaBody": "press@gabispay.com for interviews and comment."
     },
     {
       "route": "/brand",
@@ -650,11 +652,11 @@
       "sections": [
         {
           "heading": "Requesting files",
-          "body": "Write to brand@gabis.app for SVG and PNG versions of the wordmark in navy and white. Please do not extract the mark from screenshots."
+          "body": "Write to brand@gabispay.com for SVG and PNG versions of the wordmark in navy and white. Please do not extract the mark from screenshots."
         }
       ],
       "ctaTitle": "Need the files?",
-      "ctaBody": "brand@gabis.app and we will send the full set."
+      "ctaBody": "brand@gabispay.com and we will send the full set."
     },
     {
       "route": "/terms",
@@ -695,11 +697,11 @@
         },
         {
           "heading": "Changes and contact",
-          "body": "We may update these terms; material changes are notified in the app before they take effect. Questions go to legal@gabis.app."
+          "body": "We may update these terms; material changes are notified in the app before they take effect. Questions go to legal@gabispay.com."
         }
       ],
       "ctaTitle": "Questions about these terms?",
-      "ctaBody": "legal@gabis.app — a person reads it."
+      "ctaBody": "legal@gabispay.com — a person reads it."
     },
     {
       "route": "/privacy",
@@ -732,11 +734,11 @@
         },
         {
           "heading": "Your rights",
-          "body": "You can ask for a copy of your data, ask us to correct it, or ask for deletion where no legal retention duty applies. Write to privacy@gabis.app and we will respond within 30 days."
+          "body": "You can ask for a copy of your data, ask us to correct it, or ask for deletion where no legal retention duty applies. Write to privacy@gabispay.com and we will respond within 30 days."
         }
       ],
       "ctaTitle": "Exercise your rights",
-      "ctaBody": "privacy@gabis.app — access, correction or deletion requests."
+      "ctaBody": "privacy@gabispay.com — access, correction or deletion requests."
     },
     {
       "route": "/security",
@@ -770,11 +772,11 @@
       "sections": [
         {
           "heading": "What we will never ask for",
-          "body": "We will never ask for your PIN, your password, or a one-time code — not by phone, not on WhatsApp, not by email. Anyone who does is not us. Report it to security@gabis.app."
+          "body": "We will never ask for your PIN, your password, or a one-time code — not by phone, not on WhatsApp, not by email. Anyone who does is not us. Report it to security@gabispay.com."
         },
         {
           "heading": "Reporting a vulnerability",
-          "body": "If you have found a security issue, write to security@gabis.app with enough detail to reproduce it. We will acknowledge within two business days, keep you updated, and credit you if you would like us to. Please do not test against other people’s accounts."
+          "body": "If you have found a security issue, write to security@gabispay.com with enough detail to reproduce it. We will acknowledge within two business days, keep you updated, and credit you if you would like us to. Please do not test against other people’s accounts."
         },
         {
           "heading": "If something goes wrong",
@@ -782,7 +784,7 @@
         }
       ],
       "ctaTitle": "Report a security issue",
-      "ctaBody": "security@gabis.app — acknowledged within two business days."
+      "ctaBody": "security@gabispay.com — acknowledged within two business days."
     },
     {
       "route": "/tax-compliance",
@@ -824,7 +826,7 @@
         }
       ],
       "ctaTitle": "Talk to us about filing",
-      "ctaBody": "support@gabis.app if your situation is unusual — most are."
+      "ctaBody": "support@gabispay.com if your situation is unusual — most are."
     },
     {
       "route": "/help",
@@ -869,13 +871,13 @@
       ],
       "sections": [],
       "ctaTitle": "Still stuck?",
-      "ctaBody": "support@gabis.app, or WhatsApp +234 701 888 8303 — both reach a person."
+      "ctaBody": "support@gabispay.com, or WhatsApp +234 701 888 8303 — both reach a person."
     },
     {
       "route": "/contact",
       "eyebrow": "Support",
       "title": "Contact support.",
-      "lede": "Real people, sensible hours, and no phone tree. WhatsApp +234 701 888 8303, or write to support@gabis.app — tell us what happened and include a reference if you have one.",
+      "lede": "Real people, sensible hours, and no phone tree. WhatsApp +234 701 888 8303, or write to support@gabispay.com — tell us what happened and include a reference if you have one.",
       "highlights": [],
       "features": [
         {
@@ -886,17 +888,17 @@
         {
           "icon": "mail_outline_rounded",
           "title": "Email support",
-          "body": "support@gabis.app for anything that needs a paper trail or a document attached."
+          "body": "support@gabispay.com for anything that needs a paper trail or a document attached."
         },
         {
           "icon": "business_center_rounded",
           "title": "Business enquiries",
-          "body": "business@gabis.app for collections, payouts, API access and partnerships."
+          "body": "business@gabispay.com for collections, payouts, API access and partnerships."
         },
         {
           "icon": "gpp_good_outlined",
           "title": "Security reports",
-          "body": "security@gabis.app, acknowledged within two business days."
+          "body": "security@gabispay.com, acknowledged within two business days."
         }
       ],
       "faqs": [],
@@ -907,7 +909,7 @@
         }
       ],
       "ctaTitle": "Message us",
-      "ctaBody": "support@gabis.app, or WhatsApp +234 701 888 8303."
+      "ctaBody": "support@gabispay.com, or WhatsApp +234 701 888 8303."
     },
     {
       "route": "/status",
@@ -949,7 +951,7 @@
         }
       ],
       "ctaTitle": "Seeing something we are not?",
-      "ctaBody": "support@gabis.app — tell us and we will check immediately."
+      "ctaBody": "support@gabispay.com — tell us and we will check immediately."
     }
   ]
 }
