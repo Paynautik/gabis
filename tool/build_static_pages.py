@@ -185,14 +185,14 @@ def page_html(page: dict) -> str:
   <h1>{heading}</h1>
   <p class="lede">{esc(page['lede'])}</p>
   {pills}
-  <p class="cta-row"><a class="btn" href="/login">Open your account</a></p>
+  <p class="cta-row"><a class="btn" href="{esc(page.get('ctaHref', '/login'))}">{esc(page.get('ctaLabel', 'Open your account'))}</a></p>
   {cards}
   {prose}
   {faqs}
   <section class="close">
     <h2>{esc(page['ctaTitle'])}</h2>
     <p>{esc(page['ctaBody'])}</p>
-    <a class="btn lime" href="/login">Open your account</a>
+    <a class="btn lime" href="{esc(page.get('ctaHref', '/login'))}">{esc(page.get('ctaLabel', 'Open your account'))}</a>
   </section>
 </main>
 
