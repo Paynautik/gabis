@@ -127,6 +127,10 @@ for m in re.finditer(r"'(/[a-z0-9-]+)':\s*MarketingPage\(", body):
     }
     cta_title = field(block, 'ctaTitle')
     cta_body = field(block, 'ctaBody')
+    cta_label = field(block, 'ctaLabel')
+    cta_href = field(block, 'ctaHref')
+    page['ctaLabel'] = dart_string(cta_label) if cta_label else 'Open your account'
+    page['ctaHref'] = dart_string(cta_href) if cta_href else '/login'
     page['ctaTitle'] = dart_string(cta_title) if cta_title else 'Open your account'
     page['ctaBody'] = dart_string(cta_body) if cta_body else (
         'It takes a few minutes. Hold the currencies you actually use and move '

@@ -233,7 +233,7 @@ class PointsNotifier extends StateNotifier<PointsState> {
       entries: [
         PointsEntry(
             amount: pending,
-            reason: 'Caught orbs on gabis.app',
+            reason: 'Caught orbs on gabispay.com',
             at: DateTime.now(),
             kind: PointsKind.earned),
         ...state.entries,
