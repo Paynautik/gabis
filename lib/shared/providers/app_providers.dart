@@ -18,13 +18,14 @@ import '../../features/business/business_persistence_stub.dart'
 /// empty account, not a stranger's ₦2.5m and three months of somebody else's
 /// groceries. Kept on for demos and screenshots, and remembered per browser.
 class DemoDataNotifier extends StateNotifier<bool> {
-  DemoDataNotifier() : super(readRaw(_key) == 'on') {
-    _pullRemote();
+  /// [sync] is false only in tests, which have no account to ask.
+  DemoDataNotifier({bool sync = true}) : super(readRaw(_key) == 'on') {
+    if (sync) _pullRemote();
   }
 
   static const _key = 'gabis.demoData';
 
-  final _sync = UserSync();
+  late final _sync = UserSync();
 
   /// The local copy is read synchronously at startup so the first frame is
   /// correct; the account's own setting then arrives and wins, so signing in
@@ -91,7 +92,7 @@ class UserAvatarNotifier extends StateNotifier<String?> {
   /// write and losing it everywhere.
   static const _maxRemoteChars = 600 * 1024;
 
-  final _sync = UserSync();
+  late final _sync = UserSync();
 
   Future<void> _pullRemote() async {
     final profile = await _sync.get('profile');
@@ -137,7 +138,7 @@ class ProfileNameNotifier extends StateNotifier<String?> {
   static const _key = 'gabis.profile.name';
 
   final Ref _ref;
-  final _sync = UserSync();
+  late final _sync = UserSync();
 
   Future<void> _pullRemote() async {
     final profile = await _sync.get('profile');
