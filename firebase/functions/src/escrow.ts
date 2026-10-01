@@ -3,6 +3,7 @@ import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 
 import { orpay, verifyOrpayWebhook } from './openreserve';
+import { recordAjoPayment } from './ajo';
 
 /**
  * Escrow through ORPay.
@@ -147,6 +148,10 @@ export const orpayWebhook = onRequest({ secrets: ['ORPAY_WEBHOOK_SECRET'] }, asy
         { merge: true },
       );
     }
+  }
+  if (event.type === 'invoice.paid') {
+    const inv = event.data as { reference?: string };
+    await recordAjoPayment(inv.reference, event.created);
   }
   logger.info('orpay webhook', { type: event.type });
   res.send('ok');

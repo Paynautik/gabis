@@ -9,7 +9,7 @@ import { chaseMessage, isOptOut, optOutLine } from './message';
 import { send } from './send';
 
 export { createEscrow, cancelEscrow, escrowAction, orpayWebhook } from './escrow';
-export { createAjo } from './ajo';
+export { createAjo, ajoContribute } from './ajo';
 
 /**
  * The rail that makes reminders autonomous.

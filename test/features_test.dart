@@ -252,6 +252,28 @@ void main() {
       expect(calls, ['createEscrow', 'escrowAction']);
     });
 
+    test('ajo collector: sandbox records nothing remotely, live asks ORPay per member and round', () async {
+      final sandbox = SandboxAjoCollector();
+      expect(sandbox.isLive, isFalse);
+      expect((await sandbox.register(circleId: 'c1', name: 'N', members: ['A', 'B'], contributionNaira: 5000, frequency: 'weekly')).sandbox, isTrue);
+      expect(() => sandbox.collectUrl(circleId: 'c1', round: 0, member: 0), throwsUnsupportedError);
+
+      final calls = <String, Map<String, dynamic>>{};
+      final live = OpenReserveAjoCollector((name, data) async {
+        calls[name] = data;
+        return name == 'ajoContribute' ? {'checkoutUrl': 'https://pay/checkout/1'} : {'ajoId': data['id']};
+      });
+      expect(live.isLive, isTrue);
+      final r = await live.register(circleId: 'c1', name: 'Susu', members: ['A', 'B'], contributionNaira: 5000, frequency: 'monthly');
+      expect(r.ok, isTrue);
+      expect(calls['createAjo'], {'id': 'c1', 'name': 'Susu', 'members': ['A', 'B'], 'contribution': 5000, 'frequency': 'monthly'});
+      expect(await live.collectUrl(circleId: 'c1', round: 1, member: 0), 'https://pay/checkout/1');
+      expect(calls['ajoContribute'], {'id': 'c1', 'round': 1, 'member': 0});
+
+      final failing = OpenReserveAjoCollector((_, __) async => throw Exception('offline'));
+      expect((await failing.register(circleId: 'c1', name: 'N', members: ['A', 'B'], contributionNaira: 1, frequency: 'weekly')).ok, isFalse);
+    });
+
     test('cancel before funding', () async {
       final n = EscrowNotifier(SandboxEscrowCustodian());
       await n.create(title: 'Phone', counterparty: '@s', iAmBuyer: true, amountMinor: 100);

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../partners/partner_rails.dart';
 import '../partners/partner_stores.dart';
 
 const _indigo = Color(0xFF4B45F5);
@@ -76,6 +77,20 @@ class _CircleCard extends ConsumerWidget {
     final url = Uri.parse('https://wa.me/?text=${Uri.encodeComponent(_reminder(who))}');
     await launchUrl(url, mode: LaunchMode.externalApplication);
     ref.read(ajoProvider.notifier).logReminder(c.id, who);
+  }
+
+  /// Opens the partner's payment page for [member] this round. The payment is
+  /// recorded when the partner's webhook arrives, not when the page opens.
+  Future<void> _collect(BuildContext context, WidgetRef ref, String member) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final url = await ref
+          .read(ajoCollectorProvider)
+          .collectUrl(circleId: c.id, round: c.round, member: c.members.indexOf(member));
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Could not get a payment link: $e')));
+    }
   }
 
   @override
@@ -155,6 +170,7 @@ class _CircleCard extends ConsumerWidget {
                 }
               },
               onRemind: () => _remind(context, ref, [m]),
+              onCollect: ref.watch(ajoCollectorProvider).isLive ? () => _collect(context, ref, m) : null,
             ),
           const SizedBox(height: 10),
           Row(children: [
@@ -244,7 +260,8 @@ class _MemberRow extends StatelessWidget {
   final bool receives;
   final VoidCallback onPaid;
   final VoidCallback onRemind;
-  const _MemberRow({required this.name, required this.color, required this.paid, required this.receives, required this.onPaid, required this.onRemind});
+  final VoidCallback? onCollect;
+  const _MemberRow({required this.name, required this.color, required this.paid, required this.receives, required this.onPaid, required this.onRemind, this.onCollect});
 
   @override
   Widget build(BuildContext context) {
@@ -266,6 +283,7 @@ class _MemberRow extends StatelessWidget {
           const Row(children: [Icon(Icons.check_circle_rounded, color: _green, size: 18), SizedBox(width: 4), Text('Paid', style: TextStyle(color: _green, fontWeight: FontWeight.w700))])
         else ...[
           IconButton(tooltip: 'Remind on WhatsApp', onPressed: onRemind, icon: const Icon(Icons.chat_outlined, size: 18)),
+          if (onCollect != null) TextButton(onPressed: onCollect, child: const Text('Collect')),
           TextButton(onPressed: onPaid, child: const Text('Mark paid')),
         ],
       ]),
@@ -415,14 +433,27 @@ class _CreateAjoSheetState extends ConsumerState<CreateAjoSheet> {
         FilledButton(
           onPressed: valid
               ? () {
-                  ref.read(ajoProvider.notifier).create(
+                  final circle = ref.read(ajoProvider.notifier).create(
                         name: _name.text.trim(),
                         members: _memberList,
                         contributionNaira: amount,
                         frequency: _freq,
                         autoPayout: _auto,
                       );
+                  final messenger = ScaffoldMessenger.of(context);
+                  final collector = ref.read(ajoCollectorProvider);
                   Navigator.pop(context);
+                  collector
+                      .register(
+                        circleId: circle.id,
+                        name: circle.name,
+                        members: circle.members,
+                        contributionNaira: circle.contributionNaira,
+                        frequency: circle.frequency,
+                      )
+                      .then((r) {
+                    if (!r.ok) messenger.showSnackBar(SnackBar(content: Text(r.message)));
+                  });
                 }
               : null,
           child: const Text('Create circle'),

@@ -60,6 +60,23 @@ State after funding arrives only by ORPay webhook.
 4. Listen to `escrows/{id}` in the app and call `applyPartnerStatus`, then
    switch `escrowCustodianProvider` to the ORPay custodian in live mode.
 
+### Ajo contributions: `AjoCollector` (ORPay)
+
+Used by **Community & Trust → Ajo**. Sandbox keeps "Mark paid" only. Live, the
+organiser also sees **Collect** per member, which opens an ORPay checkout.
+
+**Built:** `OpenReserveAjoCollector` in the app, and in
+`firebase/functions/src/ajo.ts` the functions `createAjo` (saves the circle
+under the app's id, so a retry cannot duplicate it) and `ajoContribute` (one
+checkout per member and round, organiser only). Each checkout's reference is
+`ajo:<circleId>:<round>:<member>`; the existing `orpayWebhook` records
+`invoice.paid` for it in `ajos/{id}/payments/{round}_{member}`.
+
+**To go live:** same secrets and webhook as escrow (step 2 and 3 above), make
+sure the webhook sends `invoice.paid`, then listen to `ajos/{id}/payments` in
+the app and call `markPaid` for each new document, and switch
+`ajoCollectorProvider` to the ORPay collector in live mode.
+
 ## 3. Tax remittance: `TaxRemitter`
 
 Used by **Business → Tax · 7 corridors**.

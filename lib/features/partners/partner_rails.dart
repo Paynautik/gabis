@@ -114,6 +114,52 @@ abstract class EscrowCustodian {
   Future<String?> stepUrl(String partnerId, EscrowStep step);
 }
 
+// ── Ajo contributions ─────────────────────────────────────────────────────
+
+/// Collects one member's contribution to a saving circle. The partner hosts
+/// the payment page; the app learns it was paid from the partner's webhook,
+/// never from the link being opened. Live partner: ORPay checkout.
+abstract class AjoCollector {
+  String get name;
+
+  /// True when contributions are collected by a partner. Sandbox leaves
+  /// "Mark paid" as the only way to record one.
+  bool get isLive;
+
+  /// Registers the circle with the partner side. Safe to repeat.
+  Future<PartnerResult> register({
+    required String circleId,
+    required String name,
+    required List<String> members,
+    required int contributionNaira,
+    required String frequency,
+  });
+
+  /// A payment link for [member] (index in payout order) in [round].
+  Future<String> collectUrl({required String circleId, required int round, required int member});
+}
+
+class SandboxAjoCollector implements AjoCollector {
+  @override
+  String get name => 'Sandbox';
+  @override
+  bool get isLive => false;
+
+  @override
+  Future<PartnerResult> register({
+    required String circleId,
+    required String name,
+    required List<String> members,
+    required int contributionNaira,
+    required String frequency,
+  }) async =>
+      PartnerResult(ok: true, reference: circleId, message: 'Circle saved on this device (sandbox).', sandbox: true);
+
+  @override
+  Future<String> collectUrl({required String circleId, required int round, required int member}) =>
+      throw UnsupportedError('Sandbox circles record contributions with "Mark paid".');
+}
+
 // ── Tax remittance ────────────────────────────────────────────────────────
 
 /// Files and pays tax to an authority (FIRS, KRA, GRA, URA, TRA, NRA, LRA). Live partner:
@@ -265,6 +311,8 @@ final stablecoinRailProvider = Provider<StablecoinRail>(
 final escrowCustodianProvider =
     Provider<EscrowCustodian>((ref) => SandboxEscrowCustodian());
 
+final ajoCollectorProvider = Provider<AjoCollector>((ref) => SandboxAjoCollector());
+
 final taxRemitterProvider = Provider<TaxRemitter>((ref) => SandboxTaxRemitter());
 
 // ── Live adapters ─────────────────────────────────────────────────────────
@@ -322,5 +370,50 @@ class OpenReserveEscrowCustodian implements EscrowCustodian {
   Future<String?> stepUrl(String partnerId, EscrowStep step) async {
     final r = await call('escrowAction', {'id': partnerId, 'action': step.name});
     return r['url'] as String?;
+  }
+}
+
+/// Ajo contributions through ORPay checkouts, via firebase/functions/src/ajo.ts
+/// (createAjo, ajoContribute). Each payment lands in ajos/{id}/payments from
+/// the `invoice.paid` webhook.
+///
+/// Selected by [ajoCollectorProvider] once partner mode is live.
+class OpenReserveAjoCollector implements AjoCollector {
+  final Future<Map<String, dynamic>> Function(String name, Map<String, dynamic> data) call;
+  OpenReserveAjoCollector(this.call);
+
+  @override
+  String get name => 'ORPay';
+  @override
+  bool get isLive => true;
+
+  @override
+  Future<PartnerResult> register({
+    required String circleId,
+    required String name,
+    required List<String> members,
+    required int contributionNaira,
+    required String frequency,
+  }) async {
+    try {
+      await call('createAjo', {
+        'id': circleId,
+        'name': name,
+        'members': members,
+        'contribution': contributionNaira,
+        'frequency': frequency,
+      });
+      return PartnerResult(ok: true, reference: circleId, message: 'Circle ready to collect in ORPay.', sandbox: false);
+    } catch (e) {
+      return PartnerResult(ok: false, reference: circleId, message: 'ORPay: $e', sandbox: false);
+    }
+  }
+
+  @override
+  Future<String> collectUrl({required String circleId, required int round, required int member}) async {
+    final r = await call('ajoContribute', {'id': circleId, 'round': round, 'member': member});
+    final url = r['checkoutUrl'] as String?;
+    if (url == null || url.isEmpty) throw StateError('ORPay returned no payment link.');
+    return url;
   }
 }

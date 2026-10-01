@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "node --experimental-strip-types --test test/policy.test.ts",
+    "test": "node --experimental-strip-types --test test/policy.test.ts test/ajo.test.ts",
     "deploy": "npm run build && firebase deploy --only functions",
     "migrate": "node --experimental-strip-types scripts/migrate.ts"
   },

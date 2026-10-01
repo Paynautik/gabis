@@ -325,15 +325,15 @@ class AjoNotifier extends StateNotifier<List<AjoCircle>> {
     return '₦$b';
   }
 
-  void create({
+  /// Starts a circle and returns it.
+  AjoCircle create({
     required String name,
     required List<String> members,
     required int contributionNaira,
     required String frequency,
     bool autoPayout = false,
   }) {
-    state = [
-      AjoCircle(
+    final circle = AjoCircle(
         id: _id(),
         name: name,
         members: members,
@@ -344,10 +344,10 @@ class AjoNotifier extends StateNotifier<List<AjoCircle>> {
         startedAt: DateTime.now(),
         autoPayout: autoPayout,
         history: [AjoEvent('Circle started with ${members.length} members', DateTime.now())],
-      ),
-      ...state,
-    ];
+      );
+    state = [circle, ...state];
     _save();
+    return circle;
   }
 
   void setAutoPayout(String id, bool v) {
