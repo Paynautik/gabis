@@ -152,7 +152,7 @@ function welcomeHtml(siteUrl: string, unsubscribe: string): string {
 <html><body style="margin:0;background:#f4f0e8;font-family:Helvetica,Arial,sans-serif;color:#101010">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f0e8"><tr><td align="center" style="padding:32px 16px">
 <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden">
-<tr><td style="background:#1a1147;padding:24px 32px"><img src="${siteUrl}/landing/media/gabis-logo-white.png" alt="gabis" height="30" style="display:block;height:30px;width:auto"></td></tr>
+<tr><td style="background:#1a1147;padding:24px 32px"><img src="${siteUrl}/landing/media/gabis-logo-white.png" alt="gabis" width="110" height="28" style="display:block;width:110px;height:28px;font-family:Helvetica,Arial,sans-serif;font-size:24px;font-weight:700;line-height:28px;color:#ffffff"></td></tr>
 <tr><td style="padding:32px">
 <h1 style="margin:0 0 16px;font-size:26px;line-height:1.2;color:#1a1147">Welcome to gabis</h1>
 <p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#2b2926">You are on the list for product updates and new currency corridors. We will keep it short and only write when there is something worth saying.</p>
