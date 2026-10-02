@@ -4144,7 +4144,7 @@ class _FooterSection extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      '© 2026 gabis, a Paynautik Company. All rights reserved.',
+                      '© 2026 gabis, a PayNautik Company. All rights reserved.',
                       style: TextStyle(
                         color: Color(0xFF64748B),
                         fontSize: 12.5,
