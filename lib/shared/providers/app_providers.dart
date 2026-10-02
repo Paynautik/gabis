@@ -210,13 +210,18 @@ final userInitialsProvider = Provider<String>((ref) {
   return (parts.first[0] + parts.last[0]).toUpperCase();
 });
 
-/// The name as it is printed on a card.
+/// The name as it is printed on a card: the account holder's own, the same one
+/// the greeting and profile use, whether or not example data is on. (The card
+/// once printed the example persona's name in demo mode, which made the card
+/// look like it belonged to somebody else.)
 ///
-/// With example data on, the card belongs to the example persona, like the
-/// rest of the demo account. A real account always prints its own name.
+/// An account with no name at all yields the 'there' placeholder from
+/// [userNameProvider]; a card should never read "THERE", so it says what it
+/// is waiting for instead.
 final userCardNameProvider = Provider<String>((ref) {
-  if (ref.watch(demoDataProvider)) return 'DEJI ADEWUSI';
-  return ref.watch(userNameProvider).toUpperCase();
+  final name = ref.watch(userNameProvider).trim();
+  if (name.isEmpty || name == 'there') return 'CARD HOLDER';
+  return name.toUpperCase();
 });
 
 // --- Accounts Stateful StateNotifier ---
