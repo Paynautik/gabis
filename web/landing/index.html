@@ -852,11 +852,38 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <div style="display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
 <h2 style="margin: 0; font-size: 40px; font-weight: 700; letter-spacing: -0.02em">STAY AHEAD OF THE CURVE</h2>
 <p style="margin: 0; font-size: 16px; color: #b8b8b8">Product updates and new currency corridors. No noise.</p>
-<form onsubmit="return false" style="display: flex; gap: 12px; margin-top: 10px">
+<form id="nl-form" novalidate style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 10px">
 <label for="nl-email" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Email address</label>
-<input id="nl-email" type="email" placeholder="Enter your email address" style="width: 360px; height: 52px; box-sizing: border-box; padding: 0 22px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255,255,255,0.08); color: #ffffff; font-size: 15px; font-family: inherit">
-<button type="button" style="height: 52px; padding: 0 28px; border-radius: 999px; border: 0; background: #4b45f5; color: #ffffff; font-size: 15px; font-weight: 700; font-family: inherit">Subscribe</button>
+<input id="nl-email" name="email" type="email" required autocomplete="email" inputmode="email" placeholder="Enter your email address" style="width: 360px; max-width: 100%; height: 52px; box-sizing: border-box; padding: 0 22px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.28); background: rgba(255,255,255,0.08); color: #ffffff; font-size: 15px; font-family: inherit">
+<input name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0">
+<button id="nl-btn" type="submit" style="height: 52px; padding: 0 28px; border-radius: 999px; border: 0; background: #4b45f5; color: #ffffff; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer">Subscribe</button>
 </form>
+<p id="nl-msg" role="status" aria-live="polite" style="margin: 0; min-height: 22px; font-size: 14px; color: #b8b8b8"></p>
+<script>
+(function(){
+  var form=document.getElementById('nl-form'),input=document.getElementById('nl-email'),btn=document.getElementById('nl-btn'),msg=document.getElementById('nl-msg');
+  if(!form)return;
+  function say(text,ok){msg.textContent=text;msg.style.color=ok?'#8ff0b8':'#ffb4a8';}
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var email=input.value.trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){say('Enter a valid email address.',false);input.focus();return;}
+    btn.disabled=true;btn.style.opacity='.6';btn.textContent='Subscribing…';say('',true);
+    fetch('/api/subscribe',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:email,website:form.elements.website.value})})
+      .then(function(r){return r.json().then(function(d){return{status:r.status,data:d};});})
+      .then(function(res){
+        if(res.data&&res.data.ok){
+          input.value='';
+          say(res.data.welcome?'You are subscribed. Check your inbox for a welcome email.':'You are subscribed. Thank you.',true);
+        }else if(res.status===429){say('Too many attempts. Please try again in a little while.',false);}
+        else if(res.data&&res.data.error==='invalid_email'){say('That email address does not look right.',false);}
+        else{say('Something went wrong. Please try again.',false);}
+      })
+      .catch(function(){say('Could not reach the server. Check your connection and try again.',false);})
+      .then(function(){btn.disabled=false;btn.style.opacity='';btn.textContent='Subscribe';});
+  });
+})();
+</script>
 </div>
 <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 32px; padding-top: 48px; border-top: 1px solid rgba(255,255,255,0.14)">
 <div style="display: flex; flex-direction: column; gap: 16px">

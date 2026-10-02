@@ -10,3 +10,12 @@ pages_build_output_dir = "build/web"
 
 [ai]
 binding = "AI"
+
+# Newsletter signups from the footer form. One key per address, see
+# functions/api/subscribe.ts.
+[[kv_namespaces]]
+binding = "SUBSCRIBERS"
+id = "f24d4ea9b37a476da4a3a6cbac6e94eb"
+# Secrets (set with `wrangler pages secret put <NAME> --project-name gabis`,
+# never committed): RESEND_API_KEY turns the welcome email on. Optional
+# variables: FROM_EMAIL (default "gabis <hello@gabispay.com>") and SITE_URL.
