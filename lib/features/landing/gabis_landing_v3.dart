@@ -3842,7 +3842,7 @@ class _CurrencyVisual extends StatelessWidget {
   static const _rows = [
     ('NGN', 'Nigerian naira', '₦120,000.00', GabisV3.lime, true),
     ('USD', 'US dollar', r'$200.00', GabisV3.sky, false),
-    ('GBP', 'Pound sterling', '£100.00', GabisV3.lilac, false),
+    ('GBP', 'British pound', '£100.00', GabisV3.lilac, false),
     ('CAD', 'Canadian dollar', r'C$100.00', GabisV3.coral, false),
     ('JPY', 'Japanese yen', '¥10,000', GabisV3.sky, false),
   ];
