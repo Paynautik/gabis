@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 /// Real authentication, replacing the boolean that used to stand in for it.
 ///
@@ -32,6 +34,27 @@ class AuthService {
       await result.user!.updateDisplayName(name.trim());
     }
     return result.user!;
+  }
+
+  /// Asks the server to send the welcome email for an account that has just
+  /// been created. The server reads the address from the verified token, so
+  /// only this person can trigger it, and it sends once per account.
+  ///
+  /// Never throws and never blocks sign-up: a missing welcome email is a small
+  /// loss, a failed sign-up is not.
+  Future<void> sendWelcomeEmail(User user) async {
+    try {
+      final token = await user.getIdToken();
+      final origin = kIsWeb ? Uri.base.origin : 'https://gabispay.com';
+      await http
+          .post(
+            Uri.parse('$origin/api/welcome'),
+            headers: {'authorization': 'Bearer $token'},
+          )
+          .timeout(const Duration(seconds: 10));
+    } catch (_) {
+      // Deliberately ignored, see above.
+    }
   }
 
   /// Renames the account. Firebase caches the profile locally, so the user is

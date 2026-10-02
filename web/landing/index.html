@@ -858,15 +858,15 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <input name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0">
 <button id="nl-btn" type="submit" style="height: 52px; padding: 0 28px; border-radius: 999px; border: 0; background: #4b45f5; color: #ffffff; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer">Subscribe</button>
 </form>
-<p id="nl-msg" role="status" aria-live="polite" style="margin: 0; min-height: 22px; font-size: 14px; color: #b8b8b8"></p>
+<p id="nl-msg" role="status" aria-live="polite" style="margin: 0; min-height: 26px; font-size: 17px; font-weight: 600; color: #b8b8b8"></p>
 <script>
 (function(){
   var form=document.getElementById('nl-form'),input=document.getElementById('nl-email'),btn=document.getElementById('nl-btn'),msg=document.getElementById('nl-msg');
   if(!form)return;
-  function say(text,ok){msg.textContent=text;msg.style.color=ok?'#8ff0b8':'#ffb4a8';}
+  function say(text,ok){msg.textContent=text?(ok?'\u2713 ':'')+text:'';msg.style.color=ok?'#8ff0b8':'#ffb4a8';if(text&&msg.scrollIntoView)msg.scrollIntoView({block:'nearest',behavior:'smooth'});}
   form.addEventListener('submit',function(e){
     e.preventDefault();
-    var email=input.value.trim();
+    var done=false,email=input.value.trim();
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){say('Enter a valid email address.',false);input.focus();return;}
     btn.disabled=true;btn.style.opacity='.6';btn.textContent='Subscribing…';say('',true);
     fetch('/api/subscribe',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:email,website:form.elements.website.value})})
@@ -874,13 +874,13 @@ a{color:#16123a}a:hover{color:#4b45f5}
       .then(function(res){
         if(res.data&&res.data.ok){
           input.value='';
-          say(res.data.welcome?'You are subscribed. Check your inbox for a welcome email.':'You are subscribed. Thank you.',true);
+          say(res.data.welcome?'You are on the list. Check your inbox (and spam) for a welcome email.':'You are on the list. Thank you.',true);done=true;btn.textContent='Subscribed';btn.style.background='#1f9d6b';setTimeout(function(){btn.textContent='Subscribe';btn.style.background='#4b45f5';},4000);
         }else if(res.status===429){say('Too many attempts. Please try again in a little while.',false);}
         else if(res.data&&res.data.error==='invalid_email'){say('That email address does not look right.',false);}
         else{say('Something went wrong. Please try again.',false);}
       })
       .catch(function(){say('Could not reach the server. Check your connection and try again.',false);})
-      .then(function(){btn.disabled=false;btn.style.opacity='';btn.textContent='Subscribe';});
+      .then(function(){btn.disabled=false;btn.style.opacity='';if(!done)btn.textContent='Subscribe';});
   });
 })();
 </script>
