@@ -340,33 +340,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           const SizedBox(height: 18),
           // The three things people do with their balance
-          Row(
-            children: [
-              Expanded(
-                child: _balanceAction(
+          // Compact pills that size to their label rather than stretching
+          // across the card. FittedBox shrinks the row a touch on a very
+          // narrow phone so it stays on one line instead of wrapping.
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _balanceAction(
                   icon: Icons.add_rounded,
                   label: 'Add money',
                   primary: true,
                   onTap: () => _showReceiveSheet(context),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _balanceAction(
+                const SizedBox(width: 8),
+                _balanceAction(
                   icon: Icons.swap_horiz_rounded,
                   label: 'Exchange',
                   onTap: () => Navigator.of(context).pushNamed('/fx'),
                 ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _balanceAction(
+                const SizedBox(width: 8),
+                _balanceAction(
                   icon: Icons.north_east_rounded,
                   label: 'Send',
                   onTap: () => Navigator.of(context).pushNamed('/send'),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 16),
           // Bottom Strip (Business Service)
@@ -409,28 +411,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }) {
     final fg = primary ? context.colors.bluePrimary : Colors.white;
     return Material(
-      color: primary ? Colors.white : Colors.white.withValues(alpha: 0.18),
-      borderRadius: BorderRadius.circular(20),
+      color: primary ? Colors.white : Colors.white.withValues(alpha: 0.16),
+      shape: StadiumBorder(
+        side: BorderSide(
+          color: primary ? Colors.transparent : Colors.white.withValues(alpha: 0.28),
+        ),
+      ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        customBorder: const StadiumBorder(),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 6),
-          // Scales down rather than cutting the label off on a narrow phone.
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(icon, size: 16, color: fg),
-                const SizedBox(width: 5),
-                Text(
-                  label,
-                  maxLines: 1,
-                  style: TextStyle(color: fg, fontWeight: FontWeight.w900, fontSize: 13),
-                ),
-              ],
-            ),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: 15, color: fg),
+              const SizedBox(width: 5),
+              Text(
+                label,
+                maxLines: 1,
+                style: TextStyle(color: fg, fontWeight: FontWeight.w800, fontSize: 12.5),
+              ),
+            ],
           ),
         ),
       ),
