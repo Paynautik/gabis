@@ -96,7 +96,7 @@ async function send(env: Env, email: string, name: string, siteUrl: string): Pro
         from: env.FROM_EMAIL ?? "gabis <hello@gabispay.com>",
         to: [email],
         reply_to: "hello@gabispay.com",
-        subject: first ? `Welcome to gabis, ${first}` : "Welcome to gabis",
+        subject: first ? `${first}, your gabis account is ready` : "Your gabis account is ready",
         html: html(first, siteUrl),
         text: text(first, siteUrl),
       }),
@@ -117,34 +117,26 @@ const esc = (v: string) => v.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)
 function text(first: string, siteUrl: string): string {
   return `${first ? `Hi ${first},` : "Hi,"}
 
-Your gabis account is ready.
+Your gabis account is ready. You can sign in any time at ${siteUrl}/login.
 
-Open the app to get set up: ${siteUrl}/login
+To get started, add money to your wallet or send your first invoice. If you get stuck, or something looks wrong, just reply to this email. A person reads every reply.
 
-From there you can hold money in multiple currencies, send invoices, and let gabis follow up on what you are owed.
+If you did not create this account, reply and tell us.
 
-If you did not create this account, reply to this email and we will look into it.
+The gabis team
 
+---
 gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners.
 `;
 }
 
 function html(first: string, siteUrl: string): string {
-  const greeting = first ? `Welcome, ${esc(first)}` : "Welcome to gabis";
-  return `<!doctype html>
-<html><body style="margin:0;background:#f4f0e8;font-family:Helvetica,Arial,sans-serif;color:#101010">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f0e8"><tr><td align="center" style="padding:32px 16px">
-<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden">
-<tr><td style="background:#1a1147;padding:24px 32px"><img src="${siteUrl}/landing/media/gabis-logo-white.png" alt="gabis" width="110" height="28" style="display:block;width:110px;height:28px;font-family:Helvetica,Arial,sans-serif;font-size:24px;font-weight:700;line-height:28px;color:#ffffff"></td></tr>
-<tr><td style="padding:32px">
-<h1 style="margin:0 0 16px;font-size:26px;line-height:1.2;color:#1a1147">${greeting}</h1>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#2b2926">Your gabis account is ready.</p>
-<p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#2b2926">From the app you can hold money in multiple currencies, send invoices, and let gabis follow up on what you are owed.</p>
-<p style="margin:0 0 24px"><a href="${siteUrl}/login" style="display:inline-block;background:#4b45f5;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;padding:14px 26px;border-radius:999px">Open the app</a></p>
-</td></tr>
-<tr><td style="padding:20px 32px 28px;border-top:1px solid #ece6db;font-size:12px;line-height:1.6;color:#6b6660">
-If you did not create this account, reply to this email and we will look into it.<br><br>
-gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners.
-</td></tr>
-</table></td></tr></table></body></html>`;
+  return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:540px">
+<p>${first ? `Hi ${esc(first)},` : "Hi,"}</p>
+<p>Your gabis account is ready. You can sign in any time at <a href="${siteUrl}/login">${siteUrl.replace(/^https?:\/\//, "")}/login</a>.</p>
+<p>To get started, add money to your wallet or send your first invoice. If you get stuck, or something looks wrong, just reply to this email. A person reads every reply.</p>
+<p>If you did not create this account, reply and tell us.</p>
+<p>The gabis team</p>
+<p style="margin-top:28px;font-size:12px;color:#777">gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners.</p>
+</div>`;
 }
