@@ -5212,7 +5212,7 @@ class _FooterState extends State<_Footer> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                Text('© 2026 gabis, a PayNautik Company',
+                Text('© 2026 gabis',
                     style: TextStyle(
                         color: GabisV3.cream.withValues(alpha: .45), fontSize: 12.5)),
               ],
