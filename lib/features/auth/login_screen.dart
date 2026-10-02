@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import '../../shared/widgets/nautik_logo.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +71,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               ? auth.signUp(email, password, name: name)
               : auth.signIn(email, password))
           .timeout(const Duration(seconds: 20));
+
+      // A new account gets a welcome email. Not awaited: sign-up is done.
+      if (_creatingAccount) unawaited(auth.sendWelcomeEmail(user));
 
       if (!mounted) return;
       ref.read(authStateProvider.notifier).state = true;
