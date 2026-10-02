@@ -115,9 +115,10 @@ async function sendWelcome(
       body: JSON.stringify({
         from: env.FROM_EMAIL ?? "gabis <hello@gabispay.com>",
         to: [email],
-        subject: "Welcome to gabis",
+        subject: "Thanks for signing up to gabis",
         html: welcomeHtml(siteUrl, unsubscribe),
         text: welcomeText(siteUrl, unsubscribe),
+        reply_to: "hello@gabispay.com",
         headers: { "List-Unsubscribe": `<${unsubscribe}>` },
       }),
     });
@@ -133,38 +134,31 @@ async function sendWelcome(
 }
 
 function welcomeText(siteUrl: string, unsubscribe: string): string {
-  return `Welcome to gabis.
+  return `Hi,
 
-You are on the list for product updates and new currency corridors. We will keep it short and only write when there is something worth saying.
+Thanks for signing up for gabis updates. I will only write when there is something worth reading: new currency corridors and product changes.
 
-In the meantime:
-- Open an account: ${siteUrl}/login
-- Read our guides: ${siteUrl}/#stories
+If you want to see what gabis does, the short version is at ${siteUrl}.
 
-If you did not sign up, you can ignore this email, or unsubscribe here: ${unsubscribe}
+Got a question, or something you wish gabis did? Just reply to this email. A person reads every reply.
 
+The gabis team
+
+---
+You are getting this because this address was entered on gabispay.com. Unsubscribe: ${unsubscribe}
 gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners.
 `;
 }
 
 function welcomeHtml(siteUrl: string, unsubscribe: string): string {
-  return `<!doctype html>
-<html><body style="margin:0;background:#f4f0e8;font-family:Helvetica,Arial,sans-serif;color:#101010">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f0e8"><tr><td align="center" style="padding:32px 16px">
-<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden">
-<tr><td style="background:#1a1147;padding:24px 32px"><img src="${siteUrl}/landing/media/gabis-logo-white.png" alt="gabis" width="110" height="28" style="display:block;width:110px;height:28px;font-family:Helvetica,Arial,sans-serif;font-size:24px;font-weight:700;line-height:28px;color:#ffffff"></td></tr>
-<tr><td style="padding:32px">
-<h1 style="margin:0 0 16px;font-size:26px;line-height:1.2;color:#1a1147">Welcome to gabis</h1>
-<p style="margin:0 0 16px;font-size:16px;line-height:1.6;color:#2b2926">You are on the list for product updates and new currency corridors. We will keep it short and only write when there is something worth saying.</p>
-<p style="margin:0 0 24px;font-size:16px;line-height:1.6;color:#2b2926">In the meantime, you can open an account or read how collections, tax and school fees work.</p>
-<p style="margin:0 0 24px"><a href="${siteUrl}/login" style="display:inline-block;background:#4b45f5;color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;padding:14px 26px;border-radius:999px">Open your account</a></p>
-<p style="margin:0;font-size:15px;line-height:1.6"><a href="${siteUrl}/#stories" style="color:#4b45f5;font-weight:700">Read our guides &rarr;</a></p>
-</td></tr>
-<tr><td style="padding:20px 32px 28px;border-top:1px solid #ece6db;font-size:12px;line-height:1.6;color:#6b6660">
-You received this because this address was entered on gabispay.com. If that was not you, ignore this email or <a href="${unsubscribe}" style="color:#6b6660">unsubscribe</a>.<br><br>
-gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners.
-</td></tr>
-</table></td></tr></table></body></html>`;
+  return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:540px">
+<p>Hi,</p>
+<p>Thanks for signing up for gabis updates. I will only write when there is something worth reading: new currency corridors and product changes.</p>
+<p>If you want to see what gabis does, the short version is at <a href="${siteUrl}">${siteUrl.replace(/^https?:\/\//, "")}</a>.</p>
+<p>Got a question, or something you wish gabis did? Just reply to this email. A person reads every reply.</p>
+<p>The gabis team</p>
+<p style="margin-top:28px;font-size:12px;color:#777">You are getting this because this address was entered on gabispay.com. <a href="${unsubscribe}" style="color:#777">Unsubscribe</a>.<br>gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners.</p>
+</div>`;
 }
 
 async function sha256(input: string): Promise<string> {
