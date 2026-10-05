@@ -11,6 +11,8 @@
  * account, remembered in KV.
  */
 
+import { button, esc, layout, p, plain } from "../_lib/email";
+
 interface Env {
   SUBSCRIBERS: KVNamespace;
   /** The Firebase web API key. Public by design: it is in the app bundle. */
@@ -112,31 +114,26 @@ async function send(env: Env, email: string, name: string, siteUrl: string): Pro
   }
 }
 
-const esc = (v: string) => v.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-
 function text(first: string, siteUrl: string): string {
-  return `${first ? `Hi ${first},` : "Hi,"}
-
-Your gabis account is ready. You can sign in any time at ${siteUrl}/login.
-
-To get started, add money to your wallet or send your first invoice. If you get stuck, or something looks wrong, just reply to this email. A person reads every reply.
-
-If you did not create this account, reply and tell us.
-
-The gabis team
-
----
-gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners.
-`;
+  return plain([
+    first ? `Hi ${first},` : "Hi,",
+    `Your gabis account is ready. You can sign in any time at ${siteUrl}/login.`,
+    "To get started, add money to your wallet or send your first invoice. If you get stuck, or something looks wrong, just reply to this email. A person reads every reply.",
+    "If you did not create this account, reply and tell us.",
+    "The gabis team",
+  ]);
 }
 
 function html(first: string, siteUrl: string): string {
-  return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:540px">
-<p>${first ? `Hi ${esc(first)},` : "Hi,"}</p>
-<p>Your gabis account is ready. You can sign in any time at <a href="${siteUrl}/login">${siteUrl.replace(/^https?:\/\//, "")}/login</a>.</p>
-<p>To get started, add money to your wallet or send your first invoice. If you get stuck, or something looks wrong, just reply to this email. A person reads every reply.</p>
-<p>If you did not create this account, reply and tell us.</p>
-<p>The gabis team</p>
-<p style="margin-top:28px;font-size:12px;color:#777">gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners.</p>
-</div>`;
+  return layout({
+    siteUrl,
+    banner: "welcome",
+    body:
+      p(first ? `Hi ${esc(first)},` : "Hi,") +
+      p("Your gabis account is ready. To get started, add money to your wallet or send your first invoice.") +
+      p("If you get stuck, or something looks wrong, just reply to this email. A person reads every reply.") +
+      button(`${siteUrl}/login`, "OPEN GABIS") +
+      p("If you did not create this account, reply and tell us.") +
+      p("The gabis team"),
+  });
 }
