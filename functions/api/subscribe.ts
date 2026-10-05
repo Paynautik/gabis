@@ -14,6 +14,8 @@
  * and a hidden field catches simple bots.
  */
 
+import { button, layout, p, plain } from "../_lib/email";
+
 interface Env {
   SUBSCRIBERS: KVNamespace;
   RESEND_API_KEY?: string;
@@ -134,31 +136,30 @@ async function sendWelcome(
 }
 
 function welcomeText(siteUrl: string, unsubscribe: string): string {
-  return `Hi,
-
-Thanks for signing up for gabis updates. I will only write when there is something worth reading: new currency corridors and product changes.
-
-If you want to see what gabis does, the short version is at ${siteUrl}.
-
-Got a question, or something you wish gabis did? Just reply to this email. A person reads every reply.
-
-The gabis team
-
----
-You are getting this because this address was entered on gabispay.com. Unsubscribe: ${unsubscribe}
-gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners.
-`;
+  return plain(
+    [
+      "Hi,",
+      "Thanks for joining the gabis list. We will only write when there is something worth reading: new currency corridors and product changes.",
+      `If you want to see what gabis does, start at ${siteUrl}.`,
+      "Got a question, or something you wish gabis did? Just reply to this email. A person reads every reply.",
+      "The gabis team",
+    ],
+    `You are getting this because this address was entered on gabispay.com. Unsubscribe: ${unsubscribe}`,
+  );
 }
 
 function welcomeHtml(siteUrl: string, unsubscribe: string): string {
-  return `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.6;color:#222;max-width:540px">
-<p>Hi,</p>
-<p>Thanks for signing up for gabis updates. I will only write when there is something worth reading: new currency corridors and product changes.</p>
-<p>If you want to see what gabis does, the short version is at <a href="${siteUrl}">${siteUrl.replace(/^https?:\/\//, "")}</a>.</p>
-<p>Got a question, or something you wish gabis did? Just reply to this email. A person reads every reply.</p>
-<p>The gabis team</p>
-<p style="margin-top:28px;font-size:12px;color:#777">You are getting this because this address was entered on gabispay.com. <a href="${unsubscribe}" style="color:#777">Unsubscribe</a>.<br>gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners.</p>
-</div>`;
+  return layout({
+    siteUrl,
+    banner: "newsletter",
+    body:
+      p("Hi,") +
+      p("Thanks for joining the gabis list. We will only write when there is something worth reading: new currency corridors and product changes.") +
+      p("Got a question, or something you wish gabis did? Just reply to this email. A person reads every reply.") +
+      button(siteUrl, "SEE WHAT GABIS DOES") +
+      p("The gabis team"),
+    footerNote: `You are getting this because this address was entered on gabispay.com. <a href="${unsubscribe}" style="color:#6b6660">Unsubscribe</a>.`,
+  });
 }
 
 async function sha256(input: string): Promise<string> {
