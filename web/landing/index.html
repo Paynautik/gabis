@@ -476,6 +476,11 @@ button.mb.danger{background:#16123a !important}
 #sl-more .sl-slide.sl-sec .xh2,#sl-more .sl-slide.sl-sec h2{margin-top:0}
 @media (max-width:720px){#sl-more #who>div:first-child,#sl-more #features>div:first-child{flex-direction:column!important;align-items:flex-start!important;gap:16px!important}#sl-more .sl-slide.sl-sec{padding:28px 20px!important}#sl-more .sl-slide.trustsec{padding:32px 20px!important}}
 </style>
+<style>
+.who-pic{position:relative;aspect-ratio:4/3;overflow:hidden;background:#ece7df;flex:none}
+.who-bg{position:absolute;left:-8%;top:-8%;width:116%;height:116%;object-fit:cover;filter:blur(22px) saturate(1.1);opacity:.85}
+.who-fg{position:relative;display:block;width:100%;height:100%;object-fit:contain}
+</style>
 </head>
 <body>
 
@@ -711,7 +716,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
 <div style="background: #ffffff; border: 1px solid #e5dfd5; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column">
-<img src="/landing/media/lp-tailor.webp" width="1000" height="747" loading="lazy" decoding="async" alt="African fashion designer in his tailoring workshop" style="width: 100%; height: 380px; object-fit: cover">
+<div class="who-pic"><img class="who-bg" src="/landing/media/lp-tailor.webp" alt="" aria-hidden="true" width="1000" height="747" loading="lazy" decoding="async"><img class="who-fg" src="/landing/media/lp-tailor.webp" width="1000" height="747" loading="lazy" decoding="async" alt="African fashion designer in his tailoring workshop"></div>
 <div style="padding: 26px; display: flex; flex-direction: column; gap: 12px">
 <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: #4b45f5">TAILORS &amp; FASHION</div>
 <div style="font-family: Sora, sans-serif; font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em">Deposits and balances, settled before pickup.</div>
@@ -719,7 +724,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 </div>
 <div style="background: #ffffff; border: 1px solid #e5dfd5; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column">
-<img src="/landing/media/lp-photog.webp" width="1000" height="1000" loading="lazy" decoding="async" alt="Creative photographer in studio with camera and gabis invoice" style="width: 100%; height: 380px; object-fit: cover; object-position: center 10%">
+<div class="who-pic"><img class="who-bg" src="/landing/media/lp-photog.webp" alt="" aria-hidden="true" width="1000" height="1000" loading="lazy" decoding="async"><img class="who-fg" src="/landing/media/lp-photog.webp" width="1000" height="1000" loading="lazy" decoding="async" alt="Creative photographer in studio with camera and gabis invoice"></div>
 <div style="padding: 26px; display: flex; flex-direction: column; gap: 12px">
 <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: #4b45f5">CREATIVES</div>
 <div style="font-family: Sora, sans-serif; font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em">Bill a shoot in one sentence.</div>
@@ -727,7 +732,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 </div>
 <div style="background: #ffffff; border: 1px solid #e5dfd5; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column">
-<img src="/landing/media/lp-salon.webp" width="1000" height="747" loading="lazy" decoding="async" alt="African client smiling in modern beauty salon with settled payment" style="width: 100%; height: 380px; object-fit: cover">
+<div class="who-pic"><img class="who-bg" src="/landing/media/lp-salon.webp" alt="" aria-hidden="true" width="1000" height="747" loading="lazy" decoding="async"><img class="who-fg" src="/landing/media/lp-salon.webp" width="1000" height="747" loading="lazy" decoding="async" alt="African client smiling in modern beauty salon with settled payment"></div>
 <div style="padding: 26px; display: flex; flex-direction: column; gap: 12px">
 <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.1em; color: #4b45f5">SALONS &amp; SERVICES</div>
 <div style="font-family: Sora, sans-serif; font-size: 22px; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em">Every walk‑in, on the books.</div>
