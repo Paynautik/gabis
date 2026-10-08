@@ -10,3 +10,8 @@
 # The optimised pictures on the main landing page, same idea: unique names.
 /landing/media/lp-*
   Cache-Control: public, max-age=31536000, immutable
+
+# Owner-only pages: keep out of search results and never cache.
+/admin/*
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-store
