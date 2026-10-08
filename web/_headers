@@ -1,0 +1,8 @@
+# Cloudflare Pages response headers.
+#
+# Only the optimised pictures used by /landing/minimal are listed. Their file
+# names are unique (min-*), so a browser can keep them for a year without ever
+# serving a stale one: a changed picture gets a new name. Everything else keeps
+# Pages' default (revalidate on each load).
+/landing/media/min-*
+  Cache-Control: public, max-age=31536000, immutable
