@@ -15,3 +15,12 @@
 /admin/*
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-store
+
+# Flutter engine files only change when the Flutter version does, so the
+# browser can keep them instead of re-checking the 7 MB wasm on every visit.
+/canvaskit/*
+  Cache-Control: public, max-age=2592000
+/assets/fonts/*
+  Cache-Control: public, max-age=2592000
+/assets/packages/*
+  Cache-Control: public, max-age=2592000
