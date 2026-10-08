@@ -487,6 +487,20 @@ button.mb.danger{background:#16123a !important}
 .st-pic{position:relative;aspect-ratio:4/3;overflow:hidden}
 .st-fg{display:block;width:100%;height:100%;object-fit:contain}
 </style>
+<style>
+/* Download banner: the whole photo sits on the right, fading into the dark text panel */
+#start{background:#0c0c0c}
+@media (min-width:721px){#start{height:520px!important}}
+#start .cta-art{position:absolute;top:0;right:-1px;height:100%;aspect-ratio:1800/1004}
+#start .cta-art img{display:block;width:100%;height:100%;object-fit:cover}
+#start .cta-fade{position:absolute;inset:0 0 0 -2px;background:linear-gradient(90deg,#0c0c0c 0%,rgba(12,12,12,.94) 6%,rgba(12,12,12,.7) 18%,rgba(12,12,12,.32) 32%,rgba(12,12,12,.1) 46%,rgba(12,12,12,0) 58%)}
+@media (max-width:720px){
+ #start{display:flex!important;flex-direction:column!important;align-items:stretch!important;min-height:0!important;height:auto!important;padding:0!important}
+ #start .cta-art{position:relative;right:auto;order:2;width:100%;height:auto;aspect-ratio:1800/1004}
+ #start > div:last-child{order:1;padding:32px 22px 22px!important}
+ #start .cta-fade{inset:0;background:linear-gradient(180deg,#0c0c0c 0%,rgba(12,12,12,.55) 18%,rgba(12,12,12,0) 45%)}
+}
+</style>
 </head>
 <body>
 
@@ -870,8 +884,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </section>
 
 <section id="start" style="position: relative; margin: 0 64px 96px; height: 420px; flex-shrink: 0; border-radius: 28px; overflow: hidden; display: flex; align-items: center">
-<img src="/landing/media/lp-cta-sofa.webp" width="1800" height="1004" loading="lazy" decoding="async" alt="Woman smiling at her phone on a sofa" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%">
-<div style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: linear-gradient(90deg, rgba(12,12,12,0.88) 0%, rgba(12,12,12,0.7) 30%, rgba(12,12,12,0.15) 58%, rgba(12,12,12,0) 75%)"></div>
+<div class="cta-art"><img src="/landing/media/lp-cta-sofa.webp" width="1800" height="1004" loading="lazy" decoding="async" alt="Woman smiling at her phone on a sofa"><div class="cta-fade"></div></div>
 <div style="position: relative; padding: 0 56px; display: flex; flex-direction: column; gap: 18px; color: #ffffff; max-width: 520px">
 <h2 style="margin: 0; font-size: 56px; line-height: 0.95; font-weight: 800; letter-spacing: -0.03em">DOWNLOAD<br>FOR FREE.</h2>
 <p style="margin: 0; font-size: 16px; line-height: 1.55; color: #e2e8f0">One account, every currency, zero borders: send, receive, earn and move money globally in minutes.</p>
