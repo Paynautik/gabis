@@ -1,5 +1,3 @@
-import Anthropic from "@anthropic-ai/sdk";
-import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 
 /**
@@ -12,7 +10,6 @@ import { z } from "zod";
  */
 
 interface Env {
-  ANTHROPIC_API_KEY?: string;
   /** Groq's free tier, if a key is set. Llama, and quick. */
   GROQ_API_KEY?: string;
   /** Cloudflare's own inference, bound to this Pages project — no key at all. */
@@ -56,14 +53,13 @@ Rules:
   field in "missing" over guessing.`;
 
 /**
- * Three ways to read a sentence, tried in order.
+ * Two ways to read a sentence, tried in order.
  *
- * Claude is the best of them and needs a key. Groq's Llama is nearly free and
- * needs a key. Cloudflare's own inference needs neither — it is bound to this
- * Pages project — so drafting works on a fresh deployment with nothing
- * configured at all, which is the point of having it last rather than not at
- * all. And behind all three the app still has its own parser, so a sentence is
- * never simply refused.
+ * Groq's Llama is nearly free and needs a key. Cloudflare's own inference needs
+ * neither — it is bound to this Pages project — so drafting works on a fresh
+ * deployment with nothing configured at all, which is the point of having it
+ * last rather than not at all. And behind both the app still has its own
+ * parser, so a sentence is never simply refused.
  */
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   let prompt: string;
@@ -80,11 +76,6 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   // Each rung is tried only if the one above it is unavailable or fails; a
   // draft is a draft, and a slightly worse one beats making the owner type.
-  if (env.ANTHROPIC_API_KEY) {
-    const drafted = await withClaude(env.ANTHROPIC_API_KEY, prompt);
-    if (drafted) return json(drafted);
-  }
-
   if (env.GROQ_API_KEY) {
     // The small model first because it is quick and this is extraction, not
     // reasoning; the larger one only when the small one comes back unusable.
@@ -111,7 +102,6 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     {
       error: "not_configured",
       available: {
-        claude: Boolean(env.ANTHROPIC_API_KEY),
         groq: Boolean(env.GROQ_API_KEY),
         workersAi: Boolean(env.AI),
       },
@@ -121,38 +111,11 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   );
 };
 
-/** Null on any failure, so the caller simply moves down the list. */
-async function withClaude(apiKey: string, prompt: string) {
-  const client = new Anthropic({ apiKey });
-
-  try {
-    const response = await client.messages.parse({
-      model: "claude-opus-5",
-      max_tokens: 2000,
-      system: SYSTEM,
-      // Extraction, not reasoning — low effort keeps it quick and cheap.
-      output_config: {
-        effort: "low",
-        format: zodOutputFormat(InvoiceDraft),
-      },
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    if (response.stop_reason === "refusal" || !response.parsed_output) {
-      return null;
-    }
-
-    return response.parsed_output;
-  } catch {
-    return null;
-  }
-}
-
 /**
  * The same job through an OpenAI-shaped API, which is what Groq speaks.
  *
  * Llama will not always honour a schema, so the reply is parsed and checked
- * against the same zod shape Claude is held to. A draft that does not fit is
+ * against the same zod shape the draft must fit. A draft that does not fit is
  * discarded rather than shown: a wrong amount in a money field is worse than
  * an empty one.
  */
@@ -267,7 +230,7 @@ const SHAPE = `Reply with one JSON object and nothing else, in this shape:
 
 /**
  * A model's word is not taken for it. The reply has to parse, and it has to
- * fit the same shape Claude's output is held to, or it is thrown away.
+ * fit the same shape the draft must have, or it is thrown away.
  */
 function validate(raw: unknown) {
   if (typeof raw !== "string") {
