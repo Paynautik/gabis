@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Brand colour · gabis admin</title>
+<style>
+:root{--c:#4b45f5;--ink:#15131f;--mute:#6b6880;--line:#e3e1ee;--bg:#f6f4ee}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:560px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:24px;margin:0 0 4px}
+p.sub{color:var(--mute);margin:0 0 24px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:16px}
+label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+input[type=password],input[type=text]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+input[type=color]{width:56px;height:44px;border:1px solid var(--line);border-radius:10px;padding:2px;background:#fff}
+.sw{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.sw button{width:34px;height:34px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer}
+button.main{background:var(--c);color:#fff;border:0;border-radius:999px;padding:11px 22px;font:600 15px inherit;cursor:pointer}
+button.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:10px 20px;font:600 15px inherit;cursor:pointer}
+.pv{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.chip{background:var(--c);color:#fff;border-radius:999px;padding:6px 14px;font-weight:600;font-size:14px}
+.stat{color:var(--c);font-size:32px;font-weight:800}
+#msg{min-height:22px;font-size:14px;margin-top:10px}
+.ok{color:#127a3d}.bad{color:#b3261e}
+.small{font-size:13px;color:var(--mute)}
+</style>
+</head>
+<body>
+<main>
+<h1>Brand colour</h1>
+<p class="sub">Pick the blue used on buttons, tabs and numbers across the landing page. Everyone sees it within about a minute.</p>
+
+<div class="card">
+  <label for="tok">Admin token</label>
+  <input id="tok" type="password" autocomplete="off" placeholder="Paste the token">
+  <p class="small" style="margin:8px 0 0">Kept in this tab only, forgotten when you close it.</p>
+</div>
+
+<div class="card">
+  <label for="hex">Colour</label>
+  <div class="row">
+    <input id="pick" type="color" value="#4b45f5" aria-label="Colour picker">
+    <input id="hex" type="text" value="#4b45f5" maxlength="7" style="max-width:130px" spellcheck="false">
+    <span id="ratio" class="small"></span>
+  </div>
+  <div class="sw" id="sw"></div>
+</div>
+
+<div class="card">
+  <label>Preview</label>
+  <div class="pv">
+    <button class="main" type="button">Open your account</button>
+    <span class="chip">Catch the orbs</span>
+    <span class="stat">24/7</span>
+  </div>
+</div>
+
+<div class="row">
+  <button class="main" id="save" type="button">Save for everyone</button>
+  <button class="ghost" id="reset" type="button">Back to default</button>
+</div>
+<div id="msg" role="status"></div>
+</main>
+<script>
+(function(){
+  var HEX=/^#[0-9a-f]{6}$/i, $=function(i){return document.getElementById(i)};
+  var tok=$('tok'),pick=$('pick'),hex=$('hex'),ratio=$('ratio'),msg=$('msg'),root=document.documentElement;
+  var presets=['#4b45f5','#1d4ed8','#0f766e','#047857','#b45309','#be123c','#7e22ce','#111827'];
+  try{tok.value=sessionStorage.getItem('gb-admin')||''}catch(e){}
+  function lum(h){var n=parseInt(h.slice(1),16);return [n>>16&255,n>>8&255,n&255].map(function(v){v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)}).reduce(function(a,v,i){return a+v*[.2126,.7152,.0722][i]},0)}
+  function contrast(h){return 1.05/(lum(h)+.05)}
+  function apply(c){
+    if(!HEX.test(c))return;
+    root.style.setProperty('--c',c);pick.value=c;
+    var r=contrast(c);ratio.textContent='contrast '+r.toFixed(1)+':1 '+(r>=4.5?'(ok)':'(too light)');
+    ratio.className='small '+(r>=4.5?'ok':'bad');
+  }
+  function say(t,ok){msg.textContent=t;msg.className=ok?'ok':'bad'}
+  presets.forEach(function(c){var b=document.createElement('button');b.type='button';b.style.background=c;b.title=c;b.setAttribute('aria-label',c);b.onclick=function(){hex.value=c;apply(c)};$('sw').appendChild(b)});
+  pick.oninput=function(){hex.value=pick.value;apply(pick.value)};
+  hex.oninput=function(){var v=hex.value.trim();if(v&&v[0]!=='#')v='#'+v;apply(v)};
+  tok.oninput=function(){try{sessionStorage.setItem('gb-admin',tok.value)}catch(e){}};
+  function send(body){
+    if(!tok.value){say('Paste the admin token first.');return}
+    fetch('/api/theme',{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+tok.value.trim()},body:JSON.stringify(body)})
+      .then(function(r){return r.json().then(function(d){return{s:r.status,d:d}})})
+      .then(function(x){
+        if(x.d.ok){say(x.d.color?'Saved '+x.d.color+'. Live within a minute.':'Back to the default blue.',true);return}
+        say(x.s===401?'Wrong token.':x.s===429?'Too many wrong tries. Wait an hour.':x.s===503?'Admin token not set up on the server.':(x.d.detail||'Could not save.'));
+      }).catch(function(){say('Network error.')});
+  }
+  $('save').onclick=function(){var v=hex.value.trim();if(v&&v[0]!=='#')v='#'+v;send({color:v})};
+  $('reset').onclick=function(){send({reset:true})};
+  fetch('/api/theme',{cache:'no-cache'}).then(function(r){return r.json()}).then(function(d){if(d.color){hex.value=d.color;apply(d.color)}else apply('#4b45f5')}).catch(function(){apply('#4b45f5')});
+})();
+</script>
+</body>
+</html>

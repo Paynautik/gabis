@@ -80,3 +80,4 @@ node_modules/
 firebase/functions/node_modules/
 firebase/functions/lib/
 workers/chaser/node_modules/
+.dev.vars
