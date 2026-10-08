@@ -2,8 +2,8 @@
 #
 # The AI binding is why this file exists: it gives the invoice drafter a model
 # to fall back on with no key configured anywhere, so a fresh deployment can
-# draft an invoice out of the box. Claude is still used first when
-# ANTHROPIC_API_KEY is set, and Groq's Llama in between when GROQ_API_KEY is.
+# draft an invoice out of the box. Groq's Llama is used first when
+# GROQ_API_KEY is set.
 name = "gabis"
 compatibility_date = "2026-09-01"
 pages_build_output_dir = "build/web"

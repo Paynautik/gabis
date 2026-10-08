@@ -3,7 +3,6 @@
   "private": true,
   "description": "Cloudflare Pages Functions for gabis. The Flutter app is built separately.",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.123.0",
     "zod": "^3.23.8"
   }
 }
