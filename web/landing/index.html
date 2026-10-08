@@ -446,6 +446,29 @@ button.mb.danger{background:#16123a !important}
 @media (max-width:1024px){.cstep:not(:last-child)::after{display:none}}
 @media (max-width:720px){.csteps{gap:26px}.cstep:not(:last-child)::after{display:block;top:auto;bottom:-27px;right:auto;left:50%;width:2px;height:28px;margin-left:-1px}}
 </style>
+<style>
+.sl-wrap{position:relative}
+.sl-tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:36px 0 24px;padding-bottom:2px}
+.sl-tabs::-webkit-scrollbar{display:none}
+.sl-tabs button{flex:none;font:600 15px 'DM Sans',sans-serif;padding:11px 20px;border-radius:999px;border:1px solid #d6cfc3;background:#fff;color:#3a3552;cursor:pointer}
+.sl-tabs button[aria-selected="true"]{background:#4b45f5;border-color:#4b45f5;color:#fff}
+.sl-tabs button:hover{border-color:#4b45f5}
+.sl-track{display:flex;align-items:flex-start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;transition:height .3s ease}
+.sl-track::-webkit-scrollbar{display:none}
+.sl-slide{flex:0 0 100%;min-width:0;scroll-snap-align:start;box-sizing:border-box}
+.sl-slide>*{margin-top:0!important}
+.sl-panel{border-radius:28px;padding:56px;border:1px solid #e5dfd5}
+.sl-p1{background:#fff}
+.sl-p2{background:#efeae2;display:flex;flex-direction:column;gap:48px}
+.sl-p1 .csteps{margin-top:40px!important}
+.sl-arrows{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.sl-arr{width:46px;height:46px;border-radius:50%;border:1px solid #d6cfc3;background:#fff;font-size:20px;cursor:pointer;color:#16123a}
+.sl-arr:hover{background:#4b45f5;color:#fff;border-color:#4b45f5}
+.sl-arr[disabled]{opacity:.35;cursor:default;background:#fff;color:#16123a;border-color:#d6cfc3}
+.sl-intelbox{margin-top:48px}
+@media (max-width:720px){.sl-panel{padding:28px 20px}.sl-tabs button{padding:10px 16px;font-size:14px}}
+@media (prefers-reduced-motion:reduce){.sl-track{scroll-behavior:auto;transition:none}}
+</style>
 </head>
 <body>
 
@@ -561,13 +584,15 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 </section>
 
-<section id="collect" class="xsec">
+<section id="sl-how" class="xsec sl-wrap" data-slider>
+<div class="sl-tabs" role="tablist" aria-label="How gabis collects"><button type="button" role="tab" aria-selected="true">How it works</button><button type="button" role="tab" aria-selected="false">The agent</button></div>
+<div class="sl-track">
+<div class="sl-slide sl-panel sl-p1" id="collect">
 <div class="xhead"><div><span class="xpill">THE INNOVATION</span><h2 class="xh2 caps">Most businesses are owed money they never ask for twice.</h2></div>
 <p class="xlede">The agent asks for them — in English, Pidgin, Yoruba, Hausa or Igbo. It hears the promise, sets the follow-up, and clears the invoice when the money lands.</p></div>
 <div class="csteps"><div class="cstep c1"><div class="ctop"><span>01</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6M18 8v6M15 11h6"/></svg></div><h3>Add whoever owes you</h3><p>Import your debtors once — name, number, what they owe, when it was due.</p></div><div class="cstep c2"><div class="ctop"><span>02</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></div><h3>Reminders go out on time</h3><p>Ten days before, on the day, and after. You never have to remember a date again.</p></div><div class="cstep c3"><div class="ctop"><span>03</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6M17 6c1.2 1.2 1.2 3.8 0 5M19.5 4c2.3 2.4 2.3 6.6 0 9"/></svg></div><h3>The agent does the asking</h3><p>It negotiates in the customer’s own language, understands a payment promise, sets the follow-up date and updates the invoice itself.</p></div><div class="cstep c4"><div class="ctop"><span>04</span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.2l2.4 2.4 4.8-5"/></svg></div><h3>Payment clears the invoice</h3><p>A one-tap link on WhatsApp. When it lands, the ledger updates itself.</p></div></div>
-</section>
-
-<section id="ai" style="padding: 104px 64px; background: #efeae2; border-top: 1px solid #e5dfd5; border-bottom: 1px solid #e5dfd5; display: flex; flex-direction: column; gap: 48px">
+</div>
+<div class="sl-slide sl-panel sl-p2" id="ai">
 <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 48px">
 <h2 style="font-family: Sora, sans-serif; font-weight: 700; letter-spacing: -0.035em; margin: 0; font-size: 56px; line-height: 1.05; max-width: 720px">The agent that does the chasing for you.</h2>
 <p style="margin: 0; font-size: 18px; line-height: 1.6; color: #5f5b73; max-width: 420px">Stop matching bank alerts and calling debtors at night. gabis reads, drafts, reminds and answers.</p>
@@ -578,6 +603,9 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"></path><path d="M9 12h7M9 16h5"></path></svg></span><span class="agc-tag">Draft</span></div><h4>Invoice assistant</h4><p>“Bill Sarah 150k for brand design” becomes a ready invoice.</p><div class="agc-demo"><div class="agc-panel"><div class="agc-bub">Bill Sarah 150k for brand design</div><div class="agc-row"><small>Brand design × 1</small><b>₦150,000</b></div><div class="agc-chip">Draft ready to send</div></div></div></article>
 <article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg></span><span class="agc-tag">Ask</span></div><h4>Ask your money</h4><p>“Who has overdue installments?” Answers from your own history.</p><div class="agc-demo"><div class="agc-panel"><div class="agc-bub">Who has overdue installments?</div><div class="agc-row"><small>2 overdue</small><b>Sarah Okafor · Tunde B.</b></div><div class="agc-chip">From your own history</div></div></div></article>
 </div>
+</div>
+</div>
+<div class="sl-arrows"><button type="button" class="sl-arr" data-dir="-1" aria-label="Previous slide">&larr;</button><button type="button" class="sl-arr" data-dir="1" aria-label="Next slide">&rarr;</button></div>
 </section>
 
 <section id="intel" class="xsec">
@@ -585,7 +613,9 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <h2 class="xh2 big">Stop managing money.<br><span>Start telling it what to do.</span></h2>
 <div class="xcta"><a href="/login" class="xbtn">Experience Gabis AI</a><a href="#intel-twin" class="xbtn ghost">See live simulations</a></div></div>
 
-<div class="feat" id="intel-twin"><div class="fcopy"><span class="ftag">FEATURE 01 · MONEY TWIN</span><h3>Simulate your financial future before you spend.</h3><p>A continuous AI model of your financial life. When you ask “Can I afford this?”, gabis doesn’t just check your current balance — it simulates upcoming obligations, salary timelines and a safe buffer.</p><div class="chips"><span>Predictive twin simulation</span><span>₦320k safety buffer guard</span></div></div>
+<div class="sl-wrap sl-intelbox" data-slider>
+<div class="sl-tabs" role="tablist" aria-label="Gabis intelligence"><button type="button" role="tab" aria-selected="true">Money Twin</button><button type="button" role="tab" aria-selected="false">Autopilot</button><button type="button" role="tab" aria-selected="false">Firewall &middot; Future &middot; Executive</button><button type="button" role="tab" aria-selected="false">Agent network</button><button type="button" role="tab" aria-selected="false">Friday Roast &middot; FX Agent</button></div>
+<div class="sl-track"><div class="sl-slide"><div class="feat" id="intel-twin"><div class="fcopy"><span class="ftag">FEATURE 01 · MONEY TWIN</span><h3>Simulate your financial future before you spend.</h3><p>A continuous AI model of your financial life. When you ask “Can I afford this?”, gabis doesn’t just check your current balance — it simulates upcoming obligations, salary timelines and a safe buffer.</p><div class="chips"><span>Predictive twin simulation</span><span>₦320k safety buffer guard</span></div></div>
 <div class="mock af2 compact" id="afsim">
 <div class="mrow"><small class="mlbl">AFFORDABILITY SIMULATOR</small><span class="balp">Balance ₦620,000 · bills ₦96,000</span></div>
 <label class="afslide"><span>Price</span><input type="range" min="20000" max="520000" step="10000" value="480000" aria-label="Price"><b id="afprice">₦480,000</b></label>
@@ -604,13 +634,9 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <div class="mbtns"><button type="button" class="mb danger" id="afyes">Yes, buy it</button><button type="button" class="mb" id="afno">Cancel</button></div>
 </div>
 <div class="afdone" id="afdone" hidden role="status"><span class="afok">✓</span><div><b id="afdt"></b><span id="afdd"></span></div><button type="button" class="afagain" id="afagain">Try another</button></div>
-</div></div>
-
-<div class="feat rev"><div class="fcopy"><span class="ftag">FEATURE 02 · AUTOPILOT</span><h3>Give your money goals. gabis handles the routine.</h3><p>Traditional apps hand you tools and leave you to do the work. With gabis, you tell it what you want your money to accomplish. When income hits, your automated wealth waterfall runs in milliseconds.</p></div>
+</div></div></div><div class="sl-slide"><div class="feat rev"><div class="fcopy"><span class="ftag">FEATURE 02 · AUTOPILOT</span><h3>Give your money goals. gabis handles the routine.</h3><p>Traditional apps hand you tools and leave you to do the work. With gabis, you tell it what you want your money to accomplish. When income hits, your automated wealth waterfall runs in milliseconds.</p></div>
 <div class="mock compact"><div class="mrow"><small class="mlbl" style="color:#0f9d6b">INCOME DETECTED</small><b>₦1,200,000</b></div>
-<div class="fall"><div><span>Bills &amp; Rent</span><b>₦180,000</b></div><div><span>High-Yield Savings</span><b>₦250,000</b></div><div><span>Global Investment</span><b>₦100,000</b></div><div class="safe"><span>SAFE TO SPEND</span><b>₦670,000</b></div></div></div></div>
-
-<div class="fgrid">
+<div class="fall"><div><span>Bills &amp; Rent</span><b>₦180,000</b></div><div><span>High-Yield Savings</span><b>₦250,000</b></div><div><span>Global Investment</span><b>₦100,000</b></div><div class="safe"><span>SAFE TO SPEND</span><b>₦670,000</b></div></div></div></div></div><div class="sl-slide"><div class="fgrid">
 <div class="fcard"><div class="mock sm fx2"><small class="mlbl" style="color:#ef4444">GABIS STOPPED THIS PAYMENT</small><b class="mbig">₦420,000 → New recipient</b><ul><li>First interaction with beneficiary</li><li>Amount is 7.4× your average transfer</li><li>Recipient added 4 minutes ago</li></ul><div class="mq">“This doesn’t look like you.”</div><div class="mbtns"><span class="mb pri">Review</span><span class="mb">Approve anyway</span></div></div><span class="ftag">AI SECOND OPINION</span><h4>Financial Firewall</h4><p>An active AI security layer between you and the financial world that intercepts unusual withdrawals before money leaves.</p></div>
 <div class="fcard"><div class="mock sm fx2">
 <div class="mrow"><small class="mlbl">NEXT 30 DAYS</small><span class="safe2">₦18,400 safe today</span></div>
@@ -635,11 +661,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <div class="gfoot"><div class="avs"><i style="background:#8b5cf6"></i><i style="background:#ef4444"></i><i style="background:#3b82f6"></i><i style="background:#10b981"></i><i style="background:#f59e0b"></i></div><span>5 agents on it</span><span class="lang2">EN · Pidgin · Yorùbá · Hausa · Igbo</span></div>
 </div>
 <span class="ftag">GABIS EXECUTIVE</span><h4>Intent-Based Financial AI</h4><p>Tell gabis what you want your money to accomplish in everyday language. It works out the numbers and carries them out.</p></div>
-</div>
-
-<div class="net"><div class="fcopy"><span class="ftag">FLAGSHIP ARCHITECTURE</span><h3>Gabis Financial Agent Network</h3><p>Users don’t just get one generic chatbot. You get a coordinated network of specialized financial agents working together under the Gabis Orchestrator to simulate, protect and grow your money.</p><span class="sync">ALL 5 AGENTS SYNCHRONIZED</span></div><div class="agents"><div class="agent"><span class="aic" style="background:#8b5cf6"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a2 2 0 0 0-3-1zM15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1"/></svg></span><div><b>Money Agent</b><small>Cash flow &amp; affordability</small></div><span class="alive"></span></div><div class="agent"><span class="aic" style="background:#ef4444"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg></span><div><b>Security Agent</b><small>Fraud intercept &amp; firewall</small></div><span class="alive"></span></div><div class="agent"><span class="aic" style="background:#3b82f6"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16l18-7-3-2-6 2-5-4-2 1 3 5-4 2z"/><path d="M3 20h18"/></svg></span><div><b>Travel &amp; FX Agent</b><small>Currency spreads &amp; hedging</small></div><span class="alive"></span></div><div class="agent"><span class="aic" style="background:#10b981"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11a7 6 0 0 1 13-2h2v4h-2a7 6 0 0 1-3 3v3h-3v-2H9v2H6v-3.5A6 6 0 0 1 5 11z"/></svg></span><div><b>Wealth Agent</b><small>Automated waterfall goals</small></div><span class="alive"></span></div><div class="agent"><span class="aic" style="background:#f59e0b"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg></span><div><b>Bills Agent</b><small>Recurring debt collections</small></div><span class="alive"></span></div></div></div>
-
-<div class="fgrid two">
+</div></div><div class="sl-slide"><div class="net"><div class="fcopy"><span class="ftag">FLAGSHIP ARCHITECTURE</span><h3>Gabis Financial Agent Network</h3><p>Users don’t just get one generic chatbot. You get a coordinated network of specialized financial agents working together under the Gabis Orchestrator to simulate, protect and grow your money.</p><span class="sync">ALL 5 AGENTS SYNCHRONIZED</span></div><div class="agents"><div class="agent"><span class="aic" style="background:#8b5cf6"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4a3 3 0 0 0-3 3 3 3 0 0 0-2 5 3 3 0 0 0 2 5 3 3 0 0 0 6 1V5a2 2 0 0 0-3-1zM15 4a3 3 0 0 1 3 3 3 3 0 0 1 2 5 3 3 0 0 1-2 5 3 3 0 0 1-6 1"/></svg></span><div><b>Money Agent</b><small>Cash flow &amp; affordability</small></div><span class="alive"></span></div><div class="agent"><span class="aic" style="background:#ef4444"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg></span><div><b>Security Agent</b><small>Fraud intercept &amp; firewall</small></div><span class="alive"></span></div><div class="agent"><span class="aic" style="background:#3b82f6"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 16l18-7-3-2-6 2-5-4-2 1 3 5-4 2z"/><path d="M3 20h18"/></svg></span><div><b>Travel &amp; FX Agent</b><small>Currency spreads &amp; hedging</small></div><span class="alive"></span></div><div class="agent"><span class="aic" style="background:#10b981"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11a7 6 0 0 1 13-2h2v4h-2a7 6 0 0 1-3 3v3h-3v-2H9v2H6v-3.5A6 6 0 0 1 5 11z"/></svg></span><div><b>Wealth Agent</b><small>Automated waterfall goals</small></div><span class="alive"></span></div><div class="agent"><span class="aic" style="background:#f59e0b"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg></span><div><b>Bills Agent</b><small>Recurring debt collections</small></div><span class="alive"></span></div></div></div></div><div class="sl-slide"><div class="fgrid two">
 <div class="fcard dark roast">
 <div class="rhead"><span class="ftag">BRAND PERSONALITY · FRIDAY ROAST</span><span class="rlvl">Roast level <b>Spicy</b></span></div>
 <div class="notifs">
@@ -668,6 +690,8 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 <p>gabis watches interbank rates 24/7 across 12 currencies and converts when the moment is right, or alerts you first.</p>
 </div>
+</div></div></div>
+<div class="sl-arrows"><button type="button" class="sl-arr" data-dir="-1" aria-label="Previous slide">&larr;</button><button type="button" class="sl-arr" data-dir="1" aria-label="Next slide">&rarr;</button></div>
 </div>
 </section>
 
@@ -1030,6 +1054,29 @@ r.querySelector('#afyes').addEventListener('click',function(){var left=BAL-BILLS
 r.querySelector('#afagain').addEventListener('click',function(){show(btns);});
 var _upd=upd;upd=function(p,name){cur={p:p,name:name==='this'?'this':name};show(btns);_upd(p,name);};
 upd(480000,'a MacBook Pro');})();
+</script>
+<script>
+(function(){
+document.querySelectorAll('[data-slider]').forEach(function(box){
+  var track=box.querySelector('.sl-track'),slides=[].slice.call(track.children),tabs=[].slice.call(box.querySelectorAll('.sl-tabs button')),prev=box.querySelector('.sl-arr[data-dir="-1"]'),next=box.querySelector('.sl-arr[data-dir="1"]'),cur=0,t;
+  function fit(){track.style.height=slides[cur].offsetHeight+'px';}
+  function mark(i){cur=i;tabs.forEach(function(b,k){b.setAttribute('aria-selected',k===i?'true':'false');});if(prev)prev.disabled=i===0;if(next)next.disabled=i===slides.length-1;fit();}
+  function go(i){i=Math.max(0,Math.min(slides.length-1,i));track.scrollTo({left:slides[i].offsetLeft-track.offsetLeft,behavior:'smooth'});mark(i);}
+  tabs.forEach(function(b,i){b.addEventListener('click',function(){go(i);});});
+  if(prev)prev.addEventListener('click',function(){go(cur-1);});
+  if(next)next.addEventListener('click',function(){go(cur+1);});
+  track.addEventListener('scroll',function(){clearTimeout(t);t=setTimeout(function(){var i=Math.round(track.scrollLeft/track.clientWidth);if(i!==cur)mark(i);},80);},{passive:true});
+  if('ResizeObserver' in window){var ro=new ResizeObserver(fit);slides.forEach(function(sl){ro.observe(sl);});}
+  window.addEventListener('resize',fit);mark(0);
+  // a link to something inside a slide (#ai, #intel-twin ...) opens that slide
+  function open(hash){if(!hash||hash.length<2)return;var el=document.getElementById(hash.slice(1));if(!el)return;for(var i=0;i<slides.length;i++){if(slides[i]===el||slides[i].contains(el)){track.style.scrollBehavior='auto';track.scrollLeft=slides[i].offsetLeft-track.offsetLeft;track.style.scrollBehavior='';mark(i);return;}}}
+  box._open=open;
+});
+function route(){var h=location.hash;document.querySelectorAll('[data-slider]').forEach(function(b){if(b._open)b._open(h);});}
+window.addEventListener('hashchange',route);
+document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;var h=a.getAttribute('href');document.querySelectorAll('[data-slider]').forEach(function(b){if(b._open)b._open(h);});});
+route();
+})();
 </script>
 </body>
 </html>
