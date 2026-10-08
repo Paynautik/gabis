@@ -456,7 +456,7 @@ button.mb.danger{background:#16123a !important}
 .sl-track{display:flex;align-items:flex-start;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;transition:height .3s ease}
 .sl-track::-webkit-scrollbar{display:none}
 .sl-slide{flex:0 0 100%;min-width:0;scroll-snap-align:start;box-sizing:border-box}
-.sl-slide>*{margin-top:0!important}
+.sl-slide:not(.sl-sec)>*{margin-top:0!important}
 .sl-panel{border-radius:28px;padding:56px;border:1px solid #e5dfd5}
 .sl-p1{background:#fff}
 .sl-p2{background:#efeae2;display:flex;flex-direction:column;gap:48px}
@@ -468,6 +468,13 @@ button.mb.danger{background:#16123a !important}
 .sl-intelbox{margin-top:48px}
 @media (max-width:720px){.sl-panel{padding:28px 20px}.sl-tabs button{padding:10px 16px;font-size:14px}}
 @media (prefers-reduced-motion:reduce){.sl-track{scroll-behavior:auto;transition:none}}
+</style>
+<style>
+#sl-more .sl-slide.sl-sec{padding:48px!important;border-radius:28px;border:1px solid #e5dfd5;background:#fff;margin:0!important}
+#sl-more #rails.sl-sec{background:transparent;border:0;padding:0!important}
+#sl-more .sl-slide.trustsec{background:#16123a;border-color:#16123a;padding:52px 48px!important}
+#sl-more .sl-slide.sl-sec .xh2,#sl-more .sl-slide.sl-sec h2{margin-top:0}
+@media (max-width:720px){#sl-more #who>div:first-child,#sl-more #features>div:first-child{flex-direction:column!important;align-items:flex-start!important;gap:16px!important}#sl-more .sl-slide.sl-sec{padding:28px 20px!important}#sl-more .sl-slide.trustsec{padding:32px 20px!important}}
 </style>
 </head>
 <body>
@@ -695,7 +702,9 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 </section>
 
-<section id="who" style="padding: 112px 64px 0; display: flex; flex-direction: column; gap: 48px">
+<section id="sl-more" class="xsec sl-wrap" data-slider>
+<div class="sl-tabs" role="tablist" aria-label="More about gabis"><button type="button" role="tab" aria-selected="true">Who it&#39;s for</button><button type="button" role="tab" aria-selected="false">Features</button><button type="button" role="tab" aria-selected="false">Stablecoin rails</button><button type="button" role="tab" aria-selected="false">Tax</button><button type="button" role="tab" aria-selected="false">Trust</button></div>
+<div class="sl-track"><div class="sl-slide sl-sec" id="who" style="padding: 112px 64px 0; display: flex; flex-direction: column; gap: 48px">
 <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 48px">
 <h2 style="font-family: Sora, sans-serif; font-weight: 700; letter-spacing: -0.035em; margin: 0; font-size: 56px; line-height: 1.05; max-width: 720px">Made for the people who keep Africa trading.</h2>
 <p style="margin: 0; font-size: 18px; line-height: 1.6; color: #5f5b73; max-width: 420px">Market traders, tailors, creatives and salon owners already run on transfers and trust. gabis adds the paperwork.</p>
@@ -726,9 +735,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 </div>
 </div>
 </div>
-</section>
-
-<section id="features" style="padding: 112px 64px 0; display: flex; flex-direction: column; gap: 48px">
+</div><div class="sl-slide sl-sec" id="features" style="padding: 112px 64px 0; display: flex; flex-direction: column; gap: 48px">
 <h2 style="font-family: Sora, sans-serif; font-weight: 700; letter-spacing: -0.035em; margin: 0; font-size: 56px; line-height: 1.05; max-width: 820px">Every step from payment to proof.</h2>
 <div class="lgrid">
 <div class="fcard lc"><div class="lmock">
@@ -757,9 +764,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <div class="ralert"><span>!</span>We’ll remind you 24 hours before it closes.</div></div>
 <span class="ftag">03 · REFUNDS</span><h4>Refund windows that count down.</h4><p>Set 7‑ or 14‑day policies. Get warned before a window closes.</p></div>
 </div>
-</section>
-
-<section id="rails" class="xsec">
+</div><div id="rails" class="sl-slide sl-sec xsec">
 <div class="rails">
 <div class="fcopy"><span class="ftag">STABLECOIN RAILS</span><h3 class="rh">Get paid from anywhere. Settle in USDC or local currency.</h3><p>Customers abroad pay in US dollars; you keep USDC or convert to naira, shillings, cedis or Liberian dollars when you choose. No waiting days for a wire.</p>
 <div class="rpts"><span><i>1</i>Client pays in US dollars</span><span><i>2</i>You hold USDC</span><span><i>3</i>Cash out locally, any time</span></div></div>
@@ -774,9 +779,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <a href="/fx" class="xbtn wide">Convert to naira</a></div>
 </div>
 </div>
-</section>
-
-<section id="tax" class="xsec">
+</div><div id="tax" class="sl-slide sl-sec xsec">
 <div class="taxw">
 <div class="fcopy"><span class="ftag">TAX COMPLIANCE</span><h3 class="rh">Tax compliance across seven corridors.</h3><p>VAT and withholding tax calculated on every invoice, with reports ready for your tax authority and one‑click remittance to treasury.</p>
 <div class="tinv"><div class="mrow"><small class="mlbl">INVOICE #0142 · NIGERIA</small><span class="tauto">Auto-calculated</span></div>
@@ -803,9 +806,7 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <div class="tvat"><small>GST</small><b>10%</b></div>
 <div class="twht"><div class="mrow"><small>WHT</small><span>10 – 15%</span></div><div class="tbar"><i style="left:66.7%;width:33.3%;background:#be185d"></i></div></div></div><div class="tc tnote"><b>Rates vary by service type and residency.</b><span>gabis picks the right band per invoice and you can override it. Confirm with your tax adviser.</span></div></div>
 </div>
-</section>
-
-<section id="trust" class="xsec trustsec">
+</div><div id="trust" class="sl-slide sl-sec xsec trustsec">
 <span class="xpill dk">COMMUNITY &amp; TRUST</span>
 <h2 class="xh2 caps" style="color:#fff">The funds are secure.<br>The community is empowered.</h2>
 <p class="tlede">Most finance apps ask a model to do arithmetic and hope it is right. We do the opposite: the numbers come from your own transactions, and the model is used where it is genuinely better than code — language, context and judgement.</p>
@@ -817,6 +818,8 @@ a{color:#16123a}a:hover{color:#4b45f5}
 <div class="tcard"><div class="tvis apr"><div class="push"><div class="mrow"><span class="pg">g</span><small>gabis · now</small></div><b>Release ₦150,000 to Sarah Okafor?</b><span>Escrow · Order #0139 · delivery confirmed</span><div class="pbtn"><span class="ok">Approve</span><span>Decline</span></div></div><div class="pfoot"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Nothing moves without your tap</div></div>
 <div class="thd"><span class="tk" style="color:#c9b8ff">ALWAYS</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><h4>You approve before money moves</h4><p>Transparency is built-in. Every contribution, payout and escrow release waits for your approval. No automation here can spend on your behalf.</p></div>
 </div>
+</div></div>
+<div class="sl-arrows"><button type="button" class="sl-arr" data-dir="-1" aria-label="Previous slide">&larr;</button><button type="button" class="sl-arr" data-dir="1" aria-label="Next slide">&rarr;</button></div>
 </section>
 
 <section id="stories" class="xsec">
