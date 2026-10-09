@@ -10,6 +10,8 @@ import { z } from "zod";
  */
 
 interface Env {
+  /** Used only to count drafts per visitor, so a public page cannot run up the AI bill. */
+  SUBSCRIBERS?: KVNamespace;
   /** Groq's free tier, if a key is set. Llama, and quick. */
   GROQ_API_KEY?: string;
   /** Cloudflare's own inference, bound to this Pages project — no key at all. */
@@ -68,6 +70,20 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     prompt = typeof body.prompt === "string" ? body.prompt.trim() : "";
   } catch {
     return json({ error: "bad_request" }, 400);
+  }
+
+  // The landing page lets anyone try this without an account, so cap it:
+  // 30 drafts an hour per visitor, counted by a hash of the address.
+  if (env.SUBSCRIBERS) {
+    const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
+    const bytes = new Uint8Array(
+      await crypto.subtle.digest("SHA-256", new TextEncoder().encode(ip)),
+    );
+    const id = [...bytes.slice(0, 10)].map((b) => b.toString(16).padStart(2, "0")).join("");
+    const key = `draft-rl:${id}:${Math.floor(Date.now() / 3_600_000)}`;
+    const used = parseInt((await env.SUBSCRIBERS.get(key)) ?? "0", 10);
+    if (used >= 30) return json({ error: "rate_limited" }, 429);
+    await env.SUBSCRIBERS.put(key, String(used + 1), { expirationTtl: 7200 });
   }
 
   if (prompt.length < 3) return json({ error: "bad_request" }, 400);
