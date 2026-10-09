@@ -546,6 +546,12 @@ button.mb.danger{background:#16123a !important}
 .trust{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;margin:0 64px 56px;padding:18px 26px;border:1px solid #e5dfd5;border-radius:999px;background:#fff;font-size:15px;font-weight:600;color:#16123a}
 .trust-h{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gb)}
 .trust-by{margin-left:auto;font-weight:700;color:#5f5b73}
+@media (max-width:720px){
+.trust{margin:0 20px 40px;padding:18px !important;border-radius:20px;gap:8px 8px;font-size:14px}
+.trust-h{flex:0 0 100%;margin-bottom:2px}
+.trust span:not(.trust-h):not(.trust-by){padding:6px 12px;border-radius:999px;background:#f6f3ee}
+.trust-by{flex:0 0 100%;margin:8px 0 0;padding-top:12px;border-top:1px solid #ebe6dc;font-size:13px}
+}
 </style>
 </head>
 <body>
