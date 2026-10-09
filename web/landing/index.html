@@ -620,7 +620,7 @@ button.mb.danger{background:#16123a !important}
 .try-row button:disabled{opacity:.6;cursor:wait}
 .try-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .try-chips button{font:600 13px 'DM Sans',sans-serif;padding:8px 14px;border-radius:999px;border:1px solid #e5dfd5;background:#fff;color:#3a3552;cursor:pointer}
-.try-chips button:hover{border-color:var(--gb);color:var(--gb)}
+.try-chips button.on{border-color:var(--gb);color:var(--gb);background:#f4f3ff}.try-chips button:hover{border-color:var(--gb);color:var(--gb)}
 .try-out{margin-top:18px;min-height:210px;border-radius:20px;background:#f6f3ee;display:flex;align-items:center;justify-content:center;padding:6px}
 .try-empty{color:#8a86a0;font-size:15px}
 .inv{width:100%;background:#fff;border-radius:16px;padding:20px 22px;box-shadow:0 10px 30px rgba(22,18,58,.08);animation:invin .45s ease both}
@@ -1368,7 +1368,10 @@ recalc()});
 el.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();el.blur()}})});
 document.getElementById('invPrint').addEventListener('click',function(){window.print()})}
 if(form){
-document.querySelectorAll('.try-chips button').forEach(function(b){b.addEventListener('click',function(){inp.value=b.getAttribute('data-t');form.requestSubmit()})});
+document.querySelectorAll('.try-chips button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.try-chips button').forEach(function(x){x.classList.remove('on')});b.classList.add('on');inp.value=b.getAttribute('data-t');form.requestSubmit()})});
+/* start with a finished example instead of an empty box (no network call on load) */
+inp.value='Bill Tola 45k for logo design, net 7';var firstChip=document.querySelector('.try-chips button');if(firstChip)firstChip.classList.add('on');
+dirty=false;model={client:'Tola',amount:45000,currency:'NGN',description:'logo design',phone:'',due_in_days:7,missing:[],vat:false};render('ai');
 form.addEventListener('submit',function(e){e.preventDefault();var p=inp.value.trim();if(p.length<3){inp.focus();return}
 go.disabled=true;go.textContent='Drafting…';
 dirty=false;model=localParse(p);model.vat=false;inv0=invNo();render('local');
