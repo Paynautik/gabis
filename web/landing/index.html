@@ -553,6 +553,20 @@ button.mb.danger{background:#16123a !important}
 .trust-by{flex:0 0 100%;margin:8px 0 0;padding-top:12px;border-top:1px solid #ebe6dc;font-size:13px}
 }
 </style>
+<style>
+/* One rhythm: every band has 96px above and below on desktop, 56px on phones */
+#app{padding-top:96px !important;padding-bottom:96px !important}
+#stats{padding-top:56px !important;padding-bottom:96px !important}
+.xsec{padding-top:96px !important}
+#sl-how,#intel,#sl-more{padding-bottom:96px !important}
+#tax.xsec{padding-bottom:96px}
+#stories{padding-bottom:96px !important}
+@media (max-width:720px){#app{padding-top:56px !important;padding-bottom:56px !important}#stats{padding-top:40px !important;padding-bottom:48px !important}.xsec{padding-top:56px !important}#sl-how,#intel,#sl-more,#stories{padding-bottom:56px !important}#tax.xsec{padding-bottom:56px}}
+/* Sticky call to action: appears once the hero button has scrolled away */
+.stick{white-space:nowrap;position:fixed;left:50%;bottom:20px;transform:translate(-50%,24px);z-index:60;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;text-decoration:none;background:var(--gb);color:#fff;font:700 16px 'DM Sans',sans-serif;padding:14px 26px;border-radius:999px;box-shadow:0 10px 30px rgba(var(--gb-rgb),.45)}
+.stick.on{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+@media (prefers-reduced-motion:reduce){.stick{transition:none}}
+</style>
 </head>
 <body>
 
@@ -1158,5 +1172,7 @@ document.addEventListener('click',function(e){var a=e.target.closest&&e.target.c
 route();
 })();
 </script>
+<a class="stick" href="/login" aria-label="Open your account">Open your account</a>
+<script>(function(){var s=document.querySelector('.stick'),h=document.querySelector('h1');if(!s||!h||!('IntersectionObserver' in window))return;var foot=document.querySelector('#start');var hero=false,end=false;function u(){s.classList.toggle('on',!hero&&!end)}new IntersectionObserver(function(e){hero=e[0].isIntersecting;u()}).observe(h);if(foot)new IntersectionObserver(function(e){end=e[0].isIntersecting;u()}).observe(foot)})();</script>
 </body>
 </html>
