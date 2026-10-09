@@ -583,8 +583,10 @@ button.mb.danger{background:#16123a !important}
 .crow{display:flex;gap:10px;align-items:center;padding:10px;border-radius:14px;background:#f6f3ee}.crow i{width:30px;height:30px;border-radius:10px;flex:none}.crow span{flex:1;display:flex;flex-direction:column}.crow b{font-size:13px}.crow small{font-size:11px;color:#5f5b73}.crow em{font-style:normal;font-size:12px;font-weight:700;color:#0b8a63}
 .cnew{animation:cin .7s ease .5s both}@keyframes cin{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.cnew{animation:none}}
-@media (max-width:1024px){.heroB{padding:48px 20px !important}.heroB h1{font-size:40px !important}.heroB img{height:420px !important}.heroB .hn{position:static !important;width:auto !important;margin-top:10px}.heroC{grid-template-columns:1fr !important;padding:48px 20px !important}.heroC h1{font-size:44px !important}}
+@media (max-width:1024px){.heroB{padding:48px 20px !important}.heroB h1{font-size:40px !important}.heroB img{height:auto !important;aspect-ratio:1/1;object-position:50% 12% !important}.heroB .hn{position:static !important;width:auto !important;margin-top:10px}.heroC{grid-template-columns:1fr !important;padding:48px 20px !important}.heroC h1{font-size:44px !important}}
 </style>
+<style>@media (min-width:1025px){.heroB .hn{width:210px !important;padding:12px 14px}.heroB .hn:nth-of-type(1){left:20px !important;bottom:20px !important}.heroB .hn:nth-of-type(2){right:20px !important;top:20px !important}.heroB .hn:nth-of-type(3){right:20px !important;bottom:20px !important}}
+@media (max-width:720px){.heroB img{aspect-ratio:4/5}}</style>
 </head>
 <body>
 
