@@ -640,20 +640,16 @@ button.mb.danger{background:#16123a !important}
 .stp>li>span{width:38px;height:38px;border-radius:50%;background:var(--gb);color:#fff;font:700 17px Sora,sans-serif;display:flex;align-items:center;justify-content:center}
 .stp>li>b{font:700 26px Sora,sans-serif;letter-spacing:-.02em}.stp>li>p{margin:0;color:#4d4963;font-size:17px;line-height:1.55;max-width:460px}
 .story-phone{position:sticky;top:120px;display:flex;justify-content:center;padding-top:24px}
-.dev{position:relative;width:300px;height:600px;border-radius:44px;background:#16123a;padding:10px;box-shadow:0 40px 90px rgba(22,18,58,.28),0 0 0 1px rgba(255,255,255,.08) inset}
-.dev-notch{position:absolute;left:50%;top:18px;transform:translateX(-50%);width:84px;height:22px;border-radius:99px;background:#000;z-index:5}
-.dev-screen{position:relative;width:100%;height:100%;border-radius:34px;background:#fff;overflow:hidden}
-.scr{position:absolute;inset:0;padding:46px 16px 16px;display:flex;flex-direction:column;gap:10px;opacity:0;transform:translateY(12px);transition:opacity .45s,transform .45s;font-family:'DM Sans',sans-serif;color:#16123a}
-[data-active="1"] .scr1,[data-active="2"] .scr2,[data-active="3"] .scr3{opacity:1;transform:none}
-.scr .hd{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#6b6880}.scr .hd b{font:700 14px Sora,sans-serif;color:var(--gb)}
-.scr .bal{background:linear-gradient(135deg,var(--gb),#2d27b8);color:#fff;border-radius:20px;padding:16px}.scr .bal small{opacity:.8;font-size:11px}.scr .bal b{display:block;font:700 26px Sora,sans-serif;margin:2px 0 10px}
-.scr .acts{display:flex;gap:6px}.scr .acts i{font-style:normal;font-size:11px;font-weight:700;padding:6px 10px;border-radius:99px;background:rgba(255,255,255,.2)}
-.scr .row{display:flex;gap:10px;align-items:center;padding:10px;border-radius:14px;background:#f6f3ee;font-size:12px}.scr .row i{width:28px;height:28px;border-radius:9px;flex:none}.scr .row span{flex:1;display:flex;flex-direction:column}.scr .row b{font-size:13px}.scr .row small{color:#6b6880;font-size:11px}.scr .row em{font-style:normal;font-weight:700;color:#0b8a63}
-.scr .typed{border:1.5px solid var(--gb);border-radius:14px;padding:12px;font-size:13px;line-height:1.45;background:#fbfaff}
-.scr .dr{background:#fff;border:1px solid #e5dfd5;border-radius:16px;padding:14px;font-size:12px;display:flex;flex-direction:column;gap:6px}.scr .dr strong{font:700 24px Sora,sans-serif}
-.scr .btnx{margin-top:auto;text-align:center;background:var(--gb);color:#fff;border-radius:14px;padding:12px;font-weight:700;font-size:14px}
-.scr .ok{margin:10px auto 0;width:64px;height:64px;border-radius:50%;background:#e6f7ef;color:#0b8a63;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800}
-.scr .cen{text-align:center}.scr .cen b{display:block;font:700 24px Sora,sans-serif;margin:4px 0}
+.sv{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;flex-direction:column;opacity:0;transform:translateY(10px);transition:opacity .45s,transform .45s;pointer-events:none}
+[data-active="1"] .sv1,[data-active="2"] .sv2,[data-active="3"] .sv3{opacity:1;transform:none}
+.sbody{position:relative;height:calc(100% - 98px)}
+.styped{margin:0 22px;border:1.5px solid var(--gb);border-radius:16px;padding:12px 14px;font-size:14px;line-height:1.45;background:#fbfaff;color:#16123a}.styped small{display:block;color:#8a8699;font-size:11px;margin-bottom:4px}
+.sdraft{margin:20px 22px 0;display:flex;flex-direction:column;gap:14px}
+.sinv{border:1px solid #e5dfd5;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:6px;font-size:13px;color:#5f5b73}.sinv strong{font:700 30px Sora,sans-serif;color:#16123a;letter-spacing:-.03em}
+.srow{display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;background:#f5f4f7;font-size:13px;color:#16123a;margin:0 22px}.srow i{width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:800;color:#fff}.srow span{display:flex;flex-direction:column;flex:1}.srow small{color:#8a8699;font-size:11px}.srow b{font-size:14px}.srow em{font-style:normal;font-weight:700;color:#0b8a63}
+.sok{margin:26px auto 8px;width:72px;height:72px;border-radius:50%;background:#e6f7ef;color:#0b8a63;display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:800}
+.scen{text-align:center;padding:0 22px 14px}.scen small{color:#8a8699;font-size:14px}.scen b{display:block;font:700 34px Sora,sans-serif;letter-spacing:-.03em;margin:4px 0}
+.story-phone .phone-frame{transform-origin:top center}
 .mini{display:none}
 /* converter */
 .rate-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center;background:#eeecff;border-radius:28px;padding:48px}
@@ -667,7 +663,7 @@ button.mb.danger{background:#16123a !important}
 @media (max-width:1024px){
 .trysec,.stepsec,.ratesec{padding:0 20px 56px}.trysec{grid-template-columns:1fr;gap:24px}.sec-h{font-size:32px}
 .story{grid-template-columns:1fr}.story-phone{display:none}.stp li{min-height:0;opacity:1;padding:20px 0}.stp>li>b{font-size:22px}
-.mini{display:block;margin-top:10px}.mini .dev{width:100%;max-width:300px;height:520px;margin:0 auto}.mini .scr{opacity:1;transform:none}
+.mini{display:block;margin-top:10px}.mini .phone-frame{zoom:.95;justify-content:center}
 .rate-card{grid-template-columns:1fr;padding:26px;gap:22px}.try-box{padding:18px}
 }
 /* ===== Typography and spacing system ===== */
@@ -681,6 +677,11 @@ button.mb.danger{background:#16123a !important}
 .heroB::before{content:"";position:absolute;inset:-40px 0 auto 0;height:520px;background:radial-gradient(60% 70% at 50% 0%,rgba(var(--gb-rgb),.10),transparent 70%);pointer-events:none;z-index:-1}
 .fgrid>*,.csteps>*,.agc,.fcard,.st-card,.mock{box-shadow:0 1px 2px rgba(22,18,58,.04),0 12px 32px rgba(22,18,58,.06)}
 @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.inv{animation:none}.scr{transition:none}}
+</style>
+<style>
+.ticker{display:flex;gap:48px;padding:12px 64px;font-size:13px;color:#5f5b73;border-bottom:1px solid #e5dfd5;overflow:hidden}
+.ticker[hidden]{display:none}.tk{display:flex;gap:10px;align-items:center;white-space:nowrap}.tk b{color:#16123a}.tv{font-variant-numeric:tabular-nums}.tc{font-variant-numeric:tabular-nums;color:#0f9d6b}.tc.dn{color:#e5484d}
+@media (max-width:1024px){.ticker{padding:12px 20px;gap:28px}}
 </style>
 </head>
 <body>
@@ -711,13 +712,7 @@ a{color:#16123a}a:hover{color:var(--gb)}
 </div>
 </header>
 
-<div style="display: flex; gap: 48px; padding: 12px 64px; font-size: 13px; color: #5f5b73; border-bottom: 1px solid #e5dfd5; overflow: hidden">
-<span style="display: flex; gap: 10px; align-items: center; white-space: nowrap"><span style="font-weight: 700; color: #16123a">USDC/NGN</span><span style="font-variant-numeric: tabular-nums">₦1,538.20</span><span style="color: #0f9d6b; font-variant-numeric: tabular-nums">+0.42%</span></span>
-<span style="display: flex; gap: 10px; align-items: center; white-space: nowrap"><span style="font-weight: 700; color: #16123a">USDC/KES</span><span style="font-variant-numeric: tabular-nums">KSh 129.10</span><span style="color: #ff6b7a; font-variant-numeric: tabular-nums">−0.08%</span></span>
-<span style="display: flex; gap: 10px; align-items: center; white-space: nowrap"><span style="font-weight: 700; color: #16123a">USDC/GHS</span><span style="font-variant-numeric: tabular-nums">GH₵ 15.62</span><span style="color: #0f9d6b; font-variant-numeric: tabular-nums">+0.17%</span></span>
-<span style="display: flex; gap: 10px; align-items: center; white-space: nowrap"><span style="font-weight: 700; color: #16123a">USDC/UGX</span><span style="font-variant-numeric: tabular-nums">USh 3,702</span><span style="color: #0f9d6b; font-variant-numeric: tabular-nums">+0.05%</span></span>
-<span style="display: flex; gap: 10px; align-items: center; white-space: nowrap"><span style="font-weight: 700; color: #16123a">BTC/USD</span><span style="font-variant-numeric: tabular-nums">$ [LIVE]</span><span style="color: #0f9d6b; font-variant-numeric: tabular-nums">+1.9%</span></span>
-</div>
+<div id="ticker" class="ticker" aria-label="Exchange rates" hidden><span class="tk" data-k="NGN"><b>USDC/NGN</b><span class="tv">…</span><span class="tc"></span></span><span class="tk" data-k="KES"><b>USDC/KES</b><span class="tv">…</span><span class="tc"></span></span><span class="tk" data-k="GHS"><b>USDC/GHS</b><span class="tv">…</span><span class="tc"></span></span><span class="tk" data-k="UGX"><b>USDC/UGX</b><span class="tv">…</span><span class="tc"></span></span><span class="tk" data-k="BTC"><b>BTC/USD</b><span class="tv">…</span><span class="tc"></span></span></div>
 
 <section class="heroB" style="padding:72px 64px 64px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px"><span style="display:inline-flex;gap:8px;align-items:center;font-size:13px;font-weight:600;padding:7px 14px;border-radius:999px;border:1px solid #e5dfd5;background:#fff;color:#3a3552"><span style="width:8px;height:8px;border-radius:99px;background:var(--gb)"></span>AI collections for African business</span><h1 style="font-family:Sora,sans-serif;font-weight:700;letter-spacing:-.035em;margin:0;font-size:72px;line-height:1.02">Get paid. Stay organized.<br><span style="color:var(--gb)">Know your money.</span></h1><p style="margin:0;font-size:20px;line-height:1.6;color:#4d4963;max-width:640px">Payments, receipts, refunds, installments and reconciliation in one AI agent, with stablecoin settlement across borders.</p><div><a href="/login" style="text-decoration:none;font-size:16px;font-weight:700;padding:17px 28px;border-radius:999px;background:var(--gb);color:#fff">Open your account</a></div><div style="position:relative;width:100%;max-width:640px;margin-top:18px"><img src="/landing/media/lp-hero-gabis.webp" width="880" height="1168" alt="Smiling woman holding up a phone that shows the gabis app after a payment was received" style="width:100%;height:700px;object-fit:cover;object-position:50% 0%;border-radius:28px;display:block"><div class="hstack"><div class="hn" style="text-align:left"><div style="display:flex;gap:8px;align-items:center;font-size:10px;font-weight:700;letter-spacing:.08em;color:#10b981"><img src="/icons/Icon-192.png" alt="" width="20" height="20" style="width:20px;height:20px;display:block">PAYMENT RECEIVED</div><div style="font-size:13px;line-height:1.4"><b style="font-size:16px">₦150,000</b> from Sarah Okafor<br>Invoice #0142 paid ✓</div><div style="font-size:11px;color:#5f5b73">Matched by AI · Zenith Bank · Just now</div></div><div class="hn" style="text-align:left"><div style="display:flex;gap:8px;align-items:center;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--gb)"><img src="/icons/Icon-192.png" alt="" width="20" height="20" style="width:20px;height:20px;display:block">RECEIPT SENT</div><div style="font-size:13px;line-height:1.4">Receipt for Invoice #0142<br>emailed to Sarah</div><div style="font-size:11px;color:#5f5b73">Automatic · 2 seconds ago</div></div><div class="hn" style="text-align:left"><div style="display:flex;gap:8px;align-items:center;font-size:10px;font-weight:700;letter-spacing:.08em;color:#ef7f5d"><img src="/icons/Icon-192.png" alt="" width="20" height="20" style="width:20px;height:20px;display:block">TAX SET ASIDE</div><div style="font-size:13px;line-height:1.4">₦11,250 VAT reserved<br>from this payment</div><div style="font-size:11px;color:#5f5b73">Ready for your next filing</div></div></div></div></section>
 
@@ -745,7 +740,7 @@ a{color:#16123a}a:hover{color:var(--gb)}
 <li data-step="2"><span>2</span><b>gabis drafts and sends it</b><p>You review the invoice, then gabis sends it and follows up for you.</p><div class="mini" data-mini="2"></div></li>
 <li data-step="3"><span>3</span><b>Get paid, matched automatically</b><p>Payments are matched to the invoice, receipts go out and reminders chase what is late.</p><div class="mini" data-mini="3"></div></li>
 </ol></div>
-<div class="story-phone" aria-hidden="true"><div class="dev"><div class="dev-notch"></div><div class="dev-screen" id="devScreen" data-active="1"></div></div></div>
+<div class="story-phone" aria-hidden="true"><div id="devScreen"></div></div>
 </div></section>
 
 <section id="rates" class="ratesec" aria-label="Currency converter">
@@ -798,8 +793,8 @@ a{color:#16123a}a:hover{color:var(--gb)}
 <div class="plist"><h4>Your currencies</h4><div class="pr"><span class="pi">₦</span><span class="pc">NGN</span><span class="pa">120,000</span></div><div class="pr"><span class="pi">$</span><span class="pc">USD</span><span class="pa">200.00</span></div><div class="pr"><span class="pi">£</span><span class="pc">GBP</span><span class="pa">100.00</span></div><div class="pr"><span class="pi">KSh</span><span class="pc">KES</span><span class="pa">15,000</span></div><div class="pr"><span class="pi">GH₵</span><span class="pc">GHS</span><span class="pa">900.00</span></div><div class="pmore">+ 7 more: UGX · TZS · SSP · LRD · EUR · CAD · JPY</div></div>
 </div>
 <div class="pview" data-view="send" hidden><h3>Send money</h3><label>To<input value="Sarah Okafor · Zenith Bank" readonly></label><label>Amount<input value="₦ 150,000" readonly></label><div class="pnote">Arrives in seconds · Fee ₦0</div><button type="button" class="pgo" data-done="Sent ₦150,000 to Sarah">Send now</button><button type="button" class="pback" data-v="home">Back</button></div>
-<div class="pview" data-view="receive" hidden><h3>Receive</h3><div class="pcard"><small>Your NGN account</small><b>0123 456 789</b><span>Providus Bank · Deji Adewusi</span></div><div class="pcard"><small>Your USD account</small><b>[ACCOUNT NO.]</b><span>ACH · Wire</span></div><button type="button" class="pgo" data-done="Account number copied">Copy details</button><button type="button" class="pback" data-v="home">Back</button></div>
-<div class="pview" data-view="swap" hidden><h3>Swap</h3><label>From<input value="200.00 USD" readonly></label><div class="pnote" style="text-align:center">↓ Rate locked for 30s</div><label>To<input value="[AMOUNT] NGN" readonly></label><button type="button" class="pgo" data-done="Swapped USD → NGN">Swap now</button><button type="button" class="pback" data-v="home">Back</button></div>
+<div class="pview" data-view="receive" hidden><h3>Receive</h3><div class="pcard"><small>Your NGN account</small><b>0123 456 789</b><span>Providus Bank · Deji Adewusi</span></div><div class="pcard"><small>Your USD account</small><b>8820 1194 33</b><span>ACH · Wire</span></div><button type="button" class="pgo" data-done="Account number copied">Copy details</button><button type="button" class="pback" data-v="home">Back</button></div>
+<div class="pview" data-view="swap" hidden><h3>Swap</h3><label>From<input value="200.00 USD" readonly></label><div class="pnote" style="text-align:center">↓ Rate locked for 30s</div><label>To<input value="266,200.00 NGN" readonly></label><button type="button" class="pgo" data-done="Swapped USD → NGN">Swap now</button><button type="button" class="pback" data-v="home">Back</button></div>
 <div class="pview" data-view="deposit" hidden><h3>Add money</h3><div class="pcard"><small>Bank transfer</small><b>Instant</b><span>Free · NGN</span></div><div class="pcard"><small>Debit card</small><b>Visa · Mastercard · Verve</b><span>1.5% fee</span></div><button type="button" class="pgo" data-done="Deposit started">Continue</button><button type="button" class="pback" data-v="home">Back</button></div>
 <div class="ptoast" role="status" aria-live="polite"></div>
 <div class="home-indicator"></div>
@@ -1320,15 +1315,26 @@ var miss=(d.missing&&d.missing.length)?'<div class="inv-miss">gabis could not fi
 out.innerHTML='<div class="inv"><div class="inv-top"><span>INVOICE DRAFT</span><span>Due '+due+'</span></div><div class="inv-amt">'+esc(money(d.amount,d.currency||'NGN'))+'</div><div class="inv-to">To '+esc(d.client)+'</div><div class="inv-line"><span>'+esc(d.description)+'</span><span>'+esc(money(d.amount,d.currency||'NGN'))+'</span></div>'+miss+'<div class="inv-cta"><small>You review it before anything is sent.</small><a href="/login">Send it with gabis</a></div></div>';
 }).catch(function(){out.innerHTML='<div class="try-empty">Could not reach gabis just now. Please try again.</div>'}).then(function(){go.disabled=false;go.textContent='Draft it'})})}
 /* ---- phone screens ---- */
-var screens={
-1:'<div class="scr scr1"><div class="hd"><b>gabis</b><span>Hi, Amara</span></div><div class="bal"><small>Total balance</small><b>₦860,000</b><div class="acts"><i>Add money</i><i>Exchange</i><i>Send</i></div></div><div class="typed">Bill Tola 45k for logo design, net 7<span style="color:var(--gb)">|</span></div><div class="row"><i style="background:#10b981"></i><span><b>Payment received</b><small>Sarah Okafor · Invoice #0142</small></span><em>+₦150,000</em></div></div>',
-2:'<div class="scr scr2"><div class="hd"><b>gabis</b><span>New invoice</span></div><div class="dr"><span style="color:#6b6880">Invoice #0143 · to Tola</span><strong>₦45,000</strong><span>Logo design</span><span style="color:#6b6880">Due in 7 days</span></div><div class="row"><i style="background:var(--gb)"></i><span><b>Reminder scheduled</b><small>Day 5 and the day it is due</small></span></div><div class="btnx">Send invoice</div></div>',
-3:'<div class="scr scr3"><div class="hd"><b>gabis</b><span>Just now</span></div><div class="ok">✓</div><div class="cen"><small style="color:#6b6880">Payment received</small><b>₦45,000</b><small style="color:#6b6880">from Tola · Invoice #0143 paid</small></div><div class="row"><i style="background:var(--gb)"></i><span><b>Receipt sent</b><small>Emailed automatically</small></span></div><div class="row"><i style="background:#ef7f5d"></i><span><b>Matched to your records</b><small>Ready for your books</small></span></div></div>'};
+var BTNS='<div class="pacts"><button type="button" class="a1" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M7 17L17 7M9 7h8v8"/></svg><span>Send</span></button><button type="button" class="a2" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M17 7L7 17M15 17H7V9"/></svg><span>Receive</span></button><button type="button" class="a3" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M4 9h14l-3-3M20 15H6l3 3"/></svg><span>Swap</span></button><button type="button" class="a4" tabindex="-1"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Deposit</span></button></div>';
+var BODY='<div class="sbody"><div class="sv sv1"><div class="pbal"><small>Total balance</small><b>₦ 860,000</b></div>'+BTNS+'<div class="styped"><small>Tell gabis what you are owed</small>Bill Tola 45k for logo design, net 7<span style="color:var(--gb)">|</span></div></div>'+
+'<div class="sv sv2"><div class="sdraft"><div class="sinv"><span>Invoice #0143 · to Tola</span><strong>₦45,000</strong><span>Logo design</span><span>Due in 7 days</span></div><div class="pgo" style="margin:0;text-align:center">Send invoice</div></div><div class="srow" style="margin-top:14px"><i style="background:var(--gb)">⏱</i><span><b>Reminders scheduled</b><small>Day 5 and the day it is due</small></span></div></div>'+
+'<div class="sv sv3"><div class="sok">✓</div><div class="scen"><small>Payment received</small><b>₦45,000</b><small>from Tola · Invoice #0143 paid</small></div><div class="srow"><i style="background:var(--gb)">✉</i><span><b>Receipt sent</b><small>Emailed automatically</small></span></div><div class="srow" style="margin-top:10px"><i style="background:#ef7f5d">✓</i><span><b>Matched to your records</b><small>Ready for your books</small></span></div></div></div>';
+function phoneFrame(active){var sb=document.querySelector('#app .status-bar'),tp=document.querySelector('#app .ptop');if(!sb||!tp)return '';
+return '<div class="phone-frame"><div class="hw-btn hw-action"></div><div class="hw-btn hw-vol-up"></div><div class="hw-btn hw-vol-down"></div><div class="hw-btn hw-power"></div><div class="hw-btn hw-camera-control"></div><div class="phone" data-active="'+active+'">'+sb.outerHTML+tp.outerHTML+BODY+'<div class="home-indicator"></div></div></div>'}
 var ds=document.getElementById('devScreen');
-if(ds){ds.innerHTML=screens[1]+screens[2]+screens[3];
-document.querySelectorAll('.mini').forEach(function(m){var n=m.getAttribute('data-mini');m.innerHTML='<div class="dev"><div class="dev-notch"></div><div class="dev-screen">'+screens[n]+'</div></div>'});
+if(ds){ds.innerHTML=phoneFrame(1);var ph=ds.querySelector('.phone');
+document.querySelectorAll('.mini').forEach(function(m){var n=m.getAttribute('data-mini');m.innerHTML=phoneFrame(n)});
 var items=document.querySelectorAll('.stp li');
-if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){items.forEach(function(x){x.classList.remove('on')});en.target.classList.add('on');ds.setAttribute('data-active',en.target.getAttribute('data-step'))}})},{rootMargin:'-45% 0px -45% 0px'});items.forEach(function(i){io.observe(i)})}else{items.forEach(function(i){i.classList.add('on')})}}
+if('IntersectionObserver' in window){var io=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){items.forEach(function(x){x.classList.remove('on')});en.target.classList.add('on');if(ph)ph.setAttribute('data-active',en.target.getAttribute('data-step'))}})},{rootMargin:'-45% 0px -45% 0px'});items.forEach(function(i){io.observe(i)})}else{items.forEach(function(i){i.classList.add('on')})}}
+/* ---- ticker ---- */
+var tk=document.getElementById('ticker');
+if(tk){fetch('/api/rates').then(function(r){return r.ok?r.json():Promise.reject()}).then(function(d){
+var fm={NGN:function(v){return '₦'+v.toLocaleString('en-US',{maximumFractionDigits:2})},KES:function(v){return 'KSh '+v.toLocaleString('en-US',{maximumFractionDigits:2})},GHS:function(v){return 'GH₵ '+v.toLocaleString('en-US',{maximumFractionDigits:2})},UGX:function(v){return 'USh '+Math.round(v).toLocaleString('en-US')}};
+function chg(el,c){if(typeof c!=='number'||!isFinite(c)){el.textContent='';return}el.textContent=(c>=0?'+':'−')+Math.abs(c).toFixed(2)+'%';if(c<0)el.classList.add('dn')}
+var shown=0;tk.querySelectorAll('.tk').forEach(function(n){var k=n.getAttribute('data-k'),v=n.querySelector('.tv'),c=n.querySelector('.tc');
+if(k==='BTC'){if(d.btc&&d.btc.usd){v.textContent='$'+Math.round(d.btc.usd).toLocaleString('en-US');chg(c,d.btc.change24h);shown++}else n.remove()}
+else if(d.rates&&d.rates[k]&&fm[k]){v.textContent=fm[k](d.rates[k]);chg(c,d.changes&&d.changes[k]);shown++}else n.remove()});
+if(shown)tk.hidden=false}).catch(function(){})}
 /* ---- converter ---- */
 var rf=document.getElementById('rFrom'),rt=document.getElementById('rTo'),ra=document.getElementById('rAmt'),ro=document.getElementById('rOut'),rn=document.getElementById('rNote'),rs=document.getElementById('rSwap');
 if(rf){var names={USD:'USD',NGN:'NGN',KES:'KES',GHS:'GHS',UGX:'UGX',TZS:'TZS',GBP:'GBP',EUR:'EUR',ZAR:'ZAR',XOF:'XOF'};var data=null;
@@ -1340,7 +1346,7 @@ rs.addEventListener('click',function(){var a=rf.value;rf.value=rt.value;rt.value
 /* ---- entrance motion ---- */
 if('IntersectionObserver' in window&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){var targets=document.querySelectorAll('.trysec,.stepsec,.ratesec,.faqsec,#stats,#app,.xsec,#easy,.trust');
 targets.forEach(function(x){x.classList.add('reveal')});
-var ro2=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting){en.target.classList.add('in');ro2.unobserve(en.target)}})},{rootMargin:'0px 0px -8% 0px',threshold:.04});targets.forEach(function(x){ro2.observe(x)});}
+var ro2=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting||en.boundingClientRect.top<0){en.target.classList.add('in');ro2.unobserve(en.target)}})},{rootMargin:'0px 0px -8% 0px',threshold:.04});targets.forEach(function(x){ro2.observe(x)});}
 })();</script>
 </body>
 </html>
