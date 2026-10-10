@@ -49,7 +49,7 @@ img,video{max-width:100%}
   #rails [style*="font-size: 30px"]{font-size:22px !important}
   #tax [style*="padding: 20px 28px"],#tax [style*="padding: 16px 28px"]{padding-left:16px !important;padding-right:16px !important;font-size:14px !important}
   #easy > div{padding:36px 22px !important}
-  #easy img:last-child{min-height:320px !important;height:320px !important}
+  #easy .easy-media,#easy video{min-height:320px !important;height:320px !important}
   #start{height:auto !important;min-height:460px;align-items:flex-end !important}
   #start > div:last-child{padding:28px 22px !important;max-width:none !important}
   #start > div:last-child > div{flex-wrap:wrap}
@@ -805,6 +805,12 @@ button.mb.danger{background:#16123a !important}
 @media (prefers-reduced-motion:reduce){.agc-wave i{animation:none}}
 @media (max-width:1024px){#ai h2{font-size:34px !important}#ai .agc p{min-height:0}}
 </style>
+<style>
+.faqsec{text-align:center}
+.faqsec .stp-h{text-align:center}
+.faqs{margin:0 auto;text-align:left}
+@media (prefers-reduced-motion:reduce){#easy video{transition:none}}
+</style>
 </head>
 <body>
 
@@ -1161,7 +1167,7 @@ a{color:#16123a}a:hover{color:var(--gb)}
 <p style="margin: 0; font-size: 20px; line-height: 1.6; color: #4d4963; max-width: 480px">Open an account in minutes, hold the currencies you actually use, and move your first payment the same day.</p>
 <a href="/login" style="text-decoration: none; text-align: center; font-size: 18px; font-weight: 700; padding: 20px 28px; border-radius: 16px; background: var(--gb); color: #ffffff; max-width: 440px; box-shadow: 0 12px 28px rgba(var(--gb-rgb),0.28)">Open your account</a>
 </div>
-<img src="/landing/media/lp-poster.webp" alt="Smiling woman in a café using her phone" width="640" height="464" loading="lazy" decoding="async" style="width: 100%; height: 100%; aspect-ratio: 640 / 464; min-height: 560px; object-fit: cover; display: block">
+<div class="easy-media" style="background:#d9d1c4 url(/landing/media/lp-poster.webp) center/cover no-repeat;min-height:560px"><video src="/landing/media/loop.mp4" preload="none" muted="" loop="" playsinline="" aria-label="Smiling woman in a café using her phone" width="640" height="464" style="width: 100%; height: 100%; aspect-ratio: 640 / 464; min-height: 560px; object-fit: cover; display: block; opacity: 0; transition: opacity .7s ease"></video></div>
 </section>
 
 <section id="faq" class="faqsec" aria-label="Frequently asked questions"><h2 class="stp-h">Questions, answered</h2><div class="faqs"><details><summary>What is gabis?</summary><p>gabis is an AI agent for collecting money. It handles payments, receipts, refunds, installments and reconciliation in one place, with stablecoin settlement across borders.</p></details><details><summary>Which countries does it work in?</summary><p>Nigeria, Kenya, Ghana, Uganda, Tanzania, South Sudan and Liberia, with more countries coming soon.</p></details><details><summary>Which currencies can I hold?</summary><p>One account holds 12 currency wallets, including naira, shillings, cedis, US dollars, British pounds and euros.</p></details><details><summary>How does invoicing work?</summary><p>Describe what you are owed in a single sentence. gabis drafts the invoice for you to review, then sends it and follows up on it.</p></details><details><summary>What is stablecoin settlement?</summary><p>Cross-border payments settle in stablecoins, around the clock, so you are not waiting on bank opening hours.</p></details><details><summary>How does gabis protect my money?</summary><p>gabis checks transfers for fraud and asks you to confirm anything unusual before money moves.</p></details><details><summary>What does it cost?</summary><p>Fees depend on the payment method and the country. Open an account to see exactly what applies before you pay anything.</p></details></div></section>
@@ -1473,5 +1479,14 @@ if('IntersectionObserver' in window&&!(window.matchMedia&&matchMedia('(prefers-r
 targets.forEach(function(x){x.classList.add('reveal')});
 var ro2=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting||en.boundingClientRect.top<0){en.target.classList.add('in');ro2.unobserve(en.target)}})},{rootMargin:'0px 0px -8% 0px',threshold:.04});targets.forEach(function(x){ro2.observe(x)});}
 })();</script>
+<script>
+(function(){var v=document.querySelector('#easy video');if(!v)return;v.muted=true;
+var calm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+v.addEventListener('playing',function(){v.style.opacity='1'});
+function play(){if(calm)return;var p=v.play();if(p&&p.catch)p.catch(function(){});}
+if(!('IntersectionObserver' in window)){v.preload='auto';play();return;}
+new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting&&!document.hidden){v.preload='auto';play();}else{v.pause();}});},{threshold:.25}).observe(v);
+document.addEventListener('visibilitychange',function(){if(document.hidden)v.pause();});})();
+</script>
 </body>
 </html>
