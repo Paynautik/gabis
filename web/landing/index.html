@@ -881,6 +881,23 @@ footer a{padding-top:5px;padding-bottom:5px}
 <style>
 @media (min-width:1025px){html[data-lang="pcm"] .heroB h1{font-size:clamp(40px,3.7vw,62px) !important}}
 </style>
+<style>
+/* Mobile and tablet: the three notes stay stacked like a deck until tapped */
+@media (max-width:1024px){
+.hstack{display:grid !important;padding-top:24px;margin-top:12px;cursor:pointer;position:relative}
+.hstack .hn{grid-area:1/1;align-self:end;transition:transform .3s ease,opacity .3s ease;text-align:left}
+.hstack .hn:nth-child(1){z-index:3}
+.hstack .hn:nth-child(2){z-index:2;transform:translateY(-10px) scale(.96);transform-origin:bottom center;opacity:.92}
+.hstack .hn:nth-child(3){z-index:1;transform:translateY(-20px) scale(.92);transform-origin:bottom center;opacity:.85}
+.hstack.open{display:flex !important;flex-direction:column;gap:10px;padding-top:0}
+.hstack.open .hn{transform:none !important;opacity:1 !important}
+.hstack::after{content:"Tap to see all";display:block;margin-top:8px;text-align:center;font:600 12px 'DM Sans',sans-serif;color:#6b6880}
+.hstack.open::after{content:"Tap to stack"}
+}
+@media (min-width:1025px){.hstack::after{display:none}}
+@media (prefers-reduced-motion:reduce){.hstack .hn{transition:none}}
+</style>
+
 </head>
 <body>
 
@@ -1579,5 +1596,8 @@ function set(l){h1.innerHTML=d[l].h;p.textContent=d[l].p;b.forEach(function(x){x
 b.forEach(function(x){x.addEventListener('click',function(){set(x.getAttribute('data-l'))})});
 try{var s=localStorage.getItem('gb-lang');if(s==='pcm')set('pcm')}catch(e){}})();</script>
 
+<script>(function(){var s=document.querySelector('.hstack');if(!s)return;s.setAttribute('role','button');s.setAttribute('tabindex','0');s.setAttribute('aria-expanded','false');s.setAttribute('aria-label','Payment notes, tap to show all');
+function tog(){var o=s.classList.toggle('open');s.setAttribute('aria-expanded',o?'true':'false')}
+s.addEventListener('click',tog);s.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}})})();</script>
 </body>
 </html>
