@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="web/landing/media/gabis-logo.png" alt="gabis" width="260">
+</p>
+
 # ElumoPay
 
 > **Get paid. Stay organized. Know your money.**
