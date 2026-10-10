@@ -8,12 +8,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap">
 <meta name="description" content="gabis: the AI agent that gets African businesses paid. Payments, receipts, refunds, installments and reconciliation in one place.">
-<link rel="canonical" href="https://gabispay.com/landing/">
+<link rel="canonical" href="https://gabispay.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="gabis">
 <meta property="og:title" content="gabis: get paid, stay organized, know your money">
 <meta property="og:description" content="The AI agent that gets African businesses paid. Payments, receipts, refunds, installments and reconciliation in one place.">
-<meta property="og:url" content="https://gabispay.com/landing/">
+<meta property="og:url" content="https://gabispay.com/">
 <meta property="og:image" content="https://gabispay.com/landing/media/og-gabis.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -860,6 +860,30 @@ header nav{gap:26px !important}
 .uses-note{margin:16px 0 0;font-size:13px;color:#6b6880}
 @media (max-width:1024px){.usesec{padding:0 20px 48px}.uses{grid-template-columns:1fr}}
 </style>
+<style>
+/* "How a business uses gabis": icon, one-line promise, short copy and a small sample result */
+.uses{gap:22px}
+.uses article{padding:28px;gap:14px;transition:transform .25s ease,box-shadow .25s ease}
+.uses article:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(22,18,58,.05),0 20px 40px rgba(22,18,58,.09)}
+.uico{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,var(--gb),#3a34c9);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -8px rgba(var(--gb-rgb),.6)}
+.uico svg{width:24px;height:24px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.uses .uh h3{margin:0}.uses .uh .sub{margin:4px 0 0;font-size:15px;font-weight:600;color:var(--gb)}
+@media (min-width:1025px){.uses article>p{min-height:5.6em}}
+.smp{margin-top:auto;background:#f6f3ee;border:1px solid #efe9de;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.smp small{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a86a0}
+.srw{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13.5px;color:#3a3552}
+.srw b{color:#16123a}.srw em{font-style:normal;font-weight:700;color:#6b6880;font-size:12.5px}.srw em.g{color:#0b8a63}
+.bar{height:8px;border-radius:99px;background:#e5dfd5;overflow:hidden}.bar i{display:block;height:100%;border-radius:99px;background:var(--gb)}
+.uses-note{font-size:13px;color:#6b6880}
+@media (prefers-reduced-motion:reduce){.uses article{transition:none}.uses article:hover{transform:none}}
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://gabispay.com/#org","name":"gabis","url":"https://gabispay.com/","logo":"https://gabispay.com/landing/media/gabis-logo.png","parentOrganization":{"@type":"Organization","name":"Paynautik","url":"https://paynautik.com"},"contactPoint":{"@type":"ContactPoint","contactType":"customer support","email":"support@paynautik.com"},"areaServed":["NG","KE","GH","UG","TZ","SS","LR"]},{"@type":"WebSite","@id":"https://gabispay.com/#site","url":"https://gabispay.com/","name":"gabis","publisher":{"@id":"https://gabispay.com/#org"}}]}</script>
+<style>
+.langsw{display:inline-flex;align-self:inherit;gap:2px;padding:3px;border-radius:99px;background:#fff;border:1px solid #e5dfd5;font:600 12px 'DM Sans',sans-serif}
+.langsw button{border:0;background:none;padding:5px 12px;border-radius:99px;color:#5f5b73;cursor:pointer;font:inherit}
+.langsw button[aria-pressed="true"]{background:var(--gb);color:#fff}
+@media (min-width:1025px){.hero-copy .langsw{align-self:flex-start}}
+</style>
 </head>
 <body>
 
@@ -892,7 +916,7 @@ a{color:#16123a}a:hover{color:var(--gb)}
 
 <div id="ticker" class="ticker" aria-label="Exchange rates" hidden><span class="tkr" data-k="NGN"><b>USDC/NGN</b><span class="tkr-v">…</span><span class="tkr-c"></span></span><span class="tkr" data-k="KES"><b>USDC/KES</b><span class="tkr-v">…</span><span class="tkr-c"></span></span><span class="tkr" data-k="GHS"><b>USDC/GHS</b><span class="tkr-v">…</span><span class="tkr-c"></span></span><span class="tkr" data-k="UGX"><b>USDC/UGX</b><span class="tkr-v">…</span><span class="tkr-c"></span></span><span class="tkr" data-k="BTC"><b>BTC/USD</b><span class="tkr-v">…</span><span class="tkr-c"></span></span></div>
 
-<section class="heroB" style="padding:72px 64px 64px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px"><div class="hchips2" aria-hidden="true"><span style="animation-delay:0s">₦</span><span style="animation-delay:1.8s">£</span><span style="animation-delay:3s">€</span><span style="animation-delay:1.2s">KSh</span><span style="animation-delay:.6s">$</span><span style="animation-delay:2.4s">GH₵</span></div><div class="hdots" aria-hidden="true"></div><div class="hero-copy"><span style="display:inline-flex;gap:8px;align-items:center;font-size:13px;font-weight:600;padding:7px 14px;border-radius:999px;border:1px solid #e5dfd5;background:#fff;color:#3a3552"><span style="width:8px;height:8px;border-radius:99px;background:var(--gb)"></span>AI collections for African business</span><h1 style="font-family:Sora,sans-serif;font-weight:700;letter-spacing:-.035em;margin:0;font-size:72px;line-height:1.02">Get paid.<br>Stay organized.<br><span style="color:var(--gb)">Know your money.</span></h1><p style="margin:0;font-size:20px;line-height:1.6;color:#4d4963;max-width:640px">Payments, receipts, refunds, installments and reconciliation in one AI agent, with stablecoin settlement across borders.</p><div><a href="/login" style="text-decoration:none;font-size:16px;font-weight:700;padding:17px 28px;border-radius:999px;background:var(--gb);color:#fff">Open your account</a></div></div><div style="position:relative;width:100%;max-width:640px;margin-top:18px"><img src="/landing/media/lp-hero-gabis-5.webp" width="880" height="1168" alt="Smiling woman holding up a phone that shows the gabis app with her balance and currencies" style="width:100%;height:700px;object-fit:cover;object-position:50% 0%;border-radius:28px;display:block"><div class="hstack"><div class="hn" style="text-align:left"><div style="display:flex;gap:8px;align-items:center;font-size:10px;font-weight:700;letter-spacing:.08em;color:#10b981"><img src="/icons/Icon-192.png" alt="" width="20" height="20" style="width:20px;height:20px;display:block">PAYMENT RECEIVED</div><div style="font-size:13px;line-height:1.4"><b style="font-size:16px">₦150,000</b> from Sarah Okafor<br>Invoice #0142 paid ✓</div><div style="font-size:11px;color:#5f5b73">Matched by AI · Zenith Bank · Just now</div></div><div class="hn" style="text-align:left"><div style="display:flex;gap:8px;align-items:center;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--gb)"><img src="/icons/Icon-192.png" alt="" width="20" height="20" style="width:20px;height:20px;display:block">RECEIPT SENT</div><div style="font-size:13px;line-height:1.4">Receipt for Invoice #0142<br>emailed to Sarah</div><div style="font-size:11px;color:#5f5b73">Automatic · 2 seconds ago</div></div><div class="hn" style="text-align:left"><div style="display:flex;gap:8px;align-items:center;font-size:10px;font-weight:700;letter-spacing:.08em;color:#ef7f5d"><img src="/icons/Icon-192.png" alt="" width="20" height="20" style="width:20px;height:20px;display:block">TAX SET ASIDE</div><div style="font-size:13px;line-height:1.4">₦11,250 VAT reserved<br>from this payment</div><div style="font-size:11px;color:#5f5b73">Ready for your next filing</div></div></div></div></section>
+<section class="heroB" style="padding:72px 64px 64px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:22px"><div class="hchips2" aria-hidden="true"><span style="animation-delay:0s">₦</span><span style="animation-delay:1.8s">£</span><span style="animation-delay:3s">€</span><span style="animation-delay:1.2s">KSh</span><span style="animation-delay:.6s">$</span><span style="animation-delay:2.4s">GH₵</span></div><div class="hdots" aria-hidden="true"></div><div class="hero-copy"><div class="langsw" role="group" aria-label="Language"><button type="button" data-l="en" aria-pressed="true">English</button><button type="button" data-l="pcm" aria-pressed="false">Pidgin</button></div><span style="display:inline-flex;gap:8px;align-items:center;font-size:13px;font-weight:600;padding:7px 14px;border-radius:999px;border:1px solid #e5dfd5;background:#fff;color:#3a3552"><span style="width:8px;height:8px;border-radius:99px;background:var(--gb)"></span>AI collections for African business</span><h1 style="font-family:Sora,sans-serif;font-weight:700;letter-spacing:-.035em;margin:0;font-size:72px;line-height:1.02">Get paid.<br>Stay organized.<br><span style="color:var(--gb)">Know your money.</span></h1><p style="margin:0;font-size:20px;line-height:1.6;color:#4d4963;max-width:640px">Payments, receipts, refunds, installments and reconciliation in one AI agent, with stablecoin settlement across borders.</p><div><a href="/login" style="text-decoration:none;font-size:16px;font-weight:700;padding:17px 28px;border-radius:999px;background:var(--gb);color:#fff">Open your account</a></div></div><div style="position:relative;width:100%;max-width:640px;margin-top:18px"><img src="/landing/media/lp-hero-gabis-5.webp" width="880" height="1168" alt="Smiling woman holding up a phone that shows the gabis app with her balance and currencies" style="width:100%;height:700px;object-fit:cover;object-position:50% 0%;border-radius:28px;display:block"><div class="hstack"><div class="hn" style="text-align:left"><div style="display:flex;gap:8px;align-items:center;font-size:10px;font-weight:700;letter-spacing:.08em;color:#10b981"><img src="/icons/Icon-192.png" alt="" width="20" height="20" style="width:20px;height:20px;display:block">PAYMENT RECEIVED</div><div style="font-size:13px;line-height:1.4"><b style="font-size:16px">₦150,000</b> from Sarah Okafor<br>Invoice #0142 paid ✓</div><div style="font-size:11px;color:#5f5b73">Matched by AI · Zenith Bank · Just now</div></div><div class="hn" style="text-align:left"><div style="display:flex;gap:8px;align-items:center;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--gb)"><img src="/icons/Icon-192.png" alt="" width="20" height="20" style="width:20px;height:20px;display:block">RECEIPT SENT</div><div style="font-size:13px;line-height:1.4">Receipt for Invoice #0142<br>emailed to Sarah</div><div style="font-size:11px;color:#5f5b73">Automatic · 2 seconds ago</div></div><div class="hn" style="text-align:left"><div style="display:flex;gap:8px;align-items:center;font-size:10px;font-weight:700;letter-spacing:.08em;color:#ef7f5d"><img src="/icons/Icon-192.png" alt="" width="20" height="20" style="width:20px;height:20px;display:block">TAX SET ASIDE</div><div style="font-size:13px;line-height:1.4">₦11,250 VAT reserved<br>from this payment</div><div style="font-size:11px;color:#5f5b73">Ready for your next filing</div></div></div></div></section>
 
 <section class="trust" aria-label="Where gabis works">
 <span class="trust-h">Built for business in</span>
@@ -910,12 +934,8 @@ a{color:#16123a}a:hover{color:var(--gb)}
 <section id="uses" class="usesec" aria-label="How businesses use gabis">
 <span class="eyebrow">WHAT IT LOOKS LIKE</span>
 <h2 class="sec-h">How a business uses gabis.</h2>
-<div class="uses">
-<article><span class="ex">Example scenario</span><h3>The freelancer</h3><p>Type one sentence to bill a client. Reminders go out before the due date and on the day, and a receipt is sent the moment the money lands.</p></article>
-<article><span class="ex">Example scenario</span><h3>The school bursar</h3><p>Set an instalment plan for each parent. gabis reminds them before every due date and matches each payment to the right child.</p></article>
-<article><span class="ex">Example scenario</span><h3>The shop owner</h3><p>Customers pay by transfer with messy references. gabis matches each payment to the right order, even when the name is spelt differently.</p></article>
-</div>
-<p class="uses-note">These are illustrations of what gabis does, not customer reviews.</p>
+<div class="uses"><article><span class="uico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg></span><div class="uh"><h3>The freelancer</h3><p class="sub">Bill a client with one sentence.</p></div><p>Reminders go out before the due date and on the day. The receipt is sent the moment the money lands.</p><div class="smp"><small>Sample</small><div class="srw"><b>Invoice #0143</b><em class="g">Paid ✓</em></div><div class="srw"><span>Tola · logo design</span><span>₦45,000</span></div></div></article><article><span class="uico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11.500V16c0 1.200 2.200 2.500 5 2.500s5-1.300 5-2.500v-4.500"/></svg></span><div class="uh"><h3>The school bursar</h3><p class="sub">One plan for every parent.</p></div><p>Set an instalment plan per parent. gabis reminds them before every due date and matches each payment to the right child.</p><div class="smp"><small>Sample</small><div class="srw"><b>Term 2 fees</b><em>2 of 3 paid</em></div><div class="bar"><i style="width:66%"></i></div></div></article><article><span class="uico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-1 11H5z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/></svg></span><div class="uh"><h3>The shop owner</h3><p class="sub">Messy transfers, matched.</p></div><p>Customers pay by transfer with messy references. gabis matches each payment to the right order, even when the name is spelt differently.</p><div class="smp"><small>Sample</small><div class="srw"><span>S OKAFOR BRND DSGN</span></div><div class="srw"><b>Matched to Order #12</b><em class="g">✓</em></div></div></article></div>
+<p class="uses-note">Illustrations of what gabis does, not customer reviews.</p>
 </section>
 
 <section id="app" style="padding: 104px 64px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px; align-items: center">
@@ -1340,6 +1360,7 @@ a{color:#16123a}a:hover{color:var(--gb)}
 <div style="max-width: 900px">gabis is a financial technology company, not a bank. Money remittance and banking services are provided by our licensed financial institution partners.</div>
 <div>© 2026 gabis</div>
 </div>
+<div style="display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:center;font-size:14px;color:#b8b8b8;padding-top:8px"><span>Built by <a href="https://paynautik.com" rel="noopener" style="color:#ffffff;font-weight:700;text-decoration:none">Paynautik</a></span><span aria-hidden="true">·</span><a href="/about" style="color:#b8b8b8;text-decoration:none">About</a><span aria-hidden="true">·</span><a href="mailto:support@paynautik.com" style="color:#b8b8b8;text-decoration:none">support@paynautik.com</a></div>
 </footer>
 </div>
 
@@ -1560,5 +1581,12 @@ var mid=(right+left)/2,amp=Math.min(gap*.2,36*z);
 chips.forEach(function(c,i){c.style.left=((mid+jx[i]*amp)-sr.left)/z+'px';c.style.top=(sr.height*fy[i])/z+'px'});
 box.classList.add('ready')}
 place();window.addEventListener('resize',place);window.addEventListener('load',place);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(place)})();</script>
+<script>(function(){var d={en:{h:'Get paid.<br>Stay organized.<br><span style="color:var(--gb)">Know your money.</span>',p:'Payments, receipts, refunds, installments and reconciliation in one AI agent, with stablecoin settlement across borders.'},pcm:{h:'Collect your money.<br>Keep your books for order.<br><span style="color:var(--gb)">Know where your money dey.</span>',p:'Payment, receipt, refund, installment and reconciliation, all inside one AI agent, with stablecoin settlement wey go cross border.'}};
+var h1=document.querySelector('.heroB h1'),p=document.querySelector('.hero-copy p'),b=document.querySelectorAll('.langsw button');if(!h1||!p||!b.length)return;
+var keep={h:h1.innerHTML,p:p.textContent};d.en={h:keep.h,p:keep.p};
+function set(l){h1.innerHTML=d[l].h;p.textContent=d[l].p;b.forEach(function(x){x.setAttribute('aria-pressed',x.getAttribute('data-l')===l?'true':'false')});document.documentElement.setAttribute('data-lang',l==='pcm'?'pcm':'en');try{localStorage.setItem('gb-lang',l)}catch(e){}}
+b.forEach(function(x){x.addEventListener('click',function(){set(x.getAttribute('data-l'))})});
+try{var s=localStorage.getItem('gb-lang');if(s==='pcm')set('pcm')}catch(e){}})();</script>
+
 </body>
 </html>
