@@ -878,6 +878,9 @@ footer a{padding-top:5px;padding-bottom:5px}
 .sl-p1 .xlede{max-width:620px !important}
 }
 </style>
+<style>
+@media (min-width:1025px){html[data-lang="pcm"] .heroB h1{font-size:clamp(40px,3.7vw,62px) !important}}
+</style>
 </head>
 <body>
 
@@ -1562,17 +1565,17 @@ document.addEventListener('visibilitychange',function(){if(document.hidden)v.pau
 function place(){if(window.innerWidth<1025){box.classList.remove('ready');return}
 var sr=sec.getBoundingClientRect(),z=sr.width/sec.offsetWidth||1;
 var right=0,rs=[sec.querySelector('.hero-copy h1'),sec.querySelector('.hero-copy p'),sec.querySelector('.hero-copy a'),sec.querySelector('.hero-copy > span')];
-rs.forEach(function(e){if(!e)return;var r;if(e.tagName==='H1'){var g=document.createRange();g.selectNodeContents(e);r=g.getBoundingClientRect()}else r=e.getBoundingClientRect();if(r.right>right)right=r.right});
+rs.forEach(function(e){if(!e)return;var r;if(e.tagName==='H1'||e.tagName==='P'){var g=document.createRange();g.selectNodeContents(e);r=g.getBoundingClientRect()}else r=e.getBoundingClientRect();if(r.right>right)right=r.right});
 var img=sec.querySelector('img');if(!img)return;var left=img.getBoundingClientRect().left;var gap=left-right;
 if(gap<84*z){box.classList.remove('ready');return}
 var mid=(right+left)/2,amp=Math.min(gap*.2,36*z);
 chips.forEach(function(c,i){c.style.left=((mid+jx[i]*amp)-sr.left)/z+'px';c.style.top=(sr.height*fy[i])/z+'px'});
 box.classList.add('ready')}
-place();window.addEventListener('resize',place);window.addEventListener('load',place);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(place)})();</script>
+window.__placeChips=place;place();window.addEventListener('resize',place);window.addEventListener('load',place);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(place)})();</script>
 <script>(function(){var d={en:{h:'Get paid.<br>Stay organized.<br><span style="color:var(--gb)">Know your money.</span>',p:'Payments, receipts, refunds, installments and reconciliation in one AI agent, with stablecoin settlement across borders.'},pcm:{h:'Collect your money.<br>Keep your books for order.<br><span style="color:var(--gb)">Know where your money dey.</span>',p:'Payment, receipt, refund, installment and reconciliation, all inside one AI agent, with stablecoin settlement wey go cross border.'}};
 var h1=document.querySelector('.heroB h1'),p=document.querySelector('.hero-copy p'),b=document.querySelectorAll('.langsw button');if(!h1||!p||!b.length)return;
 var keep={h:h1.innerHTML,p:p.textContent};d.en={h:keep.h,p:keep.p};
-function set(l){h1.innerHTML=d[l].h;p.textContent=d[l].p;b.forEach(function(x){x.setAttribute('aria-pressed',x.getAttribute('data-l')===l?'true':'false')});document.documentElement.setAttribute('data-lang',l==='pcm'?'pcm':'en');try{localStorage.setItem('gb-lang',l)}catch(e){}}
+function set(l){h1.innerHTML=d[l].h;p.textContent=d[l].p;b.forEach(function(x){x.setAttribute('aria-pressed',x.getAttribute('data-l')===l?'true':'false')});document.documentElement.setAttribute('data-lang',l==='pcm'?'pcm':'en');if(window.__placeChips){window.__placeChips();setTimeout(window.__placeChips,60)}try{localStorage.setItem('gb-lang',l)}catch(e){}}
 b.forEach(function(x){x.addEventListener('click',function(){set(x.getAttribute('data-l'))})});
 try{var s=localStorage.getItem('gb-lang');if(s==='pcm')set('pcm')}catch(e){}})();</script>
 
