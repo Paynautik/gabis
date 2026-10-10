@@ -781,6 +781,30 @@ button.mb.danger{background:#16123a !important}
 .hdots{position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(rgba(var(--gb-rgb),.35) 1.4px,transparent 1.6px);background-size:22px 22px;-webkit-mask-image:radial-gradient(60% 90% at 62% 50%,#000 10%,transparent 75%);mask-image:radial-gradient(60% 90% at 62% 50%,#000 10%,transparent 75%)}
 }
 </style>
+<style>
+/* "The agent that does the chasing": same four cards, aligned and a little richer */
+#ai>div:first-child{align-items:flex-end}
+#ai h2{font-size:46px !important;line-height:1.08 !important;letter-spacing:-.025em !important;max-width:760px !important}
+#ai>div:first-child p{font-size:17px !important;max-width:400px !important}
+#ai .agc{padding:28px;gap:12px;box-shadow:0 1px 2px rgba(22,18,58,.04),0 14px 32px rgba(22,18,58,.05);border-color:#ebe6dc}
+#ai .agc p{min-height:3.2em;font-size:15px;color:#4d4963}
+#ai .agc h4{font-size:21px;margin-top:10px}
+#ai .agc-ico{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,var(--gb),#3a34c9)}
+#ai .agc-tag{font-size:10.5px;padding:6px 11px}
+#ai .agc-panel{min-height:214px;padding:14px;gap:10px;background:#f6f3ee;border:1px solid #efe9de}
+#ai .agc-row{padding:11px 13px;border-radius:12px}
+#ai .agc-row small{font-size:11px}#ai .agc-row b{font-size:13.5px}
+#ai .agc-arrow{font-size:11px}
+#ai .agc-bub{font-size:13px;padding:10px 13px}
+#ai .agc-chip{font-size:11px;padding:5px 11px}
+#ai .agc-vn{font-size:15px}#ai .agc-vs{font-size:12px}
+.agc-wave{display:flex;align-items:center;gap:3px;height:22px;margin-top:12px}
+.agc-wave i{display:block;width:3px;border-radius:2px;background:var(--gb);opacity:.55;animation:agw 1.3s ease-in-out infinite}
+.agc-wave i:nth-child(1){height:6px}.agc-wave i:nth-child(2){height:14px;animation-delay:.1s}.agc-wave i:nth-child(3){height:20px;animation-delay:.2s}.agc-wave i:nth-child(4){height:10px;animation-delay:.3s}.agc-wave i:nth-child(5){height:18px;animation-delay:.4s}.agc-wave i:nth-child(6){height:8px;animation-delay:.5s}.agc-wave i:nth-child(7){height:16px;animation-delay:.6s}.agc-wave i:nth-child(8){height:12px;animation-delay:.7s}.agc-wave i:nth-child(9){height:6px;animation-delay:.8s}
+@keyframes agw{50%{transform:scaleY(.45)}}
+@media (prefers-reduced-motion:reduce){.agc-wave i{animation:none}}
+@media (max-width:1024px){#ai h2{font-size:34px !important}#ai .agc p{min-height:0}}
+</style>
 </head>
 <body>
 
@@ -888,7 +912,7 @@ a{color:#16123a}a:hover{color:var(--gb)}
 </div>
 <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px">
 <article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h6l2-4 2 8 2-4h4"></path></svg></span><span class="agc-tag">Match</span></div><h4>Reconciliation engine</h4><p>Maps messy interbank feeds to invoices, even with fuzzy names.</p><div class="agc-demo"><div class="agc-panel"><div class="agc-row"><small>Zenith · NIP transfer</small><b>S OKAFOR BRND DSGN</b></div><div class="agc-arrow">matched by AI</div><div class="agc-row ok"><small>Invoice #0142</small><b>₦150,000 · Paid ✓</b></div></div></div></article>
-<article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg></span><span class="agc-tag">Call</span></div><h4>Voice reminders</h4><p>Localized, polite robot calls to customers with balances due.</p><div class="agc-demo"><div class="agc-panel agc-voice"><span class="agc-spk" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="#fff"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg></span><b class="agc-vn">Calling Sarah Okafor</b><small class="agc-vs">Payment reminder · ₦150,000 due</small></div></div></article>
+<article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg></span><span class="agc-tag">Call</span></div><h4>Voice reminders</h4><p>Localized, polite robot calls to customers with balances due.</p><div class="agc-demo"><div class="agc-panel agc-voice"><span class="agc-spk" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z" fill="#fff"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg></span><b class="agc-vn">Calling Sarah Okafor</b><small class="agc-vs">Payment reminder · ₦150,000 due</small><span class="agc-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div></div></article>
 <article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"></path><path d="M9 12h7M9 16h5"></path></svg></span><span class="agc-tag">Draft</span></div><h4>Invoice assistant</h4><p>“Bill Sarah 150k for brand design” becomes a ready invoice.</p><div class="agc-demo"><div class="agc-panel"><div class="agc-bub">Bill Sarah 150k for brand design</div><div class="agc-row"><small>Brand design × 1</small><b>₦150,000</b></div><div class="agc-chip">Draft ready to send</div></div></div></article>
 <article class="agc"><div class="agc-top"><span class="agc-ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg></span><span class="agc-tag">Ask</span></div><h4>Ask your money</h4><p>“Who has overdue installments?” Answers from your own history.</p><div class="agc-demo"><div class="agc-panel"><div class="agc-bub">Who has overdue installments?</div><div class="agc-row"><small>2 overdue</small><b>Sarah Okafor · Tunde B.</b></div><div class="agc-chip">From your own history</div></div></div></article>
 </div>
