@@ -711,6 +711,15 @@ button.mb.danger{background:#16123a !important}
 @media print{body *{visibility:hidden}#invDoc,#invDoc *{visibility:visible}#invDoc{position:absolute;left:0;top:0;width:100%;box-shadow:none}.inv-foot{display:none}}
 @media (max-width:1024px){.inv-meta{grid-template-columns:1fr}}
 </style>
+<style>
+/* Three steps: a calm row of three cards, no phone, no tall scroll area */
+.story{grid-template-columns:1fr !important}
+.story-steps .sec-h{margin-bottom:24px}
+.stp{flex-direction:row !important;gap:20px}
+.stp>li{flex:1 1 0;min-height:0 !important;opacity:1 !important;background:#fff;border:1px solid #e5dfd5;border-radius:20px;padding:26px !important;justify-content:flex-start !important}
+.stp>li>b{font-size:21px !important}.stp>li>p{font-size:16px !important}
+@media (max-width:1024px){.stp{flex-direction:column !important}}
+</style>
 </head>
 <body>
 
@@ -763,11 +772,11 @@ a{color:#16123a}a:hover{color:var(--gb)}
 <div class="story-steps">
 <h2 class="sec-h">Three steps. No spreadsheets.</h2>
 <ol class="stp">
-<li data-step="1"><span>1</span><b>Say what you are owed</b><p>One sentence is enough. Add your business once and your wallets are ready.</p><div class="mini" data-mini="1"></div></li>
-<li data-step="2"><span>2</span><b>gabis drafts and sends it</b><p>You review the invoice, then gabis sends it and follows up for you.</p><div class="mini" data-mini="2"></div></li>
-<li data-step="3"><span>3</span><b>Get paid, matched automatically</b><p>Payments are matched to the invoice, receipts go out and reminders chase what is late.</p><div class="mini" data-mini="3"></div></li>
+<li data-step="1"><span>1</span><b>Say what you are owed</b><p>One sentence is enough. Add your business once and your wallets are ready.</p></li>
+<li data-step="2"><span>2</span><b>gabis drafts and sends it</b><p>You review the invoice, then gabis sends it and follows up for you.</p></li>
+<li data-step="3"><span>3</span><b>Get paid, matched automatically</b><p>Payments are matched to the invoice, receipts go out and reminders chase what is late.</p></li>
 </ol></div>
-<div class="story-phone" aria-hidden="true"><div id="devScreen"></div></div>
+
 </div></section>
 
 <section id="rates" class="ratesec" aria-label="Currency converter">
