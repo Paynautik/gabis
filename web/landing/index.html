@@ -732,11 +732,13 @@ button.mb.danger{background:#16123a !important}
 @media (max-width:1024px){.hero-copy{display:flex;flex-direction:column;align-items:center;gap:22px}}
 </style>
 <style>
-/* Hero background (desktop): a soft glow behind the photo and one thin ring around it */
+/* Hero background (desktop): a soft glow and one thin oval ring, both kept inside the hero so nothing is cut off */
 @media (min-width:1025px){
 .heroB{position:relative;overflow:hidden;isolation:isolate}
-.heroB::before{content:"";position:absolute;inset:auto;right:-260px;top:50%;width:1500px;height:1100px;transform:translateY(-50%);background:radial-gradient(closest-side,rgba(var(--gb-rgb),.20),rgba(var(--gb-rgb),.08) 55%,rgba(var(--gb-rgb),0) 80%);pointer-events:none;z-index:-1}
-.heroB::after{content:"";position:absolute;right:-110px;top:50%;width:960px;height:960px;transform:translateY(-50%);border:1.5px solid rgba(var(--gb-rgb),.18);border-radius:50%;pointer-events:none;z-index:-1}
+.heroB::before{content:"";position:absolute;inset:auto;right:-120px;top:50%;width:1300px;height:620px;transform:translateY(-50%);background:radial-gradient(closest-side,rgba(var(--gb-rgb),.20),rgba(var(--gb-rgb),.08) 55%,rgba(var(--gb-rgb),0) 80%);pointer-events:none;z-index:-1}
+.heroB::after{display:none}
+.heroB>div:last-child{position:relative}
+.heroB>div:last-child::before{content:"";position:absolute;inset:-40px -56px;border:1.5px solid rgba(var(--gb-rgb),.22);border-radius:50%;pointer-events:none;z-index:-1}
 }
 </style>
 <style>
