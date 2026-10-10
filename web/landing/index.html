@@ -807,6 +807,20 @@ button.mb.danger{background:#16123a !important}
 .faqs{margin:0 auto;text-align:left}
 @media (prefers-reduced-motion:reduce){#easy video{transition:none}}
 </style>
+<style>
+/* Stats row: trim the empty space above and below the four numbers */
+#stats{padding-top:36px !important;padding-bottom:40px !important;gap:24px !important}
+#stats>div{padding:20px 0 !important}
+@media (max-width:1024px){#stats{padding-top:28px !important;padding-bottom:32px !important}}
+</style>
+<style>
+/* Header: thinner bar (smaller logo, tighter padding and buttons) */
+header{padding-top:9px !important;padding-bottom:9px !important}
+header a[aria-label="gabis home"] img{height:34px !important}
+header a[href="/login"]:first-of-type{padding:8px 14px !important}
+header [style*="padding: 12px 22px"]{padding:8px 18px !important}
+header nav{gap:26px !important}
+</style>
 </head>
 <body>
 
@@ -1188,7 +1202,7 @@ a{color:#16123a}a:hover{color:var(--gb)}
 
 <footer style="margin-top: auto; background: #1a1147; color: #ffffff; padding: 96px 64px 48px; border-top: 1px solid rgba(255,255,255,0.14); display: flex; flex-direction: column; gap: 56px">
 <div style="display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
-<h2 style="margin: 0; font-size: 40px; font-weight: 700; letter-spacing: -0.02em">STAY AHEAD OF THE CURVE</h2>
+<h2 style="margin: 0; font-size: 40px; font-weight: 700; letter-spacing: -0.02em">BE THE FIRST TO KNOW</h2>
 <p style="margin: 0; font-size: 16px; color: #b8b8b8">Product updates and new currency corridors. No noise.</p>
 <form id="nl-form" novalidate style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 10px">
 <label for="nl-email" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Email address</label>
