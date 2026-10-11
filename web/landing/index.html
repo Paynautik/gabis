@@ -927,6 +927,16 @@ header{position:sticky}
 .hchips2 span{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;min-width:38px;height:30px;padding:0 11px;border-radius:99px;background:#fff;border:1px solid #e1dbcf;color:var(--gb);font:700 13px 'DM Sans',sans-serif;box-shadow:0 8px 20px rgba(22,18,58,.12);animation:hcf 7s ease-in-out infinite alternate}
 }
 </style>
+<style>
+/* Phones: card groups become swipeable rows (snap to each card) instead of one long column */
+@media (max-width:720px){
+.csteps,.fgrid,.lgrid,.tgrid,.st-grid,#ai>div[style*="repeat(4"]{display:flex !important;flex-direction:row !important;overflow-x:auto;overflow-y:visible;scroll-snap-type:x mandatory;gap:14px !important;padding:8px 20px 18px;margin-left:-20px !important;margin-right:-20px !important;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.csteps::-webkit-scrollbar,.fgrid::-webkit-scrollbar,.lgrid::-webkit-scrollbar,.tgrid::-webkit-scrollbar,.st-grid::-webkit-scrollbar,#ai>div[style*="repeat(4"]::-webkit-scrollbar{display:none}
+.csteps>*,.fgrid>*,.lgrid>*,.tgrid>*,.st-grid>*,#ai>div[style*="repeat(4"]>*{flex:0 0 82% !important;min-width:0;scroll-snap-align:center;scroll-snap-stop:always}
+.cstep:not(:last-child)::after{display:none !important}
+.csteps{position:relative}
+}
+</style>
 </head>
 <body>
 
@@ -1637,5 +1647,6 @@ s.addEventListener('click',tog);s.addEventListener('keydown',function(e){if(e.ke
 <script>(function(){var b=document.querySelector('.mburger'),p=document.getElementById('mpanel');if(!b||!p)return;function set(o){b.setAttribute('aria-expanded',o?'true':'false');if(o)p.removeAttribute('hidden');else p.setAttribute('hidden','')}
 b.addEventListener('click',function(){set(b.getAttribute('aria-expanded')!=='true')});p.addEventListener('click',function(e){if(e.target.tagName==='A')set(false)});document.addEventListener('keydown',function(e){if(e.key==='Escape')set(false)});window.addEventListener('resize',function(){if(innerWidth>1024)set(false)})})();</script>
 
+<script>(function(){if(!window.matchMedia||!matchMedia('(max-width:720px)').matches)return;var sel=['.csteps','.fgrid','.lgrid','.tgrid','.st-grid','#ai>div[style*="repeat(4"]'];sel.forEach(function(s){document.querySelectorAll(s).forEach(function(r,i){r.setAttribute('tabindex','0');r.setAttribute('role','region');r.setAttribute('aria-label','Cards, swipe sideways')})})})();</script>
 </body>
 </html>
