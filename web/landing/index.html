@@ -906,6 +906,27 @@ footer a{padding-top:5px;padding-bottom:5px}
 #start>div:last-child>p{max-width:520px}
 }
 </style>
+<style>
+/* Phones and tablets: a menu button in place of the hidden nav links, and the hero's dots, glow and chips */
+.mburger,.mpanel{display:none}
+@media (max-width:1024px){
+header{position:sticky}
+.mburger{display:flex;flex-direction:column;justify-content:center;gap:5px;width:40px;height:40px;margin-left:8px;border:0;border-radius:12px;background:rgba(255,255,255,.12);cursor:pointer;padding:0 11px;flex:none}
+.mburger i{display:block;height:2px;border-radius:2px;background:#fff;transition:transform .25s,opacity .2s}
+.mburger[aria-expanded="true"] i:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.mburger[aria-expanded="true"] i:nth-child(2){opacity:0}
+.mburger[aria-expanded="true"] i:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mpanel:not([hidden]){display:flex;flex-direction:column;position:absolute;left:0;right:0;top:100%;background:#1a1147;border-bottom:1px solid rgba(255,255,255,.14);padding:8px 20px 16px;z-index:60;box-shadow:0 24px 40px rgba(10,6,40,.35)}
+.mpanel a{color:#fff;text-decoration:none;font:700 17px 'DM Sans',sans-serif;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.mpanel a:last-child{border-bottom:0}
+.heroB{position:relative;overflow:hidden;isolation:isolate}
+.hdots{display:block !important;position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(rgba(var(--gb-rgb),.30) 1.2px,transparent 1.5px);background-size:20px 20px;-webkit-mask-image:radial-gradient(80% 60% at 50% 70%,#000 10%,transparent 78%);mask-image:radial-gradient(80% 60% at 50% 70%,#000 10%,transparent 78%)}
+.heroB::before{content:"";position:absolute;left:50%;top:62%;width:140%;height:70%;transform:translate(-50%,-50%);background:radial-gradient(closest-side,rgba(var(--gb-rgb),.20),rgba(var(--gb-rgb),.07) 55%,rgba(var(--gb-rgb),0) 80%);pointer-events:none;z-index:-1}
+.hchips2{display:block;position:absolute;inset:0;pointer-events:none;z-index:2;visibility:hidden}
+.hchips2.ready{visibility:visible}
+.hchips2 span{position:absolute;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;min-width:38px;height:30px;padding:0 11px;border-radius:99px;background:#fff;border:1px solid #e1dbcf;color:var(--gb);font:700 13px 'DM Sans',sans-serif;box-shadow:0 8px 20px rgba(22,18,58,.12);animation:hcf 7s ease-in-out infinite alternate}
+}
+</style>
 </head>
 <body>
 
@@ -933,7 +954,7 @@ a{color:#16123a}a:hover{color:var(--gb)}
 <a href="/login" style="text-decoration: none; font-size: 15px; font-weight: 500; padding: 12px 18px; color: #ffffff">Log in</a>
 <a href="/login" style="text-decoration: none; font-size: 15px; font-weight: 700; padding: 12px 22px; border-radius: 999px; background: var(--gb); color: #ffffff">Create account</a>
 </div>
-</header>
+<button type="button" class="mburger" aria-label="Menu" aria-expanded="false" aria-controls="mpanel"><i></i><i></i><i></i></button><div class="mpanel" id="mpanel" hidden><a href="#app">App</a><a href="#collect">Collections</a><a href="#intel">Intelligence</a><a href="#who">Business</a><a href="#rails">Stablecoin rails</a><a href="#tax">Tax</a><a href="/tools">Free tools</a><a href="/trust">Trust framework</a></div></header>
 <main id="main">
 
 <div id="ticker" class="ticker" aria-label="Exchange rates" hidden><span class="tkr" data-k="NGN"><b>USDC/NGN</b><span class="tkr-v">…</span><span class="tkr-c"></span></span><span class="tkr" data-k="KES"><b>USDC/KES</b><span class="tkr-v">…</span><span class="tkr-c"></span></span><span class="tkr" data-k="GHS"><b>USDC/GHS</b><span class="tkr-v">…</span><span class="tkr-c"></span></span><span class="tkr" data-k="UGX"><b>USDC/UGX</b><span class="tkr-v">…</span><span class="tkr-c"></span></span><span class="tkr" data-k="BTC"><b>BTC/USD</b><span class="tkr-v">…</span><span class="tkr-c"></span></span></div>
@@ -1579,7 +1600,7 @@ fetch('/api/rates').then(function(r){return r.ok?r.json():Promise.reject()}).the
 [ra,rf,rt].forEach(function(x){x.addEventListener('input',calc);x.addEventListener('change',calc)});
 rs.addEventListener('click',function(){var a=rf.value;rf.value=rt.value;rt.value=a;calc()})}
 /* ---- entrance motion ---- */
-if('IntersectionObserver' in window&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){var targets=document.querySelectorAll('.trysec,.stepsec,.ratesec,.faqsec,#stats,#app,.xsec,#easy,.trust');
+if('IntersectionObserver' in window&&!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){var targets=document.querySelectorAll('.trysec,.stepsec,.ratesec,.faqsec,#stats,#app,.xsec,#easy,.trust,#start,footer');
 targets.forEach(function(x){x.classList.add('reveal')});
 var ro2=new IntersectionObserver(function(es){es.forEach(function(en){if(en.isIntersecting||en.boundingClientRect.top<0){en.target.classList.add('in');ro2.unobserve(en.target)}})},{rootMargin:'0px 0px -8% 0px',threshold:.04});targets.forEach(function(x){ro2.observe(x)});}
 })();</script>
@@ -1593,7 +1614,7 @@ new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting
 document.addEventListener('visibilitychange',function(){if(document.hidden)v.pause();});})();
 </script>
 <script>(function(){var sec=document.querySelector('.heroB'),box=document.querySelector('.hchips2');if(!sec||!box)return;var chips=box.querySelectorAll('span');var fy=[.10,.27,.44,.60,.76,.90],jx=[-.5,.6,-.2,.7,-.6,.3];
-function place(){if(window.innerWidth<1025){box.classList.remove('ready');return}
+function place(){if(window.innerWidth<1025){var sr0=sec.getBoundingClientRect(),z0=sr0.width/sec.offsetWidth||1,im=sec.querySelector('img');if(!im){return}var ib=im.getBoundingClientRect();var pts=[[0,.07],[1,.40],[0,.24],[1,.62],[0,.94],[1,.82]];chips.forEach(function(c,i){var p=pts[i];c.style.left=((p[0]?ib.right-24*z0:ib.left+24*z0)-sr0.left)/z0+'px';c.style.top=(ib.top-sr0.top+ib.height*p[1])/z0+'px'});box.classList.add('ready');return}
 var sr=sec.getBoundingClientRect(),z=sr.width/sec.offsetWidth||1;
 var right=0,rs=[sec.querySelector('.hero-copy h1'),sec.querySelector('.hero-copy p'),sec.querySelector('.hero-copy a'),sec.querySelector('.hero-copy > span')];
 rs.forEach(function(e){if(!e)return;var r;if(e.tagName==='H1'||e.tagName==='P'){var g=document.createRange();g.selectNodeContents(e);r=g.getBoundingClientRect()}else r=e.getBoundingClientRect();if(r.right>right)right=r.right});
@@ -1613,5 +1634,8 @@ try{var s=localStorage.getItem('gb-lang');if(s==='pcm')set('pcm')}catch(e){}})()
 <script>(function(){var s=document.querySelector('.hstack');if(!s)return;s.setAttribute('role','button');s.setAttribute('tabindex','0');s.setAttribute('aria-expanded','false');s.setAttribute('aria-label','Payment notes, tap to show all');
 function tog(){var o=s.classList.toggle('open');s.setAttribute('aria-expanded',o?'true':'false')}
 s.addEventListener('click',tog);s.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}})})();</script>
+<script>(function(){var b=document.querySelector('.mburger'),p=document.getElementById('mpanel');if(!b||!p)return;function set(o){b.setAttribute('aria-expanded',o?'true':'false');if(o)p.removeAttribute('hidden');else p.setAttribute('hidden','')}
+b.addEventListener('click',function(){set(b.getAttribute('aria-expanded')!=='true')});p.addEventListener('click',function(e){if(e.target.tagName==='A')set(false)});document.addEventListener('keydown',function(e){if(e.key==='Escape')set(false)});window.addEventListener('resize',function(){if(innerWidth>1024)set(false)})})();</script>
+
 </body>
 </html>
