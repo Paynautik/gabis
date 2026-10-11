@@ -928,6 +928,16 @@ header{position:sticky}
 }
 </style>
 <style>
+/* Phones: card groups become swipeable rows (snap to each card) instead of one long column */
+@media (max-width:720px){
+.csteps,.fgrid,.lgrid,.tgrid,.st-grid,#ai>div[style*="repeat(4"]{display:flex !important;flex-direction:row !important;overflow-x:auto;overflow-y:visible;scroll-snap-type:x mandatory;gap:14px !important;padding:8px 20px 18px;margin-left:-20px !important;margin-right:-20px !important;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.csteps::-webkit-scrollbar,.fgrid::-webkit-scrollbar,.lgrid::-webkit-scrollbar,.tgrid::-webkit-scrollbar,.st-grid::-webkit-scrollbar,#ai>div[style*="repeat(4"]::-webkit-scrollbar{display:none}
+.csteps>*,.fgrid>*,.lgrid>*,.tgrid>*,.st-grid>*,#ai>div[style*="repeat(4"]>*{flex:0 0 82% !important;min-width:0;scroll-snap-align:center;scroll-snap-stop:always}
+.cstep:not(:last-child)::after{display:none !important}
+.csteps{position:relative}
+}
+</style>
+<style>
 /* Phones: show the page at full size instead of the desktop design's 75% scale, so text and buttons are readable and easy to tap */
 @media (max-width:720px){
 body>div[style*="zoom"]{zoom:1 !important}
@@ -945,9 +955,6 @@ footer a{padding-top:10px !important;padding-bottom:10px !important}
 .langsw button{padding:9px 16px !important}
 main a[href^="/"]:not([style*="padding"]){display:inline-block;padding-top:8px;padding-bottom:8px}
 }
-</style>
-<style>
-@media (max-width:720px){.csteps,.fgrid,.lgrid,.tgrid,.st-grid{grid-template-columns:minmax(0,1fr) !important}.lgrid>*,.fgrid>*,.tgrid>*,.csteps>*,.st-grid>*{min-width:0}}
 </style>
 </head>
 <body>
@@ -1659,5 +1666,6 @@ s.addEventListener('click',tog);s.addEventListener('keydown',function(e){if(e.ke
 <script>(function(){var b=document.querySelector('.mburger'),p=document.getElementById('mpanel');if(!b||!p)return;function set(o){b.setAttribute('aria-expanded',o?'true':'false');if(o)p.removeAttribute('hidden');else p.setAttribute('hidden','')}
 b.addEventListener('click',function(){set(b.getAttribute('aria-expanded')!=='true')});p.addEventListener('click',function(e){if(e.target.tagName==='A')set(false)});document.addEventListener('keydown',function(e){if(e.key==='Escape')set(false)});window.addEventListener('resize',function(){if(innerWidth>1024)set(false)})})();</script>
 
+<script>(function(){if(!window.matchMedia||!matchMedia('(max-width:720px)').matches)return;var sel=['.csteps','.fgrid','.lgrid','.tgrid','.st-grid','#ai>div[style*="repeat(4"]'];sel.forEach(function(s){document.querySelectorAll(s).forEach(function(r,i){r.setAttribute('tabindex','0');r.setAttribute('role','region');r.setAttribute('aria-label','Cards, swipe sideways')})})})();</script>
 </body>
 </html>
