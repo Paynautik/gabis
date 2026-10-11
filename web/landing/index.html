@@ -937,6 +937,25 @@ header{position:sticky}
 .csteps{position:relative}
 }
 </style>
+<style>
+/* Phones: show the page at full size instead of the desktop design's 75% scale, so text and buttons are readable and easy to tap */
+@media (max-width:720px){
+body>div[style*="zoom"]{zoom:1 !important}
+.heroB h1{font-size:34px !important;line-height:1.06 !important}
+.heroB .hero-copy p{font-size:17px !important;line-height:1.55 !important}
+.xh2,.xh2.big,.sec-h,#ai h2,.sl-p1 .xh2.caps,.onel{font-size:28px !important;line-height:1.12 !important}
+.xsec{padding-top:44px !important}
+section{padding-top:44px !important;padding-bottom:44px !important}
+#stats{padding-top:24px !important;padding-bottom:28px !important}
+#app{padding-top:36px !important;padding-bottom:36px !important}
+#sl-how,#intel,#sl-more,#stories{padding-bottom:44px !important}
+#easy>div{padding:28px 20px !important}
+.pstage{transform:scale(.92);transform-origin:top center}
+footer a{padding-top:10px !important;padding-bottom:10px !important}
+.langsw button{padding:9px 16px !important}
+main a[href^="/"]:not([style*="padding"]){display:inline-block;padding-top:8px;padding-bottom:8px}
+}
+</style>
 </head>
 <body>
 
